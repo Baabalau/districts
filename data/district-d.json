@@ -1,0 +1,62 @@
+[
+  {
+    "name": "Sports Vue",
+    "amenity": "pub",
+    "lat": 29.9747964,
+    "lng": -90.0569352,
+    "phone": "+1 504 9401111",
+    "website": "http://www.sportsvuenola.com",
+    "address": "New Orleans, LA",
+    "hours": "14:00-01:00",
+    "cuisine": "",
+    "image": "https://images.unsplash.com/photo-1517650862521-d580d5348145?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
+  },
+  {
+    "name": "Seal's Class Act",
+    "amenity": "bar",
+    "lat": 29.9787187,
+    "lng": -90.0686369,
+    "phone": "(504) 713-5598",
+    "website": "",
+    "address": "New Orleans, LA",
+    "hours": "3:00 PM - 1:00 AM",
+    "cuisine": "",
+    "image": "https://images.unsplash.com/photo-1574169208507-84376144848b?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
+  },
+  {
+    "name": "Seahorse Saloon",
+    "amenity": "bar",
+    "lat": 29.9818577,
+    "lng": -90.0768858,
+    "phone": "(504) 742-6100",
+    "website": "",
+    "address": "2825 Onzaga Street",
+    "hours": "3:00 PM - 1:00 AM",
+    "cuisine": "",
+    "image": "https://images.unsplash.com/photo-1555992336-03a23c7b20ee?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
+  },
+  {
+    "name": "The Sandbar",
+    "amenity": "bar",
+    "lat": 30.0277922,
+    "lng": -90.0705983,
+    "phone": "(504) 261-3085",
+    "website": "",
+    "address": "New Orleans, LA",
+    "hours": "6:00 PM - 4:00 AM",
+    "cuisine": "",
+    "image": "https://images.unsplash.com/photo-1524661135-423995f22d0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
+  },
+  {
+    "name": "Showcase Gentlemen's Club",
+    "amenity": "bar",
+    "lat": 29.9840925,
+    "lng": -90.0714674,
+    "phone": "+1 504-940-5022",
+    "website": "https://showcasegentlemensclubla.com",
+    "address": "1915 North Broad Street",
+    "hours": "Tu-We 09:00-04:00, Fr-Sa 09:00-04:00",
+    "cuisine": "",
+    "image": "https://images.unsplash.com/photo-1555992336-03a23c7b20ee?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
+  }
+]

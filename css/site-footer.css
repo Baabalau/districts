@@ -1,0 +1,88 @@
+/* Shared site footer — index + event pages */
+
+.site-footer {
+    margin-top: 0;
+    padding: 2rem 1.25rem 2.5rem;
+    border-top-width: 3px;
+    border-top-style: solid;
+}
+
+.site-footer-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.site-footer-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    opacity: 0.85;
+}
+
+.site-footer-links {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.75rem 1.5rem;
+    font-size: 0.95rem;
+}
+
+.site-footer-links li {
+    display: inline-flex;
+    align-items: center;
+}
+
+.site-footer-links a {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+.site-footer-links a:hover {
+    opacity: 0.9;
+}
+
+/* index.html — warm palette (inherits page :root where present) */
+.site-footer--index {
+    background: var(--text-primary, #2D1B15);
+    color: var(--bg-primary, #D2B48C);
+    border-top-color: var(--brand-red, #C32F00);
+}
+
+.site-footer--index .site-footer-label {
+    color: var(--bg-secondary, #E3CBB3);
+}
+
+.site-footer--index .site-footer-links a {
+    color: var(--accent, #EE8442);
+    font-weight: 600;
+}
+
+.site-footer--index .site-footer-links a:hover {
+    color: var(--bg-primary, #D2B48C);
+}
+
+/* District / event pages — same warm palette as index */
+.site-footer--event {
+    background: var(--text-primary, #2D1B15);
+    color: var(--bg-primary, #D2B48C);
+    border-top-color: var(--brand-red, #C32F00);
+}
+
+.site-footer--event .site-footer-label {
+    color: var(--bg-secondary, #E3CBB3);
+}
+
+.site-footer--event .site-footer-links a {
+    color: var(--accent, #EE8442);
+    font-weight: 600;
+}
+
+.site-footer--event .site-footer-links a:hover {
+    color: var(--bg-primary, #D2B48C);
+}

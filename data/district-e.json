@@ -1,0 +1,26 @@
+[
+  {
+    "name": "The Lazy Jack",
+    "amenity": "pub",
+    "lat": 30.0402956,
+    "lng": -90.0131288,
+    "phone": "(504) 276-5886",
+    "website": "",
+    "address": "New Orleans, LA",
+    "hours": "3:00 PM - 1:00 AM",
+    "cuisine": "",
+    "image": "https://images.unsplash.com/photo-1524661135-423995f22d0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
+  },
+  {
+    "name": "Lakeshore Landing",
+    "amenity": "pub",
+    "lat": 30.0399574,
+    "lng": -90.0130264,
+    "phone": "(504) 254-4137",
+    "website": "",
+    "address": "New Orleans, LA",
+    "hours": "Open 24 Hours",
+    "cuisine": "",
+    "image": "https://images.unsplash.com/photo-1470337458703-46ad1756a187?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
+  }
+]

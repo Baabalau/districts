@@ -1,0 +1,153 @@
+/* Shared district event pages — matches index.html theme */
+
+:root {
+    --bg-primary: #D2B48C;
+    --bg-secondary: #E3CBB3;
+    --text-primary: #2D1B15;
+    --text-secondary: #4A3022;
+    --accent: #EE8442;
+    --accent-dark: #D6753A;
+    --brand-red: #C32F00;
+    --panel-bg: #f5ebe0;
+    --font-main: 'Inter', sans-serif;
+    --font-header: 'Montserrat', sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-main);
+    line-height: 1.6;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 50px;
+    background: rgba(45, 27, 21, 0.95);
+    backdrop-filter: blur(8px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid rgba(210, 180, 140, 0.25);
+}
+
+.logo {
+    font-family: var(--font-header);
+    font-size: 1.5rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--bg-primary);
+    letter-spacing: 0.04em;
+}
+
+.logo span {
+    color: var(--brand-red);
+}
+
+.nav-links a {
+    color: var(--bg-primary);
+    text-decoration: none;
+    margin-left: 30px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    transition: color 0.2s ease;
+}
+
+.nav-links a:hover {
+    color: var(--accent);
+}
+
+/* Leaflet — matches light map */
+.leaflet-popup-content-wrapper {
+    background: var(--panel-bg);
+    color: var(--text-primary);
+    border: 2px solid var(--text-primary);
+    border-radius: 8px;
+}
+
+.leaflet-popup-tip {
+    background: var(--panel-bg);
+    border: 2px solid var(--text-primary);
+}
+
+.leaflet-popup-close-button {
+    color: var(--text-primary) !important;
+}
+
+/* Dialogue Den */
+.upvote-btn {
+    background: transparent;
+    color: var(--brand-red);
+    border: 2px solid var(--brand-red);
+    padding: 6px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.upvote-btn:hover {
+    background: var(--brand-red);
+    color: var(--bg-primary);
+}
+
+.issue-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg-secondary);
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    border: 1px solid rgba(45, 27, 21, 0.12);
+}
+
+.issue-text {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.ask-box {
+    width: 100%;
+    padding: 15px;
+    background: var(--bg-primary);
+    border: 2px solid rgba(45, 27, 21, 0.2);
+    color: var(--text-primary);
+    border-radius: 8px;
+    margin-top: 20px;
+    font-family: var(--font-main);
+}
+
+.ask-box::placeholder {
+    color: var(--text-secondary);
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(180deg, var(--accent) 0%, var(--brand-red) 100%);
+    color: var(--bg-primary);
+    border: none;
+    border-radius: 8px;
+    margin-top: 12px;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 14px rgba(195, 47, 0, 0.35);
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(195, 47, 0, 0.4);
+}

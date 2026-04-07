@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>District C Crawl | District After Dark</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Montserrat:wght@700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <link rel="stylesheet" href="css/district-page.css">
+    <link rel="stylesheet" href="css/event-styles.css">
+    <link rel="stylesheet" href="css/site-footer.css">
+    <script src="js/event-components.js"></script>
+</head>
+<body>
+    <nav>
+        <div class="logo">District <span>After Dark</span></div>
+        <div class="nav-links"><a href="index.html">Home</a><a href="index.html#events">Events</a></div>
+    </nav>
+
+    <event-layout district="C" date="March 19" time="7:00 PM - 10:00 PM" location="Algiers / French Quarter / Bywater"></event-layout>
+
+    <footer class="site-footer site-footer--event" role="contentinfo">
+        <div class="site-footer-inner">
+            <p class="site-footer-label">City partners</p>
+            <ul class="site-footer-links">
+                <li><a href="https://nola.gov/night" target="_blank" rel="noopener noreferrer">Mayor’s Office of Nighttime Economy</a></li>
+                <li><a href="https://council.nola.gov/" target="_blank" rel="noopener noreferrer">New Orleans City Council</a></li>
+            </ul>
+        </div>
+    </footer>
+
+    <script>
+        function upvote(btn, count) {
+            btn.innerHTML = `▲ <span>${count + 1}</span>`;
+            btn.style.background = 'var(--accent)';
+            btn.style.color = 'var(--text-primary)';
+            btn.onclick = null;
+        }
+    </script>
+    <script src="js/district-map.js"></script>
+</body>
+</html>

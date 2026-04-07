@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>District After Dark | Nightcrawl Series</title>
+    <style>
+        /* --- CORE STYLES & VARIABLES --- */
+        :root {
+            /* Inverted Brown Theme */
+            --bg-primary: #D2B48C; /* Light Brown (formerly text-main) */
+            --bg-secondary: #E3CBB3; /* Lighter Brown for contrast */
+            --text-primary: #2D1B15; /* Dark Brown (formerly bg-dark) */
+            --text-secondary: #4A3022; /* Medium Brown */
+            
+            /* Accent + brand red */
+            --accent: #EE8442;
+            --accent-dark: #D6753A;
+            --brand-red: #C32F00;
+            
+            --font-main: 'Inter', sans-serif;
+            --font-header: 'Montserrat', sans-serif;
+            --font-subhead: 'Georgia', serif; /* Complementary Subheading Font */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* --- FLOATING MENU --- */
+        .menu-toggle, .menu-close {
+            position: fixed;
+            top: 30px;
+            right: 40px;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--text-primary);
+            color: var(--bg-primary);
+            border: none;
+            font-family: var(--font-header);
+            font-weight: 900;
+            font-size: 1.1rem;
+            cursor: pointer;
+            z-index: 1000;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-transform: uppercase;
+        }
+        
+        .menu-toggle:hover {
+            transform: scale(1.1) rotate(5deg);
+            background: linear-gradient(145deg, var(--brand-red), var(--accent));
+            color: var(--bg-primary);
+        }
+        
+        .menu-toggle:active, .menu-close:active {
+            transform: scale(0.95);
+        }
+
+        .menu-close {
+            background: var(--text-primary);
+            color: var(--accent);
+        }
+
+        .menu-close:hover {
+            transform: scale(1.1) rotate(-5deg);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(160deg, var(--brand-red) 0%, var(--accent) 55%, #c94e28 100%);
+            z-index: 999;
+            /* Start as a small circle hidden behind the toggle button */
+            clip-path: circle(0px at calc(100% - 80px) 70px);
+            transition: clip-path 0.7s cubic-bezier(0.77, 0, 0.175, 1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-end;
+            padding-right: 15%;
+        }
+
+        .menu-overlay.active {
+            /* Expand to cover screen */
+            clip-path: circle(150vw at calc(100% - 80px) 70px);
+        }
+
+        .menu-links a {
+            display: block;
+            font-family: var(--font-header);
+            font-size: clamp(3rem, 6vw, 5rem);
+            color: var(--bg-primary);
+            text-decoration: none;
+            text-transform: uppercase;
+            font-weight: 900;
+            margin-bottom: 25px;
+            transition: color 0.3s ease, transform 0.3s ease;
+            text-align: right;
+            text-shadow: 3px 3px 0px var(--text-primary);
+        }
+
+        .menu-links a:hover {
+            color: var(--text-primary);
+            text-shadow: none;
+            transform: translateX(-20px);
+        }
+
+        /* --- BRAND BUTTON --- */
+        .brand-btn {
+            padding: 15px 35px;
+            background: linear-gradient(180deg, var(--accent) 0%, var(--brand-red) 100%);
+            color: var(--bg-primary);
+            border: none;
+            border-radius: 5px;
+            font-family: var(--font-main);
+            font-size: 1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(238, 132, 66, 0.4);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .brand-btn:hover {
+            background: linear-gradient(180deg, #e55a2e 0%, #a82800 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(195, 47, 0, 0.45);
+        }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 100px 24px 48px;
+            /* Lightened overlay for inverted theme */
+            background: linear-gradient(rgba(210, 180, 140, 0.85), rgba(210, 180, 140, 0.95)), url('https://images.unsplash.com/photo-1517650862521-d580d5348145?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover;
+            background-attachment: fixed;
+        }
+
+        .hero-inner {
+            width: 100%;
+            max-width: 1280px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 36px;
+        }
+
+        .hero-content {
+            max-width: 640px;
+            position: relative;
+        }
+
+        .hero-map {
+            width: 100%;
+            max-width: 640px;
+        }
+
+        @media (min-width: 992px) {
+            .hero-inner {
+                flex-direction: row;
+                align-items: stretch;
+                justify-content: space-between;
+                gap: 40px;
+                text-align: left;
+            }
+            .hero-content {
+                flex: 1;
+                max-width: none;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                text-align: left;
+            }
+            .hero-map {
+                flex: 1;
+                max-width: 52%;
+                min-width: 0;
+                display: flex;
+                flex-direction: column;
+                align-self: flex-start;
+                min-height: 0;
+            }
+            .hero-map .map-wrapper {
+                width: 100%;
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                min-height: 0;
+            }
+            .hero-map #districts-map {
+                flex: 1;
+                min-height: 0;
+            }
+        }
+
+        /* 3D Stylized Hero Title — face uses brand red */
+        .title-3d {
+            display: inline-block;
+            font-family: var(--font-header);
+            font-size: clamp(3.5rem, 9vw, 7.5rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            color: var(--brand-red);
+            /* Angle and Skew */
+            transform: rotate(-5deg) skewX(-5deg);
+            /* 3D stack: dark brown → accent → depth */
+            text-shadow: 
+                1px 1px 0px #5c2a18,
+                2px 2px 0px var(--text-primary),
+                4px 4px 0px var(--text-primary),
+                6px 6px 0px var(--text-primary),
+                8px 8px 0px var(--accent),
+                10px 10px 0px var(--accent),
+                12px 12px 0px #c94e28,
+                14px 14px 0px var(--brand-red),
+                20px 22px 24px rgba(0,0,0,0.45);
+            margin-bottom: 20px;
+            line-height: 1.1;
+            letter-spacing: 2px;
+        }
+
+        /* Complementary Subtitle */
+        .subtitle {
+            font-family: var(--font-subhead);
+            font-style: italic;
+            font-size: clamp(1.8rem, 4vw, 3rem);
+            color: var(--text-primary);
+            margin-bottom: 32px;
+            display: block;
+            text-shadow: 1px 1px 0px rgba(255,255,255,0.3);
+        }
+
+        /* --- MARQUEE (thin ribbons) --- */
+        .marquee-container {
+            width: 100%;
+            overflow: hidden;
+            background: linear-gradient(90deg, var(--brand-red) 0%, var(--accent) 50%, var(--brand-red) 100%);
+            color: var(--bg-primary);
+            padding: 6px 0;
+            font-family: var(--font-header);
+            font-weight: 700;
+            font-size: 0.7rem;
+            white-space: nowrap;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            margin-top: -16px;
+            margin-bottom: 0;
+            transform: rotate(-1deg) scale(1.02);
+        }
+
+        .marquee-container.reverse {
+            transform: rotate(1deg) scale(1.02);
+            background: linear-gradient(90deg, var(--text-primary) 0%, #5c2a18 50%, var(--brand-red) 100%);
+            color: var(--bg-primary);
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 35s linear infinite;
+        }
+
+        .marquee-content.reverse-anim {
+            animation: marquee-reverse 35s linear infinite;
+        }
+
+        .marquee-content span {
+            padding: 0 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        @keyframes marquee-reverse {
+            0% { transform: translateX(-50%); }
+            100% { transform: translateX(0); }
+        }
+
+        /* --- MAP (hero + shared) --- */
+        .map-wrapper {
+            background: var(--bg-primary);
+            border: 3px solid var(--text-primary);
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 16px 32px rgba(0,0,0,0.2);
+            width: 100%;
+        }
+
+        #districts-map {
+            width: 100%;
+            height: min(52vh, 420px);
+            background: #e5e5e5;
+            border-radius: 5px;
+            z-index: 1;
+        }
+
+        @media (min-width: 992px) {
+            .hero-inner .hero-map #districts-map {
+                height: 100%;
+                min-height: 260px;
+            }
+        }
+
+        /* --- INTERSECTING HORIZONTAL CARD FLOWS --- */
+        .flow-section {
+            padding: 48px 0 56px;
+            background: var(--bg-secondary);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .flow-row {
+            overflow: hidden;
+            width: 100%;
+            padding: 10px 0;
+        }
+
+        .flow-row--people {
+            transform: rotate(-1.2deg) scale(1.03);
+            z-index: 2;
+            margin-bottom: -28px;
+        }
+
+        .flow-row--venues {
+            transform: rotate(1.2deg) scale(1.03);
+            z-index: 1;
+            position: relative;
+        }
+
+        .flow-track {
+            display: flex;
+            gap: 14px;
+            width: max-content;
+            will-change: transform;
+        }
+
+        .flow-track--left {
+            animation: flow-left 55s linear infinite;
+        }
+
+        .flow-track--right {
+            animation: flow-left 60s linear infinite reverse;
+        }
+
+        @keyframes flow-left {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+        }
+
+        .flow-card {
+            width: 118px;
+            height: 118px;
+            border-radius: 14px;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 3px solid var(--text-primary);
+            box-shadow:
+                0 6px 0 var(--accent),
+                0 10px 24px rgba(0,0,0,0.2);
+            background: var(--bg-primary);
+        }
+
+        .flow-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .flow-label {
+            text-align: center;
+            font-family: var(--font-header);
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            padding: 0 16px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .flow-track--left,
+            .flow-track--right {
+                animation: none;
+                justify-content: center;
+                flex-wrap: wrap;
+                max-width: 100%;
+                margin: 0 auto;
+            }
+        }
+
+        /* --- PURPOSE MODULE (3D trim) --- */
+        .purpose-section {
+            padding: 72px 20px 88px;
+            background: var(--bg-primary);
+        }
+
+        .purpose-module {
+            max-width: 960px;
+            margin: 0 auto;
+            position: relative;
+            perspective: 900px;
+            padding-bottom: 36px;
+        }
+
+        .purpose-frame {
+            position: relative;
+            padding: clamp(2rem, 5vw, 3.5rem) clamp(1.5rem, 4vw, 3rem);
+            background: linear-gradient(168deg, #f5e6d8 0%, var(--bg-secondary) 42%, #c9a882 100%);
+            border-radius: 8px;
+            border: 4px solid var(--text-primary);
+            /* Exaggerated 3D trim: inset bevel + stacked “frames” + cast shadow */
+            box-shadow:
+                inset 4px 4px 0 rgba(255,255,255,0.55),
+                inset -4px -4px 0 rgba(45, 27, 21, 0.2),
+                inset 0 -3px 12px rgba(195, 47, 0, 0.12),
+                0 0 0 4px var(--brand-red),
+                0 0 0 10px var(--accent),
+                0 0 0 16px var(--text-primary),
+                0 0 0 22px rgba(195, 47, 0, 0.35),
+                18px 22px 0 rgba(195, 47, 0, 0.45),
+                26px 30px 0 rgba(238, 132, 66, 0.3),
+                34px 38px 48px rgba(0,0,0,0.35);
+            transform: rotateX(11deg) translateZ(12px) scale(0.99);
+            transform-style: preserve-3d;
+            transform-origin: center center;
+        }
+
+        .purpose-frame::before {
+            content: "";
+            position: absolute;
+            inset: -28px;
+            border-radius: 14px;
+            background: radial-gradient(ellipse 80% 60% at 30% 20%, rgba(238,132,66,0.45), transparent 55%),
+                radial-gradient(ellipse 70% 50% at 80% 90%, rgba(195,47,0,0.35), transparent 50%),
+                linear-gradient(135deg, rgba(45,27,21,0.15), transparent 50%);
+            z-index: -2;
+            pointer-events: none;
+            filter: blur(2px);
+        }
+
+        .purpose-frame::after {
+            content: "";
+            position: absolute;
+            left: 8%;
+            right: 8%;
+            bottom: -18px;
+            height: 24px;
+            background: linear-gradient(180deg, rgba(45,27,21,0.35), transparent);
+            border-radius: 40%;
+            filter: blur(8px);
+            transform: rotateX(75deg);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .purpose-frame h2 {
+            font-family: var(--font-header);
+            font-size: clamp(1.75rem, 4vw, 2.75rem);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-primary);
+            margin-bottom: 1.25rem;
+            line-height: 1.15;
+        }
+
+        .purpose-frame .purpose-lead {
+            font-family: var(--font-subhead);
+            font-style: italic;
+            font-size: clamp(1.1rem, 2.2vw, 1.35rem);
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .purpose-frame p {
+            font-size: clamp(1rem, 1.8vw, 1.15rem);
+            color: var(--text-primary);
+            line-height: 1.75;
+            font-weight: 500;
+        }
+
+        .purpose-frame p + p {
+            margin-top: 1rem;
+        }
+
+        /* Custom Leaflet popup styling for inverted theme */
+        .leaflet-popup-content-wrapper {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            border: 2px solid var(--text-primary);
+            border-radius: 5px;
+        }
+        .leaflet-popup-tip {
+            background: var(--bg-primary);
+            border: 2px solid var(--text-primary);
+        }
+        .leaflet-popup-close-button {
+            color: var(--text-primary) !important;
+        }
+        .district-label {
+            color: var(--bg-primary);
+            font-weight: 900;
+            font-family: var(--font-header);
+            font-size: 1.2rem;
+            text-align: center;
+            line-height: 30px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+        }
+        .custom-tooltip {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            border: 2px solid var(--brand-red);
+            border-radius: 5px;
+            font-family: var(--font-main);
+            text-align: center;
+            font-weight: bold;
+        }
+        .leaflet-tooltip.custom-tooltip::before {
+            border-top-color: var(--brand-red);
+        }
+
+        /* --- ABOUT / WAYS TO PARTICIPATE (full section) --- */
+        .about-section {
+            padding: 100px 24px 120px;
+            max-width: 920px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .section-title {
+            text-align: center;
+            font-family: var(--font-header);
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            margin-bottom: 3rem;
+            text-transform: uppercase;
+            color: var(--text-primary);
+        }
+
+        .section-title span {
+            color: var(--brand-red);
+        }
+
+        .participate-block {
+            width: 100%;
+        }
+
+        .participate-heading {
+            font-family: var(--font-header);
+            font-size: clamp(1.35rem, 3vw, 1.85rem);
+            margin-bottom: 1.75rem;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        /* Participate toggle (residents / venues) */
+        .participate-toggle {
+            display: flex;
+            gap: 0;
+            max-width: 520px;
+            margin: 0 auto 2rem;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid var(--text-primary);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.35);
+        }
+
+        .participate-toggle [role="tab"] {
+            flex: 1;
+            padding: 14px 14px;
+            font-family: var(--font-header);
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: clamp(0.7rem, 2vw, 0.85rem);
+            letter-spacing: 0.05em;
+            border: none;
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .participate-toggle [role="tab"][aria-selected="true"] {
+            background: var(--brand-red);
+            color: var(--bg-primary);
+        }
+
+        .participate-toggle [role="tab"]:not([aria-selected="true"]):hover {
+            background: rgba(195, 47, 0, 0.12);
+            color: var(--text-primary);
+        }
+
+        .participate-toggle [role="tab"]:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+            z-index: 1;
+        }
+
+        .participate-panel[hidden] {
+            display: none;
+        }
+
+        .participate-list {
+            margin: 0;
+            padding-left: 1.35rem;
+            color: var(--text-primary);
+            font-size: 1.05rem;
+            font-weight: 500;
+            line-height: 1.65;
+        }
+
+        .participate-list li {
+            margin-bottom: 0.85rem;
+        }
+
+        .participate-list li:last-child {
+            margin-bottom: 0;
+        }
+
+        .participate-list li::marker {
+            color: var(--brand-red);
+        }
+
+        .participate-districts {
+            margin-top: 2rem;
+            padding-top: 1.75rem;
+            border-top: 1px solid rgba(45, 27, 21, 0.18);
+            text-align: center;
+        }
+
+        .participate-districts-label {
+            display: block;
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .participate-district-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 0.35rem 0.5rem;
+            font-family: var(--font-header);
+            font-weight: 800;
+            font-size: 1.05rem;
+        }
+
+        .participate-district-links a {
+            color: var(--brand-red);
+            text-decoration: underline;
+            text-underline-offset: 4px;
+            padding: 0.2rem 0.45rem;
+            border-radius: 4px;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .participate-district-links a:hover {
+            background: rgba(195, 47, 0, 0.12);
+            color: var(--text-primary);
+        }
+
+        .participate-district-sep {
+            color: var(--text-secondary);
+            user-select: none;
+            opacity: 0.7;
+        }
+
+        .participate-form-wrap {
+            margin-top: 2rem;
+            padding-top: 1.75rem;
+            border-top: 1px solid rgba(45, 27, 21, 0.18);
+            text-align: center;
+        }
+
+        .participate-form-link {
+            display: inline-block;
+            font-family: var(--font-header);
+            font-weight: 800;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--bg-primary);
+            background: linear-gradient(180deg, var(--accent) 0%, var(--brand-red) 100%);
+            padding: 14px 28px;
+            border-radius: 6px;
+            text-decoration: none;
+            box-shadow: 0 6px 18px rgba(195, 47, 0, 0.35);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .participate-form-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(195, 47, 0, 0.45);
+        }
+
+        .participate-form-link:focus-visible {
+            outline: 2px solid var(--text-primary);
+            outline-offset: 3px;
+        }
+
+        /* --- EVENTS SECTION --- */
+        .events-section {
+            padding: 100px 50px;
+            background: var(--bg-secondary);
+            border-top: 5px solid var(--text-primary);
+        }
+
+        .event-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding-bottom: 60px;
+        }
+
+        .event-card {
+            background: var(--bg-primary);
+            border: 2px solid rgba(45, 27, 21, 0.2);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (min-width: 768px) {
+            .event-card:nth-child(even) {
+                transform: translateY(40px);
+            }
+            .event-card:nth-child(even):hover {
+                transform: translateY(30px) scale(1.02);
+            }
+        }
+
+        .event-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: var(--accent);
+            box-shadow: 0 15px 40px rgba(238, 132, 66, 0.25);
+        }
+
+        .event-img {
+            height: 220px;
+            background: #ccc;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .event-info {
+            padding: 30px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .event-info h3 {
+            font-family: var(--font-header);
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+            text-transform: uppercase;
+        }
+
+        .event-info p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 25px;
+            flex-grow: 1;
+            font-weight: 500;
+        }
+
+        .event-info strong {
+            color: var(--brand-red);
+            font-size: 1.1rem;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        /* --- SCROLL ANIMATIONS (INTERSECTION OBSERVER) --- */
+        .js-reveal {
+            opacity: 0;
+            transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal-y {
+            transform: translateY(60px);
+        }
+
+        .reveal-x {
+            transform: translateX(-60px);
+        }
+
+        .reveal-x-reverse {
+            transform: translateX(60px);
+        }
+
+        .reveal-opacity {
+            transform: none;
+        }
+
+        .js-reveal.is-visible {
+            opacity: 1;
+            transform: translate(0, 0);
+        }
+        
+        .delay-200 { transition-delay: 0.2s; }
+        .delay-400 { transition-delay: 0.4s; }
+
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@700;900&family=Georgia&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/site-footer.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+</head>
+<body>
+
+    <!-- Floating Navigation Menu -->
+    <button class="menu-toggle" id="menuToggle">MENU</button>
+    
+    <div class="menu-overlay" id="menuOverlay">
+        <button class="menu-close" id="menuClose">CLOSE</button>
+        <div class="menu-links">
+            <a href="#">Home</a>
+            <a href="#events">Events</a>
+            <a href="#about">About</a>
+            <a href="#">Partners</a>
+        </div>
+    </div>
+
+    <header class="hero js-reveal reveal-opacity">
+        <div class="hero-inner">
+            <div class="hero-content js-reveal reveal-y delay-200">
+                <h1 class="title-3d">Support Your Ward!</h1>
+                <span class="subtitle">During the Long, Hot Summer</span>
+                <a href="#events" class="brand-btn">Find Your District Crawl</a>
+            </div>
+            <div class="hero-map">
+                <div class="map-wrapper">
+                    <div id="districts-map"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="marquee-container">
+        <div class="marquee-content">
+            <span>JOIN THE CRAWL • SUPPORT YOUR WARD • </span>
+            <span>JOIN THE CRAWL • SUPPORT YOUR WARD • </span>
+            <span>JOIN THE CRAWL • SUPPORT YOUR WARD • </span>
+            <span>JOIN THE CRAWL • SUPPORT YOUR WARD • </span>
+        </div>
+        <div class="marquee-content">
+            <span>JOIN THE CRAWL • SUPPORT YOUR WARD • </span>
+            <span>JOIN THE CRAWL • SUPPORT YOUR WARD • </span>
+            <span>JOIN THE CRAWL • SUPPORT YOUR WARD • </span>
+            <span>JOIN THE CRAWL • SUPPORT YOUR WARD • </span>
+        </div>
+    </div>
+
+    <section class="flow-section" aria-label="Featured councilmembers, influencers, and venues">
+        <p class="flow-label">Councilmembers &amp; influencers</p>
+        <div class="flow-row flow-row--people">
+            <div class="flow-track flow-track--left">
+                <div class="flow-card"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&h=300&fit=crop" alt="Community leader portrait"></div>
+                <div class="flow-card"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop" alt="Council representative portrait"></div>
+                <div class="flow-card"><img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=300&fit=crop" alt="Influencer portrait"></div>
+                <div class="flow-card"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&h=300&fit=crop" alt="Host portrait"></div>
+                <div class="flow-card"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&h=300&fit=crop" alt="Guest portrait"></div>
+                <div class="flow-card"><img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=300&fit=crop" alt="Organizer portrait"></div>
+                <div class="flow-card"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&h=300&fit=crop" alt="Community leader portrait"></div>
+                <div class="flow-card"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop" alt="Council representative portrait"></div>
+                <div class="flow-card"><img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=300&fit=crop" alt="Influencer portrait"></div>
+                <div class="flow-card"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&h=300&fit=crop" alt="Host portrait"></div>
+                <div class="flow-card"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&h=300&fit=crop" alt="Guest portrait"></div>
+                <div class="flow-card"><img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=300&fit=crop" alt="Organizer portrait"></div>
+            </div>
+        </div>
+        <p class="flow-label" style="margin-top: 28px;">Nightlife &amp; local haunts</p>
+        <div class="flow-row flow-row--venues">
+            <div class="flow-track flow-track--right">
+                <div class="flow-card"><img src="https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=300&h=300&fit=crop" alt="Bar interior"></div>
+                <div class="flow-card"><img src="https://images.unsplash.com/photo-1555992336-03a23c7b20ee?w=300&h=300&fit=crop" alt="Nightlife venue"></div>
+                <div class="flow-card"><img src="https://images.unsplash.com/photo-1566417713940-fe7c737a9ef2?w=300&h=300&fit=crop" alt="Cocktail lounge"></div>
+                <div class="flow-card"><img src="https://images.unsplash.com/photo-1572116469696-31de0f17cc34?w=300&h=300&fit=crop" alt="Restaurant bar"></div>
+                <div class="flow-card"><img src="https://images.unsplash.com/photo-1543007630-9710e4a00a20?w=300&h=300&fit=crop" alt="Live music venue"></div>
+                <div class="flow-card"><img src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=300&h=300&fit=crop" alt="Neighborhood spot"></div>
+                <div class="flow-card"><img src="https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=300&h=300&fit=crop" alt="Bar interior"></div>
+                <div class="flow-card"><img src="https://images.unsplash.com/photo-1555992336-03a23c7b20ee?w=300&h=300&fit=crop" alt="Nightlife venue"></div>
+                <div class="flow-card"><img src="https://images.unsplash.com/photo-1566417713940-fe7c737a9ef2?w=300&h=300&fit=crop" alt="Cocktail lounge"></div>
+                <div class="flow-card"><img src="https://images.unsplash.com/photo-1572116469696-31de0f17cc34?w=300&h=300&fit=crop" alt="Restaurant bar"></div>
+                <div class="flow-card"><img src="https://images.unsplash.com/photo-1543007630-9710e4a00a20?w=300&h=300&fit=crop" alt="Live music venue"></div>
+                <div class="flow-card"><img src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=300&h=300&fit=crop" alt="Neighborhood spot"></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="purpose" class="purpose-section js-reveal reveal-opacity">
+        <div class="purpose-module">
+            <div class="purpose-frame js-reveal reveal-y delay-200">
+                <h2>Why Districts After Dark?</h2>
+                <p class="purpose-lead">Policy off the dais, culture on the street—one summer night at a time.</p>
+                <p>Districts After Dark is a ward-by-ward nightcrawl that brings City Councilmembers, neighbors, and small-business owners into the same room (and the same line at the bar). We pair honest civic dialogue with the real places that make New Orleans after dark: music rooms, corner bars, kitchens, and patios.</p>
+                <p>Each crawl is part town hall, part celebration: trivia that rewards local knowledge, a channel for anonymous questions, and routes built to spotlight businesses that keep our corridors alive. The goal is simple—show up for your ward, meet the people who represent you, and leave with a stronger sense of what your district can be when the sun goes down.</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="marquee-container reverse">
+        <div class="marquee-content reverse-anim">
+            <span>DRINKS • DISCUSSIONS • DISCOVERIES • </span>
+            <span>DRINKS • DISCUSSIONS • DISCOVERIES • </span>
+            <span>DRINKS • DISCUSSIONS • DISCOVERIES • </span>
+            <span>DRINKS • DISCUSSIONS • DISCOVERIES • </span>
+        </div>
+        <div class="marquee-content reverse-anim">
+            <span>DRINKS • DISCUSSIONS • DISCOVERIES • </span>
+            <span>DRINKS • DISCUSSIONS • DISCOVERIES • </span>
+            <span>DRINKS • DISCUSSIONS • DISCOVERIES • </span>
+            <span>DRINKS • DISCUSSIONS • DISCOVERIES • </span>
+        </div>
+    </div>
+
+    <section id="about" class="about-section">
+        <h2 class="section-title js-reveal reveal-opacity">New Orleans' culture<br><span>lives in its neighborhoods.</span></h2>
+
+        <div class="participate-block js-reveal reveal-y delay-200">
+            <h3 class="participate-heading">Ways to participate</h3>
+            <div class="participate-toggle" role="tablist" aria-label="Participate as a resident or venue">
+                <button type="button" role="tab" id="tab-participate-residents" aria-selected="true" aria-controls="panel-participate-residents">Residents</button>
+                <button type="button" role="tab" id="tab-participate-venues" aria-selected="false" aria-controls="panel-participate-venues">Nighttime venues</button>
+            </div>
+            <div class="participate-panel" role="tabpanel" id="panel-participate-residents" aria-labelledby="tab-participate-residents">
+                <ul class="participate-list">
+                    <li>Vote for where your councilmember will hold a nighttime townhall this summer</li>
+                    <li>Submit questions for the townhall</li>
+                    <li>Fill out a bingo card to support local organizations</li>
+                </ul>
+                <div class="participate-districts">
+                    <span class="participate-districts-label">Select your council district</span>
+                    <div class="participate-district-links">
+                        <a href="district-a.html">District A</a>
+                        <span class="participate-district-sep" aria-hidden="true">·</span>
+                        <a href="district-b.html">District B</a>
+                        <span class="participate-district-sep" aria-hidden="true">·</span>
+                        <a href="district-c.html">District C</a>
+                        <span class="participate-district-sep" aria-hidden="true">·</span>
+                        <a href="district-d.html">District D</a>
+                        <span class="participate-district-sep" aria-hidden="true">·</span>
+                        <a href="district-e.html">District E</a>
+                    </div>
+                </div>
+            </div>
+            <div class="participate-panel" role="tabpanel" id="panel-participate-venues" aria-labelledby="tab-participate-venues" hidden>
+                <ul class="participate-list">
+                    <li>Make sure your business is represented</li>
+                    <li>Promote your venue to host the Support Your Ward townhall this summer</li>
+                    <li>Showcase a summer special</li>
+                </ul>
+                <div class="participate-form-wrap">
+                    <a href="#" class="participate-form-link">Fill out this form</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="events" class="events-section">
+        <h2 class="section-title js-reveal reveal-opacity">Upcoming <span>Crawls</span></h2>
+        <div class="event-grid">
+            
+            <div class="event-card js-reveal reveal-y">
+                <div class="event-img" style="background-image: url('https://images.unsplash.com/photo-1517650862521-d580d5348145?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');"></div>
+                <div class="event-info">
+                    <h3>District A</h3>
+                    <p><strong>March 5 | 7 PM - 10 PM</strong>Lakeview / Uptown</p>
+                    <a href="district-a.html" class="brand-btn" style="padding: 10px 20px; font-size: 0.8rem; text-align: center;">View Route & RSVP</a>
+                </div>
+            </div>
+
+            <div class="event-card js-reveal reveal-y delay-200">
+                <div class="event-img" style="background-image: url('https://images.unsplash.com/photo-1555992336-03a23c7b20ee?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');"></div>
+                <div class="event-info">
+                    <h3>District B</h3>
+                    <p><strong>March 12 | 7 PM - 10 PM</strong>French Quarter / CBD</p>
+                    <a href="district-b.html" class="brand-btn" style="padding: 10px 20px; font-size: 0.8rem; text-align: center;">View Route & RSVP</a>
+                </div>
+            </div>
+
+            <div class="event-card js-reveal reveal-y">
+                <div class="event-img" style="background-image: url('https://images.unsplash.com/photo-1514933651103-005eec06c04b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');"></div>
+                <div class="event-info">
+                    <h3>District C</h3>
+                    <p><strong>March 19 | 7 PM - 10 PM</strong>Algiers / French Quarter / Bywater</p>
+                    <a href="district-c.html" class="brand-btn" style="padding: 10px 20px; font-size: 0.8rem; text-align: center;">View Route & RSVP</a>
+                </div>
+            </div>
+
+            <div class="event-card js-reveal reveal-y delay-200">
+                <div class="event-img" style="background-image: url('https://images.unsplash.com/photo-1524661135-423995f22d0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');"></div>
+                <div class="event-info">
+                    <h3>District D</h3>
+                    <p><strong>March 26 | 7 PM - 10 PM</strong>Gentilly / St. Roch</p>
+                    <a href="district-d.html" class="brand-btn" style="padding: 10px 20px; font-size: 0.8rem; text-align: center;">View Route & RSVP</a>
+                </div>
+            </div>
+
+            <div class="event-card js-reveal reveal-y">
+                <div class="event-img" style="background-image: url('https://images.unsplash.com/photo-1574169208507-84376144848b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');"></div>
+                <div class="event-info">
+                    <h3>District E</h3>
+                    <p><strong>April 2 | 7 PM - 10 PM</strong>New Orleans East / Lower 9th</p>
+                    <a href="district-e.html" class="brand-btn" style="padding: 10px 20px; font-size: 0.8rem; text-align: center;">View Route & RSVP</a>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <footer class="site-footer site-footer--index" role="contentinfo">
+        <div class="site-footer-inner">
+            <p class="site-footer-label">City partners</p>
+            <ul class="site-footer-links">
+                <li><a href="https://nola.gov/night" target="_blank" rel="noopener noreferrer">Mayor’s Office of Nighttime Economy</a></li>
+                <li><a href="https://council.nola.gov/" target="_blank" rel="noopener noreferrer">New Orleans City Council</a></li>
+            </ul>
+        </div>
+    </footer>
+
+    <script src="council_districts.js"></script>
+    <script>
+        // --- MENU LOGIC ---
+        const menuToggle = document.getElementById('menuToggle');
+        const menuClose = document.getElementById('menuClose');
+        const menuOverlay = document.getElementById('menuOverlay');
+
+        menuToggle.addEventListener('click', () => {
+            menuOverlay.classList.add('active');
+        });
+
+        menuClose.addEventListener('click', () => {
+            menuOverlay.classList.remove('active');
+        });
+        
+        // Also close menu when a link is clicked
+        const menuLinks = document.querySelectorAll('.menu-links a');
+        menuLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                menuOverlay.classList.remove('active');
+            });
+        });
+
+        // --- LEAFLET MAP INITIALIZATION ---
+        // Center the map over New Orleans
+        const map = L.map('districts-map', {
+            zoomControl: false,
+            scrollWheelZoom: false,
+            doubleClickZoom: false,
+            touchZoom: false,
+            boxZoom: false,
+            dragging: false
+        }).setView([29.98, -90.05], 12);
+
+        // Using CartoDB Light theme to match the inverted look nicely
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 20
+        }).addTo(map);
+
+        // Helper to create a custom marker for a district
+        function createDistrictIcon(color, letter) {
+            return L.divIcon({
+                className: 'custom-district-marker',
+                html: `<div style="background-color: ${color}; width: 35px; height: 35px; border-radius: 50%; box-shadow: 0 5px 10px rgba(0,0,0,0.3); border: 3px solid var(--bg-primary); display: flex; align-items: center; justify-content: center;"><span class="district-label">${letter}</span></div>`,
+                iconSize: [35, 35],
+                iconAnchor: [17.5, 17.5]
+            });
+        }
+
+        // Council Districts (Approximate locations)
+        const districts = [
+            { id: 'A', lat: 29.985, lng: -90.10, color: 'var(--brand-red)', link: 'district-a.html', name: 'Lakeview / Uptown' },
+            { id: 'B', lat: 29.935, lng: -90.09, color: 'var(--text-primary)', link: 'district-b.html', name: 'Central Business District / Broadmoor' },
+            { id: 'C', lat: 29.958, lng: -90.042, color: 'var(--brand-red)', link: 'district-c.html', name: 'Algiers / French Quarter / Bywater' },
+            { id: 'D', lat: 30.01, lng: -90.05, color: 'var(--text-primary)', link: 'district-d.html', name: 'Gentilly / St. Roch' },
+            { id: 'E', lat: 30.00, lng: -89.99, color: 'var(--brand-red)', link: 'district-e.html', name: 'New Orleans East / Lower 9th' }
+        ];
+
+        districts.forEach(d => {
+            const marker = L.marker([d.lat, d.lng], { icon: createDistrictIcon(d.color, d.id) }).addTo(map);
+            
+            // Redirect to the specific district page on click
+            marker.on('click', function() {
+                window.location.href = d.link;
+            });
+            
+            // Optional: Add a simple tooltip instead of a click popup, so users know what it is before clicking
+            marker.bindTooltip(`<strong>District ${d.id}</strong><br>${d.name}`, { direction: 'top', className: 'custom-tooltip' });
+        });
+
+        // Add the New Orleans Council Districts GeoJSON layer
+        if (window.councilDistricts) {
+            const geojsonLayer = L.geoJSON(window.councilDistricts, {
+                style: function (feature) {
+                    return {
+                        color: 'var(--text-primary)',
+                        weight: 2,
+                        opacity: 0.6,
+                        fillColor: '#2D1B15',
+                        fillOpacity: 0.05
+                    };
+                },
+                onEachFeature: function (feature, layer) {
+                    layer.on({
+                        mouseover: function(e) {
+                            const l = e.target;
+                            l.setStyle({
+                                weight: 3,
+                                color: 'var(--brand-red)',
+                                fillOpacity: 0.15
+                            });
+                            l.bringToFront();
+                        },
+                        mouseout: function(e) {
+                            geojsonLayer.resetStyle(e.target);
+                        },
+                        click: function(e) {
+                            // Redirect to the respective district page when clicking the polygon
+                            const districtId = feature.properties.DISTRICTID.toLowerCase();
+                            window.location.href = `district-${districtId}.html`;
+                        }
+                    });
+                }
+            }).addTo(map);
+        } else {
+            console.error("Council districts data not loaded.");
+        }
+
+        function refreshMapSize() {
+            map.invalidateSize();
+        }
+
+        function syncHeroMapHeight() {
+            const content = document.querySelector('.hero-content');
+            const mapCol = document.querySelector('.hero-map');
+            if (!content || !mapCol) return;
+            if (window.innerWidth < 992) {
+                mapCol.style.height = '';
+                refreshMapSize();
+                return;
+            }
+            mapCol.style.height = content.offsetHeight + 'px';
+            refreshMapSize();
+        }
+
+        requestAnimationFrame(() => setTimeout(syncHeroMapHeight, 120));
+        window.addEventListener('resize', () => requestAnimationFrame(syncHeroMapHeight));
+
+        // --- SCROLL ANIMATIONS ---
+        document.addEventListener("DOMContentLoaded", () => {
+            syncHeroMapHeight();
+            setTimeout(syncHeroMapHeight, 400);
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.15 // Trigger when 15% of the element is visible
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        // Stop observing once animated to keep it visible
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            const animatedElements = document.querySelectorAll('.js-reveal');
+            animatedElements.forEach(el => observer.observe(el));
+
+            const participateTabs = document.querySelectorAll('.participate-toggle [role="tab"]');
+            const participatePanels = document.querySelectorAll('#about .participate-panel');
+            participateTabs.forEach((tab) => {
+                tab.addEventListener('click', () => {
+                    const panelId = tab.getAttribute('aria-controls');
+                    participateTabs.forEach((t) => t.setAttribute('aria-selected', t === tab ? 'true' : 'false'));
+                    participatePanels.forEach((p) => {
+                        p.hidden = p.id !== panelId;
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
