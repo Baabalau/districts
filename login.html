@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log In | District After Dark</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@700;900&family=Georgia&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #D2B48C; 
+            --text-primary: #2D1B15; 
+            --accent: #EE8442;
+            --brand-red: #C32F00;
+            --font-main: 'Inter', sans-serif;
+            --font-header: 'Montserrat', sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .auth-container {
+            background: rgba(255, 255, 255, 0.4);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .auth-container h2 {
+            font-family: var(--font-header);
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--text-primary);
+            border-radius: 5px;
+            background: transparent;
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            outline: none;
+        }
+
+        .input-group input:focus {
+            border-color: var(--brand-red);
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            background: linear-gradient(180deg, var(--accent) 0%, var(--brand-red) 100%);
+            color: var(--bg-primary);
+            border: none;
+            border-radius: 5px;
+            font-family: var(--font-main);
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .auth-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(195, 47, 0, 0.4);
+        }
+
+        .google-btn {
+            background: var(--text-primary);
+            margin-top: 15px;
+        }
+
+        .google-btn:hover {
+            background: #1a1a1a;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .auth-switch {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            color: var(--brand-red);
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        
+        .error-msg {
+            color: var(--brand-red);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            min-height: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="auth-container">
+        <h2 id="auth-title">Log In</h2>
+        <div id="error-message" class="error-msg"></div>
+        
+        <form id="auth-form">
+            <div class="input-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" required>
+            </div>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required minlength="6">
+            </div>
+            <button type="submit" class="auth-btn" id="submit-btn">Log In</button>
+        </form>
+        
+        <button class="auth-btn google-btn" id="google-btn">Sign in with Google</button>
+        
+        <div class="auth-switch" id="toggle-mode">Need an account? Sign Up</div>
+        
+        <a href="index.html" class="back-link">← Back to Home</a>
+    </div>
+
+    <!-- Need to load Firebase scripts as modules to use the setup -->
+    <script type="module">
+        import { auth, db } from "./js/firebase-config.js";
+        import { 
+            signInWithEmailAndPassword, 
+            createUserWithEmailAndPassword,
+            GoogleAuthProvider,
+            signInWithPopup
+        } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+        
+        import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+
+        const form = document.getElementById("auth-form");
+        const emailInput = document.getElementById("email");
+        const passwordInput = document.getElementById("password");
+        const submitBtn = document.getElementById("submit-btn");
+        const googleBtn = document.getElementById("google-btn");
+        const toggleModeBtn = document.getElementById("toggle-mode");
+        const title = document.getElementById("auth-title");
+        const errorMsg = document.getElementById("error-message");
+
+        let isLoginMode = true;
+
+        toggleModeBtn.addEventListener("click", () => {
+            isLoginMode = !isLoginMode;
+            if (isLoginMode) {
+                title.textContent = "Log In";
+                submitBtn.textContent = "Log In";
+                toggleModeBtn.textContent = "Need an account? Sign Up";
+            } else {
+                title.textContent = "Sign Up";
+                submitBtn.textContent = "Create Account";
+                toggleModeBtn.textContent = "Already have an account? Log In";
+            }
+            errorMsg.textContent = "";
+        });
+
+        // Ensure user document exists (used after auth completes)
+        async function ensureUserDocument(user) {
+            const userRef = doc(db, "users", user.uid);
+            const userSnap = await getDoc(userRef);
+            if (!userSnap.exists()) {
+                await setDoc(userRef, {
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: user.displayName || user.email.split('@')[0],
+                    totalPoints: 0,
+                    rsvps: [],
+                    unlockedPromos: []
+                });
+            }
+        }
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            errorMsg.textContent = "";
+            const email = emailInput.value;
+            const password = passwordInput.value;
+
+            try {
+                if (isLoginMode) {
+                    await signInWithEmailAndPassword(auth, email, password);
+                } else {
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    await ensureUserDocument(userCredential.user);
+                }
+                window.location.href = "profile.html";
+            } catch (error) {
+                errorMsg.textContent = error.message.replace("Firebase: ", "");
+            }
+        });
+
+        googleBtn.addEventListener("click", async () => {
+            errorMsg.textContent = "";
+            const provider = new GoogleAuthProvider();
+            try {
+                const result = await signInWithPopup(auth, provider);
+                await ensureUserDocument(result.user);
+                window.location.href = "profile.html";
+            } catch (error) {
+                errorMsg.textContent = error.message.replace("Firebase: ", "");
+            }
+        });
+
+        // Check if user is already logged in, redirect them
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                window.location.href = "profile.html";
+            }
+        });
+    </script>
+</body>
+</html>

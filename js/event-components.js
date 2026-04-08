@@ -11,6 +11,8 @@ class EventLayout extends HTMLElement {
                     <h1>District ${district} Crawl</h1>
                     <h2>${date} | ${time} | ${location}</h2>
                     <p>Join us for an unforgettable night exploring the hidden gems and local favorites of District ${district}. Connect with your neighbors, meet your councilmember, and experience the culture that makes our city unique.</p>
+                    <button id="rsvp-btn" class="brand-btn" style="margin-top: 20px; font-size: 1.1rem; padding: 15px 30px;">RSVP to District ${district} Crawl</button>
+                    <p id="rsvp-msg" style="margin-top: 10px; color: var(--accent); font-weight: bold; display: none;"></p>
                 </div>
                 <div class="hero-right">
                     <div class="host-shape host-council">
@@ -90,6 +92,21 @@ class EventLayout extends HTMLElement {
                 <div class="quote-block quote-right">
                     "District ${district} has some of the most vibrant, unsung spots in the city. I can't wait to show everyone what makes this neighborhood tick."
                     <span class="quote-author">— @NOLANightOwl</span>
+                </div>
+            </div>
+
+            <div class="trivia-section" style="margin-top: 60px; padding: 40px; background: rgba(0,0,0,0.05); border-radius: 10px; border: 2px solid var(--text-primary);">
+                <h2>Local Trivia: District ${district}</h2>
+                <p>Answer correctly to earn 50 points and unlock a promo code for tonight's crawl!</p>
+                <div id="trivia-container" style="margin-top: 20px;">
+                    <p style="font-weight: bold; font-size: 1.2rem; margin-bottom: 15px;">What year was the city of New Orleans founded?</p>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button class="trivia-option" data-correct="false" style="padding: 10px 20px; background: transparent; color: var(--text-primary); border: 2px solid var(--text-primary); cursor: pointer; border-radius: 5px; font-family: var(--font-main); font-weight: bold; transition: all 0.2s;">1701</button>
+                        <button class="trivia-option" data-correct="true" style="padding: 10px 20px; background: transparent; color: var(--text-primary); border: 2px solid var(--text-primary); cursor: pointer; border-radius: 5px; font-family: var(--font-main); font-weight: bold; transition: all 0.2s;">1718</button>
+                        <button class="trivia-option" data-correct="false" style="padding: 10px 20px; background: transparent; color: var(--text-primary); border: 2px solid var(--text-primary); cursor: pointer; border-radius: 5px; font-family: var(--font-main); font-weight: bold; transition: all 0.2s;">1803</button>
+                        <button class="trivia-option" data-correct="false" style="padding: 10px 20px; background: transparent; color: var(--text-primary); border: 2px solid var(--text-primary); cursor: pointer; border-radius: 5px; font-family: var(--font-main); font-weight: bold; transition: all 0.2s;">1812</button>
+                    </div>
+                    <p id="trivia-msg" style="margin-top: 20px; font-weight: bold; font-size: 1.1rem; color: var(--brand-red); display: none;"></p>
                 </div>
             </div>
 

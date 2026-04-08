@@ -15,7 +15,11 @@
 <body>
     <nav>
         <div class="logo">District <span>After Dark</span></div>
-        <div class="nav-links"><a href="index.html">Home</a><a href="index.html#events">Events</a></div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="index.html#events">Events</a>
+            <a href="login.html" id="authLink">Log In / Sign Up</a>
+        </div>
     </nav>
 
     <event-layout district="B" date="March 12" time="7:00 PM - 10:00 PM" location="French Quarter / CBD"></event-layout>
@@ -38,6 +42,7 @@
             btn.onclick = null;
         }
     </script>
-    <script src="js/district-map.js"></script>
+    <script type="module" src="js/district-map.js"></script>
+    <script type="module" src="js/auth.js"></script>
 </body>
 </html>

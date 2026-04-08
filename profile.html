@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile | District After Dark</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@700;900&family=Georgia&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #D2B48C; 
+            --bg-secondary: #E3CBB3; 
+            --text-primary: #2D1B15; 
+            --text-secondary: #4A3022; 
+            
+            --accent: #EE8442;
+            --brand-red: #C32F00;
+            
+            --font-main: 'Inter', sans-serif;
+            --font-header: 'Montserrat', sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            padding: 40px;
+        }
+
+        .profile-container {
+            background: rgba(255, 255, 255, 0.4);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--text-primary);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .profile-header h2 {
+            font-family: var(--font-header);
+            font-size: 2.5rem;
+            text-transform: uppercase;
+        }
+
+        .logout-btn {
+            padding: 10px 20px;
+            background: transparent;
+            color: var(--brand-red);
+            border: 2px solid var(--brand-red);
+            border-radius: 5px;
+            font-family: var(--font-main);
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: var(--brand-red);
+            color: var(--bg-primary);
+            box-shadow: 0 5px 15px rgba(195, 47, 0, 0.4);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(45, 27, 21, 0.2);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .stat-card h3 {
+            font-family: var(--font-header);
+            text-transform: uppercase;
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 3rem;
+            font-family: var(--font-header);
+            font-weight: 900;
+            color: var(--brand-red);
+        }
+        
+        .list-section {
+            margin-bottom: 30px;
+        }
+        
+        .list-section h3 {
+            font-family: var(--font-header);
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--text-primary);
+            padding-bottom: 5px;
+        }
+        
+        .list-item {
+            background: var(--bg-secondary);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .empty-msg {
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .home-link {
+            display: inline-block;
+            margin-top: 30px;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="profile-container" id="profile-container" style="display: none;">
+        <div class="profile-header">
+            <h2>Welcome, <span id="user-name">Crawler</span></h2>
+            <button class="logout-btn" id="logout-btn">Log Out</button>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Points</h3>
+                <div class="stat-value" id="points-val">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Crawls RSVPs</h3>
+                <div class="stat-value" id="rsvps-val">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Unlocked Promos</h3>
+                <div class="stat-value" id="promos-val">0</div>
+            </div>
+        </div>
+        
+        <div class="list-section">
+            <h3>Your RSVPs</h3>
+            <div id="rsvps-list">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+        
+        <div class="list-section">
+            <h3>Your Promo Codes</h3>
+            <div id="promos-list">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+        
+        <a href="index.html" class="home-link">← Back to Map</a>
+    </div>
+
+    <!-- Module to fetch and display data -->
+    <script type="module">
+        import { auth, db } from "./js/firebase-config.js";
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+        import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+
+        const profileContainer = document.getElementById("profile-container");
+        const userNameEl = document.getElementById("user-name");
+        const pointsVal = document.getElementById("points-val");
+        const rsvpsVal = document.getElementById("rsvps-val");
+        const promosVal = document.getElementById("promos-val");
+        const rsvpsList = document.getElementById("rsvps-list");
+        const promosList = document.getElementById("promos-list");
+        const logoutBtn = document.getElementById("logout-btn");
+
+        // Protect this page
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                // Not logged in, redirect to login
+                window.location.href = "login.html";
+            } else {
+                // Logged in, show container and load data
+                profileContainer.style.display = "block";
+                
+                try {
+                    const userRef = doc(db, "users", user.uid);
+                    const userSnap = await getDoc(userRef);
+                    
+                    if (userSnap.exists()) {
+                        const data = userSnap.data();
+                        
+                        userNameEl.textContent = data.displayName || user.email.split('@')[0];
+                        pointsVal.textContent = data.totalPoints || 0;
+                        
+                        const rsvps = data.rsvps || [];
+                        rsvpsVal.textContent = rsvps.length;
+                        
+                        const promos = data.unlockedPromos || [];
+                        promosVal.textContent = promos.length;
+                        
+                        // Populate RSVPs
+                        if (rsvps.length > 0) {
+                            rsvpsList.innerHTML = rsvps.map(rsvp => 
+                                `<div class="list-item"><strong>${rsvp.toUpperCase()} Crawl</strong> <span>Going! 🎉</span></div>`
+                            ).join('');
+                        } else {
+                            rsvpsList.innerHTML = `<div class="empty-msg">You haven't RSVP'd to any crawls yet.</div>`;
+                        }
+                        
+                        // Populate Promos
+                        if (promos.length > 0) {
+                            promosList.innerHTML = promos.map(promo => 
+                                `<div class="list-item"><strong>Promo Code</strong> <span>${promo}</span></div>`
+                            ).join('');
+                        } else {
+                            promosList.innerHTML = `<div class="empty-msg">Answer trivia questions to unlock promo codes!</div>`;
+                        }
+                        
+                    } else {
+                        console.error("No user document found!");
+                    }
+                } catch (error) {
+                    console.error("Error fetching user data:", error);
+                }
+            }
+        });
+
+        // Logout
+        logoutBtn.addEventListener("click", () => {
+            signOut(auth).then(() => {
+                window.location.href = "index.html";
+            }).catch((error) => {
+                console.error("Sign out error", error);
+            });
+        });
+    </script>
+</body>
+</html>
