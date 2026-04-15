@@ -4,6 +4,10 @@ class EventLayout extends HTMLElement {
         const date = this.getAttribute('date') || 'TBD';
         const time = this.getAttribute('time') || '7:00 PM - 10:00 PM';
         const location = this.getAttribute('location') || 'New Orleans';
+        const councilImg = this.getAttribute('council-img') || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80';
+        const councilName = this.getAttribute('council-name') || 'Councilmember Smith';
+        const influencerImg = this.getAttribute('influencer-img') || 'https://images.unsplash.com/photo-1527980965255-d3b416303d12?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80';
+        const influencerName = this.getAttribute('influencer-name') || '@NOLANightOwl';
 
         this.innerHTML = `
             <div class="event-hero">
@@ -16,13 +20,13 @@ class EventLayout extends HTMLElement {
                 </div>
                 <div class="hero-right">
                     <div class="host-shape host-council">
-                        <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="Councilmember">
-                        <h3>Councilmember Smith</h3>
+                        <img src="${councilImg}" alt="${councilName}">
+                        <h3>${councilName}</h3>
                         <p>The Policy Pro</p>
                     </div>
                     <div class="host-shape host-influencer">
-                        <img src="https://images.unsplash.com/photo-1527980965255-d3b416303d12?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="Influencer">
-                        <h3>@NOLANightOwl</h3>
+                        <img src="${influencerImg}" alt="${influencerName}">
+                        <h3>${influencerName}</h3>
                         <p>The Tastemaker</p>
                     </div>
                 </div>

@@ -70,9 +70,14 @@
     align-items: center;
 }
 
+@keyframes morph {
+    0% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+    50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+    100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+}
+
 .host-shape {
     position: absolute;
-    border-radius: 50%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -83,6 +88,7 @@
     cursor: pointer;
     overflow: hidden;
     border: 3px solid rgba(255, 255, 255, 0.85);
+    animation: morph 8s ease-in-out infinite;
 }
 
 .host-shape:hover {
@@ -91,26 +97,26 @@
 }
 
 .host-council {
-    width: 260px;
-    height: 260px;
-    top: 10px;
-    left: 20px;
+    width: 320px;
+    height: 320px;
+    top: 0;
+    left: 10px;
     background: linear-gradient(160deg, var(--brand-red) 0%, #8a2200 100%);
     color: var(--bg-primary);
 }
 
 .host-influencer {
-    width: 220px;
-    height: 220px;
-    bottom: 20px;
-    right: 30px;
+    width: 280px;
+    height: 280px;
+    bottom: 0;
+    right: 10px;
     background: linear-gradient(160deg, var(--accent) 0%, var(--accent-dark) 100%);
     color: var(--text-primary);
 }
 
 .host-shape img {
-    width: 90px;
-    height: 90px;
+    width: 140px;
+    height: 140px;
     border-radius: 50%;
     margin-bottom: 15px;
     object-fit: cover;

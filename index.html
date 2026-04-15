@@ -354,6 +354,7 @@
             transform: rotate(-1.2deg) scale(1.03);
             z-index: 2;
             margin-bottom: 20px;
+            padding-bottom: 40px;
         }
 
         .flow-row--venues {
@@ -417,12 +418,47 @@
             padding: 10px 6px;
             text-transform: uppercase;
             letter-spacing: 0.05em;
+            line-height: 1.3;
+        }
+
+        .card-caption span {
+            display: block;
+            font-size: 0.6rem;
+            color: var(--accent);
+            margin-top: 2px;
+            letter-spacing: 0.1em;
         }
 
         .flow-couple {
             display: flex;
-            gap: 14px;
-            padding: 0 7px;
+            gap: 10px;
+            padding: 0 56px;
+            align-items: flex-start;
+        }
+
+        .flow-couple .flow-card:nth-child(3) {
+            margin-top: 36px;
+        }
+
+        .couple-ampersand {
+            font-family: var(--font-header);
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: var(--brand-red);
+            align-self: center;
+            margin: 0 2px;
+            transform: rotate(-5deg) skewX(-5deg);
+            text-shadow: 
+                1px 1px 0px #5c2a18,
+                2px 2px 0px var(--text-primary),
+                3px 3px 0px var(--text-primary),
+                4px 4px 0px var(--accent),
+                5px 5px 0px var(--accent),
+                6px 6px 0px #c94e28,
+                7px 7px 0px var(--brand-red),
+                10px 10px 14px rgba(0,0,0,0.45);
+            z-index: 3;
+            line-height: 1;
         }
 
         .flow-label {
@@ -929,103 +965,113 @@
                 <!-- Group 1 -->
                 <div class="flow-couple">
                     <div class="flow-card">
-                        <img src="assets/freddie-king-iii-headshot.jpg" alt="Freddie King III">
-                        <div class="card-caption">Freddie King III</div>
+                        <img src="assets/aubreyavo.jpg" alt="Aubrey Avo">
+                        <div class="card-caption">Aubrey Avo<span>Influencer</span></div>
                     </div>
-                    <div class="flow-card">
-                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=520&fit=crop" alt="Sarah Jane">
-                        <div class="card-caption">Sarah Jane</div>
-                    </div>
-                </div>
-                <div class="flow-couple">
-                    <div class="flow-card">
-                        <img src="assets/Lesli-Harris-New-Headshot.png" alt="Lesli Harris">
-                        <div class="card-caption">Lesli Harris</div>
-                    </div>
-                    <div class="flow-card">
-                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=520&fit=crop" alt="Marcus Doe">
-                        <div class="card-caption">Marcus Doe</div>
-                    </div>
-                </div>
-                <div class="flow-couple">
-                    <div class="flow-card">
-                        <img src="assets/jason-hughes_1.png" alt="Jason Hughes">
-                        <div class="card-caption">Jason Hughes</div>
-                    </div>
-                    <div class="flow-card">
-                        <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=520&fit=crop" alt="Elena Rostova">
-                        <div class="card-caption">Elena Rostova</div>
-                    </div>
-                </div>
-                <div class="flow-couple">
+                    <div class="couple-ampersand">&amp;</div>
                     <div class="flow-card">
                         <img src="assets/Aimee-McCarron_2.png" alt="Aimee McCarron">
-                        <div class="card-caption">Aimee McCarron</div>
-                    </div>
-                    <div class="flow-card">
-                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=520&fit=crop" alt="David Smith">
-                        <div class="card-caption">David Smith</div>
+                        <div class="card-caption">Aimee McCarron<span>Councilmember District A</span></div>
                     </div>
                 </div>
                 <div class="flow-couple">
                     <div class="flow-card">
-                        <img src="assets/6f4b029a-17b9-47d7-9f28-22a5e75eec59.png" alt="Councilmember">
-                        <div class="card-caption">Councilmember</div>
+                        <img src="assets/10thwardbuck.jpg" alt="10th Ward Buck">
+                        <div class="card-caption">10th Ward Buck<span>Influencer</span></div>
                     </div>
+                    <div class="couple-ampersand">&amp;</div>
                     <div class="flow-card">
-                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=520&fit=crop" alt="Chloe Kim">
-                        <div class="card-caption">Chloe Kim</div>
+                        <img src="assets/Lesli-Harris-New-Headshot.png" alt="Lesli Harris">
+                        <div class="card-caption">Lesli Harris<span>Councilmember District B</span></div>
+                    </div>
+                </div>
+                <div class="flow-couple">
+                    <div class="flow-card">
+                        <img src="assets/caseyferrand.jpg" alt="Casey Ferrand">
+                        <div class="card-caption">Casey Ferrand<span>Influencer</span></div>
+                    </div>
+                    <div class="couple-ampersand">&amp;</div>
+                    <div class="flow-card">
+                        <img src="assets/freddie-king-iii-headshot.jpg" alt="Freddie King III">
+                        <div class="card-caption">Freddie King III<span>Councilmember District C</span></div>
+                    </div>
+                </div>
+                <div class="flow-couple">
+                    <div class="flow-card">
+                        <img src="assets/quinnbishop.jpg" alt="Quinn Bishop">
+                        <div class="card-caption">Quinn Bishop<span>Influencer</span></div>
+                    </div>
+                    <div class="couple-ampersand">&amp;</div>
+                    <div class="flow-card">
+                        <img src="assets/EugeneGreen.png" alt="Eugene Green">
+                        <div class="card-caption">Eugene Green<span>Councilmember District D</span></div>
+                    </div>
+                </div>
+                <div class="flow-couple">
+                    <div class="flow-card">
+                        <img src="assets/ronorleans.png" alt="Ron Orleans">
+                        <div class="card-caption">Ron Orleans<span>Influencer</span></div>
+                    </div>
+                    <div class="couple-ampersand">&amp;</div>
+                    <div class="flow-card">
+                        <img src="assets/jason-hughes_1.png" alt="Jason Hughes">
+                        <div class="card-caption">Jason Hughes<span>Councilmember District E</span></div>
                     </div>
                 </div>
                 <!-- Group 2 (repeated for seamless scroll) -->
                 <div class="flow-couple">
                     <div class="flow-card">
-                        <img src="assets/freddie-king-iii-headshot.jpg" alt="Freddie King III">
-                        <div class="card-caption">Freddie King III</div>
+                        <img src="assets/aubreyavo.jpg" alt="Aubrey Avo">
+                        <div class="card-caption">Aubrey Avo<span>Influencer</span></div>
                     </div>
-                    <div class="flow-card">
-                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=520&fit=crop" alt="Sarah Jane">
-                        <div class="card-caption">Sarah Jane</div>
-                    </div>
-                </div>
-                <div class="flow-couple">
-                    <div class="flow-card">
-                        <img src="assets/Lesli-Harris-New-Headshot.png" alt="Lesli Harris">
-                        <div class="card-caption">Lesli Harris</div>
-                    </div>
-                    <div class="flow-card">
-                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=520&fit=crop" alt="Marcus Doe">
-                        <div class="card-caption">Marcus Doe</div>
-                    </div>
-                </div>
-                <div class="flow-couple">
-                    <div class="flow-card">
-                        <img src="assets/jason-hughes_1.png" alt="Jason Hughes">
-                        <div class="card-caption">Jason Hughes</div>
-                    </div>
-                    <div class="flow-card">
-                        <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=520&fit=crop" alt="Elena Rostova">
-                        <div class="card-caption">Elena Rostova</div>
-                    </div>
-                </div>
-                <div class="flow-couple">
+                    <div class="couple-ampersand">&amp;</div>
                     <div class="flow-card">
                         <img src="assets/Aimee-McCarron_2.png" alt="Aimee McCarron">
-                        <div class="card-caption">Aimee McCarron</div>
-                    </div>
-                    <div class="flow-card">
-                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=520&fit=crop" alt="David Smith">
-                        <div class="card-caption">David Smith</div>
+                        <div class="card-caption">Aimee McCarron<span>Councilmember District A</span></div>
                     </div>
                 </div>
                 <div class="flow-couple">
                     <div class="flow-card">
-                        <img src="assets/6f4b029a-17b9-47d7-9f28-22a5e75eec59.png" alt="Councilmember">
-                        <div class="card-caption">Councilmember</div>
+                        <img src="assets/10thwardbuck.jpg" alt="10th Ward Buck">
+                        <div class="card-caption">10th Ward Buck<span>Influencer</span></div>
                     </div>
+                    <div class="couple-ampersand">&amp;</div>
                     <div class="flow-card">
-                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=520&fit=crop" alt="Chloe Kim">
-                        <div class="card-caption">Chloe Kim</div>
+                        <img src="assets/Lesli-Harris-New-Headshot.png" alt="Lesli Harris">
+                        <div class="card-caption">Lesli Harris<span>Councilmember District B</span></div>
+                    </div>
+                </div>
+                <div class="flow-couple">
+                    <div class="flow-card">
+                        <img src="assets/caseyferrand.jpg" alt="Casey Ferrand">
+                        <div class="card-caption">Casey Ferrand<span>Influencer</span></div>
+                    </div>
+                    <div class="couple-ampersand">&amp;</div>
+                    <div class="flow-card">
+                        <img src="assets/freddie-king-iii-headshot.jpg" alt="Freddie King III">
+                        <div class="card-caption">Freddie King III<span>Councilmember District C</span></div>
+                    </div>
+                </div>
+                <div class="flow-couple">
+                    <div class="flow-card">
+                        <img src="assets/quinnbishop.jpg" alt="Quinn Bishop">
+                        <div class="card-caption">Quinn Bishop<span>Influencer</span></div>
+                    </div>
+                    <div class="couple-ampersand">&amp;</div>
+                    <div class="flow-card">
+                        <img src="assets/EugeneGreen.png" alt="Eugene Green">
+                        <div class="card-caption">Eugene Green<span>Councilmember District D</span></div>
+                    </div>
+                </div>
+                <div class="flow-couple">
+                    <div class="flow-card">
+                        <img src="assets/ronorleans.png" alt="Ron Orleans">
+                        <div class="card-caption">Ron Orleans<span>Influencer</span></div>
+                    </div>
+                    <div class="couple-ampersand">&amp;</div>
+                    <div class="flow-card">
+                        <img src="assets/jason-hughes_1.png" alt="Jason Hughes">
+                        <div class="card-caption">Jason Hughes<span>Councilmember District E</span></div>
                     </div>
                 </div>
             </div>
