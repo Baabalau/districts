@@ -252,7 +252,7 @@
         .subtitle {
             font-family: var(--font-subhead);
             font-style: italic;
-            font-size: clamp(1.8rem, 4vw, 3rem);
+            font-size: clamp(1.2rem, 2.5vw, 1.8rem);
             color: var(--text-primary);
             margin-bottom: 32px;
             display: block;
@@ -353,7 +353,7 @@
         .flow-row--people {
             transform: rotate(-1.2deg) scale(1.03);
             z-index: 2;
-            margin-bottom: -28px;
+            margin-bottom: 20px;
         }
 
         .flow-row--venues {
@@ -383,8 +383,8 @@
         }
 
         .flow-card {
-            width: 118px;
-            height: 118px;
+            width: 200px;
+            height: 260px;
             border-radius: 14px;
             overflow: hidden;
             flex-shrink: 0;
@@ -393,6 +393,7 @@
                 0 6px 0 var(--accent),
                 0 10px 24px rgba(0,0,0,0.2);
             background: var(--bg-primary);
+            position: relative;
         }
 
         .flow-card img {
@@ -400,6 +401,28 @@
             height: 100%;
             object-fit: cover;
             display: block;
+        }
+
+        .card-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(45, 27, 21, 0.85);
+            color: var(--bg-primary);
+            font-family: var(--font-header);
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-align: center;
+            padding: 10px 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .flow-couple {
+            display: flex;
+            gap: 14px;
+            padding: 0 7px;
         }
 
         .flow-label {
@@ -872,8 +895,8 @@
     <header class="hero js-reveal reveal-opacity">
         <div class="hero-inner">
             <div class="hero-content js-reveal reveal-y delay-200">
-                <h1 class="title-3d">Support Your Ward!</h1>
-                <span class="subtitle">During the Long, Hot Summer</span>
+                <h1 class="title-3d">Districts After Dark</h1>
+                <span class="subtitle">Join in with your New Orleans City Councilmembers and local influencers on a summer night out in support of local nightlife</span>
                 <a href="#events" class="brand-btn">Find Your District Crawl</a>
             </div>
             <div class="hero-map">
@@ -903,35 +926,161 @@
         <p class="flow-label">Councilmembers &amp; influencers</p>
         <div class="flow-row flow-row--people">
             <div class="flow-track flow-track--left">
-                <div class="flow-card"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&h=300&fit=crop" alt="Community leader portrait"></div>
-                <div class="flow-card"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop" alt="Council representative portrait"></div>
-                <div class="flow-card"><img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=300&fit=crop" alt="Influencer portrait"></div>
-                <div class="flow-card"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&h=300&fit=crop" alt="Host portrait"></div>
-                <div class="flow-card"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&h=300&fit=crop" alt="Guest portrait"></div>
-                <div class="flow-card"><img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=300&fit=crop" alt="Organizer portrait"></div>
-                <div class="flow-card"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&h=300&fit=crop" alt="Community leader portrait"></div>
-                <div class="flow-card"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop" alt="Council representative portrait"></div>
-                <div class="flow-card"><img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=300&fit=crop" alt="Influencer portrait"></div>
-                <div class="flow-card"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&h=300&fit=crop" alt="Host portrait"></div>
-                <div class="flow-card"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&h=300&fit=crop" alt="Guest portrait"></div>
-                <div class="flow-card"><img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=300&fit=crop" alt="Organizer portrait"></div>
+                <!-- Group 1 -->
+                <div class="flow-couple">
+                    <div class="flow-card">
+                        <img src="assets/freddie-king-iii-headshot.jpg" alt="Freddie King III">
+                        <div class="card-caption">Freddie King III</div>
+                    </div>
+                    <div class="flow-card">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=520&fit=crop" alt="Sarah Jane">
+                        <div class="card-caption">Sarah Jane</div>
+                    </div>
+                </div>
+                <div class="flow-couple">
+                    <div class="flow-card">
+                        <img src="assets/Lesli-Harris-New-Headshot.png" alt="Lesli Harris">
+                        <div class="card-caption">Lesli Harris</div>
+                    </div>
+                    <div class="flow-card">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=520&fit=crop" alt="Marcus Doe">
+                        <div class="card-caption">Marcus Doe</div>
+                    </div>
+                </div>
+                <div class="flow-couple">
+                    <div class="flow-card">
+                        <img src="assets/jason-hughes_1.png" alt="Jason Hughes">
+                        <div class="card-caption">Jason Hughes</div>
+                    </div>
+                    <div class="flow-card">
+                        <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=520&fit=crop" alt="Elena Rostova">
+                        <div class="card-caption">Elena Rostova</div>
+                    </div>
+                </div>
+                <div class="flow-couple">
+                    <div class="flow-card">
+                        <img src="assets/Aimee-McCarron_2.png" alt="Aimee McCarron">
+                        <div class="card-caption">Aimee McCarron</div>
+                    </div>
+                    <div class="flow-card">
+                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=520&fit=crop" alt="David Smith">
+                        <div class="card-caption">David Smith</div>
+                    </div>
+                </div>
+                <div class="flow-couple">
+                    <div class="flow-card">
+                        <img src="assets/6f4b029a-17b9-47d7-9f28-22a5e75eec59.png" alt="Councilmember">
+                        <div class="card-caption">Councilmember</div>
+                    </div>
+                    <div class="flow-card">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=520&fit=crop" alt="Chloe Kim">
+                        <div class="card-caption">Chloe Kim</div>
+                    </div>
+                </div>
+                <!-- Group 2 (repeated for seamless scroll) -->
+                <div class="flow-couple">
+                    <div class="flow-card">
+                        <img src="assets/freddie-king-iii-headshot.jpg" alt="Freddie King III">
+                        <div class="card-caption">Freddie King III</div>
+                    </div>
+                    <div class="flow-card">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=520&fit=crop" alt="Sarah Jane">
+                        <div class="card-caption">Sarah Jane</div>
+                    </div>
+                </div>
+                <div class="flow-couple">
+                    <div class="flow-card">
+                        <img src="assets/Lesli-Harris-New-Headshot.png" alt="Lesli Harris">
+                        <div class="card-caption">Lesli Harris</div>
+                    </div>
+                    <div class="flow-card">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=520&fit=crop" alt="Marcus Doe">
+                        <div class="card-caption">Marcus Doe</div>
+                    </div>
+                </div>
+                <div class="flow-couple">
+                    <div class="flow-card">
+                        <img src="assets/jason-hughes_1.png" alt="Jason Hughes">
+                        <div class="card-caption">Jason Hughes</div>
+                    </div>
+                    <div class="flow-card">
+                        <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=520&fit=crop" alt="Elena Rostova">
+                        <div class="card-caption">Elena Rostova</div>
+                    </div>
+                </div>
+                <div class="flow-couple">
+                    <div class="flow-card">
+                        <img src="assets/Aimee-McCarron_2.png" alt="Aimee McCarron">
+                        <div class="card-caption">Aimee McCarron</div>
+                    </div>
+                    <div class="flow-card">
+                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=520&fit=crop" alt="David Smith">
+                        <div class="card-caption">David Smith</div>
+                    </div>
+                </div>
+                <div class="flow-couple">
+                    <div class="flow-card">
+                        <img src="assets/6f4b029a-17b9-47d7-9f28-22a5e75eec59.png" alt="Councilmember">
+                        <div class="card-caption">Councilmember</div>
+                    </div>
+                    <div class="flow-card">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=520&fit=crop" alt="Chloe Kim">
+                        <div class="card-caption">Chloe Kim</div>
+                    </div>
+                </div>
             </div>
         </div>
         <p class="flow-label" style="margin-top: 28px;">Nightlife &amp; local haunts</p>
         <div class="flow-row flow-row--venues">
             <div class="flow-track flow-track--right">
-                <div class="flow-card"><img src="https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=300&h=300&fit=crop" alt="Bar interior"></div>
-                <div class="flow-card"><img src="https://images.unsplash.com/photo-1555992336-03a23c7b20ee?w=300&h=300&fit=crop" alt="Nightlife venue"></div>
-                <div class="flow-card"><img src="https://images.unsplash.com/photo-1566417713940-fe7c737a9ef2?w=300&h=300&fit=crop" alt="Cocktail lounge"></div>
-                <div class="flow-card"><img src="https://images.unsplash.com/photo-1572116469696-31de0f17cc34?w=300&h=300&fit=crop" alt="Restaurant bar"></div>
-                <div class="flow-card"><img src="https://images.unsplash.com/photo-1543007630-9710e4a00a20?w=300&h=300&fit=crop" alt="Live music venue"></div>
-                <div class="flow-card"><img src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=300&h=300&fit=crop" alt="Neighborhood spot"></div>
-                <div class="flow-card"><img src="https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=300&h=300&fit=crop" alt="Bar interior"></div>
-                <div class="flow-card"><img src="https://images.unsplash.com/photo-1555992336-03a23c7b20ee?w=300&h=300&fit=crop" alt="Nightlife venue"></div>
-                <div class="flow-card"><img src="https://images.unsplash.com/photo-1566417713940-fe7c737a9ef2?w=300&h=300&fit=crop" alt="Cocktail lounge"></div>
-                <div class="flow-card"><img src="https://images.unsplash.com/photo-1572116469696-31de0f17cc34?w=300&h=300&fit=crop" alt="Restaurant bar"></div>
-                <div class="flow-card"><img src="https://images.unsplash.com/photo-1543007630-9710e4a00a20?w=300&h=300&fit=crop" alt="Live music venue"></div>
-                <div class="flow-card"><img src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=300&h=300&fit=crop" alt="Neighborhood spot"></div>
+                <div class="flow-card">
+                    <img src="https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=400&h=520&fit=crop" alt="Bar interior">
+                    <div class="card-caption">The Local Pub</div>
+                </div>
+                <div class="flow-card">
+                    <img src="https://images.unsplash.com/photo-1555992336-03a23c7b20ee?w=400&h=520&fit=crop" alt="Nightlife venue">
+                    <div class="card-caption">Neon Nights</div>
+                </div>
+                <div class="flow-card">
+                    <img src="https://images.unsplash.com/photo-1566417713940-fe7c737a9ef2?w=400&h=520&fit=crop" alt="Cocktail lounge">
+                    <div class="card-caption">Classic Lounge</div>
+                </div>
+                <div class="flow-card">
+                    <img src="https://images.unsplash.com/photo-1572116469696-31de0f17cc34?w=400&h=520&fit=crop" alt="Restaurant bar">
+                    <div class="card-caption">Corner Bar</div>
+                </div>
+                <div class="flow-card">
+                    <img src="https://images.unsplash.com/photo-1543007630-9710e4a00a20?w=400&h=520&fit=crop" alt="Live music venue">
+                    <div class="card-caption">Live Music Venue</div>
+                </div>
+                <div class="flow-card">
+                    <img src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=520&fit=crop" alt="Neighborhood spot">
+                    <div class="card-caption">Neighborhood Haunt</div>
+                </div>
+                <div class="flow-card">
+                    <img src="https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=400&h=520&fit=crop" alt="Bar interior">
+                    <div class="card-caption">The Local Pub</div>
+                </div>
+                <div class="flow-card">
+                    <img src="https://images.unsplash.com/photo-1555992336-03a23c7b20ee?w=400&h=520&fit=crop" alt="Nightlife venue">
+                    <div class="card-caption">Neon Nights</div>
+                </div>
+                <div class="flow-card">
+                    <img src="https://images.unsplash.com/photo-1566417713940-fe7c737a9ef2?w=400&h=520&fit=crop" alt="Cocktail lounge">
+                    <div class="card-caption">Classic Lounge</div>
+                </div>
+                <div class="flow-card">
+                    <img src="https://images.unsplash.com/photo-1572116469696-31de0f17cc34?w=400&h=520&fit=crop" alt="Restaurant bar">
+                    <div class="card-caption">Corner Bar</div>
+                </div>
+                <div class="flow-card">
+                    <img src="https://images.unsplash.com/photo-1543007630-9710e4a00a20?w=400&h=520&fit=crop" alt="Live music venue">
+                    <div class="card-caption">Live Music Venue</div>
+                </div>
+                <div class="flow-card">
+                    <img src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=520&fit=crop" alt="Neighborhood spot">
+                    <div class="card-caption">Neighborhood Haunt</div>
+                </div>
             </div>
         </div>
     </section>
@@ -1100,7 +1249,25 @@
             touchZoom: false,
             boxZoom: false,
             dragging: false
-        }).setView([29.98, -90.05], 12);
+        });
+
+        function updateMapView() {
+            if (window.innerWidth < 500) {
+                // Mobile view: Zoomed out a bit more to show all districts clearly
+                map.setView([29.98, -90.04], 11.3);
+            } else {
+                // Desktop view: Slightly more zoomed in and shifted to fit beside text
+                map.setView([29.98, -90.05], 12);
+            }
+        }
+
+        // Initial view setup
+        updateMapView();
+
+        // Listen for window resize to update map view
+        window.addEventListener('resize', () => {
+            updateMapView();
+        });
 
         // Using CartoDB Light theme to match the inverted look nicely
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
