@@ -1264,7 +1264,10 @@
 
     <script src="council_districts.js"></script>
     <script type="module" src="js/auth.js"></script>
-    <script>
+    <script type="module">
+        import { db } from "./js/firebase-config.js";
+        import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+
         // --- MENU LOGIC ---
         const menuToggle = document.getElementById('menuToggle');
         const menuClose = document.getElementById('menuClose');
@@ -1390,6 +1393,56 @@
         } else {
             console.error("Council districts data not loaded.");
         }
+
+        // Dynamic icon generator based on venue type
+        function getTinyVenueIcon(type) {
+            const colors = {
+                'bar': '#EE8442',
+                'restaurant': '#C32F00',
+                'club': '#8a2200',
+                'lounge': '#2D1B15',
+                'music': '#D2B48C',
+                'default': '#D6753A'
+            };
+            
+            let color = colors['default'];
+            if (type) {
+                const normalizedType = type.toLowerCase();
+                for (const key in colors) {
+                    if (normalizedType.includes(key)) {
+                        color = colors[key];
+                        break;
+                    }
+                }
+            }
+
+            return L.divIcon({
+                className: 'custom-venue-marker-tiny',
+                html: `<div style="background-color: ${color}; width: 6px; height: 6px; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.3); border: 1px solid #fff;"></div>`,
+                iconSize: [6, 6],
+                iconAnchor: [3, 3]
+            });
+        }
+
+        async function loadAllVenues() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "venues"));
+                querySnapshot.forEach((doc) => {
+                    const place = doc.data();
+                    if (!place.lat || !place.lng) return;
+                    
+                    L.marker([place.lat, place.lng], {
+                        icon: getTinyVenueIcon(place.type),
+                        interactive: false // non-clickable
+                    }).addTo(map);
+                });
+            } catch (error) {
+                console.error("Error fetching venues from Firestore:", error);
+            }
+        }
+        
+        // Load venues
+        loadAllVenues();
 
         function refreshMapSize() {
             map.invalidateSize();

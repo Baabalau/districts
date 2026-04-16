@@ -28,26 +28,90 @@ document.addEventListener("DOMContentLoaded", async () => {
         maxZoom: 20
     }).addTo(map);
 
-    const accentIcon = L.divIcon({
-        className: 'custom-route-marker',
-        html: '<div style="background-color: #EE8442; width: 15px; height: 15px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.25); border: 2px solid #fff;"></div>',
-        iconSize: [15, 15],
-        iconAnchor: [7.5, 7.5]
-    });
+    // Draw the district boundary if available
+    if (window.councilDistricts) {
+        const districtFeature = window.councilDistricts.features.find(
+            f => f.properties.DISTRICTID.toLowerCase() === districtId.toLowerCase()
+        );
+        
+        if (districtFeature) {
+            // 1. Draw boundary line only (no interior fill)
+            L.geoJSON(districtFeature, {
+                style: {
+                    color: '#C32F00',
+                    weight: 4,
+                    opacity: 1,
+                    fillOpacity: 0
+                }
+            }).addTo(map);
 
-    const brandIcon = L.divIcon({
-        className: 'custom-route-marker-brand',
-        html: '<div style="background-color: #C32F00; width: 15px; height: 15px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.3); border: 2px solid #fff;"></div>',
-        iconSize: [15, 15],
-        iconAnchor: [7.5, 7.5]
-    });
+            // 2. Draw inverted polygon to tint the outside
+            let rings = [];
+            if (districtFeature.geometry.type === 'Polygon') {
+                districtFeature.geometry.coordinates.forEach(ring => {
+                    // Convert GeoJSON [lng, lat] to Leaflet [lat, lng]
+                    rings.push(ring.map(c => [c[1], c[0]]));
+                });
+            } else if (districtFeature.geometry.type === 'MultiPolygon') {
+                districtFeature.geometry.coordinates.forEach(polygon => {
+                    polygon.forEach(ring => {
+                        rings.push(ring.map(c => [c[1], c[0]]));
+                    });
+                });
+            }
 
-    const smallVenueIcon = L.divIcon({
-        className: 'custom-venue-marker',
-        html: '<div style="background-color: #EE8442; width: 8px; height: 8px; border-radius: 50%; box-shadow: 0 1px 4px rgba(0,0,0,0.2); border: 1px solid #fff;"></div>',
-        iconSize: [8, 8],
-        iconAnchor: [4, 4]
-    });
+            // Outer ring covering the world
+            const outerRing = [
+                [90, -180],
+                [90, 180],
+                [-90, 180],
+                [-90, -180]
+            ];
+
+            L.polygon([outerRing, ...rings], {
+                color: 'transparent',
+                fillColor: '#2D1B15',
+                fillOpacity: 0.35
+            }).addTo(map);
+
+            // Restrict map panning to the district feature
+            const bounds = L.geoJSON(districtFeature).getBounds();
+            map.fitBounds(bounds, { padding: [20, 20] });
+            map.setMaxBounds(bounds.pad(0.3));
+            map.options.minZoom = map.getZoom() - 1;
+        }
+    }
+
+    // Dynamic icon generator based on venue type
+    function getVenueIcon(type) {
+        // Map types to distinct colors
+        const colors = {
+            'bar': '#EE8442',       // Accent orange
+            'restaurant': '#C32F00', // Brand red
+            'club': '#8a2200',      // Dark red
+            'lounge': '#2D1B15',    // Dark brown
+            'music': '#D2B48C',     // Light brown
+            'default': '#D6753A'    // Accent dark
+        };
+        
+        let color = colors['default'];
+        if (type) {
+            const normalizedType = type.toLowerCase();
+            for (const key in colors) {
+                if (normalizedType.includes(key)) {
+                    color = colors[key];
+                    break;
+                }
+            }
+        }
+
+        return L.divIcon({
+            className: 'custom-venue-marker',
+            html: `<div style="background-color: ${color}; width: 12px; height: 12px; border-radius: 50%; box-shadow: 0 2px 6px rgba(0,0,0,0.3); border: 2px solid #fff;"></div>`,
+            iconSize: [12, 12],
+            iconAnchor: [6, 6]
+        });
+    }
 
     try {
         // Fetch venues from Firestore where district matches
@@ -75,7 +139,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     </div>
                 </div>
             `;
-            L.marker([place.lat, place.lng], {icon: smallVenueIcon}).addTo(map)
+            L.marker([place.lat, place.lng], {icon: getVenueIcon(place.type)}).addTo(map)
                 .bindPopup(popupContent);
         });
     } catch (error) {
