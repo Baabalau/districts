@@ -1,14 +1,17 @@
 /* Shared event layout — matches index.html color theme */
 
 :root {
-    --bg-primary: #D2B48C;
-    --bg-secondary: #E3CBB3;
-    --text-primary: #2D1B15;
-    --text-secondary: #4A3022;
-    --accent: #EE8442;
-    --accent-dark: #D6753A;
-    --brand-red: #C32F00;
-    --panel-bg: #f5ebe0;
+    /* City of New Orleans Seal Dark Theme */
+    --bg-primary: #0F1626; /* Dark Blue */
+    --bg-secondary: #182238; /* Lighter Dark Blue */
+    --text-primary: #CBA052; /* Gold */
+    --text-secondary: #DEBA84; /* Tan */
+    
+    /* Accent + brand color */
+    --accent: #8A2F25; /* Red */
+    --accent-dark: #6A241C; /* Dark Red */
+    --brand-red: #4C835C; /* Olive Green */
+    --panel-bg: #182238;
     --font-main: 'Inter', sans-serif;
     --font-header: 'Montserrat', sans-serif;
     --font-subhead: 'Georgia', serif;
@@ -28,15 +31,15 @@
     letter-spacing: 2px;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 5px 15px rgba(238, 132, 66, 0.4);
+    box-shadow: 0 5px 15px rgba(210, 160, 57, 0.4);
     text-decoration: none;
     display: inline-block;
 }
 
 .brand-btn:hover {
-    background: linear-gradient(180deg, #e55a2e 0%, #a82800 100%);
+    background: linear-gradient(180deg, var(--accent-dark) 0%, #1E2545 100%);
     transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(195, 47, 0, 0.45);
+    box-shadow: 0 8px 25px rgba(43, 53, 97, 0.45);
 }
 
 /* Title 3D */
@@ -46,16 +49,16 @@
     font-size: clamp(3.5rem, 9vw, 7.5rem);
     font-weight: 900;
     text-transform: uppercase;
-    color: var(--brand-red);
+    color: var(--text-primary);
     transform: rotate(-5deg) skewX(-5deg);
     text-shadow: 
-        1px 1px 0px #5c2a18,
-        2px 2px 0px var(--text-primary),
-        4px 4px 0px var(--text-primary),
-        6px 6px 0px var(--text-primary),
+        1px 1px 0px #0F1626,
+        2px 2px 0px var(--accent),
+        4px 4px 0px var(--accent),
+        6px 6px 0px var(--accent),
         8px 8px 0px var(--accent),
-        10px 10px 0px var(--accent),
-        12px 12px 0px #c94e28,
+        10px 10px 0px var(--brand-red),
+        12px 12px 0px var(--brand-red),
         14px 14px 0px var(--brand-red),
         20px 22px 24px rgba(0,0,0,0.45);
     margin-bottom: 20px;
@@ -152,8 +155,8 @@
     bottom: 0;
     left: 0;
     width: 100%;
-    background: rgba(45, 27, 21, 0.85);
-    color: var(--bg-primary);
+    background: rgba(15, 22, 38, 0.85);
+    color: var(--text-primary);
     font-family: var(--font-header);
     font-size: 0.8rem;
     font-weight: 700;
@@ -181,12 +184,12 @@
     margin: 0 2px;
     transform: rotate(-5deg) skewX(-5deg);
     text-shadow: 
-        1px 1px 0px #5c2a18,
+        1px 1px 0px #1D1A16,
         2px 2px 0px var(--text-primary),
         3px 3px 0px var(--text-primary),
         4px 4px 0px var(--accent),
         5px 5px 0px var(--accent),
-        6px 6px 0px #c94e28,
+        6px 6px 0px #1E2545,
         7px 7px 0px var(--brand-red),
         10px 10px 14px rgba(0,0,0,0.45);
     z-index: 3;
@@ -210,19 +213,19 @@
 .purpose-frame {
     position: relative;
     padding: clamp(2rem, 5vw, 3.5rem) clamp(1.5rem, 4vw, 3rem);
-    background: linear-gradient(168deg, #f5e6d8 0%, var(--bg-secondary) 42%, #c9a882 100%);
+    background: linear-gradient(168deg, #1A243D 0%, var(--bg-secondary) 42%, #0A0F1A 100%);
     border-radius: 8px;
     border: 4px solid var(--text-primary);
     box-shadow:
         inset 4px 4px 0 rgba(255,255,255,0.55),
-        inset -4px -4px 0 rgba(45, 27, 21, 0.2),
-        inset 0 -3px 12px rgba(195, 47, 0, 0.12),
+        inset -4px -4px 0 rgba(15, 22, 38, 0.2),
+        inset 0 -3px 12px rgba(138, 47, 37, 0.12),
         0 0 0 4px var(--brand-red),
         0 0 0 10px var(--accent),
         0 0 0 16px var(--text-primary),
-        0 0 0 22px rgba(195, 47, 0, 0.35),
-        18px 22px 0 rgba(195, 47, 0, 0.45),
-        26px 30px 0 rgba(238, 132, 66, 0.3),
+        0 0 0 22px rgba(138, 47, 37, 0.35),
+        18px 22px 0 rgba(138, 47, 37, 0.45),
+        26px 30px 0 rgba(203, 160, 82, 0.3),
         34px 38px 48px rgba(0,0,0,0.35);
     transform: rotateX(11deg) translateZ(12px) scale(0.99);
     transform-style: preserve-3d;
@@ -234,9 +237,9 @@
     position: absolute;
     inset: -28px;
     border-radius: 14px;
-    background: radial-gradient(ellipse 80% 60% at 30% 20%, rgba(238,132,66,0.45), transparent 55%),
-        radial-gradient(ellipse 70% 50% at 80% 90%, rgba(195,47,0,0.35), transparent 50%),
-        linear-gradient(135deg, rgba(45,27,21,0.15), transparent 50%);
+    background: radial-gradient(ellipse 80% 60% at 30% 20%, rgba(203, 160, 82, 0.45), transparent 55%),
+        radial-gradient(ellipse 70% 50% at 80% 90%, rgba(138, 47, 37, 0.35), transparent 50%),
+        linear-gradient(135deg, rgba(15, 22, 38, 0.15), transparent 50%);
     z-index: -2;
     pointer-events: none;
     filter: blur(2px);
@@ -249,7 +252,7 @@
     right: 8%;
     bottom: -18px;
     height: 24px;
-    background: linear-gradient(180deg, rgba(45,27,21,0.35), transparent);
+    background: linear-gradient(180deg, rgba(15, 22, 38, 0.35), transparent);
     border-radius: 40%;
     filter: blur(8px);
     transform: rotateX(75deg);
@@ -288,14 +291,14 @@
     border-radius: 12px;
     box-shadow:
         inset 4px 4px 0 rgba(255,255,255,0.55),
-        inset -4px -4px 0 rgba(45, 27, 21, 0.2),
-        inset 0 -3px 12px rgba(195, 47, 0, 0.12),
+        inset -4px -4px 0 rgba(15, 22, 38, 0.2),
+        inset 0 -3px 12px rgba(138, 47, 37, 0.12),
         0 0 0 4px var(--brand-red),
         0 0 0 10px var(--accent),
         0 0 0 16px var(--text-primary),
-        0 0 0 22px rgba(195, 47, 0, 0.35),
-        18px 22px 0 rgba(195, 47, 0, 0.45),
-        26px 30px 0 rgba(238, 132, 66, 0.3),
+        0 0 0 22px rgba(138, 47, 37, 0.35),
+        18px 22px 0 rgba(138, 47, 37, 0.45),
+        26px 30px 0 rgba(203, 160, 82, 0.3),
         34px 38px 48px rgba(0,0,0,0.35);
     transform: rotateX(2deg) translateZ(12px) scale(0.99);
     transform-style: preserve-3d;

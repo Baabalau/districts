@@ -21,8 +21,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Initialize Leaflet Map
     const map = L.map('map').setView(config.center, config.zoom);
 
-    // Light basemap — matches index / event page theme
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    // Dark basemap
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
         subdomains: 'abcd',
         maxZoom: 20
@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             // 1. Draw boundary line only (no interior fill)
             L.geoJSON(districtFeature, {
                 style: {
-                    color: '#C32F00',
+                    color: '#2B3561',
                     weight: 4,
                     opacity: 1,
                     fillOpacity: 0
@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             L.polygon([outerRing, ...rings], {
                 color: 'transparent',
-                fillColor: '#2D1B15',
+                fillColor: '#1D1A16',
                 fillOpacity: 0.35
             }).addTo(map);
 
@@ -86,12 +86,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     function getVenueIcon(type) {
         // Map types to distinct colors
         const colors = {
-            'bar': '#EE8442',       // Accent orange
-            'restaurant': '#C32F00', // Brand red
-            'club': '#8a2200',      // Dark red
-            'lounge': '#2D1B15',    // Dark brown
-            'music': '#D2B48C',     // Light brown
-            'default': '#D6753A'    // Accent dark
+            'bar': '#D2A039',       // Accent orange -> Gold
+            'restaurant': '#2B3561', // Brand red -> Dark Blue
+            'club': '#1E2545',      // Dark red -> Darker Blue
+            'lounge': '#1D1A16',    // Dark brown -> Dark Outline
+            'music': '#D5BC8A',     // Light brown -> Tan
+            'default': '#A87B28'    // Accent dark -> Dark Gold
         };
         
         let color = colors['default'];
@@ -132,9 +132,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             const popupContent = `
                 <div style="width: 220px; font-family: Inter, sans-serif;">
                     <div style="height: 120px; background-image: url('${place.imageUrl || 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'}'); background-size: cover; background-position: center; border-radius: 5px 5px 0 0; margin: -14px -14px 10px -14px;"></div>
-                    <h4 style="margin: 0 0 5px 0; color: #C32F00; font-family: Montserrat, sans-serif; font-size: 1.2rem; text-transform: uppercase;">${place.name || 'Unnamed Venue'}</h4>
-                    <p style="margin: 0 0 10px 0; font-size: 0.8rem; color: #4A3022; text-transform: capitalize;">${place.type ? place.type.replace('_', ' ') : 'Venue'}</p>
-                    <div style="font-size: 0.85rem; color: #2D1B15; line-height: 1.4;">
+                    <h4 style="margin: 0 0 5px 0; color: #2B3561; font-family: Montserrat, sans-serif; font-size: 1.2rem; text-transform: uppercase;">${place.name || 'Unnamed Venue'}</h4>
+                    <p style="margin: 0 0 10px 0; font-size: 0.8rem; color: #4A3C2F; text-transform: capitalize;">${place.type ? place.type.replace('_', ' ') : 'Venue'}</p>
+                    <div style="font-size: 0.85rem; color: #1D1A16; line-height: 1.4;">
                         ${place.description ? `<div style="margin-bottom: 3px;">${place.description}</div>` : ''}
                     </div>
                 </div>
@@ -153,8 +153,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         
         if (currentNumber === currentVotes) {
             span.innerText = currentNumber + 1;
-            buttonElement.style.background = 'var(--accent, #EE8442)';
-            buttonElement.style.color = '#2D1B15';
+            buttonElement.style.background = 'var(--accent, #D2A039)';
+            buttonElement.style.color = '#1D1A16';
         }
     };
 

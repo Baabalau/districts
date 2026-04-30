@@ -8,24 +8,25 @@ class EventLayout extends HTMLElement {
         const councilName = this.getAttribute('council-name') || 'Councilmember Smith';
         const influencerImg = this.getAttribute('influencer-img') || 'https://images.unsplash.com/photo-1527980965255-d3b416303d12?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80';
         const influencerName = this.getAttribute('influencer-name') || '@NOLANightOwl';
+        const bgImg = this.getAttribute('bg-img') || 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80';
 
         this.innerHTML = `
-            <div class="event-hero">
+            <div class="event-hero" style="background: linear-gradient(rgba(15, 22, 38, 0.85), rgba(15, 22, 38, 0.95)), url('${bgImg}') center/cover; background-attachment: fixed;">
                 <div class="hero-left">
-                    <h1>District ${district} Crawl</h1>
+                    <h1 class="title-3d" style="margin-bottom: 10px;">District ${district} Crawl</h1>
                     <h2>${date} | ${time} | ${location}</h2>
                     <p>Join us for an unforgettable night exploring the hidden gems and local favorites of District ${district}. Connect with your neighbors, meet your councilmember, and experience the culture that makes our city unique.</p>
                     <button id="rsvp-btn" class="brand-btn" style="margin-top: 20px; font-size: 1.1rem; padding: 15px 30px;">RSVP to District ${district} Crawl</button>
                     <p id="rsvp-msg" style="margin-top: 10px; color: var(--accent); font-weight: bold; display: none;"></p>
                 </div>
                 <div class="hero-right" style="display: flex; justify-content: center; align-items: center; height: 100%;">
-                    <div class="flow-couple" style="animation: float 6s ease-in-out infinite; transform-origin: center;">
-                        <div class="flow-card">
+                    <div class="flow-couple" style="transform-origin: center;">
+                        <div class="flow-card" style="animation: float 6s ease-in-out infinite;">
                             <img src="${influencerImg}" alt="${influencerName}">
                             <div class="card-caption">${influencerName}<span>The Tastemaker</span></div>
                         </div>
-                        <div class="couple-ampersand">&amp;</div>
-                        <div class="flow-card">
+                        <div class="couple-ampersand" style="animation: float 6s ease-in-out infinite 1s;">&amp;</div>
+                        <div class="flow-card" style="animation: float 6s ease-in-out infinite 2s;">
                             <img src="${councilImg}" alt="${councilName}">
                             <div class="card-caption">${councilName}<span>The Policy Pro</span></div>
                         </div>

@@ -1,14 +1,17 @@
 /* Shared district event pages — matches index.html theme */
 
 :root {
-    --bg-primary: #D2B48C;
-    --bg-secondary: #E3CBB3;
-    --text-primary: #2D1B15;
-    --text-secondary: #4A3022;
-    --accent: #EE8442;
-    --accent-dark: #D6753A;
-    --brand-red: #C32F00;
-    --panel-bg: #f5ebe0;
+    /* City of New Orleans Seal Dark Theme */
+    --bg-primary: #0F1626; /* Dark Blue */
+    --bg-secondary: #182238; /* Lighter Dark Blue */
+    --text-primary: #CBA052; /* Gold */
+    --text-secondary: #DEBA84; /* Tan */
+    
+    /* Accent + brand color */
+    --accent: #8A2F25; /* Red */
+    --accent-dark: #6A241C; /* Dark Red */
+    --brand-red: #4C835C; /* Olive Green */
+    --panel-bg: #182238;
     --font-main: 'Inter', sans-serif;
     --font-header: 'Montserrat', sans-serif;
 }
@@ -30,12 +33,12 @@ nav {
     justify-content: space-between;
     align-items: center;
     padding: 20px 50px;
-    background: rgba(45, 27, 21, 0.95);
+    background: rgba(15, 22, 38, 0.95);
     backdrop-filter: blur(8px);
     position: sticky;
     top: 0;
     z-index: 100;
-    border-bottom: 1px solid rgba(210, 180, 140, 0.25);
+    border-bottom: 1px solid rgba(203, 160, 82, 0.25);
 }
 
 .logo {
@@ -43,7 +46,7 @@ nav {
     font-size: 1.5rem;
     font-weight: 800;
     text-transform: uppercase;
-    color: var(--bg-primary);
+    color: var(--text-primary);
     letter-spacing: 0.04em;
 }
 
@@ -52,7 +55,7 @@ nav {
 }
 
 .nav-links a {
-    color: var(--bg-primary);
+    color: var(--text-primary);
     text-decoration: none;
     margin-left: 30px;
     font-size: 0.9rem;
