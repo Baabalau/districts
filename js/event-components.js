@@ -46,6 +46,12 @@ class EventLayout extends HTMLElement {
             <div class="map-section-wrapper js-reveal reveal-opacity">
                 <h2 class="title-3d map-title"><u>District ${district}</u><br><span style="font-size: 0.8em; color: var(--accent);">${location}</span></h2>
                 <div id="map"></div>
+                <div class="map-filters" style="padding: 15px; background: var(--bg-secondary); border-top: 2px solid var(--text-primary); border-radius: 0 0 8px 8px; display: flex; justify-content: center; gap: 20px;">
+                    <label style="color: var(--text-secondary); font-family: var(--font-header); font-weight: 700; display: flex; align-items: center; gap: 8px; cursor: pointer; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 0.05em;">
+                        <input type="checkbox" id="toggle-ranked-only" style="width: 18px; height: 18px; accent-color: var(--accent);">
+                        Show Top 10 Nominees Only
+                    </label>
+                </div>
             </div>
 
             <div class="voting-section js-reveal reveal-y delay-200" id="voting-module">
@@ -73,9 +79,9 @@ class EventLayout extends HTMLElement {
                     <div class="instruction-box">
                         <h3>How it works</h3>
                         <ul>
-                            <li><strong>Round 1:</strong> Vote for your favorite neighborhood spots. The top 3 advance.</li>
-                            <li><strong>The Run-Off:</strong> A final 48-hour sprint to decide the winner among the top 3.</li>
-                            <li><strong>The Prize:</strong> The winning venue hosts the final stop. Every voter gets entered into the Golden Ticket Raffle!</li>
+                            <li><strong>Round 1:</strong> Voting opens for all districts when the press release drops. Vote for your favorite neighborhood spots. The top 5 advance.</li>
+                            <li><strong>The Run-Off:</strong> Starts the Monday before the event at 3:00 PM. A final sprint to decide the winner among the top 5.</li>
+                            <li><strong>The Prize:</strong> The winning venue hosts the final stop. Every vote is an entry into the Golden Ticket Raffle!</li>
                         </ul>
                     </div>
                 </div>
@@ -84,7 +90,7 @@ class EventLayout extends HTMLElement {
                 <div id="state-round-1" class="voting-state-container" style="display: none;">
                     <div class="voting-header">
                         <h2>Round 1: Choose Your Final Stop</h2>
-                        <p>The top 3 venues will advance to the run-off in:</p>
+                        <p>The top 5 venues will advance to the run-off in:</p>
                         <div class="countdown-clock small-clock">
                             <div class="time-box"><span>02</span><label>Days</label></div>
                             <div class="time-box"><span>14</span><label>Hrs</label></div>
@@ -98,15 +104,15 @@ class EventLayout extends HTMLElement {
                         <!-- Paginated List (Mobile friendly) -->
                         <ul class="venue-list">
                             <li><span class="rank-badge gold">1</span> <div class="v-details"><strong>The Rusty Nail</strong><br><em>Patio crawfish boil</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('The Rusty Nail')">VOTE</button></li>
-                            <li><span class="rank-badge silver">2</span> <div class="v-details"><strong>Barrel Proof</strong><br><em>Brass band on the deck</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('Barrel Proof')">VOTE</button></li>
-                            <li><span class="rank-badge bronze">3</span> <div class="v-details"><strong>The Tchoup Yard</strong><br><em>Outdoor games & DJ</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('The Tchoup Yard')">VOTE</button></li>
-                            <li><span class="rank-badge">4</span> <div class="v-details"><strong>Capulet</strong><br><em>Frozen cocktails specials</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('Capulet')">VOTE</button></li>
-                            <li><span class="rank-badge">5</span> <div class="v-details"><strong>Bulldog Mid-City</strong><br><em>Pint night deals</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('Bulldog Mid-City')">VOTE</button></li>
-                            <li><span class="rank-badge">6</span> <div class="v-details"><strong>Finn McCool's</strong><br><em>Dog-friendly patio vibes</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('Finn McCool\\'s')">VOTE</button></li>
-                            <li><span class="rank-badge">7</span> <div class="v-details"><strong>Pal's Lounge</strong><br><em>Neighborhood classic</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('Pal\\'s Lounge')">VOTE</button></li>
-                            <li><span class="rank-badge">8</span> <div class="v-details"><strong>Mick's Irish Pub</strong><br><em>Live sports & pool</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('Mick\\'s Irish Pub')">VOTE</button></li>
-                            <li><span class="rank-badge">9</span> <div class="v-details"><strong>Rendon Inn</strong><br><em>Best late night tacos</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('Rendon Inn')">VOTE</button></li>
-                            <li><span class="rank-badge">10</span> <div class="v-details"><strong>12 Mile Limit</strong><br><em>Spacious outdoor seating</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('12 Mile Limit')">VOTE</button></li>
+                            <li><span class="rank-badge gold">2</span> <div class="v-details"><strong>Barrel Proof</strong><br><em>Brass band on the deck</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('Barrel Proof')">VOTE</button></li>
+                            <li><span class="rank-badge gold">3</span> <div class="v-details"><strong>The Tchoup Yard</strong><br><em>Outdoor games & DJ</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('The Tchoup Yard')">VOTE</button></li>
+                            <li><span class="rank-badge silver">4</span> <div class="v-details"><strong>Capulet</strong><br><em>Frozen cocktails specials</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('Capulet')">VOTE</button></li>
+                            <li><span class="rank-badge silver">5</span> <div class="v-details"><strong>Bulldog Mid-City</strong><br><em>Pint night deals</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('Bulldog Mid-City')">VOTE</button></li>
+                            <li><span class="rank-badge dark-gray">6</span> <div class="v-details"><strong>Finn McCool's</strong><br><em>Dog-friendly patio vibes</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('Finn McCool\\'s')">VOTE</button></li>
+                            <li><span class="rank-badge dark-gray">7</span> <div class="v-details"><strong>Pal's Lounge</strong><br><em>Neighborhood classic</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('Pal\\'s Lounge')">VOTE</button></li>
+                            <li><span class="rank-badge dark-gray">8</span> <div class="v-details"><strong>Mick's Irish Pub</strong><br><em>Live sports & pool</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('Mick\\'s Irish Pub')">VOTE</button></li>
+                            <li><span class="rank-badge dark-gray">9</span> <div class="v-details"><strong>Rendon Inn</strong><br><em>Best late night tacos</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('Rendon Inn')">VOTE</button></li>
+                            <li><span class="rank-badge dark-gray">10</span> <div class="v-details"><strong>12 Mile Limit</strong><br><em>Spacious outdoor seating</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('12 Mile Limit')">VOTE</button></li>
                         </ul>
                         <div class="pagination">
                             <button disabled>← Prev</button>
@@ -119,7 +125,7 @@ class EventLayout extends HTMLElement {
                 <!-- RUN-OFF STATE -->
                 <div id="state-run-off" class="voting-state-container" style="display: none;">
                     <div class="voting-header">
-                        <h2>The Run-Off: Top 3</h2>
+                        <h2>The Run-Off: Top 5</h2>
                         <p>It's down to the wire! The polls close in:</p>
                         <div class="countdown-clock small-clock critical">
                             <div class="time-box"><span>12</span><label>Hrs</label></div>
@@ -153,13 +159,31 @@ class EventLayout extends HTMLElement {
                                 <span class="vote-count">650 votes</span>
                             </div>
                         </div>
+                        <div class="leaderboard-bar 4th">
+                            <div class="bar-fill" style="width: 35%;"></div>
+                            <div class="bar-content">
+                                <span class="rank">#4</span>
+                                <span class="venue-name">Capulet</span>
+                                <span class="vote-count">420 votes</span>
+                            </div>
+                        </div>
+                        <div class="leaderboard-bar 5th">
+                            <div class="bar-fill" style="width: 25%;"></div>
+                            <div class="bar-content">
+                                <span class="rank">#5</span>
+                                <span class="venue-name">Bulldog Mid-City</span>
+                                <span class="vote-count">295 votes</span>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="venue-list-container">
                         <ul class="venue-list">
                             <li><span class="rank-badge gold">1</span> <div class="v-details"><strong>The Rusty Nail</strong><br><em>Patio crawfish boil</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('The Rusty Nail')">VOTE</button></li>
-                            <li><span class="rank-badge silver">2</span> <div class="v-details"><strong>Barrel Proof</strong><br><em>Brass band on the deck</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('Barrel Proof')">VOTE</button></li>
-                            <li><span class="rank-badge bronze">3</span> <div class="v-details"><strong>The Tchoup Yard</strong><br><em>Outdoor games & DJ</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('The Tchoup Yard')">VOTE</button></li>
+                            <li><span class="rank-badge gold">2</span> <div class="v-details"><strong>Barrel Proof</strong><br><em>Brass band on the deck</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('Barrel Proof')">VOTE</button></li>
+                            <li><span class="rank-badge gold">3</span> <div class="v-details"><strong>The Tchoup Yard</strong><br><em>Outdoor games & DJ</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('The Tchoup Yard')">VOTE</button></li>
+                            <li><span class="rank-badge silver">4</span> <div class="v-details"><strong>Capulet</strong><br><em>Frozen cocktails specials</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('Capulet')">VOTE</button></li>
+                            <li><span class="rank-badge silver">5</span> <div class="v-details"><strong>Bulldog Mid-City</strong><br><em>Pint night deals</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('Bulldog Mid-City')">VOTE</button></li>
                         </ul>
                     </div>
                 </div>
@@ -188,11 +212,9 @@ class EventLayout extends HTMLElement {
                     <h2>Cast Your Vote</h2>
                     <p>You are voting for <strong id="modal-venue-name"></strong>.</p>
                     <div class="auth-buttons">
-                        <button class="auth-btn google">Continue with Google</button>
-                        <button class="auth-btn apple">Continue with Apple</button>
-                        <div class="divider"><span>OR</span></div>
-                        <input type="tel" placeholder="Enter Phone Number" class="phone-input">
-                        <button class="auth-btn phone" onclick="window.showShareScreen()">Send Magic Link</button>
+                        <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 5px;">Enter your email to authenticate your vote.</p>
+                        <input type="email" placeholder="Email Address" class="email-input" id="voter-email">
+                        <button class="auth-btn email" onclick="window.showShareScreen()">Submit Vote</button>
                     </div>
                 </div>
             </div>
@@ -330,16 +352,22 @@ class EventLayout extends HTMLElement {
         };
 
         window.showShareScreen = () => {
-            // Simulate Magic Link verification
-            const phoneInput = this.querySelector('.phone-input');
-            const btn = this.querySelector('.auth-btn.phone');
-            btn.innerText = "Verifying...";
+            // Simulate Email Link verification / Firebase Auth
+            const emailInput = this.querySelector('.email-input');
+            const btn = this.querySelector('.auth-btn.email');
+            
+            if (!emailInput.value.includes('@')) {
+                alert('Please enter a valid email address.');
+                return;
+            }
+
+            btn.innerText = "Authenticating...";
             
             setTimeout(() => {
-                btn.innerText = "Send Magic Link";
+                btn.innerText = "Submit Vote";
                 this.querySelector('#vote-modal').style.display = 'none';
                 this.querySelector('#share-modal').style.display = 'flex';
-                phoneInput.value = '';
+                emailInput.value = '';
             }, 800);
         };
 

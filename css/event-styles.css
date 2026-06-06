@@ -560,9 +560,9 @@
     display: flex; align-items: center; justify-content: center; font-weight: 900; font-family: var(--font-header);
     margin-right: 15px; flex-shrink: 0; border: 2px solid var(--bg-primary);
 }
-.rank-badge.gold { background: #d4af37; color: #000; }
-.rank-badge.silver { background: #c0c0c0; color: #000; }
-.rank-badge.bronze { background: #cd7f32; color: #000; }
+.rank-badge.gold { background: #CBA052; color: #0F1626; }
+.rank-badge.silver { background: #94A3B8; color: #0F1626; }
+.rank-badge.dark-gray { background: #475569; color: #fff; border-color: #182238; }
 
 .v-details { flex-grow: 1; }
 .v-details strong { font-size: 1.1rem; color: var(--text-primary); display: block; margin-bottom: 3px; }
@@ -657,16 +657,16 @@
     font-size: 1rem;
 }
 
-.auth-btn.google { background: #fff; color: #333; }
-.auth-btn.apple { background: #000; color: #fff; }
-.auth-btn.phone { background: var(--brand-red); color: white; }
+.auth-btn.email { background: var(--brand-red); color: white; }
 
-.phone-input {
+.email-input {
     padding: 12px;
     border-radius: 6px;
     border: 1px solid #ccc;
     font-size: 1rem;
     text-align: center;
+    background: white;
+    color: #333;
 }
 
 .divider {

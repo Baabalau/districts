@@ -11,15 +11,43 @@ document.addEventListener("DOMContentLoaded", async () => {
     const districtConfigs = {
         'a': { center: [29.985, -90.10], zoom: 14 },
         'b': { center: [29.9546, -90.0673], zoom: 15 },
-        'c': { center: [29.958, -90.042], zoom: 14 },
+        'c': { center: [29.958, -90.04], zoom: 12 },
         'd': { center: [30.01, -90.05], zoom: 14 },
         'e': { center: [30.00, -89.99], zoom: 13 }
+    };
+
+    // Initial map framing per district (full district remains pannable via maxBounds below).
+    // sw/ne = south-west and north-east corners as [lat, lng].
+    const districtInitialView = {
+        // Marigny / French Quarter — mobile uses explicit center+zoom (fitBounds is unreliable on narrow viewports)
+        'c': {
+            sw: [29.954, -90.068],
+            ne: [29.972, -90.048],
+            padding: [11, 11],
+            mobile: {
+                center: [29.960, -90.062],
+                zoom: 14
+            }
+        },
+        // Western half of District E — New Orleans East off-screen until user pans east
+        'e': {
+            sw: [29.962, -90.032],
+            ne: [30.105, -89.945],
+            padding: [6, 6]
+        }
     };
 
     const config = districtConfigs[districtId];
 
     // Initialize Leaflet Map
-    const map = L.map('map').setView(config.center, config.zoom);
+    const map = L.map('map', {
+        zoomControl: false
+    }).setView(config.center, config.zoom);
+    
+    // Move zoom control to top right to avoid overlapping with the title
+    L.control.zoom({
+        position: 'topright'
+    }).addTo(map);
 
     // Dark basemap
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
@@ -29,8 +57,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     }).addTo(map);
 
     // Draw the district boundary if available
+    let districtFeature = null;
     if (window.councilDistricts) {
-        const districtFeature = window.councilDistricts.features.find(
+        districtFeature = window.councilDistricts.features.find(
             f => f.properties.DISTRICTID.toLowerCase() === districtId.toLowerCase()
         );
         
@@ -74,17 +103,56 @@ document.addEventListener("DOMContentLoaded", async () => {
                 fillOpacity: 0.35
             }).addTo(map);
 
-            // Restrict map panning to the district feature
-            const bounds = L.geoJSON(districtFeature).getBounds();
-            map.fitBounds(bounds, { padding: [20, 20] });
-            map.setMaxBounds(bounds.pad(0.3));
-            map.options.minZoom = map.getZoom() - 1;
+            const fullBounds = L.geoJSON(districtFeature).getBounds();
+            const initialView = districtInitialView[districtId];
+
+            function applyInitialFraming() {
+                map.invalidateSize();
+                const isMobile = window.innerWidth <= 768;
+
+                if (initialView?.mobile && isMobile) {
+                    map.setView(initialView.mobile.center, initialView.mobile.zoom);
+                } else if (initialView) {
+                    const initialBounds = L.latLngBounds(initialView.sw, initialView.ne);
+                    map.fitBounds(initialBounds, { padding: initialView.padding || [20, 20] });
+                    if (initialView.zoomOffset) {
+                        map.setZoom(map.getZoom() + initialView.zoomOffset);
+                    }
+                } else {
+                    map.fitBounds(fullBounds, { padding: [20, 20] });
+                }
+
+                map.options.minZoom = map.getZoom() - 1;
+            }
+
+            applyInitialFraming();
+            // Map container may not have final mobile dimensions until layout paints
+            requestAnimationFrame(() => applyInitialFraming());
+            setTimeout(applyInitialFraming, 250);
+
+            // Users can still pan across the entire district (e.g. Algiers, New Orleans East)
+            map.setMaxBounds(fullBounds.pad(0.3));
         }
     }
 
-    // Dynamic icon generator based on venue type
-    function getVenueIcon(type) {
-        // Map types to distinct colors
+    // Dynamic icon generator based on venue type and rank
+    function getVenueIcon(type, rank) {
+        if (rank) {
+            // Use the same styling logic as the list view rank badges
+            let badgeClass = 'rank-badge';
+            if (rank <= 3) badgeClass += ' gold';
+            else if (rank <= 5) badgeClass += ' silver';
+            else badgeClass += ' dark-gray';
+            
+            return L.divIcon({
+                className: 'custom-venue-marker',
+                html: `<div class="${badgeClass}" style="width: 28px; height: 28px; font-size: 0.9rem; margin: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">${rank}</div>`,
+                iconSize: [28, 28],
+                iconAnchor: [14, 14]
+            });
+        }
+
+        // Map types to distinct colors (fallback for non-ranked venues)
         const colors = {
             'bar': '#D2A039',       // Accent orange -> Gold
             'restaurant': '#2B3561', // Brand red -> Dark Blue
@@ -107,10 +175,36 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         return L.divIcon({
             className: 'custom-venue-marker',
-            html: `<div style="background-color: ${color}; width: 12px; height: 12px; border-radius: 50%; box-shadow: 0 2px 6px rgba(0,0,0,0.3); border: 2px solid #fff;"></div>`,
-            iconSize: [12, 12],
-            iconAnchor: [6, 6]
+            html: `<div style="background-color: ${color}; width: 14px; height: 14px; border-radius: 50%; box-shadow: 0 2px 6px rgba(0,0,0,0.3); border: 2px solid #fff;"></div>`,
+            iconSize: [14, 14],
+            iconAnchor: [7, 7]
         });
+    }
+
+    function isPointInDistrict(lat, lng, feature) {
+        if (!feature || !feature.geometry) return true;
+        
+        function pointInPolygon(point, vs) {
+            let x = point[0], y = point[1];
+            let inside = false;
+            for (let i = 0, j = vs.length - 1; i < vs.length; j = i++) {
+                let xi = vs[i][0], yi = vs[i][1];
+                let xj = vs[j][0], yj = vs[j][1];
+                let intersect = ((yi > y) != (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+                if (intersect) inside = !inside;
+            }
+            return inside;
+        }
+
+        const pt = [lng, lat]; // GeoJSON uses [lng, lat]
+        if (feature.geometry.type === 'Polygon') {
+            return pointInPolygon(pt, feature.geometry.coordinates[0]);
+        } else if (feature.geometry.type === 'MultiPolygon') {
+            for (let i = 0; i < feature.geometry.coordinates.length; i++) {
+                if (pointInPolygon(pt, feature.geometry.coordinates[i][0])) return true;
+            }
+        }
+        return false;
     }
 
     try {
@@ -119,14 +213,39 @@ document.addEventListener("DOMContentLoaded", async () => {
         const q = query(venuesRef, where("district", "==", districtId.toUpperCase()));
         const querySnapshot = await getDocs(q);
 
+        let venues = [];
+
         if (querySnapshot.empty) {
-            console.log(`No venues found for district ${districtId.toUpperCase()}`);
+            console.log(`No venues found for district ${districtId.toUpperCase()}. Loading mock data for demonstration.`);
+            // Mock Data for demonstration since the database is empty right now
+            venues = [
+                { name: "The Rusty Nail", type: "bar", lat: config.center[0] + 0.005, lng: config.center[1] + 0.005, rank: 1, description: "Patio crawfish boil" },
+                { name: "Barrel Proof", type: "bar", lat: config.center[0] - 0.002, lng: config.center[1] - 0.008, rank: 2, description: "Brass band on the deck" },
+                { name: "The Tchoup Yard", type: "lounge", lat: config.center[0] - 0.006, lng: config.center[1] + 0.002, rank: 3, description: "Outdoor games & DJ" },
+                { name: "Capulet", type: "restaurant", lat: config.center[0] + 0.008, lng: config.center[1] - 0.004, rank: 4, description: "Frozen cocktails specials" },
+                { name: "Bulldog Mid-City", type: "bar", lat: config.center[0] - 0.004, lng: config.center[1] - 0.012, rank: 5, description: "Pint night deals" },
+                { name: "Finn McCool's", type: "bar", lat: config.center[0] + 0.012, lng: config.center[1] + 0.008, rank: 6, description: "Dog-friendly patio vibes" }
+            ];
+        } else {
+            querySnapshot.forEach((doc) => {
+                venues.push(doc.data());
+            });
         }
 
-        querySnapshot.forEach((doc) => {
-            const place = doc.data();
-            
-            // Handle missing lat/lng gracefully
+        // Determine if venues are in bounds and mock ranks if necessary
+        let inDistrictVenues = [];
+        venues.forEach((place) => {
+            if (!place.lat || !place.lng) return;
+            place.inBounds = districtFeature ? isPointInDistrict(place.lat, place.lng, districtFeature) : true;
+            if (place.inBounds) inDistrictVenues.push(place);
+        });
+
+        // Mock ranks if none have rank (to allow previewing the rankings UI)
+        if (!inDistrictVenues.some(v => v.rank)) {
+            inDistrictVenues.slice(0, 10).forEach((v, index) => v.rank = index + 1);
+        }
+
+        venues.forEach((place) => {
             if (!place.lat || !place.lng) return;
 
             const popupContent = `
@@ -137,9 +256,22 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <div style="font-size: 0.85rem; color: #1D1A16; line-height: 1.4;">
                         ${place.description ? `<div style="margin-bottom: 3px;">${place.description}</div>` : ''}
                     </div>
+                    <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(45, 27, 21, 0.1);">
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: bold; cursor: pointer; color: #8A2F25;">
+                            <input type="radio" name="map-vote" value="${place.name}" onclick="window.openVoteModal('${place.name.replace(/'/g, "\\'")}')" style="accent-color: #8A2F25;">
+                            Vote for this Venue
+                        </label>
+                    </div>
                 </div>
             `;
-            L.marker([place.lat, place.lng], {icon: getVenueIcon(place.type)}).addTo(map)
+            
+            // Render marker, applying opacity if it's out of bounds
+            const markerOptions = {
+                icon: getVenueIcon(place.type, place.rank),
+                opacity: place.inBounds ? 1.0 : 0.35
+            };
+            
+            L.marker([place.lat, place.lng], markerOptions).addTo(map)
                 .bindPopup(popupContent);
         });
     } catch (error) {

@@ -29,15 +29,15 @@ A realistic 3-week framework for each district influencer, beginning 3 weeks bef
 
 ---
 
-## Week 2: The Call to Action (2 Weeks Out)
+## Week 2: The Run-Off Phase (Top 5)
 
-*Goal: Drive active participation—voting for Stop 3 and submitting/voting on questions.*
+*Goal: Narrow the field to the Top 5 and drive high-stakes run-off voting.*
 
 | Day | Format | Content | Messaging (Goals) |
 |-----|--------|---------|-------------------|
-| **Day 8** | In-feed Reel/Video | Fast-paced walk past nominated venues for Stop 3 | *“The polls are officially open! Where are we ending the night? We have [N] amazing venues nominated for the 3rd stop. I’m keeping my vote a secret, but you can cast yours at the link in my bio!”* **(2)** |
+| **Day 8 (Monday 3PM)** | In-feed Reel/Video | Fast-paced walk past the Top 5 nominated venues | *“The Run-Off is officially here! We've narrowed it down to the Top 5 venues for our final stop. I’m keeping my vote a secret, but you have 48 hours to cast yours at the link in my bio!”* **(2)** |
 | **Day 10** | Story (Instagram Q&A sticker) | Native Question Box | *“At Stop 2, I’m sitting down with Councilmember [Name]. What do you actually want to know about our district? Drop your questions here, and I’ll take the best ones to the official voting page for everyone to rank.”* **(2)** |
-| **Day 13** | Story | Screenshot of current voting leaderboard (counts only—no endorsement) | *“Voting for the 3rd stop closes TOMORROW! It’s close between [Venue C] and [Venue D]. Also, go to the site and upvote the questions you want me to ask the councilmember!”* **(2 & 3)** |
+| **Day 13** | Story | Screenshot of current voting leaderboard (counts only—no endorsement) | *“Voting for the 3rd stop closes TOMORROW! It’s crazy close between the Top 5. Also, go to the site and upvote the questions you want me to ask the councilmember!”* **(2 & 3)** |
 | **Day 14** | Story | Official graphic announcing winning Stop 3 venue | *“The votes are in! We are ending the night at [Winning Venue]! See you there next week.”* **(3)** |
 
 **Days 9, 11, 12:** Normal influencer content (optional: light Story reminder to vote if engagement is low).
