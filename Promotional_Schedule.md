@@ -26,15 +26,17 @@ We have three distinct "kits" of assets because we have three different audience
 
 ---
 
-## Phase 2: The Education & Toolkit Drop (Early to Mid-May)
-*Goal: Equip the competitors (venues) and the broadcasters (influencers) with the exact tools they need to win.*
+## Phase 2: The Global Launch (The Press Release)
+*Goal: Capitalize on PR momentum to drive immediate, city-wide engagement.*
 
-### Week of May 11: The "Draft" Announcement
+### Mid-May: The Press Release Drops
+* **Action:** The central office issues the official press release announcing the Districts After Dark summer series.
+* **The Trigger:** Simultaneously, an admin manually unlocks the voting portal on the website for **all five districts**.
 * **Action:** All 5 Influencer/Councilmember duos officially announce their partnership on Instagram via a collaborative post.
-* **Asset Drop:** The **"Match Announcement" Graphic** (Split-screen, sports-draft style).
+* **Asset Drop:** The **"Match Announcement" Graphic** and the **"Polls Are Open" Tracker**.
 
 ### Week of May 18: Venue Toolkit Distribution (The Arsenal)
-* **Action:** We email the competing venues for **District A** their custom campaign kits. We give them a full week to print physical materials and plan their social strategy before voting goes live.
+* **Action:** We email all nominated venues their custom campaign kits. 
 * **Asset Drop (The Venue Kit):**
     * Custom QR Codes for printable table tents.
     * **The "Nominated" Instagram Story Template** with the exact placement for their unique pre-filled voting link.
@@ -42,32 +44,21 @@ We have three distinct "kits" of assets because we have three different audience
 
 ---
 
-## Phase 3: The Kickoff – District A's Election Week (Late May)
-*Goal: Execute the first 7-day election cycle flawlessly to set the standard for the rest of the summer.*
+## Phase 3: The Rolling Summer Series & Run-Offs (June – August)
+*Goal: Leverage the success of the previous district to fuel the next, utilizing the high-stakes Top 5 run-off mechanism.*
 
-### Monday, May 25 (Day 1): The Polls Open
-* **Action:** The District A Influencer and Councilmember drop the link in their bios. Venues put their QR codes on the bar. The live leaderboard goes public on the website.
+Voting remains open continuously for all districts. However, the intensity spikes two weeks before each specific district's event.
 
-### Wednesday, May 27 (Day 3): The Councilmember "Takeover"
-* **Action:** The District A Councilmember takes over the Influencer's Instagram Story. They walk the district, grab a coffee, and casually remind the young audience to go vote.
+### The Run-Off Mechanic (For Each District)
+* **The Monday Before (3:00 PM):** Exactly one week and a half before the district's event, the sprawling list of nominees is cut down. The **Top 5** venues with the most votes advance to the Run-Off.
+* **The Opt-Out Check:** Prior to 3:00 PM, the team contacts the top venues. If a venue cannot host the event, they are manually opted-out, allowing the 6th place venue to slide into the Top 5.
+* **The Final Sprint:** The leaderboard resets visually to highlight the Top 5, and venues/influencers push hard for the final 48-hour sprint.
 
-### Friday, May 29 (Day 5): The Blackout & The Bribe
-* **Action:** The leaderboard is hidden on the website to build suspense. The Influencer posts the "Bribe": *"DM me a screenshot of your 'I Voted' screen for a chance to win a free round at the winning bar!"*
-* **Asset Drop:** Voters are actively sharing the **"I Voted" Flex Graphic** to their own stories to enter the giveaway.
-
-### Sunday, May 31 (Day 7): The Finale Announcement
-* **Action:** Voting closes. The winning District A venue is announced via an Instagram Live with the Councilmember and Influencer.
-
----
-
-## Phase 4: The Rolling Summer Series (June – August)
-*Goal: Leverage the success of the previous district to fuel the next.*
-
+### The Rolling Schedule
 * **Early June:** District A Nightcrawl Event
     * *Action:* The actual event happens! The Influencer and Councilmember document the massive turnout. This content becomes the marketing material for District B.
-* **Mid-June:** District B Election Week
-    * *Action:* The cycle repeats. The District B Influencer says: *"Did you see how crazy District A's event was? We have to beat their voter turnout. Click the link in my bio!"*
-* **Late June:** District B Nightcrawl Event
-* **Mid-July:** District C Election Week & Event
-* **Late July:** District D Election Week & Event
-* **Mid-August:** District E Election Week & Event (The Grand Finale)
+* **Mid-June:** District B Run-Off & Event
+    * *Action:* The cycle repeats. The District B Influencer says: *"The Top 5 have been decided! You have 48 hours to lock in the winner. Click the link in my bio!"*
+* **Mid-July:** District C Run-Off & Event
+* **Late July:** District D Run-Off & Event
+* **Mid-August:** District E Run-Off & Event (The Grand Finale)
