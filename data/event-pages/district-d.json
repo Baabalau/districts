@@ -1,0 +1,33 @@
+{
+  "district": "D",
+  "date": "August 11th",
+  "time": "7:00 PM - 10:00 PM",
+  "location": "Gentilly / St. Roch",
+  "councilName": "Eugene Green",
+  "councilImg": "assets/EugeneGreen.png",
+  "influencerName": "Casey Ferrand McGee",
+  "influencerImg": "assets/caseyferrandmcgee.jpg",
+  "bgImg": "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+  "heroIntro": "Get your boots on the ground with council member {councilName} and {influencerName} on a three stop tour to experience the nightlife and support local businesses while building a relationship with your council member.",
+  "councilQuote": "This isn't just about nightlife; it's about connecting with the community where they are. We're breaking down the walls of City Hall.",
+  "influencerQuote": "District {district} has some of the most vibrant, unsung spots in the city. I can't wait to show everyone what makes this neighborhood tick.",
+  "itinerary": {
+    "stops": [
+      {
+        "number": "01",
+        "title": "{influencerName}'s St. Roch Start",
+        "body": "The night kicks off in {location} at a spot {influencerName} wants more people to know�local flavor, strong community ties, and the energy that keeps this corridor moving."
+      },
+      {
+        "number": "02",
+        "title": "{councilName}'s Gentilly Classic",
+        "body": "Stop two is Councilmember {councilName}'s pick: a Gentilly institution where longtime residents and newcomers can share a table and talk about what the ward needs next."
+      },
+      {
+        "number": "03",
+        "title": "The District D Vote",
+        "body": "Vote for the venue that should close out the crawl. The winner in {location} becomes our third stop when District D hits the street on March 26."
+      }
+    ]
+  }
+}

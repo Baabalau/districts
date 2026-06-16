@@ -1,0 +1,46 @@
+{
+  "roles": {
+    "influencer": "The Tastemaker",
+    "council": "The Policy Pro"
+  },
+  "hero": {
+    "title": "District {district} Crawl",
+    "rsvpButton": "RSVP to District {district} Crawl"
+  },
+  "behindSeries": {
+    "heading": "Behind the Series",
+    "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+  },
+  "itinerary": {
+    "heading": "Crawl-tinery"
+  },
+  "venueVoting": {
+    "heading": "Venue Voting",
+    "goals": "Highlight local favorites and bring new traffic to unsung spots.",
+    "rules": "Venues must be located within District {district}. Voting ends 48 hours before the crawl.",
+    "scheduleLabel": "Schedule:",
+    "schedule": [
+      "Voting Opens: 14 days prior",
+      "Voting Closes: 2 days prior",
+      "Winner Announced: Day of the Crawl"
+    ]
+  },
+  "venueOperators": {
+    "heading": "Venue Operators",
+    "body": "Want your establishment featured on the interactive map during the crawl?",
+    "ctaText": "Include My Venue",
+    "ctaHref": "#"
+  },
+  "dialogueDen": {
+    "heading": "The Dialogue Den",
+    "intro": "Vote on the issues you want the Councilmember to address tonight, or submit your own question below.",
+    "issues": [
+      { "text": "Late-Night Transit Reliability", "votes": 145 },
+      { "text": "Noise Ordinance Revisions", "votes": 89 },
+      { "text": "Small Business Security Grants", "votes": 62 }
+    ],
+    "questionPlaceholder": "Ask a question anonymously...",
+    "submitButton": "Drop it on the Digital Napkin",
+    "submitAlert": "Question submitted for the crawl!"
+  }
+}
