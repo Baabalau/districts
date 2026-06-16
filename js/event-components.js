@@ -389,6 +389,21 @@ class EventLayout extends HTMLElement {
                 }
             });
         };
+
+        // Handle direct links to vote for a specific venue (e.g., from social media)
+        setTimeout(() => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const voteTarget = urlParams.get('vote');
+            if (voteTarget) {
+                // Ensure we are in an active voting state (round-1 or run-off)
+                const isPreVoting = this.querySelector('#state-pre-voting')?.style.display !== 'none';
+                const isPostElection = this.querySelector('#state-post-election')?.style.display !== 'none';
+                
+                if (!isPreVoting && !isPostElection) {
+                    window.openVoteModal(voteTarget);
+                }
+            }
+        }, 150);
     }
 }
 
