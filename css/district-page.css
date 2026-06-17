@@ -12,8 +12,10 @@
     --accent-dark: #6A241C; /* Dark Red */
     --brand-red: #4C835C; /* Olive Green */
     --panel-bg: #182238;
-    --font-main: 'Inter', sans-serif;
-    --font-header: 'Montserrat', sans-serif;
+    --font-hero: 'Oswald', sans-serif;
+    --font-main: 'EB Garamond', Georgia, serif;
+    --font-header: 'EB Garamond', Georgia, serif;
+    --font-subhead: 'EB Garamond', Georgia, serif;
 }
 
 * {

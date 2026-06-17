@@ -180,7 +180,8 @@ function renderVotingModule(district) {
                         <img src="https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=600&h=400&fit=crop" alt="The Rusty Nail">
                         <h3>The Rusty Nail</h3>
                         <p>With 1,842 total votes, The Rusty Nail is the official Stop 3 for the Nightcrawl!</p>
-                        <button class="brand-btn" style="margin-top: 15px;" onclick="document.getElementById('rsvp-btn').scrollIntoView({behavior: 'smooth'})">RSVP NOW</button>
+                        <button id="rsvp-btn" class="brand-btn" style="margin-top: 15px;">RSVP NOW</button>
+                        <p id="rsvp-msg" style="margin-top: 10px; color: var(--accent); font-weight: bold; display: none;"></p>
                     </div>
                 </div>
             </div>
@@ -238,8 +239,7 @@ class EventLayout extends HTMLElement {
                     <h1 class="title-3d" style="margin-bottom: 10px;">${interpolate(shared.hero.title, vars)}</h1>
                     <h2>${districtCopy.date} | ${districtCopy.time} | ${districtCopy.location}</h2>
                     <p>${interpolate(districtCopy.heroIntro, vars)}</p>
-                    <button id="rsvp-btn" class="brand-btn" style="margin-top: 20px; font-size: 1.1rem; padding: 15px 30px;">${interpolate(shared.hero.rsvpButton, vars)}</button>
-                    <p id="rsvp-msg" style="margin-top: 10px; color: var(--accent); font-weight: bold; display: none;"></p>
+                    <button type="button" id="vote-scroll-btn" class="brand-btn" style="margin-top: 20px; font-size: 1.1rem; padding: 15px 30px;" onclick="document.getElementById('map-section').scrollIntoView({behavior: 'smooth'})">${interpolate(shared.hero.rsvpButton, vars)}</button>
                 </div>
                 <div class="hero-right" style="display: flex; justify-content: center; align-items: center; height: 100%;">
                     <div class="flow-couple" style="transform-origin: center;">
@@ -265,7 +265,7 @@ class EventLayout extends HTMLElement {
                 </div>
             </div>
 
-            <div class="map-section-wrapper js-reveal reveal-opacity">
+            <div class="map-section-wrapper js-reveal reveal-opacity" id="map-section">
                 <h2 class="title-3d map-title"><u>District ${districtCopy.district}</u><br><span style="font-size: 0.8em; color: var(--accent);">${districtCopy.location}</span></h2>
                 <div id="map"></div>
                 ${renderVotingModule(districtCopy.district)}

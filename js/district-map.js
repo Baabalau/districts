@@ -249,9 +249,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (!place.lat || !place.lng) return;
 
             const popupContent = `
-                <div style="width: 220px; font-family: Inter, sans-serif;">
+                <div style="width: 220px; font-family: 'EB Garamond', Georgia, serif;">
                     <div style="height: 120px; background-image: url('${place.imageUrl || 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'}'); background-size: cover; background-position: center; border-radius: 5px 5px 0 0; margin: -14px -14px 10px -14px;"></div>
-                    <h4 style="margin: 0 0 5px 0; color: #2B3561; font-family: Montserrat, sans-serif; font-size: 1.2rem; text-transform: uppercase;">${place.name || 'Unnamed Venue'}</h4>
+                    <h4 style="margin: 0 0 5px 0; color: #2B3561; font-family: 'EB Garamond', Georgia, serif; font-size: 1.2rem; text-transform: uppercase;">${place.name || 'Unnamed Venue'}</h4>
                     <p style="margin: 0 0 10px 0; font-size: 0.8rem; color: #4A3C2F; text-transform: capitalize;">${place.type ? place.type.replace('_', ' ') : 'Venue'}</p>
                     <div style="font-size: 0.85rem; color: #1D1A16; line-height: 1.4;">
                         ${place.description ? `<div style="margin-bottom: 3px;">${place.description}</div>` : ''}

@@ -18,9 +18,10 @@
             --accent-dark: #6A241C; /* Dark Red */
             --brand-red: #4C835C; /* Olive Green */
             
-            --font-main: 'Inter', sans-serif;
-            --font-header: 'Montserrat', sans-serif;
-            --font-subhead: 'Georgia', serif; /* Complementary Subheading Font */
+            --font-hero: 'Oswald', sans-serif;
+            --font-main: 'EB Garamond', Georgia, serif;
+            --font-header: 'EB Garamond', Georgia, serif;
+            --font-subhead: 'EB Garamond', Georgia, serif;
         }
 
         * {
@@ -127,14 +128,14 @@
 
         /* --- BRAND BUTTON --- */
         .brand-btn {
-            padding: 15px 35px;
+            padding: 14px 35px;
             background: linear-gradient(180deg, var(--accent) 0%, var(--brand-red) 100%);
             color: var(--bg-primary);
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             font-family: var(--font-main);
-            font-size: 1rem;
-            font-weight: bold;
+            font-size: 18px;
+            font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 2px;
             cursor: pointer;
@@ -225,9 +226,9 @@
         /* 3D Stylized Hero Title — face uses brand red */
         .title-3d {
             display: inline-block;
-            font-family: var(--font-header);
-            font-size: clamp(3.5rem, 9vw, 7.5rem);
-            font-weight: 900;
+            font-family: var(--font-hero);
+            font-size: 86px;
+            font-weight: 700;
             text-transform: uppercase;
             color: var(--text-primary);
             /* Angle and Skew */
@@ -251,13 +252,19 @@
         /* Complementary Subtitle */
         .subtitle {
             font-family: var(--font-subhead);
-            font-style: italic;
-            font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+            font-style: normal;
+            font-size: 22px;
+            font-weight: 500;
+            line-height: 30px;
             color: var(--text-primary);
             margin-top: 20px;
             margin-bottom: 25px;
             display: block;
             text-shadow: 1px 1px 0px rgba(255,255,255,0.3);
+        }
+
+        .subtitle strong {
+            font-weight: 500;
         }
 
         .subtitle-follow {
@@ -363,12 +370,6 @@
             padding-bottom: 40px;
         }
 
-        .flow-row--venues {
-            transform: rotate(1.2deg) scale(1.03);
-            z-index: 1;
-            position: relative;
-        }
-
         .flow-track {
             display: flex;
             gap: 14px;
@@ -378,10 +379,6 @@
 
         .flow-track--left {
             animation: flow-left 55s linear infinite;
-        }
-
-        .flow-track--right {
-            animation: flow-left 60s linear infinite reverse;
         }
 
         @keyframes flow-left {
@@ -480,8 +477,7 @@
         }
 
         @media (prefers-reduced-motion: reduce) {
-            .flow-track--left,
-            .flow-track--right {
+            .flow-track--left {
                 animation: none;
                 justify-content: center;
                 flex-wrap: wrap;
@@ -812,48 +808,48 @@
 
         .event-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 40px;
+            grid-template-columns: repeat(auto-fit, minmax(256px, 1fr));
+            gap: 32px;
             max-width: 1400px;
             margin: 0 auto;
-            padding-bottom: 60px;
+            padding-bottom: 48px;
         }
 
         .event-card {
             background: var(--bg-primary);
             border: 2px solid rgba(29, 26, 22, 0.2);
-            border-radius: 12px;
+            border-radius: 10px;
             overflow: hidden;
             transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
             display: flex;
             flex-direction: column;
         }
 
         @media (min-width: 768px) {
             .event-card:nth-child(even) {
-                transform: translateY(40px);
+                transform: translateY(32px);
             }
             .event-card:nth-child(even):hover {
-                transform: translateY(30px) scale(1.02);
+                transform: translateY(24px) scale(1.02);
             }
         }
 
         .event-card:hover {
-            transform: translateY(-10px) scale(1.02);
+            transform: translateY(-8px) scale(1.02);
             border-color: var(--accent);
-            box-shadow: 0 15px 40px rgba(210, 160, 57, 0.25);
+            box-shadow: 0 12px 32px rgba(210, 160, 57, 0.25);
         }
 
         .event-img {
-            height: 220px;
+            height: 176px;
             background: #ccc;
             background-size: cover;
             background-position: center;
         }
 
         .event-info {
-            padding: 30px;
+            padding: 24px;
             flex-grow: 1;
             display: flex;
             flex-direction: column;
@@ -861,25 +857,96 @@
 
         .event-info h3 {
             font-family: var(--font-header);
-            font-size: 1.8rem;
-            margin-bottom: 15px;
+            font-size: 20px;
+            margin-bottom: 0;
             color: var(--text-primary);
             text-transform: uppercase;
         }
 
         .event-info p {
-            font-size: 1rem;
+            font-size: 0.8rem;
             color: var(--text-secondary);
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             flex-grow: 1;
             font-weight: 500;
         }
 
+        .event-info .event-location {
+            font-size: 17px;
+            margin-bottom: 8px;
+            flex-grow: 0;
+        }
+
+        .event-info .event-datetime {
+            flex-grow: 1;
+        }
+
         .event-info strong {
             color: var(--brand-red);
-            font-size: 1.1rem;
+            font-size: 0.88rem;
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
+        }
+
+        .event-info .brand-btn {
+            padding: 10px 40px;
+            font-size: 14px;
+            width: fit-content;
+            height: 40px;
+            text-align: center;
+        }
+
+        @media (max-width: 767px) {
+            .events-section {
+                padding: 80px 28px;
+            }
+
+            .event-grid {
+                grid-template-columns: 1fr;
+                width: 90%;
+                max-width: 310px;
+                gap: 30px;
+                padding-bottom: 44px;
+            }
+
+            .event-card {
+                border-radius: 9px;
+                box-shadow: 0 7px 21px rgba(0,0,0,0.1);
+            }
+
+            .event-img {
+                height: 160px;
+            }
+
+            .event-info {
+                padding: 22px;
+            }
+
+            .event-info h3 {
+                font-size: 19px;
+                margin-bottom: 11px;
+            }
+
+            .event-info p {
+                font-size: 0.72rem;
+                margin-bottom: 18px;
+            }
+
+            .event-info strong {
+                font-size: 14px;
+                margin-bottom: 4px;
+            }
+
+            .event-info .brand-btn {
+                padding: 9px 36px;
+                font-size: 12px;
+                height: 36px;
+            }
+
+            .event-card:hover {
+                transform: translateY(-7px) scale(1.02);
+                box-shadow: 0 11px 28px rgba(210, 160, 57, 0.25);
+            }
         }
 
         /* --- SCROLL ANIMATIONS (INTERSECTION OBSERVER) --- */
@@ -913,7 +980,7 @@
         .delay-400 { transition-delay: 0.4s; }
 
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@700;900&family=Georgia&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Oswald:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/site-footer.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -964,7 +1031,7 @@
         </div>
     </div>
 
-    <section class="flow-section" aria-label="Featured councilmembers, influencers, and venues">
+    <section class="flow-section" aria-label="Featured councilmembers and influencers">
         <p class="flow-label">Councilmembers &amp; influencers</p>
         <div class="flow-row flow-row--people">
             <div class="flow-track flow-track--left">
@@ -1082,59 +1149,6 @@
                 </div>
             </div>
         </div>
-        <p class="flow-label" style="margin-top: 28px;">Nightlife &amp; local haunts</p>
-        <div class="flow-row flow-row--venues">
-            <div class="flow-track flow-track--right">
-                <div class="flow-card">
-                    <img src="https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=400&h=520&fit=crop" alt="Bar interior">
-                    <div class="card-caption">The Local Pub</div>
-                </div>
-                <div class="flow-card">
-                    <img src="https://images.unsplash.com/photo-1555992336-03a23c7b20ee?w=400&h=520&fit=crop" alt="Nightlife venue">
-                    <div class="card-caption">Neon Nights</div>
-                </div>
-                <div class="flow-card">
-                    <img src="https://images.unsplash.com/photo-1566417713940-fe7c737a9ef2?w=400&h=520&fit=crop" alt="Cocktail lounge">
-                    <div class="card-caption">Classic Lounge</div>
-                </div>
-                <div class="flow-card">
-                    <img src="https://images.unsplash.com/photo-1572116469696-31de0f17cc34?w=400&h=520&fit=crop" alt="Restaurant bar">
-                    <div class="card-caption">Corner Bar</div>
-                </div>
-                <div class="flow-card">
-                    <img src="https://images.unsplash.com/photo-1543007630-9710e4a00a20?w=400&h=520&fit=crop" alt="Live music venue">
-                    <div class="card-caption">Live Music Venue</div>
-                </div>
-                <div class="flow-card">
-                    <img src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=520&fit=crop" alt="Neighborhood spot">
-                    <div class="card-caption">Neighborhood Haunt</div>
-                </div>
-                <div class="flow-card">
-                    <img src="https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=400&h=520&fit=crop" alt="Bar interior">
-                    <div class="card-caption">The Local Pub</div>
-                </div>
-                <div class="flow-card">
-                    <img src="https://images.unsplash.com/photo-1555992336-03a23c7b20ee?w=400&h=520&fit=crop" alt="Nightlife venue">
-                    <div class="card-caption">Neon Nights</div>
-                </div>
-                <div class="flow-card">
-                    <img src="https://images.unsplash.com/photo-1566417713940-fe7c737a9ef2?w=400&h=520&fit=crop" alt="Cocktail lounge">
-                    <div class="card-caption">Classic Lounge</div>
-                </div>
-                <div class="flow-card">
-                    <img src="https://images.unsplash.com/photo-1572116469696-31de0f17cc34?w=400&h=520&fit=crop" alt="Restaurant bar">
-                    <div class="card-caption">Corner Bar</div>
-                </div>
-                <div class="flow-card">
-                    <img src="https://images.unsplash.com/photo-1543007630-9710e4a00a20?w=400&h=520&fit=crop" alt="Live music venue">
-                    <div class="card-caption">Live Music Venue</div>
-                </div>
-                <div class="flow-card">
-                    <img src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=520&fit=crop" alt="Neighborhood spot">
-                    <div class="card-caption">Neighborhood Haunt</div>
-                </div>
-            </div>
-        </div>
     </section>
 
     <section id="purpose" class="purpose-section js-reveal reveal-opacity">
@@ -1211,47 +1225,52 @@
         <div class="event-grid">
             
             <div class="event-card js-reveal reveal-y">
-                <div class="event-img" style="background-image: url('https://images.unsplash.com/photo-1517650862521-d580d5348145?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');"></div>
+                <div class="event-img" style="background-image: url('assets/district_a_image.jpeg');"></div>
                 <div class="event-info">
                     <h3>District A</h3>
-                    <p><strong>March 5 | 7 PM - 10 PM</strong>Lakeview / Uptown</p>
-                    <a href="district-a.html" class="brand-btn" style="padding: 10px 20px; font-size: 0.8rem; text-align: center;">View Route & RSVP</a>
+                    <p class="event-location">Lakeview / Uptown</p>
+                    <p class="event-datetime"><strong>March 5 | 7 PM - 10 PM</strong></p>
+                    <a href="district-a.html" class="brand-btn">view event</a>
                 </div>
             </div>
 
             <div class="event-card js-reveal reveal-y delay-200">
-                <div class="event-img" style="background-image: url('https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');"></div>
+                <div class="event-img" style="background-image: url('assets/district_b_image.jpg');"></div>
                 <div class="event-info">
                     <h3>District B</h3>
-                    <p><strong>March 12 | 7 PM - 10 PM</strong>French Quarter / CBD</p>
-                    <a href="district-b.html" class="brand-btn" style="padding: 10px 20px; font-size: 0.8rem; text-align: center;">View Route & RSVP</a>
+                    <p class="event-location">French Quarter / CBD</p>
+                    <p class="event-datetime"><strong>March 12 | 7 PM - 10 PM</strong></p>
+                    <a href="district-b.html" class="brand-btn">view event</a>
                 </div>
             </div>
 
             <div class="event-card js-reveal reveal-y">
-                <div class="event-img" style="background-image: url('https://images.unsplash.com/photo-1498226038483-2070e1ce4999?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');"></div>
+                <div class="event-img" style="background-image: url('assets/district_c_image.png');"></div>
                 <div class="event-info">
                     <h3>District C</h3>
-                    <p><strong>March 19 | 7 PM - 10 PM</strong>Algiers / French Quarter / Bywater</p>
-                    <a href="district-c.html" class="brand-btn" style="padding: 10px 20px; font-size: 0.8rem; text-align: center;">View Route & RSVP</a>
+                    <p class="event-location">Algiers / French Quarter / Bywater</p>
+                    <p class="event-datetime"><strong>March 19 | 7 PM - 10 PM</strong></p>
+                    <a href="district-c.html" class="brand-btn">view event</a>
                 </div>
             </div>
 
             <div class="event-card js-reveal reveal-y delay-200">
-                <div class="event-img" style="background-image: url('https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');"></div>
+                <div class="event-img" style="background-image: url('assets/district_d_image.jpg');"></div>
                 <div class="event-info">
                     <h3>District D</h3>
-                    <p><strong>March 26 | 7 PM - 10 PM</strong>Gentilly / St. Roch</p>
-                    <a href="district-d.html" class="brand-btn" style="padding: 10px 20px; font-size: 0.8rem; text-align: center;">View Route & RSVP</a>
+                    <p class="event-location">Gentilly / St. Roch</p>
+                    <p class="event-datetime"><strong>March 26 | 7 PM - 10 PM</strong></p>
+                    <a href="district-d.html" class="brand-btn">view event</a>
                 </div>
             </div>
 
             <div class="event-card js-reveal reveal-y">
-                <div class="event-img" style="background-image: url('https://images.unsplash.com/photo-1517650862521-d580d5348145?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');"></div>
+                <div class="event-img" style="background-image: url('assets/district_e_image.jpg');"></div>
                 <div class="event-info">
                     <h3>District E</h3>
-                    <p><strong>April 2 | 7 PM - 10 PM</strong>New Orleans East / Lower 9th</p>
-                    <a href="district-e.html" class="brand-btn" style="padding: 10px 20px; font-size: 0.8rem; text-align: center;">View Route & RSVP</a>
+                    <p class="event-location">New Orleans East / Lower 9th</p>
+                    <p class="event-datetime"><strong>April 2 | 7 PM - 10 PM</strong></p>
+                    <a href="district-e.html" class="brand-btn">view event</a>
                 </div>
             </div>
 
