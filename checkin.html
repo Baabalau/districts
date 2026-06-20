@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check-In | District After Dark</title>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Oswald:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0F1626; 
+            --text-primary: #CBA052; 
+            --text-secondary: #DEBA84; 
+            --accent: #8A2F25;
+            --brand-red: #4C835C;
+            --font-main: 'EB Garamond', Georgia, serif;
+            --font-header: 'Oswald', sans-serif;
+        }
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid rgba(203, 160, 82, 0.3);
+        }
+        h1 {
+            font-family: var(--font-header);
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        .status {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            color: var(--text-secondary);
+        }
+        .points-award {
+            font-size: 3rem;
+            font-family: var(--font-header);
+            color: var(--brand-red);
+            font-weight: bold;
+            margin: 20px 0;
+            display: none;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(180deg, var(--accent) 0%, var(--brand-red) 100%);
+            color: var(--bg-primary);
+            text-decoration: none;
+            font-family: var(--font-main);
+            font-weight: bold;
+            text-transform: uppercase;
+            border-radius: 5px;
+            margin-top: 20px;
+            display: none;
+            transition: transform 0.2s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Nightcrawl Check-In</h1>
+        <div class="status" id="status-msg">Verifying your location...</div>
+        <div class="points-award" id="points-award">+50 Points!</div>
+        <a href="profile.html" class="btn" id="profile-btn">View My Profile</a>
+        <a href="index.html" class="btn" id="home-btn" style="background: var(--text-primary);">Back to Map</a>
+    </div>
+
+    <script type="module">
+        import { auth, db } from "./js/firebase-config.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+        import { collection, query, where, getDocs, doc, getDoc, updateDoc, arrayUnion, increment } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+
+        const statusMsg = document.getElementById("status-msg");
+        const pointsAward = document.getElementById("points-award");
+        const profileBtn = document.getElementById("profile-btn");
+        const homeBtn = document.getElementById("home-btn");
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const venueQrCode = urlParams.get('venue');
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                // Redirect to login with redirect param
+                const currentUrl = encodeURIComponent(window.location.pathname + window.location.search);
+                window.location.href = `login.html?redirect=${currentUrl}`;
+                return;
+            }
+
+            if (!venueQrCode) {
+                statusMsg.textContent = "Invalid Check-In Link. No venue specified.";
+                homeBtn.style.display = "inline-block";
+                return;
+            }
+
+            try {
+                // Find the venue by qrCodeId
+                const venuesRef = collection(db, "venues");
+                const q = query(venuesRef, where("qrCodeId", "==", venueQrCode));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    statusMsg.textContent = "Venue not found! Invalid QR code.";
+                    homeBtn.style.display = "inline-block";
+                    return;
+                }
+
+                // Assume first match is the venue
+                const venueDoc = querySnapshot.docs[0];
+                const venueData = venueDoc.data();
+                const venueName = venueData.name || "this venue";
+
+                // Check if user already checked in
+                const userRef = doc(db, "users", user.uid);
+                const userSnap = await getDoc(userRef);
+                
+                if (userSnap.exists()) {
+                    const userData = userSnap.data();
+                    const checkIns = userData.checkIns || [];
+
+                    if (checkIns.includes(venueDoc.id)) {
+                        statusMsg.textContent = `You've already checked into ${venueName}.`;
+                        profileBtn.style.display = "inline-block";
+                        homeBtn.style.display = "inline-block";
+                        return;
+                    }
+
+                    // Award points and record check-in
+                    await updateDoc(userRef, {
+                        checkIns: arrayUnion(venueDoc.id),
+                        totalPoints: increment(50)
+                    });
+
+                    statusMsg.innerHTML = `Success! You supported <strong style="color:var(--text-primary)">${venueName}</strong>.`;
+                    pointsAward.style.display = "block";
+                    profileBtn.style.display = "inline-block";
+                    homeBtn.style.display = "inline-block";
+
+                } else {
+                    statusMsg.textContent = "User profile not found.";
+                }
+
+            } catch (error) {
+                console.error("Check-in error:", error);
+                statusMsg.textContent = "An error occurred during check-in.";
+            }
+        });
+    </script>
+</body>
+</html>

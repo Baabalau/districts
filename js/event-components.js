@@ -1,3 +1,5 @@
+import './leaderboard.js';
+
 function interpolate(text, vars) {
     if (!text) return '';
     return text.replace(/\{(\w+)\}/g, (_, key) => vars[key] ?? `{${key}}`);
@@ -20,14 +22,6 @@ function renderItineraryStops(stops, vars) {
                         <div class="stop-number">${stop.number}</div>
                         <h3>${interpolate(stop.title, vars)}</h3>
                         <p>${interpolate(stop.body, vars)}</p>
-                    </div>`).join('');
-}
-
-function renderIssues(issues) {
-    return issues.map((issue) => `
-                    <div class="issue-item">
-                        <span class="issue-text">${issue.text}</span>
-                        <button class="upvote-btn" onclick="upvote(this, ${issue.votes})">▲ <span>${issue.votes}</span></button>
                     </div>`).join('');
 }
 
@@ -210,7 +204,7 @@ function renderVotingModule(district) {
                         <div class="voted-venue">for <span id="share-venue-name"></span></div>
                     </div>
                     <button class="share-ig-btn" onclick="window.closeShareModal()">Share to Instagram Story</button>
-                    <button class="skip-btn" onclick="window.closeShareModal()">Skip & Ask a Question</button>
+                    <button class="skip-btn" onclick="window.closeShareModal()">Skip</button>
                 </div>
             </div>`;
 }
@@ -270,6 +264,10 @@ class EventLayout extends HTMLElement {
                 <div id="map"></div>
                 ${renderVotingModule(districtCopy.district)}
 
+            <div class="leaderboard-section js-reveal reveal-y delay-200" style="margin: 40px auto; max-width: 800px; padding: 0 20px;">
+                <district-leaderboard></district-leaderboard>
+            </div>
+
             <div class="itinerary-section js-reveal reveal-y delay-200">
                 <h2>${shared.itinerary.heading}</h2>
                 <div class="itinerary-grid">${renderItineraryStops(districtCopy.itinerary.stops, vars)}
@@ -303,17 +301,6 @@ class EventLayout extends HTMLElement {
                 <div class="quote-block quote-right js-reveal reveal-y delay-400">
                     "${interpolate(districtCopy.influencerQuote, vars)}"
                     <span class="quote-author">— ${districtCopy.influencerName}</span>
-                </div>
-            </div>
-
-            <div class="questions-section">
-                <div class="questions-panel js-reveal reveal-opacity" style="box-shadow: inset 4px 4px 0 rgba(255,255,255,0.55), inset -4px -4px 0 rgba(45, 27, 21, 0.2), inset 0 -3px 12px rgba(195, 47, 0, 0.12), 0 0 0 4px var(--brand-red), 0 0 0 10px var(--accent), 0 0 0 16px var(--text-primary), 0 0 0 22px rgba(195, 47, 0, 0.35), 18px 22px 0 rgba(195, 47, 0, 0.45); border: 4px solid var(--text-primary); transform: rotateX(2deg); padding: 40px; margin-bottom: 40px;">
-                    <h2>${shared.dialogueDen.heading}</h2>
-                    <p class="questions-intro">${shared.dialogueDen.intro}</p>
-                    ${renderIssues(shared.dialogueDen.issues)}
-
-                    <input type="text" class="ask-box" placeholder="${shared.dialogueDen.questionPlaceholder}">
-                    <button class="submit-btn" onclick="alert('${shared.dialogueDen.submitAlert}')">${shared.dialogueDen.submitButton}</button>
                 </div>
             </div>
             
@@ -388,10 +375,6 @@ class EventLayout extends HTMLElement {
 
         window.closeShareModal = () => {
             this.querySelector('#share-modal').style.display = 'none';
-            const questionsSection = this.querySelector('.questions-section');
-            if (questionsSection) {
-                questionsSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
         };
 
         window.setVotingState = (stateId) => {

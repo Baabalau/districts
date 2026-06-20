@@ -217,7 +217,9 @@
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                     await ensureUserDocument(userCredential.user);
                 }
-                window.location.href = "profile.html";
+                const urlParams = new URLSearchParams(window.location.search);
+                const redirectUrl = urlParams.get('redirect') || 'profile.html';
+                window.location.href = redirectUrl;
             } catch (error) {
                 errorMsg.textContent = error.message.replace("Firebase: ", "");
             }
@@ -229,7 +231,9 @@
             try {
                 const result = await signInWithPopup(auth, provider);
                 await ensureUserDocument(result.user);
-                window.location.href = "profile.html";
+                const urlParams = new URLSearchParams(window.location.search);
+                const redirectUrl = urlParams.get('redirect') || 'profile.html';
+                window.location.href = redirectUrl;
             } catch (error) {
                 errorMsg.textContent = error.message.replace("Firebase: ", "");
             }
@@ -238,7 +242,9 @@
         // Check if user is already logged in, redirect them
         auth.onAuthStateChanged((user) => {
             if (user) {
-                window.location.href = "profile.html";
+                const urlParams = new URLSearchParams(window.location.search);
+                const redirectUrl = urlParams.get('redirect') || 'profile.html';
+                window.location.href = redirectUrl;
             }
         });
     </script>
