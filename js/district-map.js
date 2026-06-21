@@ -8,7 +8,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     const match = path.match(/district-([a-e])\.html/i);
     const districtId = match ? match[1].toLowerCase() : 'b'; // default to b if not found
 
-    const districtConfigs = {
+    // Wait for EventLayout to render the #map container
+    const mapContainerInterval = setInterval(async () => {
+        if (!document.getElementById('map')) return;
+        clearInterval(mapContainerInterval);
+
+        const districtConfigs = {
         'a': { center: [29.985, -90.10], zoom: 14 },
         'b': { center: [29.9546, -90.0673], zoom: 15 },
         'c': { center: [29.958, -90.04], zoom: 12 },
@@ -131,7 +136,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             setTimeout(applyInitialFraming, 250);
 
             // Users can still pan across the entire district (e.g. Algiers, New Orleans East)
-            map.setMaxBounds(fullBounds.pad(0.3));
+            map.setMaxBounds(fullBounds.pad(0.8));
         }
     }
 
@@ -272,7 +277,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             };
             
             L.marker([place.lat, place.lng], markerOptions).addTo(map)
-                .bindPopup(popupContent);
+                .bindPopup(popupContent, { autoPanPaddingTopLeft: [0, 60] });
         });
     } catch (error) {
         console.error("Error fetching venues from Firestore:", error);
@@ -374,4 +379,5 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
         }, 100); // Slight delay for web component init
     });
+    }, 100); // end of mapContainerInterval
 });

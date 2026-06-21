@@ -154,12 +154,27 @@
                 <div class="stat-value" id="points-val">0</div>
             </div>
             <div class="stat-card">
+                <h3>Global Rank</h3>
+                <div class="stat-value" id="rank-val">-</div>
+            </div>
+            <div class="stat-card">
                 <h3>Crawls RSVPs</h3>
                 <div class="stat-value" id="rsvps-val">0</div>
             </div>
             <div class="stat-card">
+                <h3>Check-Ins</h3>
+                <div class="stat-value" id="checkins-val">0</div>
+            </div>
+            <div class="stat-card">
                 <h3>Unlocked Promos</h3>
                 <div class="stat-value" id="promos-val">0</div>
+            </div>
+        </div>
+        
+        <div class="list-section">
+            <h3>Your Check-Ins</h3>
+            <div id="checkins-list">
+                <!-- Dynamically populated -->
             </div>
         </div>
         
@@ -184,15 +199,18 @@
     <script type="module">
         import { auth, db } from "./js/firebase-config.js";
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
-        import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+        import { doc, getDoc, collection, query, where, getCountFromServer } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
         const profileContainer = document.getElementById("profile-container");
         const userNameEl = document.getElementById("user-name");
         const pointsVal = document.getElementById("points-val");
+        const rankVal = document.getElementById("rank-val");
         const rsvpsVal = document.getElementById("rsvps-val");
         const promosVal = document.getElementById("promos-val");
+        const checkinsVal = document.getElementById("checkins-val");
         const rsvpsList = document.getElementById("rsvps-list");
         const promosList = document.getElementById("promos-list");
+        const checkinsList = document.getElementById("checkins-list");
         const logoutBtn = document.getElementById("logout-btn");
 
         // Protect this page
@@ -212,13 +230,25 @@
                         const data = userSnap.data();
                         
                         userNameEl.textContent = data.displayName || user.email.split('@')[0];
-                        pointsVal.textContent = data.totalPoints || 0;
+                        const points = data.totalPoints || 0;
+                        pointsVal.textContent = points;
+                        
+                        try {
+                            const higherScoreQuery = query(collection(db, "users"), where("totalPoints", ">", points));
+                            const countSnapshot = await getCountFromServer(higherScoreQuery);
+                            rankVal.textContent = "#" + (countSnapshot.data().count + 1);
+                        } catch (e) {
+                            console.error("Error fetching rank", e);
+                        }
                         
                         const rsvps = data.rsvps || [];
                         rsvpsVal.textContent = rsvps.length;
                         
                         const promos = data.unlockedPromos || [];
                         promosVal.textContent = promos.length;
+                        
+                        const checkIns = data.checkIns || [];
+                        checkinsVal.textContent = checkIns.length;
                         
                         // Populate RSVPs
                         if (rsvps.length > 0) {
@@ -236,6 +266,23 @@
                             ).join('');
                         } else {
                             promosList.innerHTML = `<div class="empty-msg">Answer trivia questions to unlock promo codes!</div>`;
+                        }
+                        
+                        // Populate Check-ins
+                        if (checkIns.length > 0) {
+                            checkinsList.innerHTML = `<div class="empty-msg">Loading check-ins...</div>`;
+                            const checkInHtml = await Promise.all(checkIns.map(async (venueId) => {
+                                try {
+                                    const venueSnap = await getDoc(doc(db, "venues", venueId));
+                                    const venueName = venueSnap.exists() ? venueSnap.data().name : venueId;
+                                    return `<div class="list-item"><strong>${venueName}</strong> <span>✅ Checked In</span></div>`;
+                                } catch (e) {
+                                    return `<div class="list-item"><strong>${venueId}</strong> <span>✅ Checked In</span></div>`;
+                                }
+                            }));
+                            checkinsList.innerHTML = checkInHtml.join('');
+                        } else {
+                            checkinsList.innerHTML = `<div class="empty-msg">Scan a QR code at a participating venue to check in!</div>`;
                         }
                         
                     } else {

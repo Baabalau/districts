@@ -286,7 +286,7 @@
 /* Map Section */
 .map-section-wrapper {
     position: relative;
-    width: 90%;
+    width: 80%;
     max-width: 1400px;
     margin: 60px auto;
     background: var(--bg-primary);
@@ -845,7 +845,7 @@
 .quotes-section {
     max-width: 900px;
     margin: 80px auto;
-    padding: 0 20px;
+    padding: 0 20px 80px;
     display: flex;
     flex-direction: column;
     gap: 40px;
@@ -884,38 +884,6 @@
     letter-spacing: 0.06em;
 }
 
-/* Questions Section */
-.questions-section {
-    max-width: 800px;
-    margin: 80px auto;
-    padding: 0 20px 40px;
-}
-
-.questions-panel {
-    background: var(--panel-bg);
-    border: 2px solid rgba(45, 27, 21, 0.15);
-    border-radius: 12px;
-    padding: 40px;
-    box-shadow: 0 12px 32px rgba(45, 27, 21, 0.1);
-}
-
-.questions-panel h2 {
-    font-family: var(--font-header);
-    font-size: 2rem;
-    margin-bottom: 20px;
-    text-transform: uppercase;
-    border-bottom: 2px solid rgba(45, 27, 21, 0.12);
-    padding-bottom: 15px;
-    color: var(--text-primary);
-    letter-spacing: 0.04em;
-}
-
-.questions-intro {
-    margin-bottom: 20px;
-    font-size: 0.95rem;
-    color: var(--text-secondary);
-    line-height: 1.55;
-}
 
 /* Scroll Animations */
 .js-reveal {

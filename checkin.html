@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check-In | District After Dark</title>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Oswald:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0F1626; 
+            --text-primary: #CBA052; 
+            --text-secondary: #DEBA84; 
+            --accent: #8A2F25;
+            --brand-red: #4C835C;
+            --font-main: 'EB Garamond', Georgia, serif;
+            --font-header: 'Oswald', sans-serif;
+        }
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid rgba(203, 160, 82, 0.3);
+        }
+        h1 {
+            font-family: var(--font-header);
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        .status {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            color: var(--text-secondary);
+        }
+        .points-award {
+            font-size: 3rem;
+            font-family: var(--font-header);
+            color: var(--brand-red);
+            font-weight: bold;
+            margin: 20px 0;
+            display: none;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(180deg, var(--accent) 0%, var(--brand-red) 100%);
+            color: var(--bg-primary);
+            text-decoration: none;
+            font-family: var(--font-main);
+            font-weight: bold;
+            text-transform: uppercase;
+            border-radius: 5px;
+            margin-top: 20px;
+            display: none;
+            transition: transform 0.2s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Nightcrawl Check-In</h1>
+        <div class="status" id="status-msg">Verifying venue...</div>
+        <div id="photo-verification" style="display: none; margin-bottom: 20px;">
+            <p style="margin-bottom: 15px;">Please snap a quick photo to verify your visit!</p>
+            <input type="file" id="camera-input" accept="image/*" capture="environment" style="display: none;">
+            <button class="btn" id="open-camera-btn" style="display: inline-block; width: 100%; margin-top: 0;">📸 Open Camera</button>
+            <div id="upload-status" style="margin-top: 15px; font-size: 0.9rem; color: var(--text-secondary);"></div>
+            <!-- Canvas to compress image before upload -->
+            <canvas id="compress-canvas" style="display: none;"></canvas>
+        </div>
+        <div class="points-award" id="points-award">+50 Points!</div>
+        <a href="profile.html" class="btn" id="profile-btn">View My Profile</a>
+        <a href="index.html" class="btn" id="home-btn" style="background: var(--text-primary);">Back to Map</a>
+    </div>
+
+    <script type="module">
+        import { auth, db, storage } from "./js/firebase-config.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+        import { collection, query, where, getDocs, doc, getDoc, updateDoc, setDoc, arrayUnion, increment, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+        import { ref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-storage.js";
+
+        const statusMsg = document.getElementById("status-msg");
+        const pointsAward = document.getElementById("points-award");
+        const profileBtn = document.getElementById("profile-btn");
+        const homeBtn = document.getElementById("home-btn");
+        
+        const photoVerification = document.getElementById("photo-verification");
+        const cameraInput = document.getElementById("camera-input");
+        const openCameraBtn = document.getElementById("open-camera-btn");
+        const uploadStatus = document.getElementById("upload-status");
+        const compressCanvas = document.getElementById("compress-canvas");
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const venueQrCode = urlParams.get('venue');
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                // Redirect to login with redirect param
+                const currentUrl = encodeURIComponent(window.location.pathname + window.location.search);
+                window.location.href = `login.html?redirect=${currentUrl}`;
+                return;
+            }
+
+            if (!venueQrCode) {
+                statusMsg.textContent = "Invalid Check-In Link. No venue specified.";
+                homeBtn.style.display = "inline-block";
+                return;
+            }
+
+            try {
+                // Find the venue by qrCodeId
+                const venuesRef = collection(db, "venues");
+                const q = query(venuesRef, where("qrCodeId", "==", venueQrCode));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    statusMsg.textContent = "Venue not found! Invalid QR code.";
+                    homeBtn.style.display = "inline-block";
+                    return;
+                }
+
+                // Assume first match is the venue
+                const venueDoc = querySnapshot.docs[0];
+                const venueData = venueDoc.data();
+                const venueName = venueData.name || "this venue";
+                const venueId = venueDoc.id;
+
+                const userRef = doc(db, "users", user.uid);
+                const userSnap = await getDoc(userRef);
+                const userData = userSnap.exists() ? userSnap.data() : { displayName: "Crawler", email: user.email };
+
+                // 24-HOUR COOLDOWN CHECK
+                const customerRef = doc(db, "venues", venueId, "customers", user.uid);
+                const customerSnap = await getDoc(customerRef);
+                
+                let isFirstVisit = true;
+                let visitCount = 0;
+
+                if (customerSnap.exists()) {
+                    isFirstVisit = false;
+                    const custData = customerSnap.data();
+                    visitCount = custData.visitCount || 0;
+                    
+                    if (custData.lastVisit) {
+                        const lastVisitDate = custData.lastVisit.toDate();
+                        const now = new Date();
+                        const hoursSince = Math.abs(now - lastVisitDate) / 36e5;
+                        
+                        if (hoursSince < 24) {
+                            statusMsg.textContent = `You've already checked into ${venueName} recently. Try again in ${Math.ceil(24 - hoursSince)} hours!`;
+                            profileBtn.style.display = "inline-block";
+                            homeBtn.style.display = "inline-block";
+                            return;
+                        }
+                    }
+                }
+
+                // If they passed the cooldown, require a photo
+                statusMsg.textContent = `Checking into ${venueName}`;
+                photoVerification.style.display = "block";
+                
+                openCameraBtn.addEventListener("click", () => {
+                    cameraInput.click();
+                });
+                
+                cameraInput.addEventListener("change", async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    
+                    openCameraBtn.style.display = "none";
+                    uploadStatus.textContent = "Compressing photo...";
+                    
+                    // Compress image using Canvas
+                    const reader = new FileReader();
+                    reader.onload = (readerEvent) => {
+                        const img = new Image();
+                        img.onload = async () => {
+                            const MAX_WIDTH = 800;
+                            const MAX_HEIGHT = 800;
+                            let width = img.width;
+                            let height = img.height;
+                            
+                            if (width > height) {
+                                if (width > MAX_WIDTH) {
+                                    height *= MAX_WIDTH / width;
+                                    width = MAX_WIDTH;
+                                }
+                            } else {
+                                if (height > MAX_HEIGHT) {
+                                    width *= MAX_HEIGHT / height;
+                                    height = MAX_HEIGHT;
+                                }
+                            }
+                            
+                            compressCanvas.width = width;
+                            compressCanvas.height = height;
+                            const ctx = compressCanvas.getContext("2d");
+                            ctx.drawImage(img, 0, 0, width, height);
+                            
+                            // Convert to highly compressed JPEG base64
+                            const dataUrl = compressCanvas.toDataURL("image/jpeg", 0.6);
+                            
+                            try {
+                                uploadStatus.textContent = "Uploading verification...";
+                                // Upload to Firebase Storage
+                                const fileName = `checkins/${venueId}/${user.uid}_${Date.now()}.jpg`;
+                                const storageRef = ref(storage, fileName);
+                                await uploadString(storageRef, dataUrl, 'data_url');
+                                const downloadURL = await getDownloadURL(storageRef);
+                                
+                                uploadStatus.textContent = "Finalizing check-in...";
+                                
+                                // Finalize Firestore Data
+                                await finalizeCheckIn(venueId, venueName, user, userData, isFirstVisit, visitCount, downloadURL);
+                                
+                            } catch (uploadError) {
+                                console.error("Upload failed", uploadError);
+                                uploadStatus.textContent = "Upload failed. Please try again.";
+                                openCameraBtn.style.display = "inline-block";
+                            }
+                        };
+                        img.src = readerEvent.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                });
+
+                async function finalizeCheckIn(venueId, venueName, user, userData, isFirstVisit, visitCount, imageUrl) {
+                    // 1. Update Venue -> Customer loyalty document
+                    const customerRef = doc(db, "venues", venueId, "customers", user.uid);
+                    const newVisitCount = visitCount + 1;
+                    
+                    await setDoc(customerRef, {
+                        displayName: userData.displayName || "Crawler",
+                        email: user.email,
+                        visitCount: newVisitCount,
+                        lastVisit: serverTimestamp()
+                    }, { merge: true });
+
+                    // 2. Local Legend (Global) points logic - ONLY ON FIRST VISIT
+                    if (isFirstVisit) {
+                        const userRef = doc(db, "users", user.uid);
+                        await updateDoc(userRef, {
+                            checkIns: arrayUnion(venueId),
+                            totalPoints: increment(50)
+                        });
+                        pointsAward.style.display = "block";
+                        pointsAward.textContent = "+50 Points!";
+                    } else {
+                        pointsAward.style.display = "block";
+                        pointsAward.textContent = "Loyalty Visit Logged!";
+                        pointsAward.style.color = "var(--text-primary)";
+                    }
+
+                    photoVerification.style.display = "none";
+                    statusMsg.innerHTML = `Success! You supported <strong style="color:var(--text-primary)">${venueName}</strong>.`;
+                    
+                    profileBtn.style.display = "inline-block";
+                    homeBtn.style.display = "inline-block";
+                    
+                    // 3. Webhook Integration for Notion
+                    // REPLACE THIS URL with your actual Zapier / Make.com webhook URL
+                    const WEBHOOK_URL = "https://hook.us1.make.com/YOUR_WEBHOOK_ID_HERE"; 
+                    
+                    if (WEBHOOK_URL.includes("YOUR_WEBHOOK_ID_HERE")) {
+                        console.log("Webhook skipped: Please replace WEBHOOK_URL in checkin.html with your actual Zapier/Make URL.");
+                    } else {
+                        try {
+                            fetch(WEBHOOK_URL, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    venueName: venueName,
+                                    venueId: venueId,
+                                    patronName: userData.displayName || "Crawler",
+                                    email: user.email,
+                                    visitCount: newVisitCount,
+                                    photoUrl: imageUrl,
+                                    timestamp: new Date().toISOString()
+                                })
+                            }).catch(e => console.error("Webhook trigger failed (non-critical):", e));
+                        } catch (e) {
+                            // Non-critical, ignore
+                        }
+                    }
+                }
+
+            } catch (error) {
+                console.error("Check-in error:", error);
+                statusMsg.textContent = "An error occurred during check-in.";
+            }
+        });
+    </script>
+</body>
+</html>
