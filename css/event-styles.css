@@ -342,6 +342,11 @@
     z-index: 1;
 }
 
+.leaflet-tile-pane {
+    /* Convert grayscale tiles to a deep blue matching the app theme */
+    filter: sepia(80%) hue-rotate(190deg) saturate(300%) brightness(0.65) contrast(1.2);
+}
+
 .map-features-layout {
     width: 80%;
     max-width: 1400px;
