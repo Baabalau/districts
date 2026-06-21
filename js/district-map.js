@@ -136,7 +136,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             setTimeout(applyInitialFraming, 250);
 
             // Users can still pan across the entire district (e.g. Algiers, New Orleans East)
-            map.setMaxBounds(fullBounds.pad(0.3));
+            map.setMaxBounds(fullBounds.pad(0.8));
         }
     }
 
@@ -277,7 +277,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             };
             
             L.marker([place.lat, place.lng], markerOptions).addTo(map)
-                .bindPopup(popupContent);
+                .bindPopup(popupContent, { autoPanPaddingTopLeft: [0, 60] });
         });
     } catch (error) {
         console.error("Error fetching venues from Firestore:", error);

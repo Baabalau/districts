@@ -286,7 +286,7 @@
 /* Map Section */
 .map-section-wrapper {
     position: relative;
-    width: 90%;
+    width: 80%;
     max-width: 1400px;
     margin: 60px auto;
     background: var(--bg-primary);
