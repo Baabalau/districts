@@ -235,7 +235,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             ];
         } else {
             querySnapshot.forEach((doc) => {
-                venues.push(doc.data());
+                const data = doc.data();
+                data.id = doc.id;
+                venues.push(data);
             });
         }
 
@@ -278,7 +280,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     ${place.address ? `<p style="margin: 0 0 8px 0; font-size: 1rem; color: var(--text-secondary); line-height: 1.3;">${place.address}</p>` : ''}
                     <p style="margin: 0 0 ${hasRealDescription ? '8px' : '20px'} 0; font-size: 1.1rem; color: var(--text-secondary); text-transform: capitalize; font-style: italic;">${place.type ? place.type.replace('_', ' ') : 'Venue'}</p>
                     ${hasRealDescription ? `<p style="margin: 0 0 20px 0; font-size: 0.95rem; color: var(--text-primary); line-height: 1.4;">${place.description}</p>` : ''}
-                    <button class="brand-btn" style="width: 100%; padding: 14px 10px; font-size: 1.1rem; white-space: nowrap; text-align: center; letter-spacing: 1px; display: block; box-sizing: border-box;" onclick="window.openVoteModal('${place.name.replace(/'/g, "\\'")}')">Vote for this Venue</button>
+                    <button class="brand-btn" style="width: 100%; padding: 14px 10px; font-size: 1.1rem; white-space: nowrap; text-align: center; letter-spacing: 1px; display: block; box-sizing: border-box;" onclick="window.openVoteModal('${place.id}', '${place.name.replace(/'/g, "\\'")}')">Vote for this Venue</button>
                 </div>
             `;
             

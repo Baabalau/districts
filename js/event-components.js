@@ -1,4 +1,7 @@
 import './leaderboard.js';
+import { auth, db } from "./firebase-config.js";
+import { doc, updateDoc, increment, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 
 function interpolate(text, vars) {
     if (!text) return '';
@@ -102,16 +105,16 @@ function renderVotingModule(district) {
                     <p style="text-align: center; color: var(--text-secondary); margin-bottom: 20px;">Use the numbers on the map above to locate venues.</p>
                     <div class="venue-list-container">
                         <ul class="venue-list">
-                            <li><span class="rank-badge gold">1</span> <div class="v-details"><strong>The Rusty Nail</strong><br><em>Patio crawfish boil</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('The Rusty Nail')">VOTE</button></li>
-                            <li><span class="rank-badge gold">2</span> <div class="v-details"><strong>Barrel Proof</strong><br><em>Brass band on the deck</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('Barrel Proof')">VOTE</button></li>
-                            <li><span class="rank-badge gold">3</span> <div class="v-details"><strong>The Tchoup Yard</strong><br><em>Outdoor games & DJ</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('The Tchoup Yard')">VOTE</button></li>
-                            <li><span class="rank-badge silver">4</span> <div class="v-details"><strong>Capulet</strong><br><em>Frozen cocktails specials</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('Capulet')">VOTE</button></li>
-                            <li><span class="rank-badge silver">5</span> <div class="v-details"><strong>Bulldog Mid-City</strong><br><em>Pint night deals</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('Bulldog Mid-City')">VOTE</button></li>
-                            <li><span class="rank-badge dark-gray">6</span> <div class="v-details"><strong>Finn McCool's</strong><br><em>Dog-friendly patio vibes</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('Finn McCool\\'s')">VOTE</button></li>
-                            <li><span class="rank-badge dark-gray">7</span> <div class="v-details"><strong>Pal's Lounge</strong><br><em>Neighborhood classic</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('Pal\\'s Lounge')">VOTE</button></li>
-                            <li><span class="rank-badge dark-gray">8</span> <div class="v-details"><strong>Mick's Irish Pub</strong><br><em>Live sports & pool</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('Mick\\'s Irish Pub')">VOTE</button></li>
-                            <li><span class="rank-badge dark-gray">9</span> <div class="v-details"><strong>Rendon Inn</strong><br><em>Best late night tacos</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('Rendon Inn')">VOTE</button></li>
-                            <li><span class="rank-badge dark-gray">10</span> <div class="v-details"><strong>12 Mile Limit</strong><br><em>Spacious outdoor seating</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('12 Mile Limit')">VOTE</button></li>
+                            <li><span class="rank-badge gold">1</span> <div class="v-details"><strong>The Rusty Nail</strong><br><em>Patio crawfish boil</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('mock_1', 'The Rusty Nail')">VOTE</button></li>
+                            <li><span class="rank-badge gold">2</span> <div class="v-details"><strong>Barrel Proof</strong><br><em>Brass band on the deck</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('mock_2', 'Barrel Proof')">VOTE</button></li>
+                            <li><span class="rank-badge gold">3</span> <div class="v-details"><strong>The Tchoup Yard</strong><br><em>Outdoor games & DJ</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('mock_3', 'The Tchoup Yard')">VOTE</button></li>
+                            <li><span class="rank-badge silver">4</span> <div class="v-details"><strong>Capulet</strong><br><em>Frozen cocktails specials</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('mock_4', 'Capulet')">VOTE</button></li>
+                            <li><span class="rank-badge silver">5</span> <div class="v-details"><strong>Bulldog Mid-City</strong><br><em>Pint night deals</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('mock_5', 'Bulldog Mid-City')">VOTE</button></li>
+                            <li><span class="rank-badge dark-gray">6</span> <div class="v-details"><strong>Finn McCool's</strong><br><em>Dog-friendly patio vibes</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('mock_6', 'Finn McCool\\'s')">VOTE</button></li>
+                            <li><span class="rank-badge dark-gray">7</span> <div class="v-details"><strong>Pal's Lounge</strong><br><em>Neighborhood classic</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('mock_7', 'Pal\\'s Lounge')">VOTE</button></li>
+                            <li><span class="rank-badge dark-gray">8</span> <div class="v-details"><strong>Mick's Irish Pub</strong><br><em>Live sports & pool</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('mock_8', 'Mick\\'s Irish Pub')">VOTE</button></li>
+                            <li><span class="rank-badge dark-gray">9</span> <div class="v-details"><strong>Rendon Inn</strong><br><em>Best late night tacos</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('mock_9', 'Rendon Inn')">VOTE</button></li>
+                            <li><span class="rank-badge dark-gray">10</span> <div class="v-details"><strong>12 Mile Limit</strong><br><em>Spacious outdoor seating</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('mock_10', '12 Mile Limit')">VOTE</button></li>
                         </ul>
                         <div class="pagination">
                             <button disabled>← Prev</button>
@@ -175,11 +178,11 @@ function renderVotingModule(district) {
                     </div>
                     <div class="venue-list-container">
                         <ul class="venue-list">
-                            <li><span class="rank-badge gold">1</span> <div class="v-details"><strong>The Rusty Nail</strong><br><em>Patio crawfish boil</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('The Rusty Nail')">VOTE</button></li>
-                            <li><span class="rank-badge gold">2</span> <div class="v-details"><strong>Barrel Proof</strong><br><em>Brass band on the deck</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('Barrel Proof')">VOTE</button></li>
-                            <li><span class="rank-badge gold">3</span> <div class="v-details"><strong>The Tchoup Yard</strong><br><em>Outdoor games & DJ</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('The Tchoup Yard')">VOTE</button></li>
-                            <li><span class="rank-badge silver">4</span> <div class="v-details"><strong>Capulet</strong><br><em>Frozen cocktails specials</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('Capulet')">VOTE</button></li>
-                            <li><span class="rank-badge silver">5</span> <div class="v-details"><strong>Bulldog Mid-City</strong><br><em>Pint night deals</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('Bulldog Mid-City')">VOTE</button></li>
+                            <li><span class="rank-badge gold">1</span> <div class="v-details"><strong>The Rusty Nail</strong><br><em>Patio crawfish boil</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('mock_1', 'The Rusty Nail')">VOTE</button></li>
+                            <li><span class="rank-badge gold">2</span> <div class="v-details"><strong>Barrel Proof</strong><br><em>Brass band on the deck</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('mock_2', 'Barrel Proof')">VOTE</button></li>
+                            <li><span class="rank-badge gold">3</span> <div class="v-details"><strong>The Tchoup Yard</strong><br><em>Outdoor games & DJ</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('mock_3', 'The Tchoup Yard')">VOTE</button></li>
+                            <li><span class="rank-badge silver">4</span> <div class="v-details"><strong>Capulet</strong><br><em>Frozen cocktails specials</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('mock_4', 'Capulet')">VOTE</button></li>
+                            <li><span class="rank-badge silver">5</span> <div class="v-details"><strong>Bulldog Mid-City</strong><br><em>Pint night deals</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('mock_5', 'Bulldog Mid-City')">VOTE</button></li>
                         </ul>
                     </div>
                 </div>
@@ -205,10 +208,8 @@ function renderVotingModule(district) {
                     <button class="close-modal" onclick="window.closeVoteModal()">×</button>
                     <h2>Cast Your Vote</h2>
                     <p>You are voting for <strong id="modal-venue-name"></strong>.</p>
-                    <div class="auth-buttons">
-                        <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 5px;">Enter your email to authenticate your vote.</p>
-                        <input type="email" placeholder="Email Address" class="email-input" id="voter-email">
-                        <button class="auth-btn email" onclick="window.showShareScreen()">Submit Vote</button>
+                    <div class="auth-buttons" id="vote-auth-section">
+                        <!-- Populated dynamically based on auth state -->
                     </div>
                 </div>
             </div>
@@ -362,11 +363,41 @@ class EventLayout extends HTMLElement {
     }
 
     initVotingPortal() {
-        window.openVoteModal = (venueName) => {
+        let currentUser = null;
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            const authSection = this.querySelector('#vote-auth-section');
+            if (!authSection) return;
+            
+            if (user) {
+                authSection.innerHTML = `
+                    <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 15px;">You are logged in as <strong>${user.email}</strong>.</p>
+                    <button class="auth-btn email" id="submit-vote-btn">Submit Vote</button>
+                    <p id="vote-error-msg" style="color: var(--brand-red); font-size: 0.9rem; margin-top: 10px; display: none;"></p>
+                `;
+                
+                const submitBtn = this.querySelector('#submit-vote-btn');
+                submitBtn.addEventListener('click', () => window.submitVote());
+            } else {
+                authSection.innerHTML = `
+                    <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 15px;">Please log in to cast your vote and prevent duplicate voting.</p>
+                    <button class="auth-btn email" onclick="window.location.href='login.html?redirect=' + encodeURIComponent(window.location.pathname)">Log In to Vote</button>
+                `;
+            }
+        });
+
+        window.openVoteModal = (venueId, venueName) => {
             const modal = this.querySelector('#vote-modal');
             const nameEl = this.querySelector('#modal-venue-name');
             nameEl.innerText = venueName;
             this.querySelector('#share-venue-name').innerText = venueName;
+            modal.dataset.venueId = venueId;
+            modal.dataset.venueName = venueName;
+            
+            // Reset error message if it exists
+            const errorMsg = this.querySelector('#vote-error-msg');
+            if (errorMsg) errorMsg.style.display = 'none';
+            
             modal.style.display = 'flex';
         };
 
@@ -374,23 +405,75 @@ class EventLayout extends HTMLElement {
             this.querySelector('#vote-modal').style.display = 'none';
         };
 
-        window.showShareScreen = () => {
-            const emailInput = this.querySelector('.email-input');
-            const btn = this.querySelector('.auth-btn.email');
-
-            if (!emailInput.value.includes('@')) {
-                alert('Please enter a valid email address.');
+        window.submitVote = async () => {
+            if (!currentUser) {
+                window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.pathname);
                 return;
             }
 
-            btn.innerText = 'Authenticating...';
+            const modal = this.querySelector('#vote-modal');
+            const venueId = modal.dataset.venueId;
+            const btn = this.querySelector('#submit-vote-btn');
+            const errorMsg = this.querySelector('#vote-error-msg');
+            
+            if (!venueId || venueId === 'undefined' || venueId === 'null') {
+                errorMsg.textContent = "Error: Invalid venue selected.";
+                errorMsg.style.display = 'block';
+                return;
+            }
 
-            setTimeout(() => {
+            // Determine district from URL
+            const path = window.location.pathname;
+            const match = path.match(/district-([a-e])\.html/i);
+            const districtId = match ? match[1].toUpperCase() : 'B';
+
+            btn.innerText = 'Submitting...';
+            btn.disabled = true;
+
+            try {
+                const userRef = doc(db, "users", currentUser.uid);
+                const userSnap = await getDoc(userRef);
+                
+                let userData = userSnap.exists() ? userSnap.data() : {};
+                let votes = userData.votes || {};
+                
+                // Check if user already voted in this district
+                if (votes[districtId]) {
+                    errorMsg.textContent = `You have already voted in District ${districtId}.`;
+                    errorMsg.style.display = 'block';
+                    btn.innerText = 'Submit Vote';
+                    btn.disabled = false;
+                    return;
+                }
+                
+                // Update user's votes
+                votes[districtId] = venueId;
+                await setDoc(userRef, { votes: votes }, { merge: true });
+                
+                // Increment venue's voteCount
+                const venueRef = doc(db, "venues", venueId);
+                await updateDoc(venueRef, {
+                    voteCount: increment(1)
+                });
+                
+                window.showShareScreen();
+            } catch (error) {
+                console.error("Error submitting vote:", error);
+                errorMsg.textContent = "Error submitting vote. Please try again.";
+                errorMsg.style.display = 'block';
                 btn.innerText = 'Submit Vote';
-                this.querySelector('#vote-modal').style.display = 'none';
-                this.querySelector('#share-modal').style.display = 'flex';
-                emailInput.value = '';
-            }, 800);
+                btn.disabled = false;
+            }
+        };
+
+        window.showShareScreen = () => {
+            const btn = this.querySelector('#submit-vote-btn');
+            if (btn) {
+                btn.innerText = 'Submit Vote';
+                btn.disabled = false;
+            }
+            this.querySelector('#vote-modal').style.display = 'none';
+            this.querySelector('#share-modal').style.display = 'flex';
         };
 
         window.closeShareModal = () => {
@@ -415,7 +498,7 @@ class EventLayout extends HTMLElement {
                 const isPostElection = this.querySelector('#state-post-election')?.style.display !== 'none';
 
                 if (!isPreVoting && !isPostElection) {
-                    window.openVoteModal(voteTarget);
+                    window.openVoteModal(null, voteTarget);
                 }
             }
         }, 150);
