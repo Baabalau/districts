@@ -31,11 +31,31 @@ function renderScheduleItems(items) {
 
 function renderVotingModule(district) {
     return `
-                <div class="map-filters" style="padding: 15px; background: var(--bg-secondary); border-top: 2px solid var(--text-primary); border-radius: 0 0 8px 8px; display: flex; justify-content: center; gap: 20px;">
-                    <label style="color: var(--text-secondary); font-family: var(--font-header); font-weight: 700; display: flex; align-items: center; gap: 8px; cursor: pointer; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 0.05em;">
-                        <input type="checkbox" id="toggle-ranked-only" style="width: 18px; height: 18px; accent-color: var(--accent);">
-                        Show Top 10 Nominees Only
-                    </label>
+                <div class="map-filters" style="padding: 15px 25px; background: var(--bg-secondary); border-top: 2px solid var(--text-primary); border-radius: 0 0 8px 8px; display: flex; justify-content: center; gap: 24px; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="width: 14px; height: 14px; border-radius: 50%; background-color: #D2A039; box-shadow: 0 0 8px #D2A039;"></div>
+                        <span style="color: var(--text-primary); font-family: var(--font-header); font-size: 0.95rem; font-weight: 700; text-transform: uppercase;">Bar</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="width: 14px; height: 14px; border-radius: 50%; background-color: #B32424; box-shadow: 0 0 8px #B32424;"></div>
+                        <span style="color: var(--text-primary); font-family: var(--font-header); font-size: 0.95rem; font-weight: 700; text-transform: uppercase;">Restaurant</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="width: 14px; height: 14px; border-radius: 50%; background-color: #D946EF; box-shadow: 0 0 8px #D946EF;"></div>
+                        <span style="color: var(--text-primary); font-family: var(--font-header); font-size: 0.95rem; font-weight: 700; text-transform: uppercase;">Live Venue</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="width: 14px; height: 14px; border-radius: 50%; background-color: #45B7D1; box-shadow: 0 0 8px #45B7D1;"></div>
+                        <span style="color: var(--text-primary); font-family: var(--font-header); font-size: 0.95rem; font-weight: 700; text-transform: uppercase;">Museum/Gallery</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="width: 14px; height: 14px; border-radius: 50%; background-color: #A87B28; box-shadow: 0 0 8px #A87B28;"></div>
+                        <span style="color: var(--text-primary); font-family: var(--font-header); font-size: 0.95rem; font-weight: 700; text-transform: uppercase;">Other</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; border-left: 1px solid rgba(203, 160, 82, 0.3); padding-left: 20px;">
+                        <div style="width: 14px; height: 14px; border-radius: 50%; background-color: transparent; border: 2px solid #fff;"></div>
+                        <span style="color: var(--text-secondary); font-family: var(--font-header); font-size: 0.85rem; font-style: italic;">Top 10</span>
+                    </div>
                 </div>
             </div>
 

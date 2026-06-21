@@ -72,8 +72,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 80px 20px;
-    max-width: 1200px;
+    padding: 80px 0;
+    width: 80%;
+    max-width: 1400px;
     margin: 0 auto;
     min-height: 70vh;
 }
@@ -200,12 +201,13 @@
 
 /* Purpose Section (from index.html) */
 .purpose-section {
-    padding: 72px 20px 88px;
+    padding: 72px 0 88px;
     background: var(--bg-primary);
 }
 
 .purpose-module {
-    max-width: 960px;
+    width: 80%;
+    max-width: 1400px;
     margin: 0 auto;
     position: relative;
     perspective: 900px;
@@ -340,10 +342,16 @@
     z-index: 1;
 }
 
+.leaflet-tile-pane {
+    /* Convert grayscale tiles to a deep blue matching the app theme */
+    filter: sepia(80%) hue-rotate(190deg) saturate(300%) brightness(0.65) contrast(1.2);
+}
+
 .map-features-layout {
-    max-width: 1200px;
+    width: 80%;
+    max-width: 1400px;
     margin: 0 auto 80px;
-    padding: 0 20px;
+    padding: 0;
 }
 
 .map-features {
@@ -408,9 +416,10 @@
 
 /* Voting Section */
 .voting-section {
-    max-width: 1200px;
+    width: 80%;
+    max-width: 1400px;
     margin: 80px auto;
-    padding: 0 20px;
+    padding: 0;
 }
 
 .voting-header {
@@ -761,9 +770,10 @@
 
 /* Crawl-tinery Section */
 .itinerary-section {
-    max-width: 1200px;
+    width: 80%;
+    max-width: 1400px;
     margin: 80px auto;
-    padding: 0 20px;
+    padding: 0;
 }
 
 .itinerary-section h2 {
@@ -843,9 +853,10 @@
 
 /* Quotes Section */
 .quotes-section {
-    max-width: 900px;
+    width: 80%;
+    max-width: 1400px;
     margin: 80px auto;
-    padding: 0 20px 80px;
+    padding: 0 0 80px;
     display: flex;
     flex-direction: column;
     gap: 40px;

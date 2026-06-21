@@ -55,10 +55,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     }).addTo(map);
 
     // Dark basemap
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        subdomains: 'abcd',
-        maxZoom: 20
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+        maxNativeZoom: 16,
+        maxZoom: 17
     }).addTo(map);
 
     // Draw the district boundary if available
@@ -69,11 +69,21 @@ document.addEventListener("DOMContentLoaded", async () => {
         );
         
         if (districtFeature) {
-            // 1. Draw boundary line only (no interior fill)
+            // 1a. Draw boundary glow
             L.geoJSON(districtFeature, {
                 style: {
-                    color: '#2B3561',
-                    weight: 4,
+                    color: '#CBA052',
+                    weight: 8,
+                    opacity: 0.25,
+                    fillOpacity: 0
+                }
+            }).addTo(map);
+
+            // 1b. Draw boundary line core
+            L.geoJSON(districtFeature, {
+                style: {
+                    color: '#CBA052',
+                    weight: 3,
                     opacity: 1,
                     fillOpacity: 0
                 }
@@ -142,29 +152,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Dynamic icon generator based on venue type and rank
     function getVenueIcon(type, rank) {
-        if (rank) {
-            // Use the same styling logic as the list view rank badges
-            let badgeClass = 'rank-badge';
-            if (rank <= 3) badgeClass += ' gold';
-            else if (rank <= 5) badgeClass += ' silver';
-            else badgeClass += ' dark-gray';
-            
-            return L.divIcon({
-                className: 'custom-venue-marker',
-                html: `<div class="${badgeClass}" style="width: 28px; height: 28px; font-size: 0.9rem; margin: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">${rank}</div>`,
-                iconSize: [28, 28],
-                iconAnchor: [14, 14]
-            });
-        }
-
-        // Map types to distinct colors (fallback for non-ranked venues)
+        // Map types to distinct colors
         const colors = {
-            'bar': '#D2A039',       // Accent orange -> Gold
-            'restaurant': '#2B3561', // Brand red -> Dark Blue
-            'club': '#1E2545',      // Dark red -> Darker Blue
-            'lounge': '#1D1A16',    // Dark brown -> Dark Outline
-            'music': '#D5BC8A',     // Light brown -> Tan
-            'default': '#A87B28'    // Accent dark -> Dark Gold
+            'bar': '#D2A039',       // Gold
+            'restaurant': '#B32424', // Darker Red
+            'performance': '#D946EF', // Bright Purple (Live Venue)
+            'music': '#D946EF',     // Bright Purple (Live Venue)
+            'adult': '#D946EF',     // Bright Purple (Live Venue)
+            'museum': '#45B7D1',    // Teal (Museum/Gallery)
+            'gallery': '#45B7D1',   // Teal (Museum/Gallery)
+            'default': '#A87B28'    // Dark Gold (Other)
         };
         
         let color = colors['default'];
@@ -178,11 +175,16 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         }
 
+        const isTop10 = rank && rank <= 10;
+        const borderStyle = isTop10 ? 'border: 2px solid #fff;' : 'border: 2px solid transparent;';
+        // Add neon glow effect matching the marker's color
+        const glowStyle = `box-shadow: 0 0 8px ${color}, 0 0 12px ${color};`;
+
         return L.divIcon({
             className: 'custom-venue-marker',
-            html: `<div style="background-color: ${color}; width: 14px; height: 14px; border-radius: 50%; box-shadow: 0 2px 6px rgba(0,0,0,0.3); border: 2px solid #fff;"></div>`,
-            iconSize: [14, 14],
-            iconAnchor: [7, 7]
+            html: `<div style="background-color: ${color}; width: 16px; height: 16px; border-radius: 50%; ${glowStyle} ${borderStyle}"></div>`,
+            iconSize: [16, 16],
+            iconAnchor: [8, 8]
         });
     }
 
@@ -240,7 +242,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         // Determine if venues are in bounds and mock ranks if necessary
         let inDistrictVenues = [];
         venues.forEach((place) => {
+            // Geocoding bug fix: Saturn Bar was mistakenly placed at 3323 N Robertson (29.9711, -90.0396).
+            // Hardcode correct coordinates to Bywater location: 3067 St Claude Ave
+            if (place.name && place.name.toUpperCase() === 'SATURN BAR') {
+                place.lat = 29.9679094;
+                place.lng = -90.0442228;
+                place.district = 'C';
+            }
+
             if (!place.lat || !place.lng) return;
+            // Since we override district to C for Saturn Bar, ensure it's filtered correctly
+            // if we're not on District C page (but wait, venues are already queried by districtId).
+            // Actually, because Firestore returned it for District D, we should just let it be on the map
+            // but at the right coordinate, or exclude it if it's no longer in bounds.
             place.inBounds = districtFeature ? isPointInDistrict(place.lat, place.lng, districtFeature) : true;
             if (place.inBounds) inDistrictVenues.push(place);
         });
@@ -250,23 +264,21 @@ document.addEventListener("DOMContentLoaded", async () => {
             inDistrictVenues.slice(0, 10).forEach((v, index) => v.rank = index + 1);
         }
 
+        let allMarkers = [];
+
         venues.forEach((place) => {
             if (!place.lat || !place.lng) return;
 
+            // Failsafe: if the description field still contains raw hours data, ignore it.
+            const hasRealDescription = place.description && !place.description.trim().startsWith('Hours:');
+
             const popupContent = `
-                <div style="width: 220px; font-family: 'EB Garamond', Georgia, serif;">
-                    <div style="height: 120px; background-image: url('${place.imageUrl || 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'}'); background-size: cover; background-position: center; border-radius: 5px 5px 0 0; margin: -14px -14px 10px -14px;"></div>
-                    <h4 style="margin: 0 0 5px 0; color: #2B3561; font-family: 'EB Garamond', Georgia, serif; font-size: 1.2rem; text-transform: uppercase;">${place.name || 'Unnamed Venue'}</h4>
-                    <p style="margin: 0 0 10px 0; font-size: 0.8rem; color: #4A3C2F; text-transform: capitalize;">${place.type ? place.type.replace('_', ' ') : 'Venue'}</p>
-                    <div style="font-size: 0.85rem; color: #1D1A16; line-height: 1.4;">
-                        ${place.description ? `<div style="margin-bottom: 3px;">${place.description}</div>` : ''}
-                    </div>
-                    <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(45, 27, 21, 0.1);">
-                        <label style="display: flex; align-items: center; gap: 8px; font-weight: bold; cursor: pointer; color: #8A2F25;">
-                            <input type="radio" name="map-vote" value="${place.name}" onclick="window.openVoteModal('${place.name.replace(/'/g, "\\'")}')" style="accent-color: #8A2F25;">
-                            Vote for this Venue
-                        </label>
-                    </div>
+                <div style="width: 320px; font-family: 'EB Garamond', Georgia, serif; text-align: left; padding: 10px 4px 2px;">
+                    <h4 style="margin: 0 0 5px 0; color: var(--text-primary); font-family: 'EB Garamond', Georgia, serif; font-size: 1.6rem; text-transform: uppercase; line-height: 1.1;">${place.name || 'Unnamed Venue'}</h4>
+                    ${place.address ? `<p style="margin: 0 0 8px 0; font-size: 1rem; color: var(--text-secondary); line-height: 1.3;">${place.address}</p>` : ''}
+                    <p style="margin: 0 0 ${hasRealDescription ? '8px' : '20px'} 0; font-size: 1.1rem; color: var(--text-secondary); text-transform: capitalize; font-style: italic;">${place.type ? place.type.replace('_', ' ') : 'Venue'}</p>
+                    ${hasRealDescription ? `<p style="margin: 0 0 20px 0; font-size: 0.95rem; color: var(--text-primary); line-height: 1.4;">${place.description}</p>` : ''}
+                    <button class="brand-btn" style="width: 100%; padding: 14px 10px; font-size: 1.1rem; white-space: nowrap; text-align: center; letter-spacing: 1px; display: block; box-sizing: border-box;" onclick="window.openVoteModal('${place.name.replace(/'/g, "\\'")}')">Vote for this Venue</button>
                 </div>
             `;
             
@@ -276,8 +288,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                 opacity: place.inBounds ? 1.0 : 0.35
             };
             
-            L.marker([place.lat, place.lng], markerOptions).addTo(map)
+            const marker = L.marker([place.lat, place.lng], markerOptions).addTo(map)
                 .bindPopup(popupContent, { autoPanPaddingTopLeft: [0, 60] });
+
+            allMarkers.push({
+                marker: marker,
+                isTop10: place.rank && place.rank <= 10
+            });
         });
     } catch (error) {
         console.error("Error fetching venues from Firestore:", error);
