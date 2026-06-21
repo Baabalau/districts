@@ -12,21 +12,22 @@
     --accent-dark: #6A241C; /* Dark Red */
     --brand-red: #4C835C; /* Olive Green */
     --panel-bg: #182238;
-    --font-main: 'Inter', sans-serif;
-    --font-header: 'Montserrat', sans-serif;
-    --font-subhead: 'Georgia', serif;
+    --font-hero: 'Oswald', sans-serif;
+    --font-main: 'EB Garamond', Georgia, serif;
+    --font-header: 'EB Garamond', Georgia, serif;
+    --font-subhead: 'EB Garamond', Georgia, serif;
 }
 
 /* Brand Button */
 .brand-btn {
-    padding: 15px 35px;
+    padding: 14px 35px;
     background: linear-gradient(180deg, var(--accent) 0%, var(--brand-red) 100%);
     color: var(--bg-primary);
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     font-family: var(--font-main);
-    font-size: 1rem;
-    font-weight: bold;
+    font-size: 18px;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 2px;
     cursor: pointer;
@@ -45,9 +46,9 @@
 /* Title 3D */
 .title-3d {
     display: inline-block;
-    font-family: var(--font-header);
-    font-size: clamp(3.5rem, 9vw, 7.5rem);
-    font-weight: 900;
+    font-family: var(--font-hero);
+    font-size: clamp(4rem, 9vw, 7.5rem);
+    font-weight: 700;
     text-transform: uppercase;
     color: var(--text-primary);
     transform: rotate(-5deg) skewX(-5deg);
@@ -90,9 +91,10 @@
     padding-right: 40px;
 }
 
-.hero-left h1 {
-    font-family: var(--font-header);
-    font-size: clamp(2.2rem, 5vw, 4rem);
+.hero-left h1.title-3d {
+    font-family: var(--font-hero);
+    font-size: 64px;
+    font-weight: 700;
     text-transform: uppercase;
     line-height: 1.1;
     margin-bottom: 10px;
