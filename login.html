@@ -9,6 +9,7 @@
         :root {
             --bg-primary: #0F1626; 
             --text-primary: #CBA052; 
+            --text-secondary: #DEBA84;
             --accent: #8A2F25;
             --brand-red: #4C835C;
             --font-hero: 'Oswald', sans-serif;
@@ -30,10 +31,11 @@
         }
 
         .auth-container {
-            background: rgba(255, 255, 255, 0.4);
+            background: var(--bg-primary);
             padding: 40px;
+            border: 2px solid #ffffff;
             border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
             max-width: 400px;
             width: 100%;
             text-align: center;
@@ -42,8 +44,17 @@
         .auth-container h2 {
             font-family: var(--font-header);
             font-size: 2rem;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             text-transform: uppercase;
+            color: var(--text-primary);
+        }
+
+        .auth-container p.instructions {
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            line-height: 1.5;
         }
 
         .input-group {
@@ -55,21 +66,27 @@
             display: block;
             margin-bottom: 5px;
             font-weight: 600;
+            color: var(--text-primary);
         }
 
         .input-group input {
             width: 100%;
             padding: 10px;
-            border: 2px solid var(--text-primary);
+            border: 2px solid rgba(255, 255, 255, 0.45);
             border-radius: 5px;
-            background: transparent;
-            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.06);
+            color: #ffffff;
             font-family: var(--font-main);
             outline: none;
         }
 
+        .input-group input::placeholder {
+            color: rgba(222, 186, 132, 0.55);
+        }
+
         .input-group input:focus {
-            border-color: var(--brand-red);
+            border-color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .auth-btn {
@@ -92,61 +109,94 @@
             box-shadow: 0 5px 15px rgba(195, 47, 0, 0.4);
         }
 
+        .auth-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
         .google-btn {
             background: var(--text-primary);
             margin-top: 15px;
         }
 
         .google-btn:hover {
-            background: #1a1a1a;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+            background: #e0bc6a;
+            box-shadow: 0 5px 15px rgba(203, 160, 82, 0.35);
         }
 
-        .auth-switch {
-            margin-top: 20px;
+        .divider {
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+        }
+        .divider span {
+            padding: 0 10px;
             font-size: 0.9rem;
-            cursor: pointer;
-            color: var(--brand-red);
-            text-decoration: underline;
+            font-weight: bold;
+            font-style: italic;
+            color: var(--text-secondary);
         }
 
         .back-link {
             display: inline-block;
             margin-top: 20px;
             text-decoration: none;
-            color: var(--text-primary);
+            color: var(--text-secondary);
             font-weight: 600;
+            transition: color 0.2s ease;
+        }
+
+        .back-link:hover {
+            color: #ffffff;
         }
         
         .error-msg {
-            color: var(--brand-red);
-            font-size: 0.9rem;
+            color: #e07a6f;
+            font-size: 1rem;
             margin-bottom: 15px;
             min-height: 20px;
+            font-weight: bold;
+        }
+
+        .success-msg {
+            color: #7fd99a;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            font-weight: bold;
+            line-height: 1.5;
         }
     </style>
 </head>
 <body>
 
     <div class="auth-container">
-        <h2 id="auth-title">Log In</h2>
+        <h2 id="auth-title">Log In / Sign Up</h2>
+        <p class="instructions" id="auth-instructions">Enter your email to receive a secure login link, or sign in with Google.</p>
         <div id="error-message" class="error-msg"></div>
+        <div id="success-message" class="success-msg"></div>
         
-        <form id="auth-form">
-            <div class="input-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" required>
-            </div>
-            <div class="input-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" required minlength="6">
-            </div>
-            <button type="submit" class="auth-btn" id="submit-btn">Log In</button>
-        </form>
-        
-        <button class="auth-btn google-btn" id="google-btn">Sign in with Google</button>
-        
-        <div class="auth-switch" id="toggle-mode">Need an account? Sign Up</div>
+        <div id="auth-form-container">
+            <form id="auth-form">
+                <div class="input-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" required placeholder="your@email.com">
+                </div>
+                <button type="submit" class="auth-btn" id="submit-btn">Send Magic Link</button>
+            </form>
+            
+            <div class="divider"><span>OR</span></div>
+
+            <button class="auth-btn google-btn" id="google-btn">Sign in with Google</button>
+        </div>
         
         <a href="index.html" class="back-link">← Back to Home</a>
     </div>
@@ -155,38 +205,23 @@
     <script type="module">
         import { auth, db } from "./js/firebase-config.js";
         import { 
-            signInWithEmailAndPassword, 
-            createUserWithEmailAndPassword,
             GoogleAuthProvider,
-            signInWithPopup
+            signInWithPopup,
+            sendSignInLinkToEmail,
+            isSignInWithEmailLink,
+            signInWithEmailLink
         } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
         
         import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
         const form = document.getElementById("auth-form");
         const emailInput = document.getElementById("email");
-        const passwordInput = document.getElementById("password");
         const submitBtn = document.getElementById("submit-btn");
         const googleBtn = document.getElementById("google-btn");
-        const toggleModeBtn = document.getElementById("toggle-mode");
-        const title = document.getElementById("auth-title");
         const errorMsg = document.getElementById("error-message");
-
-        let isLoginMode = true;
-
-        toggleModeBtn.addEventListener("click", () => {
-            isLoginMode = !isLoginMode;
-            if (isLoginMode) {
-                title.textContent = "Log In";
-                submitBtn.textContent = "Log In";
-                toggleModeBtn.textContent = "Need an account? Sign Up";
-            } else {
-                title.textContent = "Sign Up";
-                submitBtn.textContent = "Create Account";
-                toggleModeBtn.textContent = "Already have an account? Log In";
-            }
-            errorMsg.textContent = "";
-        });
+        const successMsg = document.getElementById("success-message");
+        const authFormContainer = document.getElementById("auth-form-container");
+        const authInstructions = document.getElementById("auth-instructions");
 
         // Ensure user document exists (used after auth completes)
         async function ensureUserDocument(user) {
@@ -204,27 +239,43 @@
             }
         }
 
+        // Handle Magic Link Form Submission
         form.addEventListener("submit", async (e) => {
             e.preventDefault();
             errorMsg.textContent = "";
+            successMsg.textContent = "";
             const email = emailInput.value;
-            const password = passwordInput.value;
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Sending...";
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const redirectUrl = urlParams.get('redirect') || 'profile.html';
+
+            const actionCodeSettings = {
+                // URL you want to redirect back to. The domain must be in the authorized domains list in the Firebase Console.
+                url: window.location.origin + window.location.pathname + '?redirect=' + encodeURIComponent(redirectUrl),
+                handleCodeInApp: true,
+            };
 
             try {
-                if (isLoginMode) {
-                    await signInWithEmailAndPassword(auth, email, password);
-                } else {
-                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                    await ensureUserDocument(userCredential.user);
-                }
-                const urlParams = new URLSearchParams(window.location.search);
-                const redirectUrl = urlParams.get('redirect') || 'profile.html';
-                window.location.href = redirectUrl;
+                await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+                // Save the email locally so you don't need to ask the user for it again
+                // if they open the link on the same device.
+                window.localStorage.setItem('emailForSignIn', email);
+                
+                authFormContainer.style.display = "none";
+                authInstructions.style.display = "none";
+                successMsg.textContent = `A login link has been sent to ${email}. Please check your inbox and click the link to continue.`;
             } catch (error) {
+                console.error(error);
                 errorMsg.textContent = error.message.replace("Firebase: ", "");
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Send Magic Link";
             }
         });
 
+        // Handle Google Sign In
         googleBtn.addEventListener("click", async () => {
             errorMsg.textContent = "";
             const provider = new GoogleAuthProvider();
@@ -239,9 +290,47 @@
             }
         });
 
-        // Check if user is already logged in, redirect them
+        // Check if returning from a magic link
+        async function handleEmailLinkSignIn() {
+            if (isSignInWithEmailLink(auth, window.location.href)) {
+                authFormContainer.style.display = "none";
+                authInstructions.textContent = "Authenticating...";
+                
+                let email = window.localStorage.getItem('emailForSignIn');
+                if (!email) {
+                    // User opened the link on a different device. To prevent session fixation
+                    // attacks, ask the user to provide the associated email again.
+                    email = window.prompt('Please provide your email for confirmation');
+                }
+                
+                if (email) {
+                    try {
+                        const result = await signInWithEmailLink(auth, email, window.location.href);
+                        window.localStorage.removeItem('emailForSignIn');
+                        await ensureUserDocument(result.user);
+                        
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const redirectUrl = urlParams.get('redirect') || 'profile.html';
+                        window.location.href = redirectUrl;
+                    } catch (error) {
+                        console.error(error);
+                        errorMsg.textContent = "Error signing in with link. The link may have expired or already been used.";
+                        authFormContainer.style.display = "block";
+                        authInstructions.textContent = "Enter your email to receive a secure login link, or sign in with Google.";
+                    }
+                } else {
+                    authFormContainer.style.display = "block";
+                    authInstructions.textContent = "Enter your email to receive a secure login link, or sign in with Google.";
+                }
+            }
+        }
+
+        // Run on page load
+        handleEmailLinkSignIn();
+
+        // Check if user is already logged in, redirect them (unless they are currently processing a sign in link)
         auth.onAuthStateChanged((user) => {
-            if (user) {
+            if (user && !isSignInWithEmailLink(auth, window.location.href)) {
                 const urlParams = new URLSearchParams(window.location.search);
                 const redirectUrl = urlParams.get('redirect') || 'profile.html';
                 window.location.href = redirectUrl;
