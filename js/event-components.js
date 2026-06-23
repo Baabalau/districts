@@ -204,10 +204,13 @@ function renderVotingModule(district) {
             </div>
 
             <div id="vote-modal" class="modal-overlay" style="display: none;">
-                <div class="modal-content">
-                    <button class="close-modal" onclick="window.closeVoteModal()">×</button>
-                    <h2>Cast Your Vote</h2>
-                    <p>You are voting for <strong id="modal-venue-name"></strong>.</p>
+                <div class="modal-content vote-modal-content">
+                    <div class="vote-modal-header">
+                        <h2 style="font-size: 22px; font-family: var(--font-main); color: var(--text-secondary); font-weight: 500; text-transform: none;">VOTE for the District ${district} nightcrawl to end the night at...</h2>
+                        <button class="close-modal" onclick="window.closeVoteModal()">×</button>
+                    </div>
+                    <div class="animated-arrow arrow-3d" style="margin: 0 0 10px 0;">↓</div>
+                    <div id="modal-venue-name" style="font-size: 3.2rem; color: var(--text-primary); font-family: var(--font-hero); text-transform: uppercase; margin-bottom: 35px; line-height: 1.1; letter-spacing: 1px; text-shadow: 2px 2px 0px var(--accent);"></div>
                     <div class="auth-buttons" id="vote-auth-section">
                         <!-- Populated dynamically based on auth state -->
                     </div>
@@ -331,6 +334,29 @@ class EventLayout extends HTMLElement {
                     50% { transform: translateY(-10px) rotate(-1.2deg) scale(1.03); }
                     100% { transform: translateY(0px) rotate(-1.2deg) scale(1.03); }
                 }
+                @keyframes bounceArrow {
+                    0%, 100% { transform: translateY(0) rotate(-5deg) skewX(-5deg); }
+                    50% { transform: translateY(10px) rotate(-5deg) skewX(-5deg); }
+                }
+                .animated-arrow {
+                    animation: bounceArrow 1.5s infinite ease-in-out;
+                }
+                .arrow-3d {
+                    display: inline-block;
+                    font-family: var(--font-hero);
+                    font-size: 4.5rem;
+                    font-weight: 900;
+                    color: var(--text-primary);
+                    text-shadow: 
+                        1px 1px 0px #0F1626,
+                        2px 2px 0px var(--accent),
+                        3px 3px 0px var(--accent),
+                        4px 4px 0px var(--accent),
+                        5px 5px 0px var(--brand-red),
+                        6px 6px 0px var(--brand-red),
+                        7px 7px 0px var(--brand-red),
+                        10px 12px 15px rgba(0,0,0,0.45);
+                }
             </style>
         `;
 
@@ -371,8 +397,7 @@ class EventLayout extends HTMLElement {
             
             if (user) {
                 authSection.innerHTML = `
-                    <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 15px;">You are logged in as <strong>${user.email}</strong>.</p>
-                    <button class="auth-btn email" id="submit-vote-btn">Submit Vote</button>
+                    <button class="auth-btn email" id="submit-vote-btn" style="width: 100%; padding: 15px; font-size: 1.1rem;">Submit Vote</button>
                     <p id="vote-error-msg" style="color: var(--brand-red); font-size: 0.9rem; margin-top: 10px; display: none;"></p>
                 `;
                 
@@ -380,8 +405,7 @@ class EventLayout extends HTMLElement {
                 submitBtn.addEventListener('click', () => window.submitVote());
             } else {
                 authSection.innerHTML = `
-                    <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 15px;">Please log in to cast your vote and prevent duplicate voting.</p>
-                    <button class="auth-btn email" onclick="window.location.href='login.html?redirect=' + encodeURIComponent(window.location.pathname)">Log In to Vote</button>
+                    <button class="auth-btn email" style="width: 100%; padding: 15px; font-size: 1.1rem;" onclick="window.location.href='login.html?redirect=' + encodeURIComponent(window.location.pathname)">Log In with Email or Google</button>
                 `;
             }
         });
