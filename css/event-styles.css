@@ -374,9 +374,36 @@
 
 @media (max-width: 900px) {
     .map-title {
-        top: 20px;
-        left: 20px;
+        position: relative;
+        top: auto;
+        left: auto;
+        margin: 0 0 1rem;
+        pointer-events: auto;
         font-size: clamp(1.8rem, 4vw, 2.5rem);
+    }
+
+    .map-section-wrapper {
+        width: 100%;
+        max-width: none;
+        margin: 40px 0 0;
+        padding: 0 7.5vw;
+        border-radius: 0;
+        transform: none;
+        box-shadow: none;
+        background: transparent;
+    }
+
+    .map-section-wrapper #map {
+        width: 100vw;
+        max-width: 100vw;
+        margin-left: calc(50% - 50vw);
+        margin-right: calc(50% - 50vw);
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        border-top: 4px solid var(--text-primary);
+        border-bottom: 4px solid var(--text-primary);
+        height: min(58vh, 520px);
     }
     
     .map-features {
