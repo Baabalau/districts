@@ -82,14 +82,26 @@
 @media (max-width: 900px) {
     .event-hero {
         flex-direction: column;
-        text-align: center;
+        text-align: left;
+        align-items: flex-start;
         gap: 40px;
+    }
+
+    .hero-left {
+        width: 100%;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .hero-left h1.title-3d {
+        font-size: 60px;
     }
 }
 
 .hero-left {
     flex: 1;
     padding-right: 40px;
+    text-align: left;
 }
 
 .hero-left h1.title-3d {
@@ -423,7 +435,7 @@
 }
 
 .voting-header {
-    text-align: center;
+    text-align: left;
     margin-bottom: 40px;
 }
 
@@ -632,7 +644,7 @@
     border-radius: 12px;
     max-width: 400px;
     width: 90%;
-    text-align: center;
+    text-align: left;
     position: relative;
     color: var(--text-secondary);
 }
@@ -653,7 +665,7 @@
 }
 
 #vote-modal .vote-modal-content {
-    text-align: center;
+    text-align: left;
     padding: 16px 20px 40px;
 }
 
@@ -818,7 +830,7 @@
 .itinerary-section h2 {
     font-family: var(--font-header);
     font-size: 2.5rem;
-    text-align: center;
+    text-align: left;
     margin-bottom: 40px;
     text-transform: uppercase;
     color: var(--text-primary);
@@ -841,7 +853,7 @@
     border: 2px solid rgba(45, 27, 21, 0.12);
     padding: 30px;
     border-radius: 15px;
-    text-align: center;
+    text-align: left;
     position: relative;
     overflow: hidden;
     box-shadow: 0 10px 28px rgba(45, 27, 21, 0.1);
