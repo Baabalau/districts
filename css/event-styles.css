@@ -264,6 +264,32 @@
     pointer-events: none;
 }
 
+@media (max-width: 900px) {
+    .purpose-module {
+        width: 92%;
+        padding: 0 10px 24px;
+    }
+    .purpose-frame {
+        border-width: 2px;
+        box-shadow:
+            inset 2px 2px 0 rgba(255,255,255,0.55),
+            inset -2px -2px 0 rgba(15, 22, 38, 0.2),
+            inset 0 -2px 6px rgba(138, 47, 37, 0.12),
+            0 0 0 2px var(--brand-red),
+            0 0 0 5px var(--accent),
+            0 0 0 8px var(--text-primary),
+            0 0 0 11px rgba(138, 47, 37, 0.35),
+            8px 10px 0 rgba(138, 47, 37, 0.45),
+            12px 14px 0 rgba(203, 160, 82, 0.3),
+            16px 18px 24px rgba(0,0,0,0.35);
+        transform: rotateX(5deg) translateZ(6px) scale(0.99);
+        padding: clamp(1.5rem, 4vw, 2rem) clamp(1.2rem, 3vw, 1.5rem);
+    }
+    .purpose-frame::before {
+        inset: -14px;
+    }
+}
+
 .purpose-frame h2 {
     font-family: var(--font-header);
     font-size: clamp(1.75rem, 4vw, 2.75rem);
