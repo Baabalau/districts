@@ -211,7 +211,7 @@
     margin: 0 auto;
     position: relative;
     perspective: 900px;
-    padding-bottom: 36px;
+    padding: 0 20px 36px;
 }
 
 .purpose-frame {
