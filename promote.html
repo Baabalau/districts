@@ -3,17 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Promote Your Business | Districts After Dark</title>
+    <title>For Businesses | Districts After Dark</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Montserrat:wght@700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/district-page.css">
     <link rel="stylesheet" href="css/event-styles.css">
     <link rel="stylesheet" href="css/site-footer.css">
     <style>
         .promo-hero {
-            text-align: center;
             padding: 100px 20px 80px;
             background: linear-gradient(rgba(15, 22, 38, 0.92), rgba(15, 22, 38, 0.98)), url('https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover;
             border-bottom: 4px solid var(--text-primary);
+            display: flex;
+            justify-content: center;
+        }
+
+        .promo-hero-inner {
+            width: 100%;
+            max-width: 1280px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 40px;
+        }
+
+        .promo-hero-content {
+            max-width: 600px;
+            width: 100%;
+            text-align: left;
+        }
+
+        .promo-hero-visual {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 40px;
+        }
+
+        .promo-hero .title-3d {
+            font-size: clamp(3rem, 7vw, 5rem);
+            margin-bottom: 30px;
+        }
+
+        .cards-container {
+            position: relative;
+            width: 320px;
+            height: 450px;
+        }
+
+        .cards-container img.hero-image {
+            position: absolute;
+            width: 260px;
+            height: auto;
+            border-radius: 16px;
+            border: 4px solid var(--text-primary);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), z-index 0.4s;
+            cursor: pointer;
+        }
+
+        .cards-container img.hero-image.image-1 {
+            top: 20px;
+            left: 0;
+            transform: rotate(-8deg);
+            z-index: 1;
+        }
+
+        .cards-container img.hero-image.image-2 {
+            top: 60px;
+            left: 60px;
+            transform: rotate(5deg);
+            z-index: 2;
+        }
+
+        .cards-container img.hero-image.image-1:hover {
+            transform: rotate(-12deg) translateY(-20px) scale(1.05);
+            z-index: 3;
+        }
+
+        .cards-container img.hero-image.image-2:hover {
+            transform: rotate(8deg) translateY(-20px) scale(1.05);
+            z-index: 3;
+        }
+
+        @media (min-width: 992px) {
+            .promo-hero-inner {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+                gap: 60px;
+            }
+            
+            .promo-hero-content {
+                flex: 1.2;
+            }
+            
+            .promo-hero-visual {
+                flex: 1;
+                margin-top: 0;
+                justify-content: flex-end;
+            }
+
+            .cards-container {
+                width: 400px;
+                height: 500px;
+            }
+            
+            .cards-container img.hero-image {
+                width: 320px;
+            }
+            
+            .cards-container img.hero-image.image-1 {
+                top: 20px;
+                left: 0;
+            }
+
+            .cards-container img.hero-image.image-2 {
+                top: 80px;
+                left: 60px;
+            }
         }
         
         .subtitle {
@@ -23,10 +132,11 @@
             font-weight: 500;
             line-height: 34px;
             color: var(--text-primary);
-            margin: 20px auto 40px;
+            margin: 20px 0 40px; /* Left aligned margin */
             display: block;
             max-width: 900px;
             text-shadow: 1px 1px 0px rgba(255,255,255,0.2);
+            text-align: left;
         }
 
         .subtitle-follow {
@@ -36,57 +146,10 @@
             font-weight: 400;
             font-size: 19px;
             font-style: italic;
+            text-align: left;
         }
 
-        /* Elevated Previews Showcase */
-        .previews-showcase {
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            gap: 50px;
-            flex-wrap: wrap;
-            margin-top: 50px;
-        }
-
-        .preview-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            max-width: 350px;
-        }
-
-        .preview-item h3 {
-            font-family: var(--font-header);
-            color: var(--brand-red);
-            font-size: 1.5rem;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            text-shadow: 1px 1px 0px rgba(0,0,0,0.5);
-        }
-
-        .preview-dimensions {
-            margin-bottom: 20px;
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            font-family: var(--font-main);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .preview-item img {
-            height: 380px;
-            width: auto;
-            object-fit: contain;
-            border-radius: 16px;
-            border: 4px solid var(--text-primary);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
-            transition: transform 0.3s;
-        }
-
-        .preview-item img:hover {
-            transform: translateY(-10px);
-        }
+        /* Elevated Previews Showcase replaced by overlapping cards layout */
 
         .content-container {
             max-width: 1200px;
@@ -110,7 +173,7 @@
             color: var(--text-primary);
             margin-bottom: 30px;
             text-transform: uppercase;
-            text-align: center;
+            text-align: left;
             border-bottom: 2px solid rgba(203, 160, 82, 0.2);
             padding-bottom: 15px;
         }
@@ -196,7 +259,7 @@
             border-radius: 8px;
             border: 3px solid white;
             box-shadow: 0 10px 25px rgba(0,0,0,0.8);
-            text-align: center;
+            text-align: left;
             z-index: 10;
             width: 80%;
         }
@@ -228,7 +291,7 @@
             border: 4px solid var(--brand-red);
             border-radius: 16px;
             padding: 40px 60px;
-            text-align: center;
+            text-align: left;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
 
@@ -245,7 +308,7 @@
             flex-direction: column;
             gap: 15px;
             max-width: 600px;
-            margin: 30px auto 0;
+            margin: 30px 0 0;
         }
 
         .generator-form input, .generator-form select {
@@ -265,40 +328,53 @@
         <div class="nav-links">
             <a href="index.html">Home</a>
             <a href="index.html#events">Events</a>
-            <a href="promote.html" style="color: var(--text-primary);">Promote Your Business</a>
+            <a href="promote.html" style="color: var(--text-primary);">For Businesses</a>
             <a href="login.html" id="authLink">Log In / Sign Up</a>
         </div>
     </nav>
 
     <div class="promo-hero">
-        <h1 class="title-3d">Promote Your Business</h1>
-        
-        <span class="subtitle">
-            Rally your community and secure your spot as the final destination for Districts After Dark. 
-            <span class="subtitle-follow">Use our custom tools to generate stunning social media and printable graphics in seconds.</span>
-        </span>
-
-        <!-- Elevated Previews -->
-        <div class="previews-showcase">
-            <div class="preview-item">
-                <h3>Social Media Story</h3>
-                <div class="preview-dimensions">1080 x 1920 px (9:16)</div>
-                <img src="assets/promo_vote_for_us_district_a.png" alt="Social Media Graphic Preview">
+        <div class="promo-hero-inner">
+            <div class="promo-hero-content">
+                <h1 class="title-3d">For Businesses</h1>
+                
+                <span class="subtitle">
+                    Rally your community and secure your spot as the final destination for Districts After Dark. 
+                    <span class="subtitle-follow">Use our custom tools to generate stunning social media and printable graphics in seconds.</span>
+                </span>
+                
+                <button class="brand-btn" onclick="document.querySelector('.generator-tool').scrollIntoView({behavior: 'smooth'})" style="background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); font-size: 1.2rem; padding: 15px 30px; text-decoration: none; border: none; cursor: pointer; color: white;">Generate Your Graphics</button>
             </div>
-            <div class="preview-item">
-                <h3>Printable Flyer</h3>
-                <div class="preview-dimensions">2550 x 3300 px (8.5" x 11")</div>
-                <img src="assets/flyer_draft.png" alt="Printable Flyer Preview">
+
+            <!-- Elevated Previews layout overlapping cards -->
+            <div class="promo-hero-visual">
+                <div class="cards-container">
+                    <img src="assets/promo_vote_for_us_district_a.png" class="hero-image image-1" alt="Social Media Graphic Preview">
+                    <img src="assets/flyer_draft.png" class="hero-image image-2" alt="Printable Flyer Preview">
+                </div>
             </div>
         </div>
     </div>
 
     <div class="content-container">
         
+        <div class="previews-showcase" style="display: flex; gap: 40px; justify-content: flex-start; margin-top: 60px; margin-bottom: 60px; flex-wrap: wrap;">
+            <div class="preview-item" style="max-width: 350px;">
+                <h3 style="font-family: var(--font-header); color: var(--brand-red); font-size: 1.5rem; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; text-shadow: 1px 1px 0px rgba(0,0,0,0.5);">Social Media Story</h3>
+                <div class="preview-dimensions" style="margin-bottom: 20px; font-size: 0.85rem; color: var(--text-secondary); font-family: var(--font-main); text-transform: uppercase; letter-spacing: 1px;">1080 x 1920 px (9:16)</div>
+                <img src="assets/promo_vote_for_us_district_a.png" alt="Social Media Graphic Preview" style="height: 380px; width: auto; object-fit: contain; border-radius: 16px; border: 4px solid var(--text-primary); box-shadow: 0 15px 35px rgba(0,0,0,0.6); transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
+            </div>
+            <div class="preview-item" style="max-width: 350px;">
+                <h3 style="font-family: var(--font-header); color: var(--brand-red); font-size: 1.5rem; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; text-shadow: 1px 1px 0px rgba(0,0,0,0.5);">Printable Flyer</h3>
+                <div class="preview-dimensions" style="margin-bottom: 20px; font-size: 0.85rem; color: var(--text-secondary); font-family: var(--font-main); text-transform: uppercase; letter-spacing: 1px;">2550 x 3300 px (8.5" x 11")</div>
+                <img src="assets/flyer_draft.png" alt="Printable Flyer Preview" style="height: 380px; width: auto; object-fit: contain; border-radius: 16px; border: 4px solid var(--text-primary); box-shadow: 0 15px 35px rgba(0,0,0,0.6); transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
+            </div>
+        </div>
+        
         <!-- Custom Flyer Generator Tool (Moved to Top) -->
         <div class="generator-tool" style="margin-top: 60px; margin-bottom: 60px;">
             <h2>Generate Your Custom Flyer & Link</h2>
-            <p style="color: var(--text-secondary); font-size: 1.1rem; line-height: 1.6; max-width: 800px; margin: 0 auto;">
+            <p style="color: var(--text-secondary); font-size: 1.1rem; line-height: 1.6; max-width: 800px; margin: 0 0;">
                 Select your district and enter your venue name. Our system will instantly generate your unique voting URL and automatically package it into a high-resolution, printable flyer with a custom QR code.
             </p>
             
@@ -356,7 +432,7 @@
                 </div>
             </div>
             
-            <div style="text-align: center; margin-top: 50px;">
+            <div style="text-align: left; margin-top: 50px;">
                 <button class="brand-btn" onclick="window.print()">Download Guide as PDF</button>
             </div>
         </div>
