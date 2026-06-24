@@ -304,6 +304,12 @@
     margin-top: 1rem;
 }
 
+@media (max-width: 900px) {
+    .purpose-frame p {
+        font-size: 19px;
+    }
+}
+
 /* Map Section */
 .map-section-wrapper {
     position: relative;
