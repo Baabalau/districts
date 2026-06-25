@@ -218,17 +218,29 @@ function renderVotingModule(district) {
             </div>
 
             <div id="share-modal" class="modal-overlay" style="display: none;">
-                <div class="modal-content share-content">
+                <div class="modal-content share-content" style="padding: 30px 20px; background: #0F1626; max-width: 450px;">
                     <button class="close-modal" onclick="window.closeShareModal()">×</button>
-                    <div class="flex-graphic">
-                        <div class="badge">VOTED!</div>
-                        <h2>I VOTED!</h2>
-                        <div class="shield">DISTRICTS AFTER DARK</div>
-                        <p>WHERE ARE WE CRAWLING?</p>
-                        <div class="voted-venue">for <span id="share-venue-name"></span></div>
+                    <h2 style="font-size: 1.8rem; margin-bottom: 5px; color: var(--text-primary); font-family: var(--font-hero); text-transform: uppercase;">Vote Confirmed!</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 1rem;">Save this graphic and share it to your Instagram Story to rally more votes!</p>
+                    
+                    <div style="position: relative; width: 100%; max-width: 280px; margin: 0 auto 20px auto; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                        <!-- The canvas will generate the final image, and we'll display it in this img tag so users can long-press to save -->
+                        <img id="generated-share-graphic" src="" alt="Your Custom Share Graphic" style="width: 100%; height: auto; display: block;">
+                        <canvas id="share-canvas" width="1080" height="1920" style="display: none;"></canvas>
                     </div>
-                    <button class="share-ig-btn" onclick="window.closeShareModal()">Share to Instagram Story</button>
-                    <button class="skip-btn" onclick="window.closeShareModal()">Skip</button>
+                    
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 15px; font-style: italic;">Mobile: Long-press the image to save.<br>Desktop: Right-click and "Save Image As".</p>
+                    
+                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); text-align: left;">
+                        <p style="color: var(--text-primary); font-weight: bold; margin-bottom: 8px; font-size: 0.95rem;">Add this link to your Instagram Link Sticker:</p>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="text" id="share-url-input" readonly style="flex: 1; padding: 10px; border-radius: 4px; border: 1px solid var(--text-secondary); background: #182238; color: white; font-size: 0.85rem; outline: none;">
+                            <button onclick="window.copyShareUrl()" style="padding: 10px 15px; background: var(--brand-red); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.85rem; transition: background 0.2s;">Copy</button>
+                        </div>
+                        <p id="copy-success-msg" style="color: #7fd99a; font-size: 0.8rem; margin-top: 8px; display: none; text-align: center;">Link copied to clipboard!</p>
+                    </div>
+
+                    <button class="brand-btn" style="width: 100%; margin-bottom: 10px;" onclick="window.closeShareModal()">Done</button>
                 </div>
             </div>`;
 }
@@ -504,11 +516,89 @@ class EventLayout extends HTMLElement {
                 btn.disabled = false;
             }
             this.querySelector('#vote-modal').style.display = 'none';
-            this.querySelector('#share-modal').style.display = 'flex';
+            
+            // Generate the custom graphic using Canvas
+            const canvas = this.querySelector('#share-canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            img.crossOrigin = "anonymous";
+            
+            // Load the base template graphic
+            img.src = 'assets/Voter%20Share_draft1.PNG';
+            
+            img.onload = () => {
+                // Draw the template
+                ctx.drawImage(img, 0, 0, 1080, 1920);
+                
+                // Get the venue name from the modal dataset
+                const modal = this.querySelector('#vote-modal');
+                const venueName = modal.dataset.venueName || "A LOCAL BUSINESS";
+                const venueId = modal.dataset.venueId || "";
+                
+                // Configure text styling
+                ctx.font = 'bold 72px "Oswald", sans-serif';
+                ctx.fillStyle = '#8a2d24'; // Dark red color to match the design
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                // Add a subtle drop shadow to the text to ensure readability
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+                ctx.shadowBlur = 4;
+                ctx.shadowOffsetX = 2;
+                ctx.shadowOffsetY = 2;
+                
+                // The coordinates for the "Type Business Name Here" box 
+                // (Estimated based on 1080x1920 IG story dimensions)
+                const textX = 1080 / 2 + 100; // Shifted slightly right to fit in the white box
+                const textY = 520; // Y-coordinate of the white box
+                
+                // Draw the venue name onto the canvas
+                // We use a max width to ensure long names shrink to fit the box
+                ctx.fillText(venueName.toUpperCase(), textX, textY, 650);
+                
+                // Convert canvas to a data URL and set it as the image source
+                const dataUrl = canvas.toDataURL('image/png');
+                this.querySelector('#generated-share-graphic').src = dataUrl;
+                
+                // Generate the deep link URL for this specific venue
+                const shareUrl = window.location.origin + window.location.pathname + '?vote=' + encodeURIComponent(venueId);
+                const urlInput = this.querySelector('#share-url-input');
+                if (urlInput) {
+                    urlInput.value = shareUrl;
+                }
+                
+                // Show the modal
+                this.querySelector('#share-modal').style.display = 'flex';
+            };
+            
+            // Fallback in case image fails to load
+            img.onerror = () => {
+                console.error("Failed to load share graphic template.");
+                this.querySelector('#share-modal').style.display = 'flex';
+            };
         };
 
         window.closeShareModal = () => {
             this.querySelector('#share-modal').style.display = 'none';
+        };
+
+        window.copyShareUrl = () => {
+            const urlInput = this.querySelector('#share-url-input');
+            if (urlInput) {
+                urlInput.select();
+                urlInput.setSelectionRange(0, 99999); // For mobile devices
+                navigator.clipboard.writeText(urlInput.value).then(() => {
+                    const successMsg = this.querySelector('#copy-success-msg');
+                    if (successMsg) {
+                        successMsg.style.display = 'block';
+                        setTimeout(() => {
+                            successMsg.style.display = 'none';
+                        }, 3000);
+                    }
+                }).catch(err => {
+                    console.error('Failed to copy text: ', err);
+                });
+            }
         };
 
         window.setVotingState = (stateId) => {
