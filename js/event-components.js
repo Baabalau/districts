@@ -417,7 +417,7 @@ class EventLayout extends HTMLElement {
                 submitBtn.addEventListener('click', () => window.submitVote());
             } else {
                 authSection.innerHTML = `
-                    <button class="auth-btn email" style="width: 100%; padding: 15px; font-size: 1.1rem;" onclick="window.location.href='login.html?redirect=' + encodeURIComponent(window.location.pathname + window.location.search)">Log In with Email or Google</button>
+                    <button class="auth-btn email" style="width: 100%; padding: 15px; font-size: 1.1rem;" onclick="const m = document.querySelector('#vote-modal'); window.location.href='login.html?redirect=' + encodeURIComponent(window.location.pathname + '?vote=' + m.dataset.venueId + '&name=' + encodeURIComponent(m.dataset.venueName || ''))">Log In with Email or Google</button>
                 `;
             }
         });
@@ -447,13 +447,14 @@ class EventLayout extends HTMLElement {
         };
 
         window.submitVote = async () => {
-            if (!currentUser) {
-                window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.pathname + window.location.search);
-                return;
-            }
-
             const modal = this.querySelector('#vote-modal');
             const venueId = modal.dataset.venueId;
+            const venueName = modal.dataset.venueName || '';
+            
+            if (!currentUser) {
+                window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.pathname + '?vote=' + venueId + '&name=' + encodeURIComponent(venueName));
+                return;
+            }
             const btn = this.querySelector('#submit-vote-btn');
             const errorMsg = this.querySelector('#vote-error-msg');
             
@@ -507,7 +508,7 @@ class EventLayout extends HTMLElement {
                 window.showShareScreen();
             } catch (error) {
                 console.error("Error submitting vote:", error);
-                errorMsg.textContent = "Error submitting vote. Please try again.";
+                errorMsg.textContent = "Error: " + error.message.replace("Firebase: ", "");
                 errorMsg.style.display = 'block';
                 btn.innerText = 'Submit Vote';
                 btn.disabled = false;
@@ -566,7 +567,7 @@ class EventLayout extends HTMLElement {
                 this.querySelector('#generated-share-graphic').src = dataUrl;
                 
                 // Generate the deep link URL for this specific venue
-                const shareUrl = window.location.origin + window.location.pathname + '?vote=' + encodeURIComponent(venueId);
+                const shareUrl = window.location.origin + window.location.pathname + '?vote=' + encodeURIComponent(venueId) + '&name=' + encodeURIComponent(venueName);
                 const urlInput = this.querySelector('#share-url-input');
                 if (urlInput) {
                     urlInput.value = shareUrl;
@@ -619,12 +620,14 @@ class EventLayout extends HTMLElement {
         setTimeout(() => {
             const urlParams = new URLSearchParams(window.location.search);
             const voteTarget = urlParams.get('vote');
+            const venueName = urlParams.get('name') || voteTarget;
+            
             if (voteTarget) {
                 const isPreVoting = this.querySelector('#state-pre-voting')?.style.display !== 'none';
                 const isPostElection = this.querySelector('#state-post-election')?.style.display !== 'none';
 
                 if (!isPreVoting && !isPostElection) {
-                    window.openVoteModal(null, voteTarget);
+                    window.openVoteModal(voteTarget, venueName);
                 }
             }
         }, 150);
