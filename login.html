@@ -207,8 +207,7 @@
         import { auth, db } from "./js/firebase-config.js";
         import { 
             GoogleAuthProvider,
-            signInWithRedirect,
-            getRedirectResult,
+            signInWithPopup,
             sendSignInLinkToEmail,
             isSignInWithEmailLink,
             signInWithEmailLink
@@ -282,34 +281,23 @@
             errorMsg.textContent = "";
             const provider = new GoogleAuthProvider();
             
-            // Save redirect URL before redirecting to Google
-            const urlParams = new URLSearchParams(window.location.search);
-            const redirectUrl = urlParams.get('redirect') || 'profile.html';
-            window.sessionStorage.setItem('pendingRedirectUrl', redirectUrl);
-            
             try {
-                await signInWithRedirect(auth, provider);
+                const result = await signInWithPopup(auth, provider);
+                await ensureUserDocument(result.user);
+                const urlParams = new URLSearchParams(window.location.search);
+                const redirectUrl = urlParams.get('redirect') || 'profile.html';
+                window.location.href = redirectUrl;
             } catch (error) {
-                errorMsg.textContent = error.message.replace("Firebase: ", "");
+                console.error("Google Auth Error:", error);
+                if (error.code === 'auth/popup-blocked') {
+                    errorMsg.innerHTML = "Popups are blocked by your browser.<br>Please use the Magic Link option above.";
+                } else if (error.code === 'auth/popup-closed-by-user') {
+                    errorMsg.textContent = "Sign-in was cancelled.";
+                } else {
+                    errorMsg.textContent = error.message.replace("Firebase: ", "");
+                }
             }
         });
-
-        // Check if returning from a Google redirect
-        async function handleGoogleRedirect() {
-            try {
-                const result = await getRedirectResult(auth);
-                if (result) {
-                    authFormContainer.style.display = "none";
-                    authInstructions.textContent = "Authenticating...";
-                    await ensureUserDocument(result.user);
-                    const redirectUrl = window.sessionStorage.getItem('pendingRedirectUrl') || 'profile.html';
-                    window.sessionStorage.removeItem('pendingRedirectUrl');
-                    window.location.href = redirectUrl;
-                }
-            } catch (error) {
-                errorMsg.textContent = error.message.replace("Firebase: ", "");
-            }
-        }
 
         // Check if returning from a magic link
         async function handleEmailLinkSignIn() {
@@ -347,20 +335,25 @@
         }
 
         // Run on page load
-        handleGoogleRedirect();
         handleEmailLinkSignIn();
 
-        // Check if user is already logged in, redirect them (unless they are currently processing a sign in link or redirect)
+        // Detect In-App Browsers (Instagram, Facebook, etc)
+        // Google actively blocks OAuth requests from these embedded webviews for security reasons.
+        // If detected, we hide the Google button to prevent the user from hitting a dead end,
+        // forcing them to use the Magic Link which works flawlessly.
+        const isAppBrowser = /Instagram|FBAN|FBAV|Snapchat|Twitter/i.test(navigator.userAgent);
+        if (isAppBrowser) {
+            googleBtn.style.display = 'none';
+            document.querySelector('.divider').style.display = 'none';
+            authInstructions.innerHTML = "Enter your email to receive a secure login link.<br><br><span style='font-size: 0.9rem; color: var(--text-secondary);'><em>(Google Sign-In is disabled inside Instagram. To use Google, tap the three dots in the top right and select 'Open in Browser'.)</em></span>";
+        }
+
+        // Check if user is already logged in, redirect them (unless they are currently processing a sign in link)
         auth.onAuthStateChanged((user) => {
             if (user && !isSignInWithEmailLink(auth, window.location.href)) {
-                // Wait a tiny bit to ensure handleGoogleRedirect doesn't race this
-                setTimeout(() => {
-                    const pendingRedirect = window.sessionStorage.getItem('pendingRedirectUrl');
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const redirectUrl = pendingRedirect || urlParams.get('redirect') || 'profile.html';
-                    window.sessionStorage.removeItem('pendingRedirectUrl');
-                    window.location.href = redirectUrl;
-                }, 100);
+                const urlParams = new URLSearchParams(window.location.search);
+                const redirectUrl = urlParams.get('redirect') || 'profile.html';
+                window.location.href = redirectUrl;
             }
         });
     </script>
