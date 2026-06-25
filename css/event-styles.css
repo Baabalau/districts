@@ -228,22 +228,22 @@
 
 .purpose-frame {
     position: relative;
-    padding: clamp(2rem, 5vw, 3.5rem) clamp(1.5rem, 4vw, 3rem);
+    padding: clamp(1.5rem, 4vw, 2rem) clamp(1.2rem, 3vw, 1.5rem);
     background: linear-gradient(168deg, #1A243D 0%, var(--bg-secondary) 42%, #0A0F1A 100%);
     border-radius: 8px;
-    border: 4px solid var(--text-primary);
+    border: 2px solid var(--text-primary);
     box-shadow:
-        inset 4px 4px 0 rgba(255,255,255,0.55),
-        inset -4px -4px 0 rgba(15, 22, 38, 0.2),
-        inset 0 -3px 12px rgba(138, 47, 37, 0.12),
-        0 0 0 4px var(--brand-red),
-        0 0 0 10px var(--accent),
-        0 0 0 16px var(--text-primary),
-        0 0 0 22px rgba(138, 47, 37, 0.35),
-        18px 22px 0 rgba(138, 47, 37, 0.45),
-        26px 30px 0 rgba(203, 160, 82, 0.3),
-        34px 38px 48px rgba(0,0,0,0.35);
-    transform: rotateX(11deg) translateZ(12px) scale(0.99);
+        inset 2px 2px 0 rgba(255,255,255,0.55),
+        inset -2px -2px 0 rgba(15, 22, 38, 0.2),
+        inset 0 -2px 6px rgba(138, 47, 37, 0.12),
+        0 0 0 2px var(--brand-red),
+        0 0 0 5px var(--accent),
+        0 0 0 8px var(--text-primary),
+        0 0 0 11px rgba(138, 47, 37, 0.35),
+        8px 10px 0 rgba(138, 47, 37, 0.45),
+        12px 14px 0 rgba(203, 160, 82, 0.3),
+        16px 18px 24px rgba(0,0,0,0.35);
+    transform: rotateX(5deg) translateZ(6px) scale(0.99);
     transform-style: preserve-3d;
     transform-origin: center center;
 }
@@ -251,7 +251,7 @@
 .purpose-frame::before {
     content: "";
     position: absolute;
-    inset: -28px;
+    inset: -14px;
     border-radius: 14px;
     background: radial-gradient(ellipse 80% 60% at 30% 20%, rgba(203, 160, 82, 0.45), transparent 55%),
         radial-gradient(ellipse 70% 50% at 80% 90%, rgba(138, 47, 37, 0.35), transparent 50%),
@@ -281,25 +281,6 @@
         width: 92%;
         padding: 0 10px 24px;
     }
-    .purpose-frame {
-        border-width: 2px;
-        box-shadow:
-            inset 2px 2px 0 rgba(255,255,255,0.55),
-            inset -2px -2px 0 rgba(15, 22, 38, 0.2),
-            inset 0 -2px 6px rgba(138, 47, 37, 0.12),
-            0 0 0 2px var(--brand-red),
-            0 0 0 5px var(--accent),
-            0 0 0 8px var(--text-primary),
-            0 0 0 11px rgba(138, 47, 37, 0.35),
-            8px 10px 0 rgba(138, 47, 37, 0.45),
-            12px 14px 0 rgba(203, 160, 82, 0.3),
-            16px 18px 24px rgba(0,0,0,0.35);
-        transform: rotateX(5deg) translateZ(6px) scale(0.99);
-        padding: clamp(1.5rem, 4vw, 2rem) clamp(1.2rem, 3vw, 1.5rem);
-    }
-    .purpose-frame::before {
-        inset: -14px;
-    }
 }
 
 .purpose-frame h2 {
@@ -323,6 +304,12 @@
     margin-top: 1rem;
 }
 
+@media (max-width: 900px) {
+    .purpose-frame p {
+        font-size: 19px;
+    }
+}
+
 /* Map Section */
 .map-section-wrapper {
     position: relative;
@@ -332,17 +319,17 @@
     background: var(--bg-primary);
     border-radius: 12px;
     box-shadow:
-        inset 4px 4px 0 rgba(255,255,255,0.55),
-        inset -4px -4px 0 rgba(15, 22, 38, 0.2),
-        inset 0 -3px 12px rgba(138, 47, 37, 0.12),
-        0 0 0 4px var(--brand-red),
-        0 0 0 10px var(--accent),
-        0 0 0 16px var(--text-primary),
-        0 0 0 22px rgba(138, 47, 37, 0.35),
-        18px 22px 0 rgba(138, 47, 37, 0.45),
-        26px 30px 0 rgba(203, 160, 82, 0.3),
-        34px 38px 48px rgba(0,0,0,0.35);
-    transform: rotateX(2deg) translateZ(12px) scale(0.99);
+        inset 2px 2px 0 rgba(255,255,255,0.55),
+        inset -2px -2px 0 rgba(15, 22, 38, 0.2),
+        inset 0 -2px 6px rgba(138, 47, 37, 0.12),
+        0 0 0 2px var(--brand-red),
+        0 0 0 5px var(--accent),
+        0 0 0 8px var(--text-primary),
+        0 0 0 11px rgba(138, 47, 37, 0.35),
+        8px 10px 0 rgba(138, 47, 37, 0.45),
+        12px 14px 0 rgba(203, 160, 82, 0.3),
+        16px 18px 24px rgba(0,0,0,0.35);
+    transform: rotateX(1deg) translateZ(6px) scale(0.99);
     transform-style: preserve-3d;
     padding: 10px;
 }
