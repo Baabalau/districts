@@ -426,7 +426,12 @@ class EventLayout extends HTMLElement {
             const modal = this.querySelector('#vote-modal');
             const nameEl = this.querySelector('#modal-venue-name');
             nameEl.innerText = venueName;
-            this.querySelector('#share-venue-name').innerText = venueName;
+            
+            const shareVenueName = this.querySelector('#share-venue-name');
+            if (shareVenueName) {
+                shareVenueName.innerText = venueName;
+            }
+            
             modal.dataset.venueId = venueId;
             modal.dataset.venueName = venueName;
             
