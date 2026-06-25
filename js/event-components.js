@@ -405,7 +405,7 @@ class EventLayout extends HTMLElement {
                 submitBtn.addEventListener('click', () => window.submitVote());
             } else {
                 authSection.innerHTML = `
-                    <button class="auth-btn email" style="width: 100%; padding: 15px; font-size: 1.1rem;" onclick="window.location.href='login.html?redirect=' + encodeURIComponent(window.location.pathname)">Log In with Email or Google</button>
+                    <button class="auth-btn email" style="width: 100%; padding: 15px; font-size: 1.1rem;" onclick="window.location.href='login.html?redirect=' + encodeURIComponent(window.location.pathname + window.location.search)">Log In with Email or Google</button>
                 `;
             }
         });
@@ -431,7 +431,7 @@ class EventLayout extends HTMLElement {
 
         window.submitVote = async () => {
             if (!currentUser) {
-                window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.pathname);
+                window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.pathname + window.location.search);
                 return;
             }
 
@@ -455,6 +455,13 @@ class EventLayout extends HTMLElement {
             btn.disabled = true;
 
             try {
+                // If this is a mock venue for testing, bypass Firestore updates to allow unlimited testing
+                if (venueId.startsWith('mock_')) {
+                    console.log("Mock venue selected. Bypassing Firestore writes for testing.");
+                    window.showShareScreen();
+                    return;
+                }
+
                 const userRef = doc(db, "users", currentUser.uid);
                 const userSnap = await getDoc(userRef);
                 
