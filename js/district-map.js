@@ -243,8 +243,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         // Determine if venues are in bounds and mock ranks if necessary
         let inDistrictVenues = [];
+        
+        // --- CLIENT-SIDE OVERRIDES ---
+        
         venues.forEach((place) => {
-            // Geocoding bug fix: Saturn Bar was mistakenly placed at 3323 N Robertson (29.9711, -90.0396).
+            // 2. Geocoding bug fix: Saturn Bar was mistakenly placed at 3323 N Robertson (29.9711, -90.0396).
             // Hardcode correct coordinates to Bywater location: 3067 St Claude Ave
             if (place.name && place.name.toUpperCase() === 'SATURN BAR') {
                 place.lat = 29.9679094;

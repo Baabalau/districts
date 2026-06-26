@@ -34,32 +34,47 @@ function renderScheduleItems(items) {
 
 function renderVotingModule(district) {
     return `
-                <div class="map-filters" style="padding: 15px 25px; background: var(--bg-secondary); border-top: 2px solid var(--text-primary); border-radius: 0 0 8px 8px; display: flex; justify-content: center; gap: 24px; flex-wrap: wrap;">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <div style="width: 14px; height: 14px; border-radius: 50%; background-color: #D2A039; box-shadow: 0 0 8px #D2A039;"></div>
-                        <span style="color: var(--text-primary); font-family: var(--font-header); font-size: 0.95rem; font-weight: 700; text-transform: uppercase;">Bar</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <div style="width: 14px; height: 14px; border-radius: 50%; background-color: #B32424; box-shadow: 0 0 8px #B32424;"></div>
-                        <span style="color: var(--text-primary); font-family: var(--font-header); font-size: 0.95rem; font-weight: 700; text-transform: uppercase;">Restaurant</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <div style="width: 14px; height: 14px; border-radius: 50%; background-color: #D946EF; box-shadow: 0 0 8px #D946EF;"></div>
-                        <span style="color: var(--text-primary); font-family: var(--font-header); font-size: 0.95rem; font-weight: 700; text-transform: uppercase;">Live Venue</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <div style="width: 14px; height: 14px; border-radius: 50%; background-color: #45B7D1; box-shadow: 0 0 8px #45B7D1;"></div>
-                        <span style="color: var(--text-primary); font-family: var(--font-header); font-size: 0.95rem; font-weight: 700; text-transform: uppercase;">Museum/Gallery</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <div style="width: 14px; height: 14px; border-radius: 50%; background-color: #A87B28; box-shadow: 0 0 8px #A87B28;"></div>
-                        <span style="color: var(--text-primary); font-family: var(--font-header); font-size: 0.95rem; font-weight: 700; text-transform: uppercase;">Other</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 8px; border-left: 1px solid rgba(203, 160, 82, 0.3); padding-left: 20px;">
-                        <div style="width: 14px; height: 14px; border-radius: 50%; background-color: transparent; border: 2px solid #fff;"></div>
-                        <span style="color: var(--text-secondary); font-family: var(--font-header); font-size: 0.85rem; font-style: italic;">Top 10</span>
+                <div class="map-filters-viewport" style="background: var(--bg-secondary); margin-top: 0; margin-bottom: 40px; padding: 20px 0; border-radius: 0 0 8px 8px; width: 100%;">
+                    <div class="map-filters-inner" style="width: 100%; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: nowrap; gap: 30px;">
+                        
+                        <div style="display: flex; align-items: center; gap: 20px; padding-right: 30px; border-right: 1px solid rgba(255,255,255,0.2); flex-shrink: 0;">
+                            <span id="legend-round-name" style="color: var(--brand-gold); font-family: var(--font-hero); font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap;">Round 1</span>
+                            <div class="countdown-clock small-clock" style="margin: 0; flex-wrap: nowrap;">
+                                <div class="time-box" style="padding: 6px 12px; min-width: 50px;"><span style="font-size: 2rem; line-height: 1;">02</span><label style="font-size: 0.7rem;">Days</label></div>
+                                <div class="time-box" style="padding: 6px 12px; min-width: 50px;"><span style="font-size: 2rem; line-height: 1;">14</span><label style="font-size: 0.7rem;">Hrs</label></div>
+                                <div class="time-box" style="padding: 6px 12px; min-width: 50px;"><span style="font-size: 2rem; line-height: 1;">20</span><label style="font-size: 0.7rem;">Mins</label></div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: center; justify-content: flex-start; flex-grow: 1;">
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <div style="width: 12px; height: 12px; border-radius: 50%; background-color: #D2A039; box-shadow: 0 0 8px #D2A039;"></div>
+                                <span style="color: var(--text-primary); font-family: var(--font-header); font-size: 0.85rem; font-weight: 700; text-transform: uppercase;">Bar</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <div style="width: 12px; height: 12px; border-radius: 50%; background-color: #B32424; box-shadow: 0 0 8px #B32424;"></div>
+                                <span style="color: var(--text-primary); font-family: var(--font-header); font-size: 0.85rem; font-weight: 700; text-transform: uppercase;">Restaurant</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <div style="width: 12px; height: 12px; border-radius: 50%; background-color: #D946EF; box-shadow: 0 0 8px #D946EF;"></div>
+                                <span style="color: var(--text-primary); font-family: var(--font-header); font-size: 0.85rem; font-weight: 700; text-transform: uppercase;">Live Venue</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <div style="width: 12px; height: 12px; border-radius: 50%; background-color: #45B7D1; box-shadow: 0 0 8px #45B7D1;"></div>
+                                <span style="color: var(--text-primary); font-family: var(--font-header); font-size: 0.85rem; font-weight: 700; text-transform: uppercase;">Museum/Gallery</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <div style="width: 12px; height: 12px; border-radius: 50%; background-color: #A87B28; box-shadow: 0 0 8px #A87B28;"></div>
+                                <span style="color: var(--text-primary); font-family: var(--font-header); font-size: 0.85rem; font-weight: 700; text-transform: uppercase;">Other</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 6px; border-left: 1px solid rgba(203, 160, 82, 0.3); padding-left: 15px;">
+                                <div style="width: 12px; height: 12px; border-radius: 50%; background-color: transparent; border: 2px solid #fff;"></div>
+                                <span style="color: var(--text-secondary); font-family: var(--font-header); font-size: 0.8rem; font-style: italic;">Top 10</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
             </div>
 
             <div class="voting-section js-reveal reveal-y delay-200" id="voting-module">
@@ -72,28 +87,22 @@ function renderVotingModule(district) {
                 </div>
 
                 <div id="state-pre-voting" class="voting-state-container">
-                    <div class="voting-header">
-                        <h2>The Election: Stop 3</h2>
-                        <p>Where are we ending the night? The polls open 14 days before the event.</p>
+                    <div class="voting-header" style="margin-bottom: 10px;">
+                        <h2 style="font-size: 2.5rem; margin-bottom: 5px;">The Election: Stop 3</h2>
+                        <p style="font-size: 1.1rem; color: var(--text-secondary);">Where are we ending the night? The polls open 14 days before the event.</p>
                     </div>
-                    <div class="countdown-clock">
-                        <div class="time-box"><span>14</span><label>Days</label></div>
-                        <div class="time-box"><span>08</span><label>Hours</label></div>
-                        <div class="time-box"><span>45</span><label>Mins</label></div>
-                        <div class="time-box"><span>12</span><label>Secs</label></div>
-                    </div>
-                    <div class="instruction-box">
-                        <h3>How it works</h3>
-                        <ul>
-                            <li><strong>Round 1:</strong> Voting opens for all districts when the press release drops. Vote for your favorite neighborhood spots. The top 5 advance.</li>
-                            <li><strong>The Run-Off:</strong> Starts the Monday before the event at 3:00 PM. A final sprint to decide the winner among the top 5.</li>
-                            <li><strong>The Prize:</strong> The winning venue hosts the final stop. Every vote is an entry into the Golden Ticket Raffle!</li>
+                    <div class="instruction-box" style="padding: 15px 20px; max-width: 700px; margin: 0 auto 20px auto; text-align: left; background: rgba(15, 22, 38, 0.5);">
+                        <h3 style="margin-bottom: 10px; font-size: 1.1rem; color: var(--brand-gold);">How it works</h3>
+                        <ul style="margin: 0; padding-left: 20px; font-size: 0.95rem;">
+                            <li style="margin-bottom: 5px;"><strong>Round 1:</strong> Voting opens for all districts when the press release drops. Vote for your favorite neighborhood spots. The top 5 advance.</li>
+                            <li style="margin-bottom: 5px;"><strong>The Run-Off:</strong> Starts the Monday before the event at 3:00 PM. A final sprint to decide the winner among the top 5.</li>
+                            <li style="margin-bottom: 0;"><strong>The Prize:</strong> The winning venue hosts the final stop. Every vote is an entry into the Golden Ticket Raffle!</li>
                         </ul>
                     </div>
                 </div>
 
                 <div id="state-round-1" class="voting-state-container" style="display: none;">
-                    <div class="voting-header">
+                    <div class="voting-header" style="display: none;">
                         <h2>Round 1: Choose Your Final Stop</h2>
                         <p>The top 5 venues will advance to the run-off in:</p>
                         <div class="countdown-clock small-clock">
@@ -102,19 +111,48 @@ function renderVotingModule(district) {
                             <div class="time-box"><span>20</span><label>Mins</label></div>
                         </div>
                     </div>
-                    <p style="text-align: center; color: var(--text-secondary); margin-bottom: 20px;">Use the numbers on the map above to locate venues.</p>
+                    <p style="text-align: center; color: var(--text-secondary); margin-bottom: 15px; font-size: 0.9rem;">Use the numbers on the map above to locate venues.</p>
+                    
+                    <div class="leaderboard" style="margin-bottom: 20px;">
+                        <h3 style="color: var(--brand-gold); font-family: var(--font-hero); font-size: 1.2rem; margin-bottom: 10px; text-transform: uppercase;">Current Leaders</h3>
+                        <div class="leaderboard-bar 1st" style="margin-bottom: 6px;">
+                            <div class="bar-fill" style="width: 85%;"></div>
+                            <div class="bar-content" style="padding: 6px 12px;">
+                                <span class="rank">#1</span>
+                                <span class="venue-name">The Rusty Nail</span>
+                                <span class="vote-count">1,245 votes</span>
+                            </div>
+                        </div>
+                        <div class="leaderboard-bar 2nd" style="margin-bottom: 6px;">
+                            <div class="bar-fill" style="width: 65%;"></div>
+                            <div class="bar-content" style="padding: 6px 12px;">
+                                <span class="rank">#2</span>
+                                <span class="venue-name">Barrel Proof</span>
+                                <span class="vote-count">980 votes</span>
+                            </div>
+                        </div>
+                        <div class="leaderboard-bar 3rd" style="margin-bottom: 6px;">
+                            <div class="bar-fill" style="width: 45%;"></div>
+                            <div class="bar-content" style="padding: 6px 12px;">
+                                <span class="rank">#3</span>
+                                <span class="venue-name">The Tchoup Yard</span>
+                                <span class="vote-count">650 votes</span>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="venue-list-container">
                         <ul class="venue-list">
-                            <li><span class="rank-badge gold">1</span> <div class="v-details"><strong>The Rusty Nail</strong><br><em>Patio crawfish boil</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('mock_1', 'The Rusty Nail')">VOTE</button></li>
-                            <li><span class="rank-badge gold">2</span> <div class="v-details"><strong>Barrel Proof</strong><br><em>Brass band on the deck</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('mock_2', 'Barrel Proof')">VOTE</button></li>
-                            <li><span class="rank-badge gold">3</span> <div class="v-details"><strong>The Tchoup Yard</strong><br><em>Outdoor games & DJ</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('mock_3', 'The Tchoup Yard')">VOTE</button></li>
-                            <li><span class="rank-badge silver">4</span> <div class="v-details"><strong>Capulet</strong><br><em>Frozen cocktails specials</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('mock_4', 'Capulet')">VOTE</button></li>
-                            <li><span class="rank-badge silver">5</span> <div class="v-details"><strong>Bulldog Mid-City</strong><br><em>Pint night deals</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('mock_5', 'Bulldog Mid-City')">VOTE</button></li>
-                            <li><span class="rank-badge dark-gray">6</span> <div class="v-details"><strong>Finn McCool's</strong><br><em>Dog-friendly patio vibes</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('mock_6', 'Finn McCool\\'s')">VOTE</button></li>
-                            <li><span class="rank-badge dark-gray">7</span> <div class="v-details"><strong>Pal's Lounge</strong><br><em>Neighborhood classic</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('mock_7', 'Pal\\'s Lounge')">VOTE</button></li>
-                            <li><span class="rank-badge dark-gray">8</span> <div class="v-details"><strong>Mick's Irish Pub</strong><br><em>Live sports & pool</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('mock_8', 'Mick\\'s Irish Pub')">VOTE</button></li>
-                            <li><span class="rank-badge dark-gray">9</span> <div class="v-details"><strong>Rendon Inn</strong><br><em>Best late night tacos</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('mock_9', 'Rendon Inn')">VOTE</button></li>
-                            <li><span class="rank-badge dark-gray">10</span> <div class="v-details"><strong>12 Mile Limit</strong><br><em>Spacious outdoor seating</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('mock_10', '12 Mile Limit')">VOTE</button></li>
+                            <li><span class="rank-badge gold">1</span> <div class="v-details"><strong>The Rusty Nail</strong><br><em>Patio crawfish boil</em></div> <button class="brand-btn vote-btn-small" onclick="window.openVoteModal('mock_1', 'The Rusty Nail')">VOTE</button></li>
+                            <li><span class="rank-badge gold">2</span> <div class="v-details"><strong>Barrel Proof</strong><br><em>Brass band on the deck</em></div> <button class="brand-btn vote-btn-small" onclick="window.openVoteModal('mock_2', 'Barrel Proof')">VOTE</button></li>
+                            <li><span class="rank-badge gold">3</span> <div class="v-details"><strong>The Tchoup Yard</strong><br><em>Outdoor games & DJ</em></div> <button class="brand-btn vote-btn-small" onclick="window.openVoteModal('mock_3', 'The Tchoup Yard')">VOTE</button></li>
+                            <li><span class="rank-badge silver">4</span> <div class="v-details"><strong>Capulet</strong><br><em>Frozen cocktails specials</em></div> <button class="brand-btn vote-btn-small" onclick="window.openVoteModal('mock_4', 'Capulet')">VOTE</button></li>
+                            <li><span class="rank-badge silver">5</span> <div class="v-details"><strong>Bulldog Mid-City</strong><br><em>Pint night deals</em></div> <button class="brand-btn vote-btn-small" onclick="window.openVoteModal('mock_5', 'Bulldog Mid-City')">VOTE</button></li>
+                            <li><span class="rank-badge dark-gray">6</span> <div class="v-details"><strong>Finn McCool's</strong><br><em>Dog-friendly patio vibes</em></div> <button class="brand-btn vote-btn-small" onclick="window.openVoteModal('mock_6', 'Finn McCool\\'s')">VOTE</button></li>
+                            <li><span class="rank-badge dark-gray">7</span> <div class="v-details"><strong>Pal's Lounge</strong><br><em>Neighborhood classic</em></div> <button class="brand-btn vote-btn-small" onclick="window.openVoteModal('mock_7', 'Pal\\'s Lounge')">VOTE</button></li>
+                            <li><span class="rank-badge dark-gray">8</span> <div class="v-details"><strong>Mick's Irish Pub</strong><br><em>Live sports & pool</em></div> <button class="brand-btn vote-btn-small" onclick="window.openVoteModal('mock_8', 'Mick\\'s Irish Pub')">VOTE</button></li>
+                            <li><span class="rank-badge dark-gray">9</span> <div class="v-details"><strong>Rendon Inn</strong><br><em>Best late night tacos</em></div> <button class="brand-btn vote-btn-small" onclick="window.openVoteModal('mock_9', 'Rendon Inn')">VOTE</button></li>
+                            <li><span class="rank-badge dark-gray">10</span> <div class="v-details"><strong>12 Mile Limit</strong><br><em>Spacious outdoor seating</em></div> <button class="brand-btn vote-btn-small" onclick="window.openVoteModal('mock_10', '12 Mile Limit')">VOTE</button></li>
                         </ul>
                         <div class="pagination">
                             <button disabled>← Prev</button>
@@ -125,51 +163,47 @@ function renderVotingModule(district) {
                 </div>
 
                 <div id="state-run-off" class="voting-state-container" style="display: none;">
-                    <div class="voting-header">
+                    <div class="voting-header" style="display: none;">
                         <h2>The Run-Off: Top 5</h2>
                         <p>It's down to the wire! The polls close in:</p>
-                        <div class="countdown-clock small-clock critical">
-                            <div class="time-box"><span>12</span><label>Hrs</label></div>
-                            <div class="time-box"><span>45</span><label>Mins</label></div>
-                            <div class="time-box"><span>09</span><label>Secs</label></div>
-                        </div>
                     </div>
-                    <div class="leaderboard">
-                        <div class="leaderboard-bar 1st">
+                    <div class="leaderboard" style="margin-bottom: 20px;">
+                        <h3 style="color: var(--brand-gold); font-family: var(--font-hero); font-size: 1.2rem; margin-bottom: 10px; text-transform: uppercase;">Current Leaders</h3>
+                        <div class="leaderboard-bar 1st" style="margin-bottom: 6px;">
                             <div class="bar-fill" style="width: 85%;"></div>
-                            <div class="bar-content">
+                            <div class="bar-content" style="padding: 6px 12px;">
                                 <span class="rank">#1</span>
                                 <span class="venue-name">The Rusty Nail</span>
                                 <span class="vote-count">1,245 votes</span>
                             </div>
                         </div>
-                        <div class="leaderboard-bar 2nd">
+                        <div class="leaderboard-bar 2nd" style="margin-bottom: 6px;">
                             <div class="bar-fill" style="width: 65%;"></div>
-                            <div class="bar-content">
+                            <div class="bar-content" style="padding: 6px 12px;">
                                 <span class="rank">#2</span>
                                 <span class="venue-name">Barrel Proof</span>
                                 <span class="vote-count">980 votes</span>
                             </div>
                         </div>
-                        <div class="leaderboard-bar 3rd">
+                        <div class="leaderboard-bar 3rd" style="margin-bottom: 6px;">
                             <div class="bar-fill" style="width: 45%;"></div>
-                            <div class="bar-content">
+                            <div class="bar-content" style="padding: 6px 12px;">
                                 <span class="rank">#3</span>
                                 <span class="venue-name">The Tchoup Yard</span>
                                 <span class="vote-count">650 votes</span>
                             </div>
                         </div>
-                        <div class="leaderboard-bar 4th">
+                        <div class="leaderboard-bar 4th" style="margin-bottom: 6px;">
                             <div class="bar-fill" style="width: 35%;"></div>
-                            <div class="bar-content">
+                            <div class="bar-content" style="padding: 6px 12px;">
                                 <span class="rank">#4</span>
                                 <span class="venue-name">Capulet</span>
                                 <span class="vote-count">420 votes</span>
                             </div>
                         </div>
-                        <div class="leaderboard-bar 5th">
+                        <div class="leaderboard-bar 5th" style="margin-bottom: 6px;">
                             <div class="bar-fill" style="width: 25%;"></div>
-                            <div class="bar-content">
+                            <div class="bar-content" style="padding: 6px 12px;">
                                 <span class="rank">#5</span>
                                 <span class="venue-name">Bulldog Mid-City</span>
                                 <span class="vote-count">295 votes</span>
@@ -178,11 +212,11 @@ function renderVotingModule(district) {
                     </div>
                     <div class="venue-list-container">
                         <ul class="venue-list">
-                            <li><span class="rank-badge gold">1</span> <div class="v-details"><strong>The Rusty Nail</strong><br><em>Patio crawfish boil</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('mock_1', 'The Rusty Nail')">VOTE</button></li>
-                            <li><span class="rank-badge gold">2</span> <div class="v-details"><strong>Barrel Proof</strong><br><em>Brass band on the deck</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('mock_2', 'Barrel Proof')">VOTE</button></li>
-                            <li><span class="rank-badge gold">3</span> <div class="v-details"><strong>The Tchoup Yard</strong><br><em>Outdoor games & DJ</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('mock_3', 'The Tchoup Yard')">VOTE</button></li>
-                            <li><span class="rank-badge silver">4</span> <div class="v-details"><strong>Capulet</strong><br><em>Frozen cocktails specials</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('mock_4', 'Capulet')">VOTE</button></li>
-                            <li><span class="rank-badge silver">5</span> <div class="v-details"><strong>Bulldog Mid-City</strong><br><em>Pint night deals</em></div> <button class="vote-btn-small" onclick="window.openVoteModal('mock_5', 'Bulldog Mid-City')">VOTE</button></li>
+                            <li><span class="rank-badge gold">1</span> <div class="v-details"><strong>The Rusty Nail</strong><br><em>Patio crawfish boil</em></div> <button class="brand-btn vote-btn-small" onclick="window.openVoteModal('mock_1', 'The Rusty Nail')">VOTE</button></li>
+                            <li><span class="rank-badge gold">2</span> <div class="v-details"><strong>Barrel Proof</strong><br><em>Brass band on the deck</em></div> <button class="brand-btn vote-btn-small" onclick="window.openVoteModal('mock_2', 'Barrel Proof')">VOTE</button></li>
+                            <li><span class="rank-badge gold">3</span> <div class="v-details"><strong>The Tchoup Yard</strong><br><em>Outdoor games & DJ</em></div> <button class="brand-btn vote-btn-small" onclick="window.openVoteModal('mock_3', 'The Tchoup Yard')">VOTE</button></li>
+                            <li><span class="rank-badge silver">4</span> <div class="v-details"><strong>Capulet</strong><br><em>Frozen cocktails specials</em></div> <button class="brand-btn vote-btn-small" onclick="window.openVoteModal('mock_4', 'Capulet')">VOTE</button></li>
+                            <li><span class="rank-badge silver">5</span> <div class="v-details"><strong>Bulldog Mid-City</strong><br><em>Pint night deals</em></div> <button class="brand-btn vote-btn-small" onclick="window.openVoteModal('mock_5', 'Bulldog Mid-City')">VOTE</button></li>
                         </ul>
                     </div>
                 </div>
@@ -218,29 +252,30 @@ function renderVotingModule(district) {
             </div>
 
             <div id="share-modal" class="modal-overlay" style="display: none;">
-                <div class="modal-content share-content" style="padding: 30px 20px; background: #0F1626; max-width: 450px;">
+                <div class="modal-content share-content" style="padding: 20px 15px; background: #0F1626; max-width: 400px; max-height: 90vh; overflow-y: auto;">
                     <button class="close-modal" onclick="window.closeShareModal()">×</button>
-                    <h2 style="font-size: 1.8rem; margin-bottom: 5px; color: var(--text-primary); font-family: var(--font-hero); text-transform: uppercase;">Vote Confirmed!</h2>
-                    <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 1rem;">Save this graphic and share it to your Instagram Story to rally more votes!</p>
+                    <h2 style="font-size: 1.6rem; margin-bottom: 5px; color: var(--text-primary); font-family: var(--font-hero); text-transform: uppercase;">Vote Confirmed!</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 15px; font-size: 0.95rem;">Save this graphic and share it to your Instagram Story to rally more votes!</p>
                     
-                    <div style="position: relative; width: 100%; max-width: 280px; margin: 0 auto 20px auto; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                    <div style="position: relative; width: 100%; max-width: 220px; margin: 0 auto 15px auto; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
                         <!-- The canvas will generate the final image, and we'll display it in this img tag so users can long-press to save -->
                         <img id="generated-share-graphic" src="" alt="Your Custom Share Graphic" style="width: 100%; height: auto; display: block;">
                         <canvas id="share-canvas" width="1080" height="1920" style="display: none;"></canvas>
                     </div>
                     
-                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 15px; font-style: italic;">Mobile: Long-press the image to save.<br>Desktop: Right-click and "Save Image As".</p>
+                    <a id="download-graphic-btn" href="#" download="districts_votefor_business.png" class="brand-btn" style="display: block; text-align: center; margin-bottom: 15px; text-decoration: none; padding: 12px;">Download Graphic</a>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 15px; font-style: italic;">Mobile: Tap Download, or long-press the image to save.</p>
                     
-                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); text-align: left;">
-                        <p style="color: var(--text-primary); font-weight: bold; margin-bottom: 8px; font-size: 0.95rem;">Add this link to your Instagram Link Sticker:</p>
+                    <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); text-align: left;">
+                        <p style="color: var(--text-primary); font-weight: bold; margin-bottom: 8px; font-size: 0.9rem;">Add this link to your Instagram Link Sticker:</p>
                         <div style="display: flex; gap: 10px; align-items: center;">
-                            <input type="text" id="share-url-input" readonly style="flex: 1; padding: 10px; border-radius: 4px; border: 1px solid var(--text-secondary); background: #182238; color: white; font-size: 0.85rem; outline: none;">
-                            <button onclick="window.copyShareUrl()" style="padding: 10px 15px; background: var(--brand-red); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.85rem; transition: background 0.2s;">Copy</button>
+                            <input type="text" id="share-url-input" readonly style="flex: 1; padding: 8px; border-radius: 4px; border: 1px solid var(--text-secondary); background: #182238; color: white; font-size: 0.8rem; outline: none;">
+                            <button onclick="window.copyShareUrl()" style="padding: 8px 12px; background: var(--brand-red); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.8rem; transition: background 0.2s;">Copy</button>
                         </div>
                         <p id="copy-success-msg" style="color: #7fd99a; font-size: 0.8rem; margin-top: 8px; display: none; text-align: center;">Link copied to clipboard!</p>
                     </div>
 
-                    <button class="brand-btn" style="width: 100%; margin-bottom: 10px;" onclick="window.closeShareModal()">Done</button>
+                    <button class="brand-btn" style="width: 100%; margin-bottom: 5px; padding: 10px;" onclick="window.closeShareModal()">Done</button>
                 </div>
             </div>`;
 }
@@ -553,13 +588,48 @@ class EventLayout extends HTMLElement {
                 const textX = 1080 / 2 + 100; // Shifted slightly right to fit in the white box
                 const textY = 520; // Y-coordinate of the white box
                 
-                // Draw the venue name onto the canvas
-                // We use a max width to ensure long names shrink to fit the box
-                ctx.fillText(venueName.toUpperCase(), textX, textY, 650);
+                // Helper function to wrap text
+                const wrapText = (context, text, x, y, maxWidth, lineHeight) => {
+                    const words = text.split(' ');
+                    let line = '';
+                    let lines = [];
+
+                    for(let n = 0; n < words.length; n++) {
+                        const testLine = line + words[n] + ' ';
+                        const metrics = context.measureText(testLine);
+                        if (metrics.width > maxWidth && n > 0) {
+                            lines.push(line);
+                            line = words[n] + ' ';
+                        } else {
+                            line = testLine;
+                        }
+                    }
+                    lines.push(line);
+
+                    // Center the block of text vertically
+                    const totalHeight = lines.length * lineHeight;
+                    let startY = y - (totalHeight / 2) + (lineHeight / 2);
+
+                    for(let i = 0; i < lines.length; i++) {
+                        context.fillText(lines[i].trim(), x, startY + (i * lineHeight));
+                    }
+                };
+
+                // Draw the venue name onto the canvas, wrapping to 2 lines if necessary
+                // Max width of the white box is roughly 550px
+                wrapText(ctx, venueName.toUpperCase(), textX, textY, 550, 75);
                 
                 // Convert canvas to a data URL and set it as the image source
                 const dataUrl = canvas.toDataURL('image/png');
                 this.querySelector('#generated-share-graphic').src = dataUrl;
+                
+                // Set up the explicit download button with the custom filename
+                const downloadBtn = this.querySelector('#download-graphic-btn');
+                if (downloadBtn) {
+                    downloadBtn.href = dataUrl;
+                    const safeName = venueName.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_');
+                    downloadBtn.download = `districts_votefor_${safeName}.png`;
+                }
                 
                 // Generate the deep link URL for this specific venue
                 const shareUrl = window.location.origin + window.location.pathname + '?vote=' + encodeURIComponent(venueId) + '&name=' + encodeURIComponent(venueName);
@@ -604,6 +674,16 @@ class EventLayout extends HTMLElement {
 
         window.setVotingState = (stateId) => {
             const states = ['pre-voting', 'round-1', 'run-off', 'post-election'];
+            
+            // Update map legend round name based on state
+            const legendRoundName = this.querySelector('#legend-round-name');
+            if (legendRoundName) {
+                if (stateId === 'pre-voting') legendRoundName.innerText = 'Voting Opens Soon';
+                else if (stateId === 'round-1') legendRoundName.innerText = 'Round 1';
+                else if (stateId === 'run-off') legendRoundName.innerText = 'Run-Off';
+                else if (stateId === 'post-election') legendRoundName.innerText = 'Results';
+            }
+            
             states.forEach(s => {
                 const el = this.querySelector('#state-' + s);
                 if (el) {
