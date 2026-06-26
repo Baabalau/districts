@@ -486,9 +486,9 @@ class EventLayout extends HTMLElement {
                 let userData = userSnap.exists() ? userSnap.data() : {};
                 let votes = userData.votes || {};
                 
-                // Check if user already voted in this district
-                if (votes[districtId]) {
-                    errorMsg.textContent = `You have already voted in District ${districtId}.`;
+                // Check if user already voted for this specific venue
+                if (votes[venueId]) {
+                    errorMsg.textContent = `You have already voted for ${venueName || 'this venue'}.`;
                     errorMsg.style.display = 'block';
                     btn.innerText = 'Submit Vote';
                     btn.disabled = false;
@@ -496,7 +496,7 @@ class EventLayout extends HTMLElement {
                 }
                 
                 // Update user's votes
-                votes[districtId] = venueId;
+                votes[venueId] = true;
                 await setDoc(userRef, { votes: votes }, { merge: true });
                 
                 // Increment venue's voteCount

@@ -12,7 +12,7 @@ To ensure integrity and prevent botting, all users must be authenticated via **E
 * **`users` Collection:** Stores user profiles.
   * `uid`: String
   * `email`: String
-  * `votes`: Map `{ 'A': 'venue_id_1', 'B': 'venue_id_7' }` (Tracks which venue the user voted for in each district to prevent double-voting).
+  * `votes`: Map `{ 'venue_id_1': true, 'venue_id_7': true }` (Tracks which venues the user has voted for to prevent voting for the same venue multiple times).
 * **`venues` Collection:** Stores the nominees.
   * `id`: String
   * `district`: String ('A', 'B', etc.)
