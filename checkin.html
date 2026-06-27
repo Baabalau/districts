@@ -125,22 +125,19 @@
             }
 
             try {
-                // Find the venue by qrCodeId
-                const venuesRef = collection(db, "venues");
-                const q = query(venuesRef, where("qrCodeId", "==", venueQrCode));
-                const querySnapshot = await getDocs(q);
+                // Find the venue by its document ID (venueQrCode)
+                const venueRef = doc(db, "venues", venueQrCode);
+                const venueSnap = await getDoc(venueRef);
 
-                if (querySnapshot.empty) {
+                if (!venueSnap.exists()) {
                     statusMsg.textContent = "Venue not found! Invalid QR code.";
                     homeBtn.style.display = "inline-block";
                     return;
                 }
 
-                // Assume first match is the venue
-                const venueDoc = querySnapshot.docs[0];
-                const venueData = venueDoc.data();
+                const venueData = venueSnap.data();
                 const venueName = venueData.name || "this venue";
-                const venueId = venueDoc.id;
+                const venueId = venueSnap.id;
 
                 const userRef = doc(db, "users", user.uid);
                 const userSnap = await getDoc(userRef);
