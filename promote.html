@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>For Businesses | Districts After Dark</title>
+    <title>Your Business | Districts After Dark</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Montserrat:wght@700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/district-page.css">
     <link rel="stylesheet" href="css/event-styles.css">
@@ -320,6 +320,44 @@
             font-family: var(--font-main);
             color: #333;
         }
+
+        .custom-google-form label {
+            color: var(--text-primary);
+            font-family: var(--font-header);
+            font-size: 1.2rem;
+            margin-bottom: -5px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .custom-google-form .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .custom-google-form .checkbox-group label {
+            text-transform: none;
+            font-weight: normal;
+            font-family: var(--font-main);
+            font-size: 1.1rem;
+            margin-bottom: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .custom-google-form .checkbox-group input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            margin: 0;
+        }
     </style>
 </head>
 <body>
@@ -328,7 +366,7 @@
         <div class="nav-links">
             <a href="index.html">Home</a>
             <a href="index.html#events">Events</a>
-            <a href="promote.html" style="color: var(--text-primary);">For Businesses</a>
+            <a href="promote.html" style="color: var(--text-primary);">Your Business</a>
             <a href="login.html" id="authLink">Log In / Sign Up</a>
         </div>
     </nav>
@@ -336,7 +374,7 @@
     <div class="promo-hero">
         <div class="promo-hero-inner">
             <div class="promo-hero-content">
-                <h1 class="title-3d">For Businesses</h1>
+                <h1 class="title-3d">Your Business</h1>
                 
                 <span class="subtitle">
                     Rally your community and secure your spot as the final destination for Districts After Dark. 
@@ -349,7 +387,7 @@
             <!-- Elevated Previews layout overlapping cards -->
             <div class="promo-hero-visual">
                 <div class="cards-container">
-                    <img src="assets/Voter%20Share_draft1.PNG" class="hero-image image-1" alt="Social Media Graphic Preview">
+                    <img src="assets/promo_vote_for_us_district_a.png" class="hero-image image-1" alt="Social Media Graphic Preview">
                     <img src="assets/flyer_draft.png" class="hero-image image-2" alt="Printable Flyer Preview">
                 </div>
             </div>
@@ -362,7 +400,7 @@
             <div class="preview-item" style="max-width: 350px;">
                 <h3 style="font-family: var(--font-header); color: var(--brand-red); font-size: 1.5rem; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; text-shadow: 1px 1px 0px rgba(0,0,0,0.5);">Social Media Story</h3>
                 <div class="preview-dimensions" style="margin-bottom: 20px; font-size: 0.85rem; color: var(--text-secondary); font-family: var(--font-main); text-transform: uppercase; letter-spacing: 1px;">1080 x 1920 px (9:16)</div>
-                <img src="assets/Voter%20Share_draft1.PNG" alt="Social Media Graphic Preview" style="height: 380px; width: auto; object-fit: contain; border-radius: 16px; border: 4px solid var(--text-primary); box-shadow: 0 15px 35px rgba(0,0,0,0.6); transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
+                <img src="assets/promo_vote_for_us_district_a.png" alt="Social Media Graphic Preview" style="height: 380px; width: auto; object-fit: contain; border-radius: 16px; border: 4px solid var(--text-primary); box-shadow: 0 15px 35px rgba(0,0,0,0.6); transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
             </div>
             <div class="preview-item" style="max-width: 350px;">
                 <h3 style="font-family: var(--font-header); color: var(--brand-red); font-size: 1.5rem; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; text-shadow: 1px 1px 0px rgba(0,0,0,0.5);">Printable Flyer</h3>
@@ -371,24 +409,89 @@
             </div>
         </div>
         
+        <!-- Request to Join the Map / Google Form Integration -->
+        <div class="generator-tool" style="margin-top: 60px; margin-bottom: 60px;">
+            <h2>Join the Map</h2>
+            <p style="color: var(--text-secondary); font-size: 1.1rem; line-height: 1.6; max-width: 800px; margin: 0 0 20px 0;">
+                Request to have your business added to the official Districts After Dark map. 
+                <br><br><small><em>(Developer Note: To connect this to a real Google Form, replace the form action URL and the "entry.100000X" name attributes with those from a generated Google Form "Get pre-filled link" URL.)</em></small>
+            </p>
+            
+            <form class="generator-form custom-google-form" action="https://docs.google.com/forms/u/0/d/e/YOUR_FORM_ID/formResponse" method="POST" target="hidden_iframe" onsubmit="this.reset(); alert('Thanks for submitting! We will review your request.');">
+                
+                <label for="entry.1000000">Business Name</label>
+                <input type="text" name="entry.1000000" id="entry.1000000" placeholder="e.g., The Bulldog" required>
+
+                <label for="entry.1000001">Your Name</label>
+                <input type="text" name="entry.1000001" id="entry.1000001" placeholder="e.g., Jane Doe" required>
+
+                <label for="entry.1000002">Your Role with the Business</label>
+                <input type="text" name="entry.1000002" id="entry.1000002" placeholder="e.g., Owner, General Manager" required>
+
+                <label for="entry.1000005">Street Address</label>
+                <input type="text" name="entry.1000005" id="entry.1000005" placeholder="e.g., 123 Main St, New Orleans, LA 70112" required>
+
+                <label for="entry.1000006">Council District</label>
+                <select name="entry.1000006" id="entry.1000006" required>
+                    <option value="" disabled selected>Select Your District...</option>
+                    <option value="District A">District A</option>
+                    <option value="District B">District B</option>
+                    <option value="District C">District C</option>
+                    <option value="District D">District D</option>
+                    <option value="District E">District E</option>
+                </select>
+
+                <label for="entry.1000007">Email Address</label>
+                <input type="email" name="entry.1000007" id="entry.1000007" placeholder="e.g., hello@business.com" required>
+
+                <label for="entry.1000008">Phone Number</label>
+                <input type="tel" name="entry.1000008" id="entry.1000008" placeholder="e.g., (504) 555-0199" required>
+
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" name="entry.1000003" value="Yes" required>
+                        I confirm this business is in good standing with the City of New Orleans.
+                    </label>
+                </div>
+
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" name="entry.1000009" value="Yes">
+                        I would like my business to host our council district's event
+                    </label>
+                </div>
+
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" name="entry.1000004" value="Yes">
+                        Please remove my business from this website and affiliated communications
+                    </label>
+                </div>
+
+                <button type="submit" class="brand-btn" style="background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); font-size: 1.2rem; padding: 20px; border: none; cursor: pointer; color: white;">Submit Request</button>
+            </form>
+            <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(this.submitted) {}"></iframe>
+        </div>
+
         <!-- Custom Flyer Generator Tool (Moved to Top) -->
         <div class="generator-tool" style="margin-top: 60px; margin-bottom: 60px;">
-            <h2>Generate Your Custom Flyer & Link</h2>
+            <h2>Generate Your Check-In QR Code</h2>
             <p style="color: var(--text-secondary); font-size: 1.1rem; line-height: 1.6; max-width: 800px; margin: 0 0;">
-                Select your district and enter your venue name. Our system will instantly generate your unique voting URL and automatically package it into a high-resolution, printable flyer with a custom QR code.
+                Select your venue from the list below to generate your unique Check-In QR code. Print this out and place it at your venue so customers can scan it to check in and earn points!
             </p>
             
             <div class="generator-form">
-                <select id="district-select">
-                    <option value="" disabled selected>Select Your District...</option>
-                    <option value="A">District A</option>
-                    <option value="B">District B</option>
-                    <option value="C">District C</option>
-                    <option value="D">District D</option>
-                    <option value="E">District E</option>
+                <select id="venue-select">
+                    <option value="" disabled selected>Loading venues...</option>
                 </select>
-                <input type="text" id="venue-name" placeholder="Enter Your Venue Name (e.g., The Bulldog)">
-                <button class="brand-btn" onclick="alert('In production, this will trigger the frontend rendering process to output your flyer!')" style="background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); font-size: 1.2rem; padding: 20px;">Generate Flyer & QR Code</button>
+                <button class="brand-btn" id="generate-qr-btn" style="background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); font-size: 1.2rem; padding: 20px; border: none; cursor: pointer; color: white;">Generate QR Code</button>
+            </div>
+            
+            <div id="qr-result" style="display: none; margin-top: 30px; text-align: center; background: white; padding: 30px; border-radius: 12px; max-width: 400px; margin-left: auto; margin-right: auto;">
+                <h3 style="color: #0F1626; font-family: var(--font-header); font-size: 1.5rem; margin-bottom: 20px; text-transform: uppercase;" id="qr-venue-name">Your Venue</h3>
+                <img id="qr-image" src="" alt="Check-In QR Code" style="width: 100%; height: auto; max-width: 300px; margin-bottom: 20px;">
+                <p style="color: #333; font-size: 1rem; font-family: var(--font-main); margin-bottom: 20px;">Scan this code to check in!</p>
+                <button class="brand-btn" onclick="window.print()" style="background: #0F1626; color: white; width: 100%; border: none; padding: 15px; cursor: pointer; font-size: 1.1rem; border-radius: 5px;">Print QR Code</button>
             </div>
         </div>
 
@@ -448,5 +551,61 @@
             </ul>
         </div>
     </footer>
+
+    <script type="module">
+        import { db } from "./js/firebase-config.js";
+        import { collection, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const venueSelect = document.getElementById('venue-select');
+            const generateBtn = document.getElementById('generate-qr-btn');
+            const qrResult = document.getElementById('qr-result');
+            const qrImage = document.getElementById('qr-image');
+            const qrVenueName = document.getElementById('qr-venue-name');
+
+            try {
+                const venuesRef = collection(db, "venues");
+                const q = query(venuesRef, orderBy("name"));
+                const querySnapshot = await getDocs(q);
+                
+                venueSelect.innerHTML = '<option value="" disabled selected>Select Your Venue...</option>';
+                
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const option = document.createElement('option');
+                    option.value = doc.id;
+                    option.textContent = data.name + (data.district ? ` (District ${data.district})` : '');
+                    venueSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error("Error loading venues:", error);
+                venueSelect.innerHTML = '<option value="" disabled selected>Error loading venues</option>';
+            }
+
+            generateBtn.addEventListener('click', () => {
+                const selectedOption = venueSelect.options[venueSelect.selectedIndex];
+                if (!selectedOption || !selectedOption.value) {
+                    alert("Please select a venue first.");
+                    return;
+                }
+
+                const venueId = selectedOption.value;
+                const venueName = selectedOption.textContent.split(' (')[0];
+                
+                // Construct the check-in URL
+                const checkInUrl = `${window.location.origin}/checkin.html?venue=${venueId}`;
+                
+                // Generate QR code using a free API
+                const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(checkInUrl)}&color=0F1626&bgcolor=FFFFFF`;
+                
+                qrImage.src = qrApiUrl;
+                qrVenueName.textContent = venueName;
+                qrResult.style.display = 'block';
+                
+                // Scroll to result
+                qrResult.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+        });
+    </script>
 </body>
 </html>

@@ -1171,7 +1171,7 @@
         <div class="menu-links">
             <a href="#">Home</a>
             <a href="#events">Events</a>
-            <a href="promote.html">For Businesses</a>
+            <a href="promote.html">Your Business</a>
             <a href="#about">About</a>
             <a href="#">Partners</a>
             <a href="login.html" id="authLink">Log In / Sign Up</a>
@@ -1629,9 +1629,23 @@
 
         async function loadAllVenues() {
             try {
+                let venues = [];
                 const querySnapshot = await getDocs(collection(db, "venues"));
                 querySnapshot.forEach((doc) => {
-                    const place = doc.data();
+                    venues.push(doc.data());
+                });
+
+                // Client-side overrides
+
+                // 2. Fix Saturn Bar
+                venues.forEach(place => {
+                    if (place.name && place.name.toUpperCase() === 'SATURN BAR') {
+                        place.lat = 29.9679094;
+                        place.lng = -90.0442228;
+                    }
+                });
+
+                venues.forEach((place) => {
                     if (!place.lat || !place.lng) return;
                     
                     L.marker([place.lat, place.lng], {
