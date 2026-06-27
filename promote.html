@@ -365,30 +365,38 @@
             background: linear-gradient(135deg, var(--bg-primary), #1a2336);
             border: 4px solid var(--brand-red);
             border-radius: 16px;
-            padding: 40px clamp(24px, 4vw, 60px);
+            padding: 24px clamp(24px, 4vw, 60px) 40px;
             text-align: left;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
 
-        .generator-tool h2 {
-            font-family: var(--font-header);
-            font-size: 2rem;
-            color: var(--text-primary);
-            margin-bottom: 15px;
-            text-transform: uppercase;
-        }
-
         .generator-form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
             max-width: 600px;
             margin: 30px 0 0;
         }
 
-        .generator-form input, .generator-form select {
-            padding: 18px;
+        .form-step {
+            display: block;
+        }
+
+        .form-step h3 {
+            font-family: var(--font-header);
+            font-size: 1.5rem;
+            color: white;
+            background-color: var(--brand-red);
+            margin-top: 0;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            padding: 12px 20px;
             border-radius: 8px;
+            letter-spacing: 0.05em;
+        }
+
+        .generator-form input:not([type="checkbox"]), .generator-form select {
+            width: 100%;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
             border: 2px solid var(--text-secondary);
             background: white;
             font-size: 1.2rem;
@@ -399,10 +407,12 @@
         .custom-google-form label {
             color: var(--text-primary);
             font-family: var(--font-header);
-            font-size: 1.2rem;
-            margin-bottom: -5px;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
             text-transform: uppercase;
             font-weight: bold;
+            display: block;
+            letter-spacing: 0.05em;
         }
 
         .custom-google-form .checkbox-group {
@@ -413,6 +423,7 @@
             padding: 15px;
             border-radius: 8px;
             border: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 15px;
         }
 
         .custom-google-form .checkbox-group label {
@@ -514,16 +525,12 @@
                     </div>
                 </div>
             </div>
-            
-            <div style="text-align: left; margin-top: 30px; margin-bottom: 80px;">
-                <button class="brand-btn" onclick="window.print()">Download Guide as PDF</button>
-            </div>
         </div>
         
         <!-- Multi-Step Integrated Form -->
         <div class="generator-tool" id="integrated-form-container" style="margin-top: 60px; margin-bottom: 60px;">
+            <h2 style="font-family: var(--font-header); font-size: 2rem; color: var(--text-primary); margin-top: 0; margin-bottom: 15px; text-transform: uppercase;">Join the Map & Generate Promo Graphics</h2>
             <div id="step-intro" style="text-align: left;">
-                <h2>Join the Map & Generate Promo Graphics</h2>
                 <p style="color: var(--text-secondary); font-size: 1.1rem; line-height: 1.6; max-width: 800px; margin: 0 0 20px 0;">
                     Complete this form to request your business be added to the official Districts After Dark map. 
                     Once completed, you'll instantly receive your customized social media graphic and printable check-in flyer.
@@ -531,7 +538,7 @@
                 <button type="button" id="start-form-btn" class="brand-btn" style="background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); font-size: 1.2rem; padding: 15px 30px; border: none; cursor: pointer; color: white; border-radius: 8px;">Get Started</button>
             </div>
             
-            <form id="multi-step-form" class="generator-form custom-google-form" style="display: none;" onsubmit="return false;">
+            <form id="multi-step-form" class="generator-form custom-google-form" style="display: none;">
                 
                 <!-- Step 1 -->
                 <div class="form-step" id="step-1">
@@ -561,8 +568,8 @@
                     <label for="biz-address">Street Address</label>
                     <input type="text" id="biz-address" placeholder="e.g., 123 Main St, New Orleans, LA 70112" required>
                     
-                    <label for="biz-url">Business Website URL</label>
-                    <input type="url" id="biz-url" placeholder="https://yourbusiness.com" required>
+                    <label for="biz-url">Business Website URL <span style="font-size: 0.9rem; font-weight: normal; color: var(--text-secondary); text-transform: none;">(Optional)</span></label>
+                    <input type="url" id="biz-url" placeholder="https://yourbusiness.com">
                     
                     <div style="margin-top: 20px; display: flex; gap: 15px;">
                         <button type="button" class="brand-btn prev-btn" style="background: transparent; border: 2px solid var(--text-secondary); color: var(--text-secondary); font-size: 1.2rem; padding: 15px 30px; cursor: pointer; border-radius: 8px;">Back</button>
@@ -582,10 +589,11 @@
                         <option value="District C">District C</option>
                         <option value="District D">District D</option>
                         <option value="District E">District E</option>
+                        <option value="Not Sure">I'm not sure</option>
                     </select>
                     
-                    <label for="biz-logo" style="margin-top: 15px;">Upload Your Logo <span style="font-size: 0.9rem; font-weight: normal; color: var(--text-secondary); text-transform: none;">(Used on your promo graphics instead of text)</span></label>
-                    <input type="file" id="biz-logo" accept="image/*" style="background: rgba(255,255,255,0.05); color: white;" required>
+                    <label for="biz-logo" style="margin-top: 15px;">Upload Your Logo <span style="font-size: 0.9rem; font-weight: normal; color: var(--text-secondary); text-transform: none;">(Optional - Used on your promo graphics instead of text)</span></label>
+                    <input type="file" id="biz-logo" accept="image/*" style="background: rgba(255,255,255,0.05); color: white;">
                     
                     <div style="margin-top: 20px; display: flex; gap: 15px;">
                         <button type="button" class="brand-btn prev-btn" style="background: transparent; border: 2px solid var(--text-secondary); color: var(--text-secondary); font-size: 1.2rem; padding: 15px 30px; cursor: pointer; border-radius: 8px;">Back</button>
@@ -599,7 +607,7 @@
                     
                     <div class="checkbox-group">
                         <label>
-                            <input type="checkbox" id="chk-good-standing" required>
+                            <input type="checkbox" id="chk-good-standing">
                             I confirm this business is in good standing with the City of New Orleans.
                         </label>
                     </div>
@@ -631,6 +639,15 @@
                     Thank you! We've automatically generated your custom promotional graphics below. 
                     <br><strong>Right-click (or long-press on mobile) to save these images.</strong>
                 </p>
+
+                <div style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 25px; margin-bottom: 40px; max-width: 600px;">
+                    <h3 style="font-family: var(--font-header); color: var(--text-primary); font-size: 1.3rem; margin-top: 0; margin-bottom: 15px; text-transform: uppercase;">Your Unique Voting Link</h3>
+                    <p style="color: white; font-size: 1rem; margin-bottom: 15px;">Share this link directly with your followers so they can vote for you!</p>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="generated-voting-url" readonly style="flex: 1; padding: 12px 15px; border-radius: 8px; border: 2px solid var(--text-secondary); background: rgba(255,255,255,0.9); font-size: 1rem; color: #333;">
+                        <button type="button" id="copy-link-btn" class="brand-btn" style="background: var(--brand-red); color: white; border: none; padding: 0 20px; border-radius: 8px; cursor: pointer; font-weight: bold; white-space: nowrap;">Copy Link</button>
+                    </div>
+                </div>
                 
                 <div style="display: flex; flex-wrap: wrap; gap: 40px; justify-content: flex-start;">
                     <div class="preview-item" style="max-width: 350px;">
@@ -639,6 +656,7 @@
                         <div id="social-composite" style="position: relative; width: 100%; max-width: 350px; aspect-ratio: 9/16; border-radius: 16px; border: 4px solid var(--text-primary); overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.6);">
                             <img src="assets/promo_vote_for_us_district_a.png" style="width: 100%; height: 100%; object-fit: cover;">
                             <img id="social-logo-overlay" src="" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); max-width: 60%; max-height: 20%; object-fit: contain;">
+                            <div id="social-name-text" style="position: absolute; top: 60%; left: 0; width: 100%; text-align: center; color: white; font-family: var(--font-header); font-size: 1.5rem; font-weight: bold; text-shadow: 1px 1px 4px rgba(0,0,0,0.8);"></div>
                         </div>
                     </div>
                     
@@ -673,6 +691,23 @@
     </footer>
 
     <script type="module">
+        // Configuration for graphic overlays
+        const graphicConfig = {
+            social: {
+                logo: { top: '50%', left: '50%', maxWidth: '60%', maxHeight: '20%' },
+                text: { top: '60%', left: '0', width: '100%', fontSize: '1.5rem', color: 'white' }
+            },
+            flyer: {
+                logo: { top: '15%', left: '50%', maxWidth: '60%', maxHeight: '15%' },
+                qr: { bottom: '20%', left: '50%', width: '35%' },
+                text: { bottom: '8%', left: '0', width: '100%', fontSize: '1.2rem', color: 'black' }
+            },
+            qrColors: {
+                foreground: '0F1626', // Dark blue
+                background: 'FFFFFF'  // White
+            }
+        };
+
         document.addEventListener('DOMContentLoaded', () => {
             const startBtn = document.getElementById('start-form-btn');
             const introSection = document.getElementById('step-intro');
@@ -699,11 +734,11 @@
 
             nextBtns.forEach(btn => {
                 btn.addEventListener('click', () => {
-                    // Very basic validation check before advancing
-                    const inputs = steps[currentStep].querySelectorAll('input[required], select[required]');
+                    // Validation check before advancing
+                    const inputs = steps[currentStep].querySelectorAll('input, select');
                     let isValid = true;
                     inputs.forEach(input => {
-                        if (!input.value) {
+                        if (!input.checkValidity()) {
                             input.reportValidity();
                             isValid = false;
                         }
@@ -751,26 +786,69 @@
                 
                 // Get form values
                 const bizName = document.getElementById('biz-name').value || 'Your Business';
-                const bizUrl = document.getElementById('biz-url').value || 'https://example.com';
+                const bizDistrict = document.getElementById('biz-district').value || 'District A';
                 
-                // Construct pseudo-unique venue id
+                // Construct pseudo-unique venue id and district page URL
                 const venueId = bizName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-                const checkInUrl = `${window.location.origin}/checkin.html?venue=${venueId}`;
+                let districtPage = 'index.html';
+                if (bizDistrict.startsWith('District')) {
+                    const letter = bizDistrict.split(' ')[1].toLowerCase();
+                    districtPage = `district-${letter}.html`;
+                }
+                const votingUrl = `${window.location.origin}/${districtPage}?vote=${venueId}`;
                 
                 // Fetch QR code
-                const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(checkInUrl)}&color=0F1626&bgcolor=FFFFFF`;
+                const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(votingUrl)}&color=${graphicConfig.qrColors.foreground}&bgcolor=${graphicConfig.qrColors.background}`;
 
                 // Set Graphic Previews
                 const formSuccess = document.getElementById('form-success');
                 const socialLogo = document.getElementById('social-logo-overlay');
+                const socialName = document.getElementById('social-name-text');
                 const flyerLogo = document.getElementById('flyer-logo-overlay');
                 const flyerQr = document.getElementById('flyer-qr-overlay');
                 const flyerName = document.getElementById('flyer-name-text');
 
-                socialLogo.src = logoDataUrl;
-                flyerLogo.src = logoDataUrl;
+                // Apply Config Styles
+                Object.assign(socialLogo.style, graphicConfig.social.logo);
+                Object.assign(socialName.style, graphicConfig.social.text);
+                Object.assign(flyerLogo.style, graphicConfig.flyer.logo);
+                Object.assign(flyerQr.style, graphicConfig.flyer.qr);
+                Object.assign(flyerName.style, graphicConfig.flyer.text);
+
+                if (logoDataUrl) {
+                    socialLogo.src = logoDataUrl;
+                    socialLogo.style.display = 'block';
+                    socialName.style.display = 'none'; // Hide text if logo exists
+                    flyerLogo.src = logoDataUrl;
+                    flyerLogo.style.display = 'block';
+                    flyerName.style.display = 'none'; // Hide text if logo exists
+                } else {
+                    socialLogo.style.display = 'none';
+                    socialName.textContent = bizName;
+                    socialName.style.display = 'block';
+                    flyerLogo.style.display = 'none';
+                    flyerName.textContent = bizName;
+                    flyerName.style.display = 'block';
+                }
+                
                 flyerQr.src = qrApiUrl;
-                flyerName.textContent = bizName;
+                
+                // Set Voting URL UI
+                const urlInput = document.getElementById('generated-voting-url');
+                urlInput.value = votingUrl;
+                
+                const copyBtn = document.getElementById('copy-link-btn');
+                copyBtn.addEventListener('click', () => {
+                    navigator.clipboard.writeText(votingUrl).then(() => {
+                        const originalText = copyBtn.textContent;
+                        copyBtn.textContent = 'Copied!';
+                        copyBtn.style.background = '#2f533a'; // Darker green
+                        setTimeout(() => {
+                            copyBtn.textContent = originalText;
+                            copyBtn.style.background = 'var(--brand-red)';
+                        }, 2000);
+                    });
+                });
 
                 // Hide form, show results
                 form.style.display = 'none';
