@@ -474,12 +474,12 @@
             <div class="promo-hero-visual">
                 <div class="cards-container">
                     <div class="hero-image-wrapper wrapper-1">
-                        <img src="assets/promo_vote_for_us_district_a.png" class="hero-image" alt="Social Media Graphic Preview">
+                        <img src="assets/Voter%20Share_draft1.PNG" class="hero-image" alt="Social Media Graphic Preview">
                         <div class="image-caption">Customized Social Media Story</div>
                     </div>
                     
                     <div class="hero-image-wrapper wrapper-2">
-                        <img src="assets/flyer_draft.png" class="hero-image" alt="Printable Flyer Preview">
+                            <img src="assets/Districts%20Standup%20Draft3.png" class="hero-image" alt="Printable Flyer Preview">
                         <div class="image-caption">Customized Printable Flyer</div>
                     </div>
                 </div>
@@ -542,7 +542,43 @@
                 
                 <!-- Step 1 -->
                 <div class="form-step" id="step-1">
-                    <h3>Step 1 of 4: Contact Information</h3>
+                    <h3>Step 1 of 4: Business Details</h3>
+                    
+                    <label for="biz-name">Business Name</label>
+                    <input type="text" id="biz-name" list="existing-businesses" placeholder="e.g., The Bulldog" required autocomplete="off">
+                    <datalist id="existing-businesses"></datalist>
+                    
+                    <div class="checkbox-group" style="margin-top: -10px; margin-bottom: 20px;">
+                        <label>
+                            <input type="checkbox" id="chk-new-business">
+                            This is a new business not currently on the map
+                        </label>
+                    </div>
+                    
+                    <label for="biz-address">Street Address</label>
+                    <input type="text" id="biz-address" placeholder="e.g., 123 Main St, New Orleans, LA 70112" required>
+                    
+                    <label for="biz-url">Business Website URL <span style="font-size: 0.9rem; font-weight: normal; color: var(--text-secondary); text-transform: none;">(Optional)</span></label>
+                    <input type="url" id="biz-url" placeholder="https://yourbusiness.com">
+                    
+                    <label for="op-relationship">Your Relationship to the Business</label>
+                    <select id="op-relationship" required>
+                        <option value="" disabled selected>Select Relationship...</option>
+                        <option value="Owner">Owner</option>
+                        <option value="Manager">Manager</option>
+                        <option value="Employee">Employee</option>
+                        <option value="Patron/Fan">Patron / Fan</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    
+                    <div style="margin-top: 20px;">
+                        <button type="button" class="brand-btn next-btn" style="background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); font-size: 1.2rem; padding: 15px 30px; border: none; cursor: pointer; color: white; border-radius: 8px;">Next</button>
+                    </div>
+                </div>
+                
+                <!-- Step 2 -->
+                <div class="form-step" id="step-2" style="display: none;">
+                    <h3>Step 2 of 4: Contact Information</h3>
                     
                     <label for="op-name">Your Name</label>
                     <input type="text" id="op-name" placeholder="e.g., Jane Doe" required>
@@ -552,24 +588,6 @@
                     
                     <label for="op-phone">Phone Number</label>
                     <input type="tel" id="op-phone" placeholder="e.g., (504) 555-0199" required>
-                    
-                    <div style="margin-top: 20px;">
-                        <button type="button" class="brand-btn next-btn" style="background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); font-size: 1.2rem; padding: 15px 30px; border: none; cursor: pointer; color: white; border-radius: 8px;">Next</button>
-                    </div>
-                </div>
-                
-                <!-- Step 2 -->
-                <div class="form-step" id="step-2" style="display: none;">
-                    <h3>Step 2 of 4: Business Details</h3>
-                    
-                    <label for="biz-name">Business Name</label>
-                    <input type="text" id="biz-name" placeholder="e.g., The Bulldog" required>
-                    
-                    <label for="biz-address">Street Address</label>
-                    <input type="text" id="biz-address" placeholder="e.g., 123 Main St, New Orleans, LA 70112" required>
-                    
-                    <label for="biz-url">Business Website URL <span style="font-size: 0.9rem; font-weight: normal; color: var(--text-secondary); text-transform: none;">(Optional)</span></label>
-                    <input type="url" id="biz-url" placeholder="https://yourbusiness.com">
                     
                     <div style="margin-top: 20px; display: flex; gap: 15px;">
                         <button type="button" class="brand-btn prev-btn" style="background: transparent; border: 2px solid var(--text-secondary); color: var(--text-secondary); font-size: 1.2rem; padding: 15px 30px; cursor: pointer; border-radius: 8px;">Back</button>
@@ -654,9 +672,9 @@
                         <h3 style="font-family: var(--font-header); color: var(--brand-red); font-size: 1.5rem; margin-bottom: 10px; text-transform: uppercase;">Social Media Story</h3>
                         <!-- A container for the composite image -->
                         <div id="social-composite" style="position: relative; width: 100%; max-width: 350px; aspect-ratio: 9/16; border-radius: 16px; border: 4px solid var(--text-primary); overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.6);">
-                            <img src="assets/promo_vote_for_us_district_a.png" style="width: 100%; height: 100%; object-fit: cover;">
-                            <img id="social-logo-overlay" src="" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); max-width: 60%; max-height: 20%; object-fit: contain;">
-                            <div id="social-name-text" style="position: absolute; top: 60%; left: 0; width: 100%; text-align: center; color: white; font-family: var(--font-header); font-size: 1.5rem; font-weight: bold; text-shadow: 1px 1px 4px rgba(0,0,0,0.8);"></div>
+                            <img src="assets/Voter%20Share_draft1.PNG" style="width: 100%; height: 100%; object-fit: cover;">
+                            <img id="social-logo-overlay" src="" style="position: absolute; object-fit: contain;">
+                            <div id="social-name-text" style="position: absolute; text-align: center; font-family: var(--font-header); font-weight: bold; text-shadow: 1px 1px 4px rgba(0,0,0,0.8);"></div>
                         </div>
                     </div>
                     
@@ -664,13 +682,13 @@
                         <h3 style="font-family: var(--font-header); color: var(--brand-red); font-size: 1.5rem; margin-bottom: 10px; text-transform: uppercase;">Printable Flyer</h3>
                         <div id="flyer-composite" style="position: relative; width: 100%; max-width: 350px; aspect-ratio: 8.5/11; background: white; border-radius: 16px; border: 4px solid var(--text-primary); overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.6);">
                             <!-- We can overlay the logo and QR code over the flyer background -->
-                            <img src="assets/flyer_draft.png" style="width: 100%; height: 100%; object-fit: cover;">
+                            <img src="assets/Districts%20Standup%20Draft3.png" style="width: 100%; height: 100%; object-fit: cover;">
                             <!-- Flyer Logo -->
-                            <img id="flyer-logo-overlay" src="" style="position: absolute; top: 15%; left: 50%; transform: translate(-50%, -50%); max-width: 60%; max-height: 15%; object-fit: contain;">
+                            <img id="flyer-logo-overlay" src="" style="position: absolute; object-fit: contain;">
                             <!-- Flyer QR Code -->
-                            <img id="flyer-qr-overlay" src="" style="position: absolute; bottom: 20%; left: 50%; transform: translate(-50%, 50%); width: 35%; aspect-ratio: 1/1;">
+                            <img id="flyer-qr-overlay" src="" style="position: absolute; aspect-ratio: 1/1;">
                             <!-- Flyer Text -->
-                            <div id="flyer-name-text" style="position: absolute; bottom: 8%; left: 0; width: 100%; text-align: center; color: black; font-family: var(--font-header); font-size: 1.2rem; font-weight: bold;"></div>
+                            <div id="flyer-name-text" style="position: absolute; text-align: center; font-family: var(--font-header); font-weight: bold;"></div>
                         </div>
                     </div>
                 </div>
@@ -694,17 +712,17 @@
         // Configuration for graphic overlays
         const graphicConfig = {
             social: {
-                logo: { top: '50%', left: '50%', maxWidth: '60%', maxHeight: '20%' },
-                text: { top: '60%', left: '0', width: '100%', fontSize: '1.5rem', color: 'white' }
+                logo: { top: '28%', left: '46%', maxWidth: '40%', maxHeight: '12%', transform: 'translate(0, -50%)' },
+                text: { top: '28%', left: '46%', width: '40%', fontSize: '1.3rem', color: '#8a2d24', transform: 'translate(0, -50%)', textAlign: 'left', whiteSpace: 'nowrap', textShadow: 'none' }
             },
             flyer: {
-                logo: { top: '15%', left: '50%', maxWidth: '60%', maxHeight: '15%' },
-                qr: { bottom: '20%', left: '50%', width: '35%' },
-                text: { bottom: '8%', left: '0', width: '100%', fontSize: '1.2rem', color: 'black' }
+                logo: { top: '71%', left: '14%', maxWidth: '35%', maxHeight: '12%', transform: 'translate(0, -50%)' },
+                qr: { bottom: '27%', left: '78%', width: '18%', transform: 'translate(-50%, 50%)' },
+                text: { top: '71%', left: '14%', width: '35%', fontSize: '1.2rem', color: '#8a2d24', transform: 'translate(0, -50%)', textAlign: 'left', whiteSpace: 'nowrap' }
             },
             qrColors: {
-                foreground: '0F1626', // Dark blue
-                background: 'FFFFFF'  // White
+                foreground: 'eecd7e', // Gold
+                background: '1F2937'  // Dark background to match flyer
             }
         };
 
@@ -720,6 +738,23 @@
             ];
             
             let currentStep = 0;
+
+            // Load existing venues for autocomplete
+            const datalist = document.getElementById('existing-businesses');
+            import('./js/firebase-config.js').then(async (module) => {
+                const { db } = module;
+                const { collection, getDocs } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
+                try {
+                    const querySnapshot = await getDocs(collection(db, "venues"));
+                    querySnapshot.forEach((doc) => {
+                        const option = document.createElement('option');
+                        option.value = doc.data().name;
+                        datalist.appendChild(option);
+                    });
+                } catch (error) {
+                    console.error("Error loading venues for autocomplete:", error);
+                }
+            }).catch(err => console.error("Firebase module not loaded for autocomplete", err));
 
             // Start button logic
             startBtn.addEventListener('click', () => {
