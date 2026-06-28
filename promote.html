@@ -448,28 +448,6 @@
             cursor: pointer;
             margin: 0;
         }
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-            #flyer-composite, #flyer-composite * {
-                visibility: visible;
-            }
-            #flyer-composite {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                max-width: none !important;
-                border: none !important;
-                box-shadow: none !important;
-                border-radius: 0 !important;
-            }
-            @page {
-                size: letter portrait;
-                margin: 0;
-            }
-        }
     </style>
 </head>
 <body>
@@ -720,8 +698,7 @@
                             <!-- Flyer Text -->
                             <div id="flyer-name-text" style="position: absolute; text-align: center; font-family: var(--font-header); font-weight: bold;"></div>
                         </div>
-                        <p style="text-align: center; color: var(--text-secondary); font-size: 0.9rem; margin-top: 10px;">Printable Flyer (8.5 x 11 in)</p>
-                        <button type="button" class="brand-btn" onclick="window.print()" style="background: transparent; border: 2px solid var(--text-secondary); color: var(--text-secondary); font-size: 1.2rem; padding: 15px 30px; cursor: pointer; border-radius: 8px; margin-top: 20px;">Save to Print</button>
+                        <p id="flyer-hint" style="text-align: center; color: var(--text-secondary); font-size: 0.9rem; margin-top: 10px;">Printable Flyer (8.5 x 11 in)</p>
                     </div>
                 </div>
             </div>
@@ -1120,8 +1097,9 @@
 
                         // 2. Update UI instantly with local data URLs (No CORS issues, works offline/locally)
                         const socialContainer = document.getElementById('social-composite').parentElement;
+                        const flyerContainer = document.getElementById('flyer-composite').parentElement;
                         
-                        // Create the download button using the local dataUrl
+                        // Create the download button for Social Story
                         const downloadSocialBtn = document.createElement('a');
                         downloadSocialBtn.href = socialDataUrl;
                         downloadSocialBtn.download = socialFilename;
@@ -1134,6 +1112,21 @@
                             socialHint.replaceWith(downloadSocialBtn);
                         } else {
                             socialContainer.appendChild(downloadSocialBtn);
+                        }
+
+                        // Create the download button for Printable Flyer
+                        const downloadFlyerBtn = document.createElement('a');
+                        downloadFlyerBtn.href = flyerDataUrl;
+                        downloadFlyerBtn.download = flyerFilename;
+                        downloadFlyerBtn.className = 'brand-btn';
+                        downloadFlyerBtn.style.cssText = 'display: inline-block; background: var(--brand-red); color: white; text-decoration: none; padding: 10px 20px; border-radius: 8px; margin-top: 15px; font-weight: bold; text-align: center; width: 100%; box-sizing: border-box; cursor: pointer;';
+                        downloadFlyerBtn.textContent = 'Download Printable Flyer';
+
+                        const flyerHint = flyerContainer.querySelector('#flyer-hint');
+                        if (flyerHint) {
+                            flyerHint.replaceWith(downloadFlyerBtn);
+                        } else {
+                            flyerContainer.appendChild(downloadFlyerBtn);
                         }
 
                         // Replace HTML composites with flat images. 
@@ -1149,9 +1142,6 @@
 
                         replaceWithFlatImage('social-composite', socialDataUrl);
                         replaceWithFlatImage('flyer-composite', flyerDataUrl);
-
-                        // Also force a download for the user immediately
-                        downloadSocialBtn.click();
 
                         // 3. Upload to Firebase & Google Sheets in the background
                         const { ref, uploadString, getDownloadURL } = await import('https://www.gstatic.com/firebasejs/10.9.0/firebase-storage.js');
