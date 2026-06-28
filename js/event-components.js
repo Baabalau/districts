@@ -290,7 +290,7 @@ function renderVotingModule(district) {
                                 <input type="text" id="share-url-input" readonly style="position: absolute; left: -9999px;" aria-hidden="true">
                                 <div style="text-align: left;">
                                     <button onclick="window.copyShareUrl()" style="padding: 8px 14px; background: #618A62; color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9rem; font-family: var(--font-main); transition: background 0.2s; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px;">
-                                        <div class="link-icon" style="width: 14px; height: 14px; background-color: var(--brand-gold); opacity: 0.8; -webkit-mask: url('assets/link.png') no-repeat center / contain; mask: url('assets/link.png') no-repeat center / contain;"></div> Copy Link
+                                        <div class="link-icon" style="width: 14px; height: 14px; background-color: var(--brand-gold); opacity: 0.8; -webkit-mask-image: url('assets/link.png'); -webkit-mask-size: contain; -webkit-mask-repeat: no-repeat; -webkit-mask-position: center; mask-image: url('assets/link.png'); mask-size: contain; mask-repeat: no-repeat; mask-position: center;"></div> Copy Link
                                     </button>
                                 </div>
                                 <p id="copy-success-msg" style="color: #7fd99a; font-family: var(--font-main); font-size: 0.85rem; margin: 8px 0 0 0; display: none; text-align: left;">Link copied to clipboard!</p>
