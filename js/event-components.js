@@ -267,7 +267,7 @@ function renderVotingModule(district) {
                     }
                     .share-modal-body {
                         flex-direction: row;
-                        align-items: center;
+                        align-items: flex-start;
                     }
                     .share-modal-instructions {
                         flex: 1;
@@ -281,7 +281,7 @@ function renderVotingModule(district) {
             <div id="share-modal" class="modal-overlay" style="display: none;">
                 <div class="modal-content share-content share-modal-content-box" style="padding: 25px 20px 20px 20px; background: #0F1626; max-height: 90vh; overflow-y: auto;">
                     <button class="close-modal" onclick="window.closeShareModal()" style="top: 20px; right: 20px;">×</button>
-                    <h2 id="share-modal-title" style="font-size: 1.6rem; margin-top: 0; margin-bottom: 15px; color: var(--text-primary); font-family: var(--font-hero); text-transform: uppercase; padding-right: 30px; line-height: 1.2;">Vote Confirmed!</h2>
+                    <h2 id="share-modal-title" style="font-size: 1.6rem; margin-top: 0; margin-bottom: 15px; color: var(--text-primary); font-family: var(--font-hero); padding-right: 30px; line-height: 1.2;">Vote Confirmed!</h2>
                     
                     <div class="share-modal-body">
                         <div class="share-modal-instructions">
@@ -289,20 +289,20 @@ function renderVotingModule(district) {
                                 <p style="color: var(--text-secondary); font-family: var(--font-main); font-size: 1.05rem; margin: 0 0 12px 0; line-height: 1.3;">Encourage friends to vote for this business, too! <b style="color: var(--brand-gold);">Save the image below & share as an Instagram story.</b> Use Instagram's text and sticker tools to add the business name and the link to vote for this business.</p>
                                 <input type="text" id="share-url-input" readonly style="position: absolute; left: -9999px;" aria-hidden="true">
                                 <div style="text-align: left;">
-                                    <button onclick="window.copyShareUrl()" style="padding: 10px 16px; background: #618A62; color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1rem; font-family: var(--font-main); transition: background 0.2s; white-space: nowrap;">Copy Link</button>
+                                    <button onclick="window.copyShareUrl()" style="padding: 8px 14px; background: #618A62; color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9rem; font-family: var(--font-main); transition: background 0.2s; white-space: nowrap;">Copy Link</button>
                                 </div>
                                 <p id="copy-success-msg" style="color: #7fd99a; font-family: var(--font-main); font-size: 0.85rem; margin: 8px 0 0 0; display: none; text-align: left;">Link copied to clipboard!</p>
                             </div>
                         </div>
 
                         <div class="share-modal-graphics" style="display: flex; justify-content: center; align-items: stretch; gap: 15px;">
-                            <div style="position: relative; width: 100%; max-width: 220px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); flex-shrink: 0;">
+                            <div style="position: relative; width: 100%; max-width: 220px; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.6); border: 2px solid var(--brand-gold); flex-shrink: 0;">
                                 <!-- The graphic is displayed directly without canvas modification -->
                                 <img id="generated-share-graphic" src="" alt="Your Custom Share Graphic" style="width: 100%; height: auto; display: block;">
                             </div>
                             
                             <div style="position: relative; display: flex; flex-direction: column; flex-grow: 1; max-width: 130px;">
-                                <p style="position: absolute; top: 0%; color: var(--brand-gold); font-family: var(--font-main); font-size: 0.9rem; font-weight: bold; line-height: 1.3; margin: 0;">Open image in Instagram as a Story</p>
+                                <p style="position: absolute; top: 0%; color: var(--brand-gold); font-family: var(--font-main); font-size: 0.9rem; font-weight: bold; line-height: 1.3; margin: 0;">&lt;&lt; Open image in Instagram as a Story</p>
                                 <p style="position: absolute; top: 35%; color: var(--brand-gold); font-family: var(--font-main); font-size: 0.9rem; font-weight: bold; line-height: 1.3; margin: 0;">&lt;&lt; Use Text Tool to place business name here</p>
                                 <p style="position: absolute; bottom: 12%; color: var(--brand-gold); font-family: var(--font-main); font-size: 0.9rem; font-weight: bold; line-height: 1.3; margin: 0;">&lt;&lt; Use sticker to copy/paste link here</p>
                             </div>
