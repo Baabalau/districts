@@ -256,9 +256,9 @@ function renderVotingModule(district) {
                     <button class="close-modal" onclick="window.closeShareModal()" style="top: 20px; right: 20px;">×</button>
                     <h2 id="share-modal-title" style="font-size: 1.6rem; margin-top: 0; margin-bottom: 15px; color: var(--text-primary); font-family: var(--font-hero); text-transform: uppercase; padding-right: 30px; line-height: 1.2;">Vote Confirmed!</h2>
                     
-                    <div style="background: rgba(255,255,255,0.05); padding: 10px 15px 15px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); text-align: left; margin-bottom: 20px;">
-                        <p style="color: var(--text-secondary); font-family: var(--font-main); font-size: 0.9rem; margin-bottom: 10px; line-height: 1.4;">Save image below & share as an Instagram story to recruit more votes!</p>
-                        <p style="color: var(--text-secondary); font-family: var(--font-main); font-size: 0.9rem; margin-bottom: 6px;">Add an Instagram Sticker with link to this URL:</p>
+                    <div style="background: rgba(255,255,255,0.05); padding: 8px 15px 12px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); text-align: left; margin-bottom: 15px;">
+                        <p style="color: var(--text-secondary); font-family: var(--font-main); font-size: 0.9rem; margin-bottom: 6px; line-height: 1.2;">Save image below & share as an Instagram story to recruit more votes!</p>
+                        <p style="color: var(--text-secondary); font-family: var(--font-main); font-size: 0.9rem; margin-bottom: 6px; line-height: 1.2;">Add an Instagram Sticker with link to this URL:</p>
                         <div style="display: flex; gap: 10px; align-items: center;">
                             <input type="text" id="share-url-input" readonly style="flex: 1; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--text-secondary); background: #182238; color: white; font-size: 0.8rem; outline: none; font-family: var(--font-main);">
                             <button onclick="window.copyShareUrl()" style="padding: 6px 12px; background: var(--brand-red); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.8rem; font-family: var(--font-main); transition: background 0.2s;">Copy</button>
@@ -266,15 +266,15 @@ function renderVotingModule(district) {
                         <p id="copy-success-msg" style="color: #7fd99a; font-family: var(--font-main); font-size: 0.75rem; margin-top: 6px; display: none; text-align: center;">Link copied to clipboard!</p>
                     </div>
 
-                    <div style="display: flex; justify-content: center; align-items: flex-end; gap: 15px; margin-bottom: 10px;">
+                    <div style="display: flex; justify-content: center; align-items: stretch; gap: 15px; margin-bottom: 10px;">
                         <div style="position: relative; width: 100%; max-width: 220px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); flex-shrink: 0;">
-                            <!-- The canvas will generate the final image, and we'll display it in this img tag so users can long-press to save -->
+                            <!-- The graphic is displayed directly without canvas modification -->
                             <img id="generated-share-graphic" src="" alt="Your Custom Share Graphic" style="width: 100%; height: auto; display: block;">
-                            <canvas id="share-canvas" width="1080" height="1920" style="display: none;"></canvas>
                         </div>
                         
-                        <div style="display: flex; flex-direction: column; align-items: flex-start; max-width: 130px; margin-bottom: 40px;">
-                            <p style="color: var(--brand-gold); font-family: var(--font-main); font-size: 0.9rem; font-weight: bold; line-height: 1.3; margin: 0;">&lt;&lt; Apply link sticker here</p>
+                        <div style="position: relative; display: flex; flex-direction: column; flex-grow: 1; max-width: 130px;">
+                            <p style="position: absolute; top: 28%; color: var(--brand-gold); font-family: var(--font-main); font-size: 0.9rem; font-weight: bold; line-height: 1.3; margin: 0;">&lt;&lt; Apply text with business name here</p>
+                            <p style="position: absolute; bottom: 12%; color: var(--brand-gold); font-family: var(--font-main); font-size: 0.9rem; font-weight: bold; line-height: 1.3; margin: 0;">&lt;&lt; Apply link sticker here</p>
                         </div>
                     </div>
                 </div>
@@ -596,58 +596,9 @@ class EventLayout extends HTMLElement {
             img.src = `assets/District%20Parings/VoteShare_${districtId}.png`;
             
             img.onload = () => {
-                // Draw the template
-                ctx.drawImage(img, 0, 0, 1080, 1920);
-                
-                // Configure text styling
-                ctx.font = 'bold 72px "Oswald", sans-serif';
-                ctx.fillStyle = '#8a2d24'; // Dark red color to match the design
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                
-                // Add a subtle drop shadow to the text to ensure readability
-                ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
-                ctx.shadowBlur = 4;
-                ctx.shadowOffsetX = 2;
-                ctx.shadowOffsetY = 2;
-                
-                // The coordinates for the "Type Business Name Here" box 
-                // (Estimated based on 1080x1920 IG story dimensions)
-                const textX = 1080 / 2 + 100; // Shifted slightly right to fit in the white box
-                const textY = 520; // Y-coordinate of the white box
-                
-                // Helper function to wrap text
-                const wrapText = (context, text, x, y, maxWidth, lineHeight) => {
-                    const words = text.split(' ');
-                    let line = '';
-                    let lines = [];
-
-                    for(let n = 0; n < words.length; n++) {
-                        const testLine = line + words[n] + ' ';
-                        const metrics = context.measureText(testLine);
-                        if (metrics.width > maxWidth && n > 0) {
-                            lines.push(line);
-                            line = words[n] + ' ';
-                        } else {
-                            line = testLine;
-                        }
-                    }
-                    lines.push(line);
-
-                    // Center the block of text vertically
-                    const totalHeight = lines.length * lineHeight;
-                    let startY = y - (totalHeight / 2) + (lineHeight / 2);
-
-                    for(let i = 0; i < lines.length; i++) {
-                        context.fillText(lines[i].trim(), x, startY + (i * lineHeight));
-                    }
-                };
-
-                // Draw the venue name onto the canvas, wrapping to 2 lines if necessary
-                // Max width of the white box is roughly 550px
-                wrapText(ctx, venueName.toUpperCase(), textX, textY, 550, 75);
-                
                 // Convert canvas to a data URL and set it as the image source
+                // We no longer draw the venue name on the graphic for the voter share modal
+                ctx.drawImage(img, 0, 0, 1080, 1920);
                 const dataUrl = canvas.toDataURL('image/png');
                 this.querySelector('#generated-share-graphic').src = dataUrl;
                 
