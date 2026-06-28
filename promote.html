@@ -711,6 +711,7 @@
         </div>
     </footer>
 
+    <script src="council_districts.js"></script>
     <script type="module">
         // Configuration for graphic overlays
         const graphicConfig = {
@@ -792,10 +793,12 @@
                         bizAddressInput.value = match[1];
                     }
                     bizAddressInput.disabled = true;
+                    bizAddressInput.required = false; // Not required manually if auto-filled
                 } else {
                     // Not an existing business (yet)
                     chkNewBusiness.disabled = false;
                     bizAddressInput.disabled = false;
+                    bizAddressInput.required = true; // Mandatory for new businesses
                 }
             });
 
@@ -854,6 +857,101 @@
                         logoDataUrl = readerEvent.target.result;
                     };
                     reader.readAsDataURL(file);
+                }
+            });
+
+            // Ray-casting algorithm for point in polygon
+            function isPointInPolygon(point, polygon) {
+                let x = point[0], y = point[1];
+                let inside = false;
+                for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+                    let xi = polygon[i][0], yi = polygon[i][1];
+                    let xj = polygon[j][0], yj = polygon[j][1];
+                    let intersect = ((yi > y) != (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+                    if (intersect) inside = !inside;
+                }
+                return inside;
+            }
+
+            function getDistrictFromCoordinates(lng, lat) {
+                if (!window.councilDistricts) return null;
+                
+                for (const feature of window.councilDistricts.features) {
+                    const geometry = feature.geometry;
+                    let isInside = false;
+                    
+                    if (geometry.type === 'Polygon') {
+                        // Check outer ring
+                        isInside = isPointInPolygon([lng, lat], geometry.coordinates[0]);
+                    } else if (geometry.type === 'MultiPolygon') {
+                        for (const polygon of geometry.coordinates) {
+                            if (isPointInPolygon([lng, lat], polygon[0])) {
+                                isInside = true;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if (isInside) {
+                        return `District ${feature.properties.DISTRICTID}`;
+                    }
+                }
+                return null;
+            }
+
+            // Auto-determine district via Geocoding when "Not Sure" is selected
+            const districtSelect = document.getElementById('biz-district');
+            districtSelect.addEventListener('change', async (e) => {
+                if (e.target.value === 'Not Sure') {
+                    const address = document.getElementById('biz-address').value;
+                    if (!address) {
+                        alert("Please enter a Street Address in Step 1 first so we can determine your district.");
+                        e.target.value = ""; // Reset selection
+                        return;
+                    }
+
+                    // Show loading state
+                    const originalOptions = Array.from(e.target.options);
+                    e.target.innerHTML = '<option value="Not Sure" selected>Locating your district...</option>';
+                    e.target.disabled = true;
+
+                    try {
+                        const query = encodeURIComponent(`${address}, New Orleans, LA`);
+                        const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`);
+                        const data = await response.json();
+
+                        // Restore options
+                        e.target.innerHTML = '';
+                        originalOptions.forEach(opt => e.target.appendChild(opt));
+                        e.target.disabled = false;
+
+                        if (data && data.length > 0) {
+                            const lat = parseFloat(data[0].lat);
+                            const lng = parseFloat(data[0].lon);
+                            
+                            const foundDistrict = getDistrictFromCoordinates(lng, lat);
+                            
+                            if (foundDistrict) {
+                                e.target.value = foundDistrict;
+                                alert(`Found it! Your business is located in ${foundDistrict}.`);
+                            } else {
+                                alert("We found the address, but it appears to be outside the New Orleans council districts. Please select manually.");
+                                e.target.value = "";
+                            }
+                        } else {
+                            alert("We couldn't find that exact address. Please try adjusting it in Step 1, or select your district manually.");
+                            e.target.value = "";
+                        }
+                    } catch (error) {
+                        console.error("Geocoding error:", error);
+                        // Restore options
+                        e.target.innerHTML = '';
+                        originalOptions.forEach(opt => e.target.appendChild(opt));
+                        e.target.disabled = false;
+                        
+                        alert("There was an error looking up the address. Please select your district manually.");
+                        e.target.value = "";
+                    }
                 }
             });
 
