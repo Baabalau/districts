@@ -38,7 +38,7 @@ function renderVotingModule(district) {
                     <div class="map-filters-inner" style="width: 100%; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: nowrap; gap: 30px;">
                         
                         <div style="display: flex; align-items: center; gap: 20px; padding-right: 30px; border-right: 1px solid rgba(255,255,255,0.2); flex-shrink: 0;">
-                            <span id="legend-round-name" style="color: var(--brand-gold); font-family: var(--font-hero); font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap;">Round 1</span>
+                            <span id="legend-round-name" style="color: var(--text-primary); font-family: var(--font-hero); font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap;">Round 1</span>
                             <div class="countdown-clock small-clock" style="margin: 0; flex-wrap: nowrap;">
                                 <div class="time-box" style="padding: 6px 12px; min-width: 50px;"><span style="font-size: 2rem; line-height: 1;">02</span><label style="font-size: 0.7rem;">Days</label></div>
                                 <div class="time-box" style="padding: 6px 12px; min-width: 50px;"><span style="font-size: 2rem; line-height: 1;">14</span><label style="font-size: 0.7rem;">Hrs</label></div>
@@ -92,7 +92,7 @@ function renderVotingModule(district) {
                         <p style="font-size: 1.1rem; color: var(--text-secondary);">Where are we ending the night? The polls open 14 days before the event.</p>
                     </div>
                     <div class="instruction-box" style="padding: 15px 20px; max-width: 700px; margin: 0 auto 20px auto; text-align: left; background: rgba(15, 22, 38, 0.5);">
-                        <h3 style="margin-bottom: 10px; font-size: 1.1rem; color: var(--brand-gold);">How it works</h3>
+                        <h3 style="margin-bottom: 10px; font-size: 1.1rem; color: var(--text-primary);">How it works</h3>
                         <ul style="margin: 0; padding-left: 20px; font-size: 0.95rem;">
                             <li style="margin-bottom: 5px;"><strong>Round 1:</strong> Voting opens for all districts when the press release drops. Vote for your favorite neighborhood spots. The top 5 advance.</li>
                             <li style="margin-bottom: 5px;"><strong>The Run-Off:</strong> Starts the Monday before the event at 3:00 PM. A final sprint to decide the winner among the top 5.</li>
@@ -114,7 +114,7 @@ function renderVotingModule(district) {
                     <p style="text-align: center; color: var(--text-secondary); margin-bottom: 15px; font-size: 0.9rem;">Use the numbers on the map above to locate venues.</p>
                     
                     <div class="leaderboard" style="margin-bottom: 20px;">
-                        <h3 style="color: var(--brand-gold); font-family: var(--font-hero); font-size: 1.2rem; margin-bottom: 10px; text-transform: uppercase;">Current Leaders</h3>
+                        <h3 style="color: var(--text-primary); font-family: var(--font-hero); font-size: 1.2rem; margin-bottom: 10px; text-transform: uppercase;">Current Leaders</h3>
                         <div class="leaderboard-bar 1st" style="margin-bottom: 6px;">
                             <div class="bar-fill" style="width: 85%;"></div>
                             <div class="bar-content" style="padding: 6px 12px;">
@@ -168,7 +168,7 @@ function renderVotingModule(district) {
                         <p>It's down to the wire! The polls close in:</p>
                     </div>
                     <div class="leaderboard" style="margin-bottom: 20px;">
-                        <h3 style="color: var(--brand-gold); font-family: var(--font-hero); font-size: 1.2rem; margin-bottom: 10px; text-transform: uppercase;">Current Leaders</h3>
+                        <h3 style="color: var(--text-primary); font-family: var(--font-hero); font-size: 1.2rem; margin-bottom: 10px; text-transform: uppercase;">Current Leaders</h3>
                         <div class="leaderboard-bar 1st" style="margin-bottom: 6px;">
                             <div class="bar-fill" style="width: 85%;"></div>
                             <div class="bar-content" style="padding: 6px 12px;">
@@ -251,31 +251,65 @@ function renderVotingModule(district) {
                 </div>
             </div>
 
+            <style>
+                .share-modal-content-box {
+                    max-width: 480px;
+                    width: 90%;
+                }
+                .share-modal-body {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 25px;
+                }
+                @media (min-width: 768px) {
+                    .share-modal-content-box {
+                        max-width: 750px !important;
+                    }
+                    .share-modal-body {
+                        flex-direction: row;
+                        align-items: flex-start;
+                    }
+                    .share-modal-instructions {
+                        flex: 0 0 38%;
+                    }
+                    .share-modal-graphics {
+                        flex: 1;
+                        justify-content: flex-start !important;
+                    }
+                }
+            </style>
             <div id="share-modal" class="modal-overlay" style="display: none;">
-                <div class="modal-content share-content" style="padding: 20px 15px; background: #0F1626; max-width: 400px; max-height: 90vh; overflow-y: auto;">
-                    <button class="close-modal" onclick="window.closeShareModal()">×</button>
-                    <h2 style="font-size: 1.6rem; margin-bottom: 5px; color: var(--text-primary); font-family: var(--font-hero); text-transform: uppercase;">Vote Confirmed!</h2>
-                    <p style="color: var(--text-secondary); margin-bottom: 15px; font-size: 0.95rem;">Save this graphic and share it to your Instagram Story to rally more votes!</p>
+                <div class="modal-content share-content share-modal-content-box" style="padding: 25px 20px 20px 20px; background: #0F1626; max-height: 90vh; overflow-y: auto;">
+                    <button class="close-modal" onclick="window.closeShareModal()" style="top: 20px; right: 20px;">×</button>
+                    <h2 id="share-modal-title" style="font-size: 1.6rem; margin-top: 0; margin-bottom: 25px; color: var(--text-primary); font-family: var(--font-hero); padding-right: 30px; line-height: 1.2;">Vote Confirmed!</h2>
                     
-                    <div style="position: relative; width: 100%; max-width: 220px; margin: 0 auto 15px auto; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-                        <!-- The canvas will generate the final image, and we'll display it in this img tag so users can long-press to save -->
-                        <img id="generated-share-graphic" src="" alt="Your Custom Share Graphic" style="width: 100%; height: auto; display: block;">
-                        <canvas id="share-canvas" width="1080" height="1920" style="display: none;"></canvas>
-                    </div>
-                    
-                    <a id="download-graphic-btn" href="#" download="districts_votefor_business.png" class="brand-btn" style="display: block; text-align: center; margin-bottom: 15px; text-decoration: none; padding: 12px;">Download Graphic</a>
-                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 15px; font-style: italic;">Mobile: Tap Download, or long-press the image to save.</p>
-                    
-                    <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); text-align: left;">
-                        <p style="color: var(--text-primary); font-weight: bold; margin-bottom: 8px; font-size: 0.9rem;">Add this link to your Instagram Link Sticker:</p>
-                        <div style="display: flex; gap: 10px; align-items: center;">
-                            <input type="text" id="share-url-input" readonly style="flex: 1; padding: 8px; border-radius: 4px; border: 1px solid var(--text-secondary); background: #182238; color: white; font-size: 0.8rem; outline: none;">
-                            <button onclick="window.copyShareUrl()" style="padding: 8px 12px; background: var(--brand-red); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.8rem; transition: background 0.2s;">Copy</button>
+                    <div class="share-modal-body">
+                        <div class="share-modal-instructions">
+                            <div style="background: rgba(255,255,255,0.05); padding: 12px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); text-align: left; margin-bottom: 0;">
+                                <p style="color: var(--text-secondary); font-family: var(--font-main); font-size: 1.05rem; margin: 0 0 12px 0; line-height: 1.3;">Encourage friends to vote for this business, too! <b style="color: var(--text-primary);">Save the image below & share as an Instagram story.</b> Use Instagram's text and sticker tools to add the business name and the link to vote for this business.</p>
+                                <input type="text" id="share-url-input" readonly style="position: absolute; left: -9999px;" aria-hidden="true">
+                                <div style="text-align: left;">
+                                    <button onclick="window.copyShareUrl()" style="padding: 8px 14px; background: #618A62; color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9rem; font-family: var(--font-main); transition: background 0.2s; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px;">
+                                        <img class="link-icon" src="assets/link.png" alt="" style="width: 14px; height: 14px; object-fit: contain; filter: brightness(0) saturate(100%) invert(72%) sepia(21%) saturate(942%) hue-rotate(354deg) brightness(91%) contrast(88%); opacity: 0.8; transition: all 0.2s ease;"> Copy Link
+                                    </button>
+                                </div>
+                                <p id="copy-success-msg" style="color: #7fd99a; font-family: var(--font-main); font-size: 0.85rem; margin: 8px 0 0 0; display: none; text-align: left;">Link copied to clipboard!</p>
+                            </div>
                         </div>
-                        <p id="copy-success-msg" style="color: #7fd99a; font-size: 0.8rem; margin-top: 8px; display: none; text-align: center;">Link copied to clipboard!</p>
-                    </div>
 
-                    <button class="brand-btn" style="width: 100%; margin-bottom: 5px; padding: 10px;" onclick="window.closeShareModal()">Done</button>
+                        <div class="share-modal-graphics" style="display: flex; justify-content: center; align-items: stretch; gap: 15px;">
+                            <div style="position: relative; width: 100%; max-width: 220px; flex-shrink: 0;">
+                                <!-- The graphic is displayed directly without canvas modification -->
+                                <img id="generated-share-graphic" src="" alt="Your Custom Share Graphic" style="width: 100%; height: auto; display: block; border: 2px solid var(--text-primary); border-radius: 12px; box-sizing: border-box; box-shadow: 0 8px 24px rgba(0,0,0,0.6);">
+                            </div>
+                            
+                            <div style="position: relative; display: flex; flex-direction: column; flex-grow: 1; max-width: 130px;">
+                                <p style="position: absolute; top: 0%; color: var(--text-primary); font-family: var(--font-main); font-size: 0.9rem; font-weight: bold; line-height: 1.3; margin: 0;">&lt;&lt; Open image in Instagram as a Story</p>
+                                <p style="position: absolute; top: 35%; color: var(--text-primary); font-family: var(--font-main); font-size: 0.9rem; font-weight: bold; line-height: 1.3; margin: 0;">&lt;&lt; Use Text Tool to place business name here</p>
+                                <p style="position: absolute; bottom: 12%; color: var(--text-primary); font-family: var(--font-main); font-size: 0.9rem; font-weight: bold; line-height: 1.3; margin: 0;">&lt;&lt; Use sticker to copy/paste link here</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>`;
 }
@@ -558,100 +592,39 @@ class EventLayout extends HTMLElement {
             }
             this.querySelector('#vote-modal').style.display = 'none';
             
-            // Generate the custom graphic using Canvas
-            const canvas = this.querySelector('#share-canvas');
-            const ctx = canvas.getContext('2d');
-            const img = new Image();
-            img.crossOrigin = "anonymous";
+            // Get the venue details
+            const modal = this.querySelector('#vote-modal');
+            const venueName = modal.dataset.venueName || "A LOCAL BUSINESS";
+            const venueId = modal.dataset.venueId || "";
             
-            // Load the base template graphic
-            img.src = 'assets/Voter%20Share_draft1.PNG';
+            // Determine district from URL
+            const path = window.location.pathname;
+            const match = path.match(/district-([a-e])\.html/i);
+            const districtId = match ? match[1].toUpperCase() : 'B';
+
+            // Personalize the success message with the venue name
+            const titleEl = this.querySelector('#share-modal-title');
+            if (titleEl) {
+                // Capitalize only the first letter of the sentence, keep venue name as is
+                titleEl.innerHTML = `Vote for <span style="text-transform: uppercase;">${venueName}</span> confirmed!`;
+                titleEl.style.textTransform = 'none'; // Override the CSS uppercase
+            }
+
+            // Generate the deep link URL for this specific venue immediately
+            const shareUrl = window.location.origin + window.location.pathname + '?vote=' + encodeURIComponent(venueId) + '&name=' + encodeURIComponent(venueName);
+            const urlInput = this.querySelector('#share-url-input');
+            if (urlInput) {
+                urlInput.value = shareUrl;
+            }
             
-            img.onload = () => {
-                // Draw the template
-                ctx.drawImage(img, 0, 0, 1080, 1920);
-                
-                // Get the venue name from the modal dataset
-                const modal = this.querySelector('#vote-modal');
-                const venueName = modal.dataset.venueName || "A LOCAL BUSINESS";
-                const venueId = modal.dataset.venueId || "";
-                
-                // Configure text styling
-                ctx.font = 'bold 72px "Oswald", sans-serif';
-                ctx.fillStyle = '#8a2d24'; // Dark red color to match the design
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                
-                // Add a subtle drop shadow to the text to ensure readability
-                ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
-                ctx.shadowBlur = 4;
-                ctx.shadowOffsetX = 2;
-                ctx.shadowOffsetY = 2;
-                
-                // The coordinates for the "Type Business Name Here" box 
-                // (Estimated based on 1080x1920 IG story dimensions)
-                const textX = 1080 / 2 + 100; // Shifted slightly right to fit in the white box
-                const textY = 520; // Y-coordinate of the white box
-                
-                // Helper function to wrap text
-                const wrapText = (context, text, x, y, maxWidth, lineHeight) => {
-                    const words = text.split(' ');
-                    let line = '';
-                    let lines = [];
-
-                    for(let n = 0; n < words.length; n++) {
-                        const testLine = line + words[n] + ' ';
-                        const metrics = context.measureText(testLine);
-                        if (metrics.width > maxWidth && n > 0) {
-                            lines.push(line);
-                            line = words[n] + ' ';
-                        } else {
-                            line = testLine;
-                        }
-                    }
-                    lines.push(line);
-
-                    // Center the block of text vertically
-                    const totalHeight = lines.length * lineHeight;
-                    let startY = y - (totalHeight / 2) + (lineHeight / 2);
-
-                    for(let i = 0; i < lines.length; i++) {
-                        context.fillText(lines[i].trim(), x, startY + (i * lineHeight));
-                    }
-                };
-
-                // Draw the venue name onto the canvas, wrapping to 2 lines if necessary
-                // Max width of the white box is roughly 550px
-                wrapText(ctx, venueName.toUpperCase(), textX, textY, 550, 75);
-                
-                // Convert canvas to a data URL and set it as the image source
-                const dataUrl = canvas.toDataURL('image/png');
-                this.querySelector('#generated-share-graphic').src = dataUrl;
-                
-                // Set up the explicit download button with the custom filename
-                const downloadBtn = this.querySelector('#download-graphic-btn');
-                if (downloadBtn) {
-                    downloadBtn.href = dataUrl;
-                    const safeName = venueName.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_');
-                    downloadBtn.download = `districts_votefor_${safeName}.png`;
-                }
-                
-                // Generate the deep link URL for this specific venue
-                const shareUrl = window.location.origin + window.location.pathname + '?vote=' + encodeURIComponent(venueId) + '&name=' + encodeURIComponent(venueName);
-                const urlInput = this.querySelector('#share-url-input');
-                if (urlInput) {
-                    urlInput.value = shareUrl;
-                }
-                
-                // Show the modal
-                this.querySelector('#share-modal').style.display = 'flex';
-            };
+            // Set the image source directly without using canvas
+            const imgEl = this.querySelector('#generated-share-graphic');
+            if (imgEl) {
+                imgEl.src = `assets/District%20Parings/VoteShare_${districtId}.png`;
+            }
             
-            // Fallback in case image fails to load
-            img.onerror = () => {
-                console.error("Failed to load share graphic template.");
-                this.querySelector('#share-modal').style.display = 'flex';
-            };
+            // Show the modal
+            this.querySelector('#share-modal').style.display = 'flex';
         };
 
         window.closeShareModal = () => {
@@ -661,15 +634,35 @@ class EventLayout extends HTMLElement {
         window.copyShareUrl = () => {
             const urlInput = this.querySelector('#share-url-input');
             if (urlInput) {
-                urlInput.select();
-                urlInput.setSelectionRange(0, 99999); // For mobile devices
                 navigator.clipboard.writeText(urlInput.value).then(() => {
+                    const btn = this.querySelector('button[onclick="window.copyShareUrl()"]');
+                    const icon = btn ? btn.querySelector('.link-icon') : null;
                     const successMsg = this.querySelector('#copy-success-msg');
-                    if (successMsg) {
-                        successMsg.style.display = 'block';
+                    
+                    if (btn) {
+                        const origBg = btn.style.background;
+                        const origBorder = btn.style.borderColor;
+                        btn.style.background = '#618A62';
+                        btn.style.borderColor = '#618A62';
+                        
+                        if (icon) {
+                            icon.dataset.origFilter = icon.style.filter;
+                            icon.dataset.origOp = icon.style.opacity;
+                            icon.style.filter = 'brightness(0) saturate(100%) invert(100%)';
+                            icon.style.opacity = '1';
+                        }
+                        
+                        if (successMsg) successMsg.style.display = 'block';
+                        
                         setTimeout(() => {
-                            successMsg.style.display = 'none';
-                        }, 3000);
+                            if (successMsg) successMsg.style.display = 'none';
+                            btn.style.background = origBg;
+                            btn.style.borderColor = origBorder;
+                            if (icon) {
+                                icon.style.filter = icon.dataset.origFilter;
+                                icon.style.opacity = icon.dataset.origOp;
+                            }
+                        }, 2000);
                     }
                 }).catch(err => {
                     console.error('Failed to copy text: ', err);
@@ -700,15 +693,24 @@ class EventLayout extends HTMLElement {
         setTimeout(() => {
             const urlParams = new URLSearchParams(window.location.search);
             const voteTarget = urlParams.get('vote');
-            const venueName = urlParams.get('name') || voteTarget;
             
             if (voteTarget) {
-                const isPreVoting = this.querySelector('#state-pre-voting')?.style.display !== 'none';
-                const isPostElection = this.querySelector('#state-post-election')?.style.display !== 'none';
-
-                if (!isPreVoting && !isPostElection) {
-                    window.openVoteModal(voteTarget, venueName);
-                }
+                // We want to open the map popup for this venue, not just the vote modal directly.
+                // The map rendering is asynchronous, so we wait for the markers to be populated.
+                const checkMapInterval = setInterval(() => {
+                    if (window.openMapPopupForVenue) {
+                        clearInterval(checkMapInterval);
+                        window.openMapPopupForVenue(voteTarget);
+                        // Also scroll to the map
+                        const mapSection = document.getElementById('map-section');
+                        if (mapSection) {
+                            mapSection.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    }
+                }, 200);
+                
+                // Fallback: clear interval after 5 seconds if map fails to load
+                setTimeout(() => clearInterval(checkMapInterval), 5000);
             }
         }, 150);
     }
