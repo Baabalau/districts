@@ -254,8 +254,8 @@ function renderVotingModule(district) {
             <div id="share-modal" class="modal-overlay" style="display: none;">
                 <div class="modal-content share-content" style="padding: 20px 15px; background: #0F1626; max-width: 400px; max-height: 90vh; overflow-y: auto;">
                     <button class="close-modal" onclick="window.closeShareModal()">×</button>
-                    <h2 style="font-size: 1.6rem; margin-bottom: 5px; color: var(--text-primary); font-family: var(--font-hero); text-transform: uppercase;">Vote Confirmed!</h2>
-                    <p style="color: var(--text-secondary); margin-bottom: 15px; font-size: 0.95rem;">Save this graphic and share it to your Instagram Story to rally more votes!</p>
+                    <h2 id="share-modal-title" style="font-size: 1.6rem; margin-bottom: 5px; color: var(--text-primary); font-family: var(--font-hero); text-transform: uppercase;">Vote Confirmed!</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 15px; font-size: 0.95rem;">Save this graphic and share it to your Instagram Story to rally more votes! <strong>Add text for the business name and a sticker for the link.</strong></p>
                     
                     <div style="position: relative; width: 100%; max-width: 220px; margin: 0 auto 15px auto; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
                         <!-- The canvas will generate the final image, and we'll display it in this img tag so users can long-press to save -->
@@ -274,8 +274,6 @@ function renderVotingModule(district) {
                         </div>
                         <p id="copy-success-msg" style="color: #7fd99a; font-size: 0.8rem; margin-top: 8px; display: none; text-align: center;">Link copied to clipboard!</p>
                     </div>
-
-                    <button class="brand-btn" style="width: 100%; margin-bottom: 5px; padding: 10px;" onclick="window.closeShareModal()">Done</button>
                 </div>
             </div>`;
 }
@@ -558,23 +556,45 @@ class EventLayout extends HTMLElement {
             }
             this.querySelector('#vote-modal').style.display = 'none';
             
+            // Get the venue details
+            const modal = this.querySelector('#vote-modal');
+            const venueName = modal.dataset.venueName || "A LOCAL BUSINESS";
+            const venueId = modal.dataset.venueId || "";
+            
+            // Determine district from URL
+            const path = window.location.pathname;
+            const match = path.match(/district-([a-e])\.html/i);
+            const districtId = match ? match[1].toUpperCase() : 'B';
+
+            // Personalize the success message if we have the user's name
+            const titleEl = this.querySelector('#share-modal-title');
+            if (titleEl) {
+                let firstName = "";
+                if (currentUser && currentUser.displayName) {
+                    firstName = ", " + currentUser.displayName.split(' ')[0];
+                }
+                titleEl.innerText = `Vote Confirmed${firstName}!`;
+            }
+
+            // Generate the deep link URL for this specific venue immediately
+            const shareUrl = window.location.origin + window.location.pathname + '?vote=' + encodeURIComponent(venueId) + '&name=' + encodeURIComponent(venueName);
+            const urlInput = this.querySelector('#share-url-input');
+            if (urlInput) {
+                urlInput.value = shareUrl;
+            }
+            
             // Generate the custom graphic using Canvas
             const canvas = this.querySelector('#share-canvas');
             const ctx = canvas.getContext('2d');
             const img = new Image();
             img.crossOrigin = "anonymous";
             
-            // Load the base template graphic
-            img.src = 'assets/Voter%20Share_draft1.PNG';
+            // Load the district-specific template graphic
+            img.src = `assets/District%20Parings/VoteShare_${districtId}.png`;
             
             img.onload = () => {
                 // Draw the template
                 ctx.drawImage(img, 0, 0, 1080, 1920);
-                
-                // Get the venue name from the modal dataset
-                const modal = this.querySelector('#vote-modal');
-                const venueName = modal.dataset.venueName || "A LOCAL BUSINESS";
-                const venueId = modal.dataset.venueId || "";
                 
                 // Configure text styling
                 ctx.font = 'bold 72px "Oswald", sans-serif';
@@ -634,13 +654,6 @@ class EventLayout extends HTMLElement {
                     downloadBtn.href = dataUrl;
                     const safeName = venueName.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_');
                     downloadBtn.download = `districts_votefor_${safeName}.png`;
-                }
-                
-                // Generate the deep link URL for this specific venue
-                const shareUrl = window.location.origin + window.location.pathname + '?vote=' + encodeURIComponent(venueId) + '&name=' + encodeURIComponent(venueName);
-                const urlInput = this.querySelector('#share-url-input');
-                if (urlInput) {
-                    urlInput.value = shareUrl;
                 }
                 
                 // Show the modal
