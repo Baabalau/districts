@@ -72,11 +72,11 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 80px 0;
+    padding: 40px 0 80px;
     width: 80%;
     max-width: 1400px;
     margin: 0 auto;
-    min-height: 70vh;
+    min-height: 50vh;
 }
 
 @media (max-width: 900px) {

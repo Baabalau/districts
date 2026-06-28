@@ -23,7 +23,7 @@
         }
 
         .promo-hero {
-            padding: 40px var(--promo-gutter) 80px;
+            padding: 10px var(--promo-gutter) 80px;
             background: linear-gradient(rgba(15, 22, 38, 0.92), rgba(15, 22, 38, 0.98)), url('https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover;
             border-bottom: 4px solid var(--text-primary);
             display: flex;
@@ -124,7 +124,7 @@
         @media (min-width: 992px) {
             .promo-hero-inner {
                 flex-direction: row;
-                align-items: center;
+                align-items: flex-start;
                 justify-content: center;
                 gap: clamp(40px, 6vw, 80px);
             }
@@ -138,7 +138,7 @@
                 margin-top: 0;
                 margin-bottom: 12px;
                 justify-content: center;
-                transform: translateY(-8px);
+                transform: translateY(48px);
             }
 
             .cards-container {
