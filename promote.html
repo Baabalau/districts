@@ -444,6 +444,28 @@
             cursor: pointer;
             margin: 0;
         }
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #flyer-composite, #flyer-composite * {
+                visibility: visible;
+            }
+            #flyer-composite {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                max-width: none !important;
+                border: none !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+            }
+            @page {
+                size: letter portrait;
+                margin: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -670,22 +692,23 @@
                     </div>
                 </div>
                 
-                <div style="display: flex; flex-wrap: wrap; gap: 40px; justify-content: flex-start;">
-                    <div class="preview-item" style="max-width: 350px;">
+                <div style="display: flex; flex-wrap: wrap; gap: 40px; justify-content: flex-start; align-items: flex-start;">
+                    <div class="preview-item" style="max-width: 300px;">
                         <h3 style="font-family: var(--font-header); color: var(--brand-red); font-size: 1.5rem; margin-bottom: 10px; text-transform: uppercase;">Social Media Story</h3>
                         <!-- A container for the composite image -->
-                        <div id="social-composite" style="position: relative; width: 100%; max-width: 350px; aspect-ratio: 9/16; border-radius: 16px; border: 4px solid var(--text-primary); overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.6);">
-                            <img src="assets/Voter%20Share_draft1.PNG" style="width: 100%; height: 100%; object-fit: cover;">
+                        <div id="social-composite" style="position: relative; width: 100%; max-width: 300px; aspect-ratio: 9/16; border-radius: 16px; border: 4px solid var(--text-primary); overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.6);">
+                            <img id="social-base-img" src="assets/Voter%20Share_draft1.PNG" style="width: 100%; height: 100%; object-fit: cover;">
                             <img id="social-logo-overlay" src="" style="position: absolute; object-fit: contain;">
                             <div id="social-name-text" style="position: absolute; text-align: center; font-family: var(--font-header); font-weight: bold; text-shadow: 1px 1px 4px rgba(0,0,0,0.8);"></div>
                         </div>
+                        <p style="text-align: center; color: var(--text-secondary); font-size: 0.9rem; margin-top: 10px;">Digital Story (9:16)</p>
                     </div>
                     
-                    <div class="preview-item" style="max-width: 350px;">
-                        <h3 style="font-family: var(--font-header); color: var(--brand-red); font-size: 1.5rem; margin-bottom: 10px; text-transform: uppercase;">Printable Flyer</h3>
-                        <div id="flyer-composite" style="position: relative; width: 100%; max-width: 350px; aspect-ratio: 8.5/11; background: white; border-radius: 16px; border: 4px solid var(--text-primary); overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.6);">
+                    <div class="preview-item" style="max-width: 450px; display: flex; flex-direction: column; align-items: center;">
+                        <h3 style="font-family: var(--font-header); color: var(--brand-red); font-size: 1.5rem; margin-bottom: 10px; text-transform: uppercase; align-self: flex-start;">Printable Flyer</h3>
+                        <div id="flyer-composite" style="position: relative; width: 100%; max-width: 450px; aspect-ratio: 8.5/11; background: white; border-radius: 16px; border: 4px solid var(--text-primary); overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.6);">
                             <!-- We can overlay the logo and QR code over the flyer background -->
-                            <img src="assets/Districts%20Standup%20Draft3.png" style="width: 100%; height: 100%; object-fit: cover;">
+                            <img id="flyer-base-img" src="assets/Districts%20Standup%20Draft3.png" style="width: 100%; height: 100%; object-fit: cover;">
                             <!-- Flyer Logo -->
                             <img id="flyer-logo-overlay" src="" style="position: absolute; object-fit: contain;">
                             <!-- Flyer QR Code -->
@@ -693,9 +716,10 @@
                             <!-- Flyer Text -->
                             <div id="flyer-name-text" style="position: absolute; text-align: center; font-family: var(--font-header); font-weight: bold;"></div>
                         </div>
+                        <p style="text-align: center; color: var(--text-secondary); font-size: 0.9rem; margin-top: 10px;">Printable Flyer (8.5 x 11 in)</p>
+                        <button type="button" class="brand-btn" onclick="window.print()" style="background: transparent; border: 2px solid var(--text-secondary); color: var(--text-secondary); font-size: 1.2rem; padding: 15px 30px; cursor: pointer; border-radius: 8px; margin-top: 20px;">Save to Print</button>
                     </div>
                 </div>
-                <button type="button" class="brand-btn" onclick="window.print()" style="background: transparent; border: 2px solid var(--text-secondary); color: var(--text-secondary); font-size: 1.2rem; padding: 15px 30px; cursor: pointer; border-radius: 8px; margin-top: 40px;">Print Flyer</button>
             </div>
         </div>
 
@@ -716,13 +740,13 @@
         // Configuration for graphic overlays
         const graphicConfig = {
             social: {
-                logo: { top: '28%', left: '46%', maxWidth: '40%', maxHeight: '12%', transform: 'translate(0, -50%)' },
-                text: { top: '28%', left: '46%', width: '40%', fontSize: '1.3rem', color: '#8a2d24', transform: 'translate(0, -50%)', textAlign: 'left', whiteSpace: 'nowrap', textShadow: 'none' }
+                logo: { top: '70%', left: '30%', maxWidth: '40%', maxHeight: '12%', transform: 'translate(0, -50%)' },
+                text: { top: '70%', left: '30%', width: '40%', fontSize: '1.2rem', color: '#8a2d24', transform: 'translate(0, -50%)', textAlign: 'left', whiteSpace: 'nowrap', textShadow: 'none' }
             },
             flyer: {
-                logo: { top: '71%', left: '14%', maxWidth: '35%', maxHeight: '12%', transform: 'translate(0, -50%)' },
+                logo: { top: '71%', left: '12%', maxWidth: '35%', maxHeight: '12%', transform: 'translate(0, -50%)' },
                 qr: { bottom: '27%', left: '78%', width: '18%', transform: 'translate(-50%, 50%)' },
-                text: { top: '71%', left: '14%', width: '35%', fontSize: '1.2rem', color: '#8a2d24', transform: 'translate(0, -50%)', textAlign: 'left', whiteSpace: 'nowrap' }
+                text: { top: '71%', left: '12%', width: '35%', fontSize: '1.1rem', color: '#8a2d24', transform: 'translate(0, -50%)', textAlign: 'left', whiteSpace: 'nowrap' }
             },
             qrColors: {
                 foreground: 'eecd7e', // Gold
@@ -973,9 +997,10 @@
                 // Construct pseudo-unique venue id and district page URL
                 const venueId = bizName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
                 let districtPage = 'index.html';
+                let districtLetter = 'A';
                 if (bizDistrict.startsWith('District')) {
-                    const letter = bizDistrict.split(' ')[1].toLowerCase();
-                    districtPage = `district-${letter}.html`;
+                    districtLetter = bizDistrict.split(' ')[1].toUpperCase();
+                    districtPage = `district-${districtLetter.toLowerCase()}.html`;
                 }
                 const votingUrl = `${window.location.origin}/${districtPage}?vote=${venueId}`;
                 
@@ -1023,11 +1048,17 @@
 
                 // Set Graphic Previews
                 const formSuccess = document.getElementById('form-success');
+                const socialBaseImg = document.getElementById('social-base-img');
+                const flyerBaseImg = document.getElementById('flyer-base-img');
                 const socialLogo = document.getElementById('social-logo-overlay');
                 const socialName = document.getElementById('social-name-text');
                 const flyerLogo = document.getElementById('flyer-logo-overlay');
                 const flyerQr = document.getElementById('flyer-qr-overlay');
                 const flyerName = document.getElementById('flyer-name-text');
+
+                // Update base images based on district
+                socialBaseImg.src = `assets/District Parings/BIZ Promo_${districtLetter}.png`;
+                flyerBaseImg.src = `assets/Districts_Standup_Flyer/Districts_Standup_${districtLetter}.png`;
 
                 // Apply Config Styles
                 Object.assign(socialLogo.style, graphicConfig.social.logo);
