@@ -626,23 +626,26 @@
                     <div class="checkbox-group">
                         <label>
                             <input type="checkbox" id="chk-good-standing">
-                            I confirm this business is in good standing with the City of New Orleans.
+                            This business is licensed to operate in the City of New Orleans.
                         </label>
                     </div>
 
                     <div class="checkbox-group">
                         <label>
                             <input type="checkbox" id="chk-host">
-                            I would like my business to host our council district's event.
+                            Yes, our business would like to host District [B]'s final stop of the night on [Tuesday, July 28th]
                         </label>
                     </div>
 
                     <div class="checkbox-group">
                         <label>
                             <input type="checkbox" id="chk-opt-out">
-                            Please remove my business from this website and affiliated communications.
+                            Please remove our business from this website and affiliated promotions.
                         </label>
                     </div>
+                    
+                    <label for="op-comments" style="margin-top: 15px;">Additional Comments or Questions <span style="font-size: 0.9rem; font-weight: normal; color: var(--text-secondary); text-transform: none;">(Optional)</span></label>
+                    <textarea id="op-comments" rows="4" placeholder="Anything else we should know?" style="width: 100%; padding: 16px; margin-bottom: 20px; border-radius: 8px; border: 2px solid var(--text-secondary); background: rgba(255,255,255,0.05); color: white; font-family: inherit; resize: vertical;"></textarea>
                     
                     <div style="margin-top: 20px; display: flex; gap: 15px;">
                         <button type="button" class="brand-btn prev-btn" style="background: transparent; border: 2px solid var(--text-secondary); color: var(--text-secondary); font-size: 1.2rem; padding: 15px 30px; cursor: pointer; border-radius: 8px;">Back</button>
@@ -739,22 +742,62 @@
             
             let currentStep = 0;
 
+            // Map to store venue names and their Firebase IDs
+            const venueMap = new Map();
+
             // Load existing venues for autocomplete
             const datalist = document.getElementById('existing-businesses');
             import('./js/firebase-config.js').then(async (module) => {
                 const { db } = module;
-                const { collection, getDocs } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
+                const { collection, getDocs } = await import('https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js');
                 try {
                     const querySnapshot = await getDocs(collection(db, "venues"));
                     querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        const venueName = data.name;
+                        const venueAddress = data.address;
+                        
+                        // Append address in parentheses if it exists to differentiate franchises
+                        let dropdownLabel = venueName;
+                        if (venueAddress) {
+                            dropdownLabel = `${venueName} (${venueAddress})`;
+                        }
+
                         const option = document.createElement('option');
-                        option.value = doc.data().name;
+                        option.value = dropdownLabel;
                         datalist.appendChild(option);
+                        
+                        // Store the mapping using the full label so it's unique
+                        venueMap.set(dropdownLabel, doc.id);
                     });
                 } catch (error) {
                     console.error("Error loading venues for autocomplete:", error);
                 }
             }).catch(err => console.error("Firebase module not loaded for autocomplete", err));
+
+            // Auto-deactivate fields if an existing business is selected
+            const bizNameInput = document.getElementById('biz-name');
+            const chkNewBusiness = document.getElementById('chk-new-business');
+            const bizAddressInput = document.getElementById('biz-address');
+
+            bizNameInput.addEventListener('input', () => {
+                if (venueMap.has(bizNameInput.value)) {
+                    // It's an existing business
+                    chkNewBusiness.checked = false;
+                    chkNewBusiness.disabled = true;
+                    
+                    // Extract address from parentheses and auto-fill
+                    const match = bizNameInput.value.match(/\((.*)\)$/);
+                    if (match) {
+                        bizAddressInput.value = match[1];
+                    }
+                    bizAddressInput.disabled = true;
+                } else {
+                    // Not an existing business (yet)
+                    chkNewBusiness.disabled = false;
+                    bizAddressInput.disabled = false;
+                }
+            });
 
             // Start button logic
             startBtn.addEventListener('click', () => {
@@ -820,8 +863,14 @@
                 e.preventDefault();
                 
                 // Get form values
-                const bizName = document.getElementById('biz-name').value || 'Your Business';
+                const rawBizName = document.getElementById('biz-name').value || 'Your Business';
                 const bizDistrict = document.getElementById('biz-district').value || 'District A';
+                
+                // Check if this business matches an existing Firebase ID using the raw input
+                const matchedVenueId = venueMap.get(rawBizName) || null;
+
+                // Clean the business name for graphics (remove the address in parentheses if it exists)
+                const bizName = rawBizName.replace(/\s*\(.*\)$/, '').trim();
                 
                 // Construct pseudo-unique venue id and district page URL
                 const venueId = bizName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
@@ -831,6 +880,45 @@
                     districtPage = `district-${letter}.html`;
                 }
                 const votingUrl = `${window.location.origin}/${districtPage}?vote=${venueId}`;
+                
+                // Prepare data for Google Apps Script Web App
+                const formData = {
+                    bizName: bizName,
+                    matchedVenueId: matchedVenueId,
+                    isNewBusiness: document.getElementById('chk-new-business').checked,
+                    bizAddress: document.getElementById('biz-address').value,
+                    bizUrl: document.getElementById('biz-url').value,
+                    opRelationship: document.getElementById('op-relationship').value,
+                    opName: document.getElementById('op-name').value,
+                    opEmail: document.getElementById('op-email').value,
+                    opPhone: document.getElementById('op-phone').value,
+                    bizDistrict: bizDistrict,
+                    chkGoodStanding: document.getElementById('chk-good-standing').checked,
+                    chkHost: document.getElementById('chk-host').checked,
+                    chkOptOut: document.getElementById('chk-opt-out').checked,
+                    opComments: document.getElementById('op-comments').value
+                };
+
+                // Send data to Google Sheets via Web App
+                // NOTE: Replace YOUR_WEB_APP_URL with the actual URL after deploying the Apps Script
+                const scriptUrl = 'https://script.google.com/macros/s/AKfycbyiZ-stBQhmx-vq4KYt8ACGq8ahKJieh8lbelzxafCT5ICSiVuMTR0YXgof14MMhCP9/exec';
+                
+                if (scriptUrl !== 'YOUR_WEB_APP_URL') {
+                    fetch(scriptUrl, {
+                        method: 'POST',
+                        mode: 'no-cors', // no-cors is often needed for simple Google Apps Script submissions
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    }).then(() => {
+                        console.log("Form data sent to Google Sheets");
+                    }).catch(error => {
+                        console.error("Error sending form data:", error);
+                    });
+                } else {
+                    console.log("Form data ready to be pushed to Google Sheets:", formData);
+                }
                 
                 // Fetch QR code
                 const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(votingUrl)}&color=${graphicConfig.qrColors.foreground}&bgcolor=${graphicConfig.qrColors.background}`;
@@ -888,9 +976,6 @@
                 // Hide form, show results
                 form.style.display = 'none';
                 formSuccess.style.display = 'block';
-
-                // Send data to backend / webhook here if necessary
-                console.log("Form data ready to be pushed to backend/Google Sheets");
             });
         });
     </script>
