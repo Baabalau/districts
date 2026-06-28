@@ -290,7 +290,7 @@ function renderVotingModule(district) {
                                 <input type="text" id="share-url-input" readonly style="position: absolute; left: -9999px;" aria-hidden="true">
                                 <div style="text-align: left;">
                                     <button onclick="window.copyShareUrl()" style="padding: 8px 14px; background: #618A62; color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9rem; font-family: var(--font-main); transition: background 0.2s; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px;">
-                                        <img src="assets/link.png" alt="" style="width: 14px; height: 14px; object-fit: contain;"> Copy Link
+                                        <div class="link-icon" style="width: 14px; height: 14px; background-color: var(--brand-gold); opacity: 0.8; -webkit-mask: url('assets/link.png') no-repeat center / contain; mask: url('assets/link.png') no-repeat center / contain;"></div> Copy Link
                                     </button>
                                 </div>
                                 <p id="copy-success-msg" style="color: #7fd99a; font-family: var(--font-main); font-size: 0.85rem; margin: 8px 0 0 0; display: none; text-align: left;">Link copied to clipboard!</p>
@@ -605,7 +605,9 @@ class EventLayout extends HTMLElement {
             // Personalize the success message with the venue name
             const titleEl = this.querySelector('#share-modal-title');
             if (titleEl) {
-                titleEl.innerText = `Vote for ${venueName} confirmed!`;
+                // Capitalize only the first letter of the sentence, keep venue name as is
+                titleEl.innerHTML = `Vote for <span style="text-transform: uppercase;">${venueName}</span> confirmed!`;
+                titleEl.style.textTransform = 'none'; // Override the CSS uppercase
             }
 
             // Generate the deep link URL for this specific venue immediately
@@ -632,14 +634,35 @@ class EventLayout extends HTMLElement {
         window.copyShareUrl = () => {
             const urlInput = this.querySelector('#share-url-input');
             if (urlInput) {
-                // Since input is hidden, we don't need to select it. Just write the value directly.
                 navigator.clipboard.writeText(urlInput.value).then(() => {
+                    const btn = this.querySelector('button[onclick="window.copyShareUrl()"]');
+                    const icon = btn ? btn.querySelector('.link-icon') : null;
                     const successMsg = this.querySelector('#copy-success-msg');
-                    if (successMsg) {
-                        successMsg.style.display = 'block';
+                    
+                    if (btn) {
+                        const origBg = btn.style.background;
+                        const origBorder = btn.style.borderColor;
+                        btn.style.background = '#618A62';
+                        btn.style.borderColor = '#618A62';
+                        
+                        if (icon) {
+                            icon.dataset.origBg = icon.style.backgroundColor;
+                            icon.dataset.origOp = icon.style.opacity;
+                            icon.style.backgroundColor = '#ffffff';
+                            icon.style.opacity = '1';
+                        }
+                        
+                        if (successMsg) successMsg.style.display = 'block';
+                        
                         setTimeout(() => {
-                            successMsg.style.display = 'none';
-                        }, 3000);
+                            if (successMsg) successMsg.style.display = 'none';
+                            btn.style.background = origBg;
+                            btn.style.borderColor = origBorder;
+                            if (icon) {
+                                icon.style.backgroundColor = icon.dataset.origBg;
+                                icon.style.opacity = icon.dataset.origOp;
+                            }
+                        }, 2000);
                     }
                 }).catch(err => {
                     console.error('Failed to copy text: ', err);
