@@ -265,11 +265,18 @@
                                     stepFinalize.innerHTML = "⏳ Finalizing check-in..."; 
                                     stepFinalize.style.color = "var(--text-primary)";
                                     
-                                    // Finalize Firestore Data
-                                    await finalizeCheckIn(venueId, venueName, user, userData, isFirstVisit, visitCount, downloadURL);
-                                    
-                                    stepFinalize.innerHTML = "✅ Check-in complete!"; 
-                                    stepFinalize.style.color = "var(--brand-red)";
+                                    try {
+                                        // Finalize Firestore Data
+                                        await finalizeCheckIn(venueId, venueName, user, userData, isFirstVisit, visitCount, downloadURL);
+                                        
+                                        stepFinalize.innerHTML = "✅ Check-in complete!"; 
+                                        stepFinalize.style.color = "var(--brand-red)";
+                                    } catch (firestoreError) {
+                                        console.error("Firestore finalize failed", firestoreError);
+                                        const errMsg = firestoreError.message ? firestoreError.message : firestoreError;
+                                        stepFinalize.innerHTML = `❌ Database error <span style="display:block; font-size: 0.8rem; margin-top:4px; opacity:0.8;">(${errMsg})</span>`; 
+                                        stepFinalize.style.color = "#ff6b6b";
+                                    }
                                     
                                 } catch (uploadError) {
                                     console.error("Upload failed", uploadError);
@@ -300,7 +307,7 @@
                         stepFinalize.style.color = "var(--brand-red)";
                     } catch (err) {
                         console.error("Finalize error", err);
-                        stepFinalize.innerHTML = "❌ Finalization failed."; 
+                        stepFinalize.innerHTML = `❌ Finalization failed <span style="display:block; font-size: 0.8rem; margin-top:4px; opacity:0.8;">(${err.message || err})</span>`; 
                         stepFinalize.style.color = "#ff6b6b";
                     }
                 });
