@@ -256,9 +256,8 @@ function renderVotingModule(district) {
                     <button class="close-modal" onclick="window.closeShareModal()" style="top: 20px; right: 20px;">×</button>
                     <h2 id="share-modal-title" style="font-size: 1.6rem; margin-top: 0; margin-bottom: 15px; color: var(--text-primary); font-family: var(--font-hero); text-transform: uppercase; padding-right: 30px; line-height: 1.2;">Vote Confirmed!</h2>
                     
-                    <div style="background: rgba(255,255,255,0.05); padding: 8px 15px 12px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); text-align: left; margin-bottom: 15px;">
-                        <p style="color: var(--text-secondary); font-family: var(--font-main); font-size: 0.9rem; margin-bottom: 6px; line-height: 1.2;">Encourage friends to vote for this business, too! Save the image below to share as an Instagram story.</p>
-                        <p id="share-modal-instruction" style="color: var(--text-secondary); font-family: var(--font-main); font-size: 0.9rem; margin-bottom: 6px; line-height: 1.2;">Just add the business name and this link direct to where they can vote for [business name]</p>
+                    <div style="background: rgba(255,255,255,0.05); padding: 0 15px 12px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); text-align: left; margin-bottom: 15px;">
+                        <p style="color: var(--text-secondary); font-family: var(--font-main); font-size: 0.9rem; margin-top: 8px; margin-bottom: 8px; line-height: 1.2;">Encourage friends to vote for this business, too! <b>Save the image below & share as an Instagram story.</b> Use Instagram's text and sticker tools to add the business name and the link to vote for this business.</p>
                         <div style="display: flex; gap: 10px; align-items: center;">
                             <input type="text" id="share-url-input" readonly style="flex: 1; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--text-secondary); background: #182238; color: white; font-size: 0.8rem; outline: none; font-family: var(--font-main);">
                             <button onclick="window.copyShareUrl()" style="padding: 6px 12px; background: var(--brand-red); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.8rem; font-family: var(--font-main); transition: background 0.2s;">Copy</button>
@@ -577,12 +576,6 @@ class EventLayout extends HTMLElement {
                     firstName = ", " + currentUser.displayName.split(' ')[0];
                 }
                 titleEl.innerText = `Vote Confirmed${firstName}!`;
-            }
-
-            // Update the instruction text dynamically with the venue name
-            const instructionEl = this.querySelector('#share-modal-instruction');
-            if (instructionEl) {
-                instructionEl.innerText = `Just add the business name and this link direct to where they can vote for ${venueName}`;
             }
 
             // Generate the deep link URL for this specific venue immediately
