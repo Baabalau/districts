@@ -285,15 +285,19 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <div style="width: 320px; font-family: 'EB Garamond', Georgia, serif; text-align: left; padding: 10px 4px 2px;">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px; position: relative;">
                         <h4 style="margin: 0; color: var(--text-primary); font-family: 'EB Garamond', Georgia, serif; font-size: 1.6rem; text-transform: uppercase; line-height: 1.1; padding-right: 10px;">${place.name || 'Unnamed Venue'}</h4>
-                        <button onclick="navigator.clipboard.writeText('${venueShareUrl}'); const msg = this.nextElementSibling; msg.style.display='block'; setTimeout(() => msg.style.display='none', 2000);" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s;" title="Copy direct link to this venue">
-                            <img src="assets/link.svg" alt="Copy Link" style="width: 16px; height: 16px; object-fit: contain;">
-                        </button>
-                        <span style="display: none; position: absolute; top: -25px; right: 0; background: var(--brand-gold); color: #0F1626; font-family: var(--font-main); font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; font-weight: bold; white-space: nowrap;">Link Copied!</span>
                     </div>
                     ${place.address ? `<p style="margin: 0 0 8px 0; font-size: 1rem; color: var(--text-secondary); line-height: 1.3;">${place.address}</p>` : ''}
                     <p style="margin: 0 0 ${hasRealDescription ? '8px' : '20px'} 0; font-size: 1.1rem; color: var(--text-secondary); text-transform: capitalize; font-style: italic;">${place.type ? place.type.replace('_', ' ') : 'Venue'}</p>
                     ${hasRealDescription ? `<p style="margin: 0 0 20px 0; font-size: 0.95rem; color: var(--text-primary); line-height: 1.4;">${place.description}</p>` : ''}
-                    <button class="brand-btn" style="width: 100%; padding: 14px 10px; font-size: 1.1rem; white-space: nowrap; text-align: center; letter-spacing: 1px; display: block; box-sizing: border-box;" onclick="window.openVoteModal('${place.id}', '${place.name.replace(/'/g, "\\'")}')">Vote for this Venue</button>
+                    <div style="display: flex; gap: 10px; align-items: center; margin-top: 15px;">
+                        <button class="brand-btn" style="flex: 1; padding: 14px 15px; font-size: 1.1rem; white-space: nowrap; text-align: left; letter-spacing: 1px; box-sizing: border-box;" onclick="window.openVoteModal('${place.id}', '${place.name.replace(/'/g, "\\'")}')">Vote For This Business</button>
+                        <div style="position: relative;">
+                            <button onclick="navigator.clipboard.writeText('${venueShareUrl}'); const msg = this.nextElementSibling; msg.style.display='block'; setTimeout(() => msg.style.display='none', 2000);" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; width: 44px; height: 44px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s;" title="Copy direct link to this venue">
+                                <img src="assets/link.png" alt="Copy Link" style="width: 18px; height: 18px; object-fit: contain;">
+                            </button>
+                            <span style="display: none; position: absolute; bottom: 100%; right: 0; margin-bottom: 8px; background: var(--brand-gold); color: #0F1626; font-family: var(--font-main); font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; font-weight: bold; white-space: nowrap;">Link Copied!</span>
+                        </div>
+                    </div>
                 </div>
             `;
             
