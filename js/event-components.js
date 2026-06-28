@@ -254,10 +254,19 @@ function renderVotingModule(district) {
             <div id="share-modal" class="modal-overlay" style="display: none;">
                 <div class="modal-content share-content" style="padding: 25px 20px 20px 20px; background: #0F1626; max-width: 480px; max-height: 90vh; overflow-y: auto;">
                     <button class="close-modal" onclick="window.closeShareModal()" style="top: 20px; right: 20px;">×</button>
-                    <h2 id="share-modal-title" style="font-size: 1.6rem; margin-top: 0; margin-bottom: 8px; color: var(--text-primary); font-family: var(--font-hero); text-transform: uppercase; padding-right: 30px; line-height: 1.2;">Vote Confirmed!</h2>
-                    <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.95rem;">Save this image & share as an Instagram story to recruit more votes!</p>
+                    <h2 id="share-modal-title" style="font-size: 1.6rem; margin-top: 0; margin-bottom: 15px; color: var(--text-primary); font-family: var(--font-hero); text-transform: uppercase; padding-right: 30px; line-height: 1.2;">Vote Confirmed!</h2>
                     
-                    <div style="display: flex; justify-content: center; align-items: flex-end; gap: 15px; margin-bottom: 20px;">
+                    <div style="background: rgba(255,255,255,0.05); padding: 12px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); text-align: left; margin-bottom: 20px;">
+                        <p style="color: var(--text-secondary); margin-bottom: 12px; font-size: 0.95rem; line-height: 1.4;">Save this image & share as an Instagram story to recruit more votes! <strong>Add text for the business name and a sticker for the link.</strong></p>
+                        <p style="color: var(--text-primary); font-weight: bold; margin-bottom: 6px; font-size: 0.85rem;">Add this link to your Instagram Link Sticker:</p>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="text" id="share-url-input" readonly style="flex: 1; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--text-secondary); background: #182238; color: white; font-size: 0.8rem; outline: none;">
+                            <button onclick="window.copyShareUrl()" style="padding: 6px 12px; background: var(--brand-red); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.8rem; transition: background 0.2s;">Copy</button>
+                        </div>
+                        <p id="copy-success-msg" style="color: #7fd99a; font-size: 0.75rem; margin-top: 6px; display: none; text-align: center;">Link copied to clipboard!</p>
+                    </div>
+
+                    <div style="display: flex; justify-content: center; align-items: flex-end; gap: 15px; margin-bottom: 10px;">
                         <div style="position: relative; width: 100%; max-width: 220px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); flex-shrink: 0;">
                             <!-- The canvas will generate the final image, and we'll display it in this img tag so users can long-press to save -->
                             <img id="generated-share-graphic" src="" alt="Your Custom Share Graphic" style="width: 100%; height: auto; display: block;">
@@ -265,21 +274,12 @@ function renderVotingModule(district) {
                         </div>
                         
                         <div style="display: flex; flex-direction: column; align-items: flex-start; max-width: 130px; margin-bottom: 40px;">
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--brand-gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 8px; margin-left: -10px; transform: rotate(-15deg);">
-                                <path d="M9 14L4 9l5-5"/>
-                                <path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5v4.5"/>
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--brand-gold)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 8px; margin-left: -15px; transform: rotate(-15deg) scaleX(-1);">
+                                <path d="M10 14L3 9l7-5"/>
+                                <path d="M3 9h12.5a5.5 5.5 0 0 1 5.5 5.5v4.5"/>
                             </svg>
                             <p style="color: var(--brand-gold); font-family: var(--font-main); font-size: 0.85rem; font-weight: bold; line-height: 1.3; margin: 0;">Apply a link sticker in Instagram here</p>
                         </div>
-                    </div>
-                    
-                    <div style="background: rgba(255,255,255,0.05); padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); text-align: left;">
-                        <p style="color: var(--text-primary); font-weight: bold; margin-bottom: 6px; font-size: 0.85rem;">Add this link to your Instagram Link Sticker:</p>
-                        <div style="display: flex; gap: 10px; align-items: center;">
-                            <input type="text" id="share-url-input" readonly style="flex: 1; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--text-secondary); background: #182238; color: white; font-size: 0.8rem; outline: none;">
-                            <button onclick="window.copyShareUrl()" style="padding: 6px 12px; background: var(--brand-red); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.8rem; transition: background 0.2s;">Copy</button>
-                        </div>
-                        <p id="copy-success-msg" style="color: #7fd99a; font-size: 0.75rem; margin-top: 6px; display: none; text-align: center;">Link copied to clipboard!</p>
                     </div>
                 </div>
             </div>`;
