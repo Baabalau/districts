@@ -8,9 +8,22 @@
     <link rel="stylesheet" href="css/district-page.css">
     <link rel="stylesheet" href="css/event-styles.css">
     <link rel="stylesheet" href="css/site-footer.css">
+    
+    <!-- html2canvas for flattening composite images -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
     <style>
+        :root {
+            --promo-gutter: clamp(32px, 6vw, 80px);
+        }
+
+        nav {
+            padding-left: var(--promo-gutter);
+            padding-right: var(--promo-gutter);
+        }
+
         .promo-hero {
-            padding: 100px 20px 80px;
+            padding: 10px var(--promo-gutter) 80px;
             background: linear-gradient(rgba(15, 22, 38, 0.92), rgba(15, 22, 38, 0.98)), url('https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover;
             border-bottom: 4px solid var(--text-primary);
             display: flex;
@@ -21,6 +34,7 @@
             width: 100%;
             max-width: 1280px;
             margin: 0 auto;
+            padding-inline: clamp(16px, 2vw, 40px);
             display: flex;
             flex-direction: column;
             align-items: flex-start;
@@ -48,41 +62,61 @@
 
         .cards-container {
             position: relative;
-            width: 320px;
-            height: 450px;
+            width: 300px;
+            height: 400px;
         }
 
-        .cards-container img.hero-image {
+        .cards-container .hero-image-wrapper {
             position: absolute;
-            width: 260px;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), z-index 0.4s;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .cards-container .hero-image-wrapper img.hero-image {
+            width: 240px;
             height: auto;
             border-radius: 16px;
             border: 4px solid var(--text-primary);
             box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), z-index 0.4s;
-            cursor: pointer;
         }
 
-        .cards-container img.hero-image.image-1 {
-            top: 20px;
+        .cards-container .hero-image-wrapper .image-caption {
+            font-family: var(--font-header);
+            color: var(--brand-red);
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            text-shadow: 1px 1px 0px rgba(0,0,0,0.8);
+            text-align: center;
+            margin-top: 10px;
+            background: rgba(15, 22, 38, 0.8);
+            padding: 5px 15px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .cards-container .hero-image-wrapper.wrapper-1 {
+            top: 10px;
             left: 0;
             transform: rotate(-8deg);
-            z-index: 1;
-        }
-
-        .cards-container img.hero-image.image-2 {
-            top: 60px;
-            left: 60px;
-            transform: rotate(5deg);
             z-index: 2;
         }
 
-        .cards-container img.hero-image.image-1:hover {
+        .cards-container .hero-image-wrapper.wrapper-2 {
+            top: 50px;
+            left: 50px;
+            transform: rotate(5deg);
+            z-index: 1;
+        }
+
+        .cards-container .hero-image-wrapper.wrapper-1:hover {
             transform: rotate(-12deg) translateY(-20px) scale(1.05);
             z-index: 3;
         }
 
-        .cards-container img.hero-image.image-2:hover {
+        .cards-container .hero-image-wrapper.wrapper-2:hover {
             transform: rotate(8deg) translateY(-20px) scale(1.05);
             z-index: 3;
         }
@@ -90,9 +124,9 @@
         @media (min-width: 992px) {
             .promo-hero-inner {
                 flex-direction: row;
-                align-items: center;
-                justify-content: space-between;
-                gap: 60px;
+                align-items: flex-start;
+                justify-content: center;
+                gap: clamp(40px, 6vw, 80px);
             }
             
             .promo-hero-content {
@@ -102,26 +136,71 @@
             .promo-hero-visual {
                 flex: 1;
                 margin-top: 0;
-                justify-content: flex-end;
+                margin-bottom: 12px;
+                justify-content: center;
+                transform: translateY(48px);
             }
 
             .cards-container {
-                width: 400px;
-                height: 500px;
+                width: 360px;
+                height: 420px;
             }
             
-            .cards-container img.hero-image {
-                width: 320px;
+            .cards-container .hero-image-wrapper img.hero-image {
+                width: 280px;
             }
             
-            .cards-container img.hero-image.image-1 {
-                top: 20px;
+            .cards-container .hero-image-wrapper.wrapper-1 {
+                top: 10px;
                 left: 0;
             }
 
-            .cards-container img.hero-image.image-2 {
-                top: 80px;
-                left: 60px;
+            .cards-container .hero-image-wrapper.wrapper-2 {
+                top: 55px;
+                left: 50px;
+            }
+        }
+        
+        @media (max-width: 991px) {
+            .promo-hero-inner {
+                flex-direction: column;
+                align-items: center;
+            }
+            .promo-hero-content {
+                text-align: center;
+                margin-bottom: 20px;
+            }
+            .subtitle {
+                text-align: center;
+                margin: 20px auto 40px;
+            }
+            .subtitle-follow {
+                text-align: center;
+            }
+            .promo-hero-visual {
+                justify-content: center;
+                margin-top: 40px;
+                margin-bottom: 16px;
+            }
+            .cards-container {
+                width: 300px;
+                height: 400px;
+            }
+            .cards-container .hero-image-wrapper img.hero-image {
+                width: 240px;
+            }
+            .cards-container .hero-image-wrapper.wrapper-1 {
+                top: 10px;
+                left: 0;
+            }
+            .cards-container .hero-image-wrapper.wrapper-2 {
+                top: 50px;
+                left: 50px;
+            }
+            .promo-hero .title-3d {
+                font-size: clamp(2.5rem, 8vw, 4rem);
+                margin-bottom: 20px;
+                text-align: center;
             }
         }
         
@@ -152,9 +231,9 @@
         /* Elevated Previews Showcase replaced by overlapping cards layout */
 
         .content-container {
-            max-width: 1200px;
+            max-width: 1280px;
             margin: 0 auto 80px;
-            padding: 0 20px;
+            padding: 0 var(--promo-gutter);
         }
 
         /* Simplified Instructions */
@@ -162,7 +241,7 @@
             background: var(--bg-secondary);
             border: 2px solid var(--text-primary);
             border-radius: 16px;
-            padding: 40px 60px;
+            padding: 40px clamp(24px, 4vw, 60px);
             margin-bottom: 80px;
             box-shadow: 0 15px 40px rgba(0,0,0,0.4);
         }
@@ -290,30 +369,38 @@
             background: linear-gradient(135deg, var(--bg-primary), #1a2336);
             border: 4px solid var(--brand-red);
             border-radius: 16px;
-            padding: 40px 60px;
+            padding: 24px clamp(24px, 4vw, 60px) 40px;
             text-align: left;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
 
-        .generator-tool h2 {
-            font-family: var(--font-header);
-            font-size: 2rem;
-            color: var(--text-primary);
-            margin-bottom: 15px;
-            text-transform: uppercase;
-        }
-
         .generator-form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
             max-width: 600px;
             margin: 30px 0 0;
         }
 
-        .generator-form input, .generator-form select {
-            padding: 18px;
+        .form-step {
+            display: block;
+        }
+
+        .form-step h3 {
+            font-family: var(--font-header);
+            font-size: 1.5rem;
+            color: white;
+            background-color: var(--brand-red);
+            margin-top: 0;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            padding: 12px 20px;
             border-radius: 8px;
+            letter-spacing: 0.05em;
+        }
+
+        .generator-form input:not([type="checkbox"]), .generator-form select {
+            width: 100%;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
             border: 2px solid var(--text-secondary);
             background: white;
             font-size: 1.2rem;
@@ -324,10 +411,12 @@
         .custom-google-form label {
             color: var(--text-primary);
             font-family: var(--font-header);
-            font-size: 1.2rem;
-            margin-bottom: -5px;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
             text-transform: uppercase;
             font-weight: bold;
+            display: block;
+            letter-spacing: 0.05em;
         }
 
         .custom-google-form .checkbox-group {
@@ -338,6 +427,7 @@
             padding: 15px;
             border-radius: 8px;
             border: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 15px;
         }
 
         .custom-google-form .checkbox-group label {
@@ -374,7 +464,7 @@
     <div class="promo-hero">
         <div class="promo-hero-inner">
             <div class="promo-hero-content">
-                <h1 class="title-3d">Your Business</h1>
+                <h1 class="title-3d">Promote Your Business</h1>
                 
                 <span class="subtitle">
                     Rally your community and secure your spot as the final destination for Districts After Dark. 
@@ -387,8 +477,15 @@
             <!-- Elevated Previews layout overlapping cards -->
             <div class="promo-hero-visual">
                 <div class="cards-container">
-                    <img src="assets/promo_vote_for_us_district_a.png" class="hero-image image-1" alt="Social Media Graphic Preview">
-                    <img src="assets/flyer_draft.png" class="hero-image image-2" alt="Printable Flyer Preview">
+                    <div class="hero-image-wrapper wrapper-1">
+                        <img src="assets/District%20Parings/BIZ%20Promo_D.png" class="hero-image" alt="Social Media Graphic Preview">
+                        <div class="image-caption">Customized Social Media Story</div>
+                    </div>
+                    
+                    <div class="hero-image-wrapper wrapper-2">
+                            <img src="assets/Districts_Standup_Flyer/Districts_Standup_D.png" class="hero-image" alt="Printable Flyer Preview">
+                        <div class="image-caption">Customized Printable Flyer</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -396,129 +493,27 @@
 
     <div class="content-container">
         
-        <div class="previews-showcase" style="display: flex; gap: 40px; justify-content: flex-start; margin-top: 60px; margin-bottom: 60px; flex-wrap: wrap;">
-            <div class="preview-item" style="max-width: 350px;">
-                <h3 style="font-family: var(--font-header); color: var(--brand-red); font-size: 1.5rem; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; text-shadow: 1px 1px 0px rgba(0,0,0,0.5);">Social Media Story</h3>
-                <div class="preview-dimensions" style="margin-bottom: 20px; font-size: 0.85rem; color: var(--text-secondary); font-family: var(--font-main); text-transform: uppercase; letter-spacing: 1px;">1080 x 1920 px (9:16)</div>
-                <img src="assets/promo_vote_for_us_district_a.png" alt="Social Media Graphic Preview" style="height: 380px; width: auto; object-fit: contain; border-radius: 16px; border: 4px solid var(--text-primary); box-shadow: 0 15px 35px rgba(0,0,0,0.6); transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
-            </div>
-            <div class="preview-item" style="max-width: 350px;">
-                <h3 style="font-family: var(--font-header); color: var(--brand-red); font-size: 1.5rem; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; text-shadow: 1px 1px 0px rgba(0,0,0,0.5);">Printable Flyer</h3>
-                <div class="preview-dimensions" style="margin-bottom: 20px; font-size: 0.85rem; color: var(--text-secondary); font-family: var(--font-main); text-transform: uppercase; letter-spacing: 1px;">2550 x 3300 px (8.5" x 11")</div>
-                <img src="assets/flyer_draft.png" alt="Printable Flyer Preview" style="height: 380px; width: auto; object-fit: contain; border-radius: 16px; border: 4px solid var(--text-primary); box-shadow: 0 15px 35px rgba(0,0,0,0.6); transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
-            </div>
-        </div>
-        
-        <!-- Request to Join the Map / Google Form Integration -->
-        <div class="generator-tool" style="margin-top: 60px; margin-bottom: 60px;">
-            <h2>Join the Map</h2>
-            <p style="color: var(--text-secondary); font-size: 1.1rem; line-height: 1.6; max-width: 800px; margin: 0 0 20px 0;">
-                Request to have your business added to the official Districts After Dark map. 
-                <br><br><small><em>(Developer Note: To connect this to a real Google Form, replace the form action URL and the "entry.100000X" name attributes with those from a generated Google Form "Get pre-filled link" URL.)</em></small>
-            </p>
-            
-            <form class="generator-form custom-google-form" action="https://docs.google.com/forms/u/0/d/e/YOUR_FORM_ID/formResponse" method="POST" target="hidden_iframe" onsubmit="this.reset(); alert('Thanks for submitting! We will review your request.');">
-                
-                <label for="entry.1000000">Business Name</label>
-                <input type="text" name="entry.1000000" id="entry.1000000" placeholder="e.g., The Bulldog" required>
-
-                <label for="entry.1000001">Your Name</label>
-                <input type="text" name="entry.1000001" id="entry.1000001" placeholder="e.g., Jane Doe" required>
-
-                <label for="entry.1000002">Your Role with the Business</label>
-                <input type="text" name="entry.1000002" id="entry.1000002" placeholder="e.g., Owner, General Manager" required>
-
-                <label for="entry.1000005">Street Address</label>
-                <input type="text" name="entry.1000005" id="entry.1000005" placeholder="e.g., 123 Main St, New Orleans, LA 70112" required>
-
-                <label for="entry.1000006">Council District</label>
-                <select name="entry.1000006" id="entry.1000006" required>
-                    <option value="" disabled selected>Select Your District...</option>
-                    <option value="District A">District A</option>
-                    <option value="District B">District B</option>
-                    <option value="District C">District C</option>
-                    <option value="District D">District D</option>
-                    <option value="District E">District E</option>
-                </select>
-
-                <label for="entry.1000007">Email Address</label>
-                <input type="email" name="entry.1000007" id="entry.1000007" placeholder="e.g., hello@business.com" required>
-
-                <label for="entry.1000008">Phone Number</label>
-                <input type="tel" name="entry.1000008" id="entry.1000008" placeholder="e.g., (504) 555-0199" required>
-
-                <div class="checkbox-group">
-                    <label>
-                        <input type="checkbox" name="entry.1000003" value="Yes" required>
-                        I confirm this business is in good standing with the City of New Orleans.
-                    </label>
-                </div>
-
-                <div class="checkbox-group">
-                    <label>
-                        <input type="checkbox" name="entry.1000009" value="Yes">
-                        I would like my business to host our council district's event
-                    </label>
-                </div>
-
-                <div class="checkbox-group">
-                    <label>
-                        <input type="checkbox" name="entry.1000004" value="Yes">
-                        Please remove my business from this website and affiliated communications
-                    </label>
-                </div>
-
-                <button type="submit" class="brand-btn" style="background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); font-size: 1.2rem; padding: 20px; border: none; cursor: pointer; color: white;">Submit Request</button>
-            </form>
-            <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(this.submitted) {}"></iframe>
-        </div>
-
-        <!-- Custom Flyer Generator Tool (Moved to Top) -->
-        <div class="generator-tool" style="margin-top: 60px; margin-bottom: 60px;">
-            <h2>Generate Your Check-In QR Code</h2>
-            <p style="color: var(--text-secondary); font-size: 1.1rem; line-height: 1.6; max-width: 800px; margin: 0 0;">
-                Select your venue from the list below to generate your unique Check-In QR code. Print this out and place it at your venue so customers can scan it to check in and earn points!
-            </p>
-            
-            <div class="generator-form">
-                <select id="venue-select">
-                    <option value="" disabled selected>Loading venues...</option>
-                </select>
-                <button class="brand-btn" id="generate-qr-btn" style="background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); font-size: 1.2rem; padding: 20px; border: none; cursor: pointer; color: white;">Generate QR Code</button>
-            </div>
-            
-            <div id="qr-result" style="display: none; margin-top: 30px; text-align: center; background: white; padding: 30px; border-radius: 12px; max-width: 400px; margin-left: auto; margin-right: auto;">
-                <h3 style="color: #0F1626; font-family: var(--font-header); font-size: 1.5rem; margin-bottom: 20px; text-transform: uppercase;" id="qr-venue-name">Your Venue</h3>
-                <img id="qr-image" src="" alt="Check-In QR Code" style="width: 100%; height: auto; max-width: 300px; margin-bottom: 20px;">
-                <p style="color: #333; font-size: 1rem; font-family: var(--font-main); margin-bottom: 20px;">Scan this code to check in!</p>
-                <button class="brand-btn" onclick="window.print()" style="background: #0F1626; color: white; width: 100%; border: none; padding: 15px; cursor: pointer; font-size: 1.1rem; border-radius: 5px;">Print QR Code</button>
-            </div>
-        </div>
-
         <!-- Simplified Instructional Guide -->
-        <div class="guide-section" id="social-guide">
-            <h2>Share Customized Social Graphics Promoting Your Business</h2>
+        <div class="guide-section" id="social-guide" style="margin-top: 40px; background: transparent; border: none; box-shadow: none; padding: 0;">
+            <h2 style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px;">Share Customized Social Graphics Promoting Your Business</h2>
             
             <div class="instruction-row">
                 <div class="instruction-steps">
-                    <div class="simple-step">
-                        <span class="icon">📱</span>
+                    <div class="simple-step" style="background: transparent; border-left: none; padding: 10px 0; box-shadow: none;">
                         <div class="step-text">
                             <h4>Download & Import</h4>
                             <p>Save the blank graphic to your phone and open it as a background in Instagram Stories or TikTok.</p>
                         </div>
                     </div>
                     
-                    <div class="simple-step">
-                        <span class="icon">Aa</span>
+                    <div class="simple-step" style="background: transparent; border-left: none; padding: 10px 0; box-shadow: none;">
                         <div class="step-text">
-                            <h4>Add Your Name</h4>
-                            <p>Use the app's native Text Tool to type your venue's name directly into the designated center box.</p>
+                            <h4>Add Your Logo</h4>
+                            <p>You can also use the app's native tools to place your logo over the designated center box.</p>
                         </div>
                     </div>
                     
-                    <div class="simple-step">
-                        <span class="icon">🔗</span>
+                    <div class="simple-step" style="background: transparent; border-left: none; padding: 10px 0; box-shadow: none;">
                         <div class="step-text">
                             <h4>Add The Link & Share</h4>
                             <p>Generate your link below, place a "Link Sticker" over the bottom arrow, and post it to your followers!</p>
@@ -527,16 +522,185 @@
                 </div>
 
                 <div class="instruction-visual">
-                    <img src="assets/Voter%20Share_draft1.PNG" alt="Customization Visual">
+                    <img src="assets/District%20Parings/BIZ%20Promo_D.png" alt="Customization Visual">
                     <div class="visual-pointer">
-                        TYPE VENUE NAME HERE
-                        <span>(Using the native text tool)</span>
+                        PLACE LOGO HERE
+                        <span>(Using the native sticker tool)</span>
                     </div>
                 </div>
             </div>
+        </div>
+        
+        <!-- Multi-Step Integrated Form -->
+        <div class="generator-tool" id="integrated-form-container" style="margin-top: 60px; margin-bottom: 60px;">
+            <h2 style="font-family: var(--font-header); font-size: 2rem; color: var(--text-primary); margin-top: 0; margin-bottom: 15px; text-transform: uppercase;">Join the Map & Generate Promo Graphics</h2>
+            <div id="step-intro" style="text-align: left;">
+                <p style="color: var(--text-secondary); font-size: 1.1rem; line-height: 1.6; max-width: 800px; margin: 0 0 20px 0;">
+                    Complete this form to request your business be added to the official Districts After Dark map. 
+                    Once completed, you'll instantly receive your customized social media graphic and printable check-in flyer.
+                </p>
+                <button type="button" id="start-form-btn" class="brand-btn" style="background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); font-size: 1.2rem; padding: 15px 30px; border: none; cursor: pointer; color: white; border-radius: 8px;">Get Started</button>
+            </div>
             
-            <div style="text-align: left; margin-top: 50px;">
-                <button class="brand-btn" onclick="window.print()">Download Guide as PDF</button>
+            <form id="multi-step-form" class="generator-form custom-google-form" style="display: none;">
+                
+                <!-- Step 1 -->
+                <div class="form-step" id="step-1">
+                    <h3>Step 1 of 4: Business Details</h3>
+                    
+                    <label for="biz-name">Business Name</label>
+                    <input type="text" id="biz-name" list="existing-businesses" placeholder="e.g., The Bulldog" required autocomplete="off">
+                    <datalist id="existing-businesses"></datalist>
+                    
+                    <div class="checkbox-group" style="margin-top: -10px; margin-bottom: 20px;">
+                        <label>
+                            <input type="checkbox" id="chk-new-business">
+                            This is a new business not currently on the map
+                        </label>
+                    </div>
+                    
+                    <label for="biz-address">Street Address</label>
+                    <input type="text" id="biz-address" placeholder="e.g., 123 Main St, New Orleans, LA 70112" required>
+                    
+                    <label for="biz-url">Business Website URL <span style="font-size: 0.9rem; font-weight: normal; color: var(--text-secondary); text-transform: none;">(Optional)</span></label>
+                    <input type="url" id="biz-url" placeholder="https://yourbusiness.com">
+                    
+                    <label for="op-relationship">Your Relationship to the Business</label>
+                    <select id="op-relationship" required>
+                        <option value="" disabled selected>Select Relationship...</option>
+                        <option value="Owner">Owner</option>
+                        <option value="Manager">Manager</option>
+                        <option value="Employee">Employee</option>
+                        <option value="Patron/Fan">Patron / Fan</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    
+                    <div style="margin-top: 20px;">
+                        <button type="button" class="brand-btn next-btn" style="background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); font-size: 1.2rem; padding: 15px 30px; border: none; cursor: pointer; color: white; border-radius: 8px;">Next</button>
+                    </div>
+                </div>
+                
+                <!-- Step 2 -->
+                <div class="form-step" id="step-2" style="display: none;">
+                    <h3>Step 2 of 4: Contact Information</h3>
+                    
+                    <label for="op-name">Your Name</label>
+                    <input type="text" id="op-name" placeholder="e.g., Jane Doe" required>
+                    
+                    <label for="op-email">Email Address</label>
+                    <input type="email" id="op-email" placeholder="e.g., hello@business.com" required>
+                    
+                    <label for="op-phone">Phone Number</label>
+                    <input type="tel" id="op-phone" placeholder="e.g., (504) 555-0199" required>
+                    
+                    <div style="margin-top: 20px; display: flex; gap: 15px;">
+                        <button type="button" class="brand-btn prev-btn" style="background: transparent; border: 2px solid var(--text-secondary); color: var(--text-secondary); font-size: 1.2rem; padding: 15px 30px; cursor: pointer; border-radius: 8px;">Back</button>
+                        <button type="button" class="brand-btn next-btn" style="background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); font-size: 1.2rem; padding: 15px 30px; border: none; cursor: pointer; color: white; border-radius: 8px;">Next</button>
+                    </div>
+                </div>
+                
+                <!-- Step 3 -->
+                <div class="form-step" id="step-3" style="display: none;">
+                    <h3>Step 3 of 4: Map & Branding</h3>
+                    
+                    <label for="biz-district">Council District</label>
+                    <select id="biz-district" required>
+                        <option value="" disabled selected>Select Your District...</option>
+                        <option value="District A">District A</option>
+                        <option value="District B">District B</option>
+                        <option value="District C">District C</option>
+                        <option value="District D">District D</option>
+                        <option value="District E">District E</option>
+                        <option value="Not Sure">I'm not sure</option>
+                    </select>
+                    
+                    <label for="biz-logo" style="margin-top: 15px;">Upload Your Logo <span style="font-size: 0.9rem; font-weight: normal; color: var(--text-secondary); text-transform: none;">(Optional - Used on your promo graphics instead of text)</span></label>
+                    <input type="file" id="biz-logo" accept="image/*" style="background: rgba(255,255,255,0.05); color: white;">
+                    
+                    <div style="margin-top: 20px; display: flex; gap: 15px;">
+                        <button type="button" class="brand-btn prev-btn" style="background: transparent; border: 2px solid var(--text-secondary); color: var(--text-secondary); font-size: 1.2rem; padding: 15px 30px; cursor: pointer; border-radius: 8px;">Back</button>
+                        <button type="button" class="brand-btn next-btn" style="background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); font-size: 1.2rem; padding: 15px 30px; border: none; cursor: pointer; color: white; border-radius: 8px;">Next</button>
+                    </div>
+                </div>
+                
+                <!-- Step 4 -->
+                <div class="form-step" id="step-4" style="display: none;">
+                    <h3>Step 4 of 4: Confirmations</h3>
+                    
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" id="chk-good-standing">
+                            This business is licensed to operate in the City of New Orleans.
+                        </label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" id="chk-host">
+                            Yes, our business would like to host District [B]'s final stop of the night on [Tuesday, July 28th]
+                        </label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" id="chk-opt-out">
+                            Please remove our business from this website and affiliated promotions.
+                        </label>
+                    </div>
+                    
+                    <label for="op-comments" style="margin-top: 15px;">Additional Comments or Questions <span style="font-size: 0.9rem; font-weight: normal; color: var(--text-secondary); text-transform: none;">(Optional)</span></label>
+                    <textarea id="op-comments" rows="4" placeholder="Anything else we should know?" style="width: 100%; padding: 16px; margin-bottom: 20px; border-radius: 8px; border: 2px solid var(--text-secondary); background: rgba(255,255,255,0.05); color: white; font-family: inherit; resize: vertical;"></textarea>
+                    
+                    <div style="margin-top: 20px; display: flex; gap: 15px;">
+                        <button type="button" class="brand-btn prev-btn" style="background: transparent; border: 2px solid var(--text-secondary); color: var(--text-secondary); font-size: 1.2rem; padding: 15px 30px; cursor: pointer; border-radius: 8px;">Back</button>
+                        <button type="submit" id="submit-form-btn" class="brand-btn" style="background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); font-size: 1.2rem; padding: 15px 30px; border: none; cursor: pointer; color: white; border-radius: 8px;">Submit & Generate Graphics</button>
+                    </div>
+                </div>
+            </form>
+            
+            <div id="form-success" style="display:none; text-align: left; margin-top: 20px;">
+                <h2 style="color: var(--neon-cyan); margin-bottom: 10px;">Success! Request Submitted.</h2>
+                <p style="color: var(--text-secondary); font-size: 1.1rem; line-height: 1.6; margin-bottom: 30px;">
+                    Thank you! We've automatically generated your custom promotional graphics below. 
+                    <br><strong>Right-click (or long-press on mobile) to save these images.</strong>
+                </p>
+
+                <div style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 25px; margin-bottom: 40px; max-width: 600px;">
+                    <h3 style="font-family: var(--font-header); color: var(--text-primary); font-size: 1.3rem; margin-top: 0; margin-bottom: 15px; text-transform: uppercase;">Your Unique Voting Link</h3>
+                    <p style="color: white; font-size: 1rem; margin-bottom: 15px;">Share this link directly with your followers so they can vote for you!</p>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="generated-voting-url" readonly style="flex: 1; padding: 12px 15px; border-radius: 8px; border: 2px solid var(--text-secondary); background: rgba(255,255,255,0.9); font-size: 1rem; color: #333;">
+                        <button type="button" id="copy-link-btn" class="brand-btn" style="background: var(--brand-red); color: white; border: none; padding: 0 20px; border-radius: 8px; cursor: pointer; font-weight: bold; white-space: nowrap;">Copy Link</button>
+                    </div>
+                </div>
+                
+                <div style="display: flex; flex-wrap: wrap; gap: 40px; justify-content: flex-start; align-items: flex-start;">
+                    <div class="preview-item" style="max-width: 300px;">
+                        <h3 style="font-family: var(--font-header); color: var(--brand-red); font-size: 1.5rem; margin-bottom: 10px; text-transform: uppercase;">Social Media Story</h3>
+                        <!-- A container for the composite image -->
+                        <div id="social-composite" style="position: relative; width: 100%; max-width: 300px; aspect-ratio: 9/16; border-radius: 16px; border: 4px solid var(--text-primary); overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.6);">
+                            <img id="social-base-img" src="assets/Voter%20Share_draft1.PNG" style="width: 100%; height: 100%; object-fit: cover;">
+                            <img id="social-logo-overlay" src="" style="position: absolute; object-fit: contain;">
+                            <div id="social-name-text" style="position: absolute; text-align: center; font-family: var(--font-header); font-weight: bold; text-shadow: 1px 1px 4px rgba(0,0,0,0.8);"></div>
+                        </div>
+                        <p style="text-align: center; color: var(--text-secondary); font-size: 0.9rem; margin-top: 10px;">Digital Story (9:16)</p>
+                    </div>
+                    
+                    <div class="preview-item" style="max-width: 450px; display: flex; flex-direction: column; align-items: center;">
+                        <h3 style="font-family: var(--font-header); color: var(--brand-red); font-size: 1.5rem; margin-bottom: 10px; text-transform: uppercase; align-self: flex-start;">Printable Flyer</h3>
+                        <div id="flyer-composite" style="position: relative; width: 100%; max-width: 450px; aspect-ratio: 8.5/11; background: white; border-radius: 16px; border: 4px solid var(--text-primary); overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.6);">
+                            <!-- We can overlay the logo and QR code over the flyer background -->
+                            <img id="flyer-base-img" src="assets/Districts%20Standup%20Draft3.png" style="width: 100%; height: 100%; object-fit: cover;">
+                            <!-- Flyer Logo -->
+                            <img id="flyer-logo-overlay" src="" style="position: absolute; object-fit: contain;">
+                            <!-- Flyer QR Code -->
+                            <img id="flyer-qr-overlay" src="" style="position: absolute; aspect-ratio: 1/1;">
+                            <!-- Flyer Text -->
+                            <div id="flyer-name-text" style="position: absolute; text-align: center; font-family: var(--font-header); font-weight: bold;"></div>
+                        </div>
+                        <p id="flyer-hint" style="text-align: center; color: var(--text-secondary); font-size: 0.9rem; margin-top: 10px;">Printable Flyer (8.5 x 11 in)</p>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -552,58 +716,466 @@
         </div>
     </footer>
 
+    <script src="council_districts.js"></script>
     <script type="module">
-        import { db } from "./js/firebase-config.js";
-        import { collection, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+        // Configuration for graphic overlays
+        const graphicConfig = {
+            social: {
+                logo: { top: '70%', left: '30%', maxWidth: '40%', maxHeight: '12%', transform: 'translate(0, -50%)' },
+                text: { top: '70%', left: '30%', width: '40%', fontSize: '1.2rem', color: '#8a2d24', transform: 'translate(0, -50%)', textAlign: 'left', whiteSpace: 'nowrap', textShadow: 'none' }
+            },
+            flyer: {
+                logo: { top: '71%', left: '12%', maxWidth: '35%', maxHeight: '12%', transform: 'translate(0, -50%)' },
+                qr: { bottom: '27%', left: '78%', width: '18%', transform: 'translate(-50%, 50%)' },
+                text: { top: '71%', left: '12%', width: '35%', fontSize: '1.1rem', color: '#8a2d24', transform: 'translate(0, -50%)', textAlign: 'left', whiteSpace: 'nowrap' }
+            },
+            qrColors: {
+                foreground: 'eecd7e', // Gold
+                background: '1F2937'  // Dark background to match flyer
+            }
+        };
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            const venueSelect = document.getElementById('venue-select');
-            const generateBtn = document.getElementById('generate-qr-btn');
-            const qrResult = document.getElementById('qr-result');
-            const qrImage = document.getElementById('qr-image');
-            const qrVenueName = document.getElementById('qr-venue-name');
+        document.addEventListener('DOMContentLoaded', () => {
+            const startBtn = document.getElementById('start-form-btn');
+            const introSection = document.getElementById('step-intro');
+            const form = document.getElementById('multi-step-form');
+            const steps = [
+                document.getElementById('step-1'),
+                document.getElementById('step-2'),
+                document.getElementById('step-3'),
+                document.getElementById('step-4')
+            ];
+            
+            let currentStep = 0;
 
-            try {
-                const venuesRef = collection(db, "venues");
-                const q = query(venuesRef, orderBy("name"));
-                const querySnapshot = await getDocs(q);
-                
-                venueSelect.innerHTML = '<option value="" disabled selected>Select Your Venue...</option>';
-                
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    const option = document.createElement('option');
-                    option.value = doc.id;
-                    option.textContent = data.name + (data.district ? ` (District ${data.district})` : '');
-                    venueSelect.appendChild(option);
+            // Map to store venue names and their Firebase IDs
+            const venueMap = new Map();
+
+            // Load existing venues for autocomplete
+            const datalist = document.getElementById('existing-businesses');
+            import('./js/firebase-config.js').then(async (module) => {
+                const { db } = module;
+                const { collection, getDocs } = await import('https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js');
+                try {
+                    const querySnapshot = await getDocs(collection(db, "venues"));
+                    querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        const venueName = data.name;
+                        const venueAddress = data.address;
+                        
+                        // Append address in parentheses if it exists to differentiate franchises
+                        let dropdownLabel = venueName;
+                        if (venueAddress) {
+                            dropdownLabel = `${venueName} (${venueAddress})`;
+                        }
+
+                        const option = document.createElement('option');
+                        option.value = dropdownLabel;
+                        datalist.appendChild(option);
+                        
+                        // Store the mapping using the full label so it's unique
+                        venueMap.set(dropdownLabel, doc.id);
+                    });
+                } catch (error) {
+                    console.error("Error loading venues for autocomplete:", error);
+                }
+            }).catch(err => console.error("Firebase module not loaded for autocomplete", err));
+
+            // Auto-deactivate fields if an existing business is selected
+            const bizNameInput = document.getElementById('biz-name');
+            const chkNewBusiness = document.getElementById('chk-new-business');
+            const bizAddressInput = document.getElementById('biz-address');
+
+            bizNameInput.addEventListener('input', () => {
+                if (venueMap.has(bizNameInput.value)) {
+                    // It's an existing business
+                    chkNewBusiness.checked = false;
+                    chkNewBusiness.disabled = true;
+                    
+                    // Extract address from parentheses and auto-fill
+                    const match = bizNameInput.value.match(/\((.*)\)$/);
+                    if (match) {
+                        bizAddressInput.value = match[1];
+                    }
+                    bizAddressInput.disabled = true;
+                    bizAddressInput.required = false; // Not required manually if auto-filled
+                } else {
+                    // Not an existing business (yet)
+                    chkNewBusiness.disabled = false;
+                    bizAddressInput.disabled = false;
+                    bizAddressInput.required = true; // Mandatory for new businesses
+                }
+            });
+
+            // Start button logic
+            startBtn.addEventListener('click', () => {
+                introSection.style.display = 'none';
+                form.style.display = 'flex';
+                showStep(0);
+            });
+
+            // Next / Prev button logic
+            const nextBtns = document.querySelectorAll('.next-btn');
+            const prevBtns = document.querySelectorAll('.prev-btn');
+
+            nextBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Validation check before advancing
+                    const inputs = steps[currentStep].querySelectorAll('input, select');
+                    let isValid = true;
+                    inputs.forEach(input => {
+                        if (!input.checkValidity()) {
+                            input.reportValidity();
+                            isValid = false;
+                        }
+                    });
+
+                    if (isValid && currentStep < steps.length - 1) {
+                        showStep(currentStep + 1);
+                    }
                 });
-            } catch (error) {
-                console.error("Error loading venues:", error);
-                venueSelect.innerHTML = '<option value="" disabled selected>Error loading venues</option>';
+            });
+
+            prevBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (currentStep > 0) {
+                        showStep(currentStep - 1);
+                    }
+                });
+            });
+
+            function showStep(index) {
+                steps.forEach((step, i) => {
+                    step.style.display = (i === index) ? 'block' : 'none';
+                });
+                currentStep = index;
             }
 
-            generateBtn.addEventListener('click', () => {
-                const selectedOption = venueSelect.options[venueSelect.selectedIndex];
-                if (!selectedOption || !selectedOption.value) {
-                    alert("Please select a venue first.");
-                    return;
+            // Logo file preview reader
+            const logoInput = document.getElementById('biz-logo');
+            let logoDataUrl = "";
+            logoInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (readerEvent) => {
+                        logoDataUrl = readerEvent.target.result;
+                    };
+                    reader.readAsDataURL(file);
                 }
+            });
 
-                const venueId = selectedOption.value;
-                const venueName = selectedOption.textContent.split(' (')[0];
+            // Ray-casting algorithm for point in polygon
+            function isPointInPolygon(point, polygon) {
+                let x = point[0], y = point[1];
+                let inside = false;
+                for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+                    let xi = polygon[i][0], yi = polygon[i][1];
+                    let xj = polygon[j][0], yj = polygon[j][1];
+                    let intersect = ((yi > y) != (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+                    if (intersect) inside = !inside;
+                }
+                return inside;
+            }
+
+            function getDistrictFromCoordinates(lng, lat) {
+                if (!window.councilDistricts) return null;
                 
-                // Construct the check-in URL
-                const checkInUrl = `${window.location.origin}/checkin.html?venue=${venueId}`;
+                for (const feature of window.councilDistricts.features) {
+                    const geometry = feature.geometry;
+                    let isInside = false;
+                    
+                    if (geometry.type === 'Polygon') {
+                        // Check outer ring
+                        isInside = isPointInPolygon([lng, lat], geometry.coordinates[0]);
+                    } else if (geometry.type === 'MultiPolygon') {
+                        for (const polygon of geometry.coordinates) {
+                            if (isPointInPolygon([lng, lat], polygon[0])) {
+                                isInside = true;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if (isInside) {
+                        return `District ${feature.properties.DISTRICTID}`;
+                    }
+                }
+                return null;
+            }
+
+            // Auto-determine district via Geocoding when "Not Sure" is selected
+            const districtSelect = document.getElementById('biz-district');
+            districtSelect.addEventListener('change', async (e) => {
+                if (e.target.value === 'Not Sure') {
+                    const address = document.getElementById('biz-address').value;
+                    if (!address) {
+                        alert("Please enter a Street Address in Step 1 first so we can determine your district.");
+                        e.target.value = ""; // Reset selection
+                        return;
+                    }
+
+                    // Show loading state
+                    const originalOptions = Array.from(e.target.options);
+                    e.target.innerHTML = '<option value="Not Sure" selected>Locating your district...</option>';
+                    e.target.disabled = true;
+
+                    try {
+                        const query = encodeURIComponent(`${address}, New Orleans, LA`);
+                        const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`);
+                        const data = await response.json();
+
+                        // Restore options
+                        e.target.innerHTML = '';
+                        originalOptions.forEach(opt => e.target.appendChild(opt));
+                        e.target.disabled = false;
+
+                        if (data && data.length > 0) {
+                            const lat = parseFloat(data[0].lat);
+                            const lng = parseFloat(data[0].lon);
+                            
+                            const foundDistrict = getDistrictFromCoordinates(lng, lat);
+                            
+                            if (foundDistrict) {
+                                e.target.value = foundDistrict;
+                                alert(`Found it! Your business is located in ${foundDistrict}.`);
+                            } else {
+                                alert("We found the address, but it appears to be outside the New Orleans council districts. Please select manually.");
+                                e.target.value = "";
+                            }
+                        } else {
+                            alert("We couldn't find that exact address. Please try adjusting it in Step 1, or select your district manually.");
+                            e.target.value = "";
+                        }
+                    } catch (error) {
+                        console.error("Geocoding error:", error);
+                        // Restore options
+                        e.target.innerHTML = '';
+                        originalOptions.forEach(opt => e.target.appendChild(opt));
+                        e.target.disabled = false;
+                        
+                        alert("There was an error looking up the address. Please select your district manually.");
+                        e.target.value = "";
+                    }
+                }
+            });
+
+            // Form Submit Logic
+            const submitBtn = document.getElementById('submit-form-btn');
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
                 
-                // Generate QR code using a free API
-                const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(checkInUrl)}&color=0F1626&bgcolor=FFFFFF`;
+                // Get form values
+                const rawBizName = document.getElementById('biz-name').value || 'Your Business';
+                const bizDistrict = document.getElementById('biz-district').value || 'District A';
                 
-                qrImage.src = qrApiUrl;
-                qrVenueName.textContent = venueName;
-                qrResult.style.display = 'block';
+                // Check if this business matches an existing Firebase ID using the raw input
+                const matchedVenueId = venueMap.get(rawBizName) || null;
+
+                // Clean the business name for graphics (remove the address in parentheses if it exists)
+                const bizName = rawBizName.replace(/\s*\(.*\)$/, '').trim();
                 
-                // Scroll to result
-                qrResult.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // Construct pseudo-unique venue id and district page URL
+                const venueId = bizName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                let districtPage = 'index.html';
+                let districtLetter = 'A';
+                if (bizDistrict.startsWith('District')) {
+                    districtLetter = bizDistrict.split(' ')[1].toUpperCase();
+                    districtPage = `district-${districtLetter.toLowerCase()}.html`;
+                }
+                const votingUrl = `${window.location.origin}/${districtPage}?vote=${venueId}`;
+                
+                // Prepare data for Google Apps Script Web App
+                const formData = {
+                    bizName: bizName,
+                    matchedVenueId: matchedVenueId,
+                    isNewBusiness: document.getElementById('chk-new-business').checked,
+                    bizAddress: document.getElementById('biz-address').value,
+                    bizUrl: document.getElementById('biz-url').value,
+                    opRelationship: document.getElementById('op-relationship').value,
+                    opName: document.getElementById('op-name').value,
+                    opEmail: document.getElementById('op-email').value,
+                    opPhone: document.getElementById('op-phone').value,
+                    bizDistrict: bizDistrict,
+                    chkGoodStanding: document.getElementById('chk-good-standing').checked,
+                    chkHost: document.getElementById('chk-host').checked,
+                    chkOptOut: document.getElementById('chk-opt-out').checked,
+                    opComments: document.getElementById('op-comments').value
+                };
+
+                // Send data to Google Sheets via Web App
+                // NOTE: Replace YOUR_WEB_APP_URL with the actual URL after deploying the Apps Script
+                const scriptUrl = 'https://script.google.com/macros/s/AKfycbyiZ-stBQhmx-vq4KYt8ACGq8ahKJieh8lbelzxafCT5ICSiVuMTR0YXgof14MMhCP9/exec';
+                
+                // We will send the fetch request AFTER the images are flattened and uploaded
+                // so we can include the image URLs in the payload.
+                
+                // Fetch QR code
+                const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(votingUrl)}&color=${graphicConfig.qrColors.foreground}&bgcolor=${graphicConfig.qrColors.background}`;
+
+                // Set Graphic Previews
+                const formSuccess = document.getElementById('form-success');
+                const socialBaseImg = document.getElementById('social-base-img');
+                const flyerBaseImg = document.getElementById('flyer-base-img');
+                const socialLogo = document.getElementById('social-logo-overlay');
+                const socialName = document.getElementById('social-name-text');
+                const flyerLogo = document.getElementById('flyer-logo-overlay');
+                const flyerQr = document.getElementById('flyer-qr-overlay');
+                const flyerName = document.getElementById('flyer-name-text');
+
+                // Update base images based on district
+                socialBaseImg.src = `assets/District Parings/BIZ Promo_${districtLetter}.png`;
+                flyerBaseImg.src = `assets/Districts_Standup_Flyer/Districts_Standup_${districtLetter}.png`;
+
+                // Apply Config Styles
+                Object.assign(socialLogo.style, graphicConfig.social.logo);
+                Object.assign(socialName.style, graphicConfig.social.text);
+                Object.assign(flyerLogo.style, graphicConfig.flyer.logo);
+                Object.assign(flyerQr.style, graphicConfig.flyer.qr);
+                Object.assign(flyerName.style, graphicConfig.flyer.text);
+
+                if (logoDataUrl) {
+                    socialLogo.src = logoDataUrl;
+                    socialLogo.style.display = 'block';
+                    socialName.style.display = 'none'; // Hide text if logo exists
+                    flyerLogo.src = logoDataUrl;
+                    flyerLogo.style.display = 'block';
+                    flyerName.style.display = 'none'; // Hide text if logo exists
+                } else {
+                    socialLogo.style.display = 'none';
+                    socialName.textContent = bizName;
+                    socialName.style.display = 'block';
+                    flyerLogo.style.display = 'none';
+                    flyerName.textContent = bizName;
+                    flyerName.style.display = 'block';
+                }
+                
+                flyerQr.src = qrApiUrl;
+                
+                // Set Voting URL UI
+                const urlInput = document.getElementById('generated-voting-url');
+                urlInput.value = votingUrl;
+                
+                const copyBtn = document.getElementById('copy-link-btn');
+                copyBtn.addEventListener('click', () => {
+                    navigator.clipboard.writeText(votingUrl).then(() => {
+                        const originalText = copyBtn.textContent;
+                        copyBtn.textContent = 'Copied!';
+                        copyBtn.style.background = '#2f533a'; // Darker green
+                        setTimeout(() => {
+                            copyBtn.textContent = originalText;
+                            copyBtn.style.background = 'var(--brand-red)';
+                        }, 2000);
+                    });
+                });
+
+                // Hide form, show results
+                form.style.display = 'none';
+                formSuccess.style.display = 'block';
+
+                // Flatten images with html2canvas and upload to Firebase Storage
+                setTimeout(async () => {
+                    try {
+                        // 1. Flatten the images locally first (Fast for the user)
+                        const flattenImage = async (elementId) => {
+                            const element = document.getElementById(elementId);
+                            const canvas = await html2canvas(element, { 
+                                useCORS: true, // Crucial for loading external images like the QR code
+                                scale: 2 // Higher resolution
+                            });
+                            return canvas.toDataURL('image/png');
+                        };
+
+                        const timestamp = Date.now();
+                        const socialFilename = `${venueId}-social-${timestamp}.png`;
+                        const flyerFilename = `${venueId}-flyer-${timestamp}.png`;
+
+                        const [socialDataUrl, flyerDataUrl] = await Promise.all([
+                            flattenImage('social-composite'),
+                            flattenImage('flyer-composite')
+                        ]);
+
+                        // 2. Update UI instantly with local data URLs (No CORS issues, works offline/locally)
+                        const socialContainer = document.getElementById('social-composite').parentElement;
+                        const flyerContainer = document.getElementById('flyer-composite').parentElement;
+                        
+                        // Create the download button for Social Story
+                        const downloadSocialBtn = document.createElement('a');
+                        downloadSocialBtn.href = socialDataUrl;
+                        downloadSocialBtn.download = socialFilename;
+                        downloadSocialBtn.className = 'brand-btn';
+                        downloadSocialBtn.style.cssText = 'display: inline-block; background: var(--brand-red); color: white; text-decoration: none; padding: 10px 20px; border-radius: 8px; margin-top: 15px; font-weight: bold; text-align: center; width: 100%; box-sizing: border-box; cursor: pointer;';
+                        downloadSocialBtn.textContent = 'Download Social Story';
+                        
+                        const socialHint = socialContainer.querySelector('p');
+                        if (socialHint) {
+                            socialHint.replaceWith(downloadSocialBtn);
+                        } else {
+                            socialContainer.appendChild(downloadSocialBtn);
+                        }
+
+                        // Create the download button for Printable Flyer
+                        const downloadFlyerBtn = document.createElement('a');
+                        downloadFlyerBtn.href = flyerDataUrl;
+                        downloadFlyerBtn.download = flyerFilename;
+                        downloadFlyerBtn.className = 'brand-btn';
+                        downloadFlyerBtn.style.cssText = 'display: inline-block; background: var(--brand-red); color: white; text-decoration: none; padding: 10px 20px; border-radius: 8px; margin-top: 15px; font-weight: bold; text-align: center; width: 100%; box-sizing: border-box; cursor: pointer;';
+                        downloadFlyerBtn.textContent = 'Download Printable Flyer';
+
+                        const flyerHint = flyerContainer.querySelector('#flyer-hint');
+                        if (flyerHint) {
+                            flyerHint.replaceWith(downloadFlyerBtn);
+                        } else {
+                            flyerContainer.appendChild(downloadFlyerBtn);
+                        }
+
+                        // Replace HTML composites with flat images. 
+                        // This allows mobile users to "Long Press -> Save Image" natively and ensures perfect printing.
+                        const replaceWithFlatImage = (elementId, dataUrl) => {
+                            const composite = document.getElementById(elementId);
+                            const flatImg = document.createElement('img');
+                            flatImg.id = elementId; // Keep ID for print CSS
+                            flatImg.src = dataUrl;
+                            flatImg.style.cssText = composite.style.cssText;
+                            composite.replaceWith(flatImg);
+                        };
+
+                        replaceWithFlatImage('social-composite', socialDataUrl);
+                        replaceWithFlatImage('flyer-composite', flyerDataUrl);
+
+                        // 3. Upload to Firebase & Google Sheets in the background
+                        const { ref, uploadString, getDownloadURL } = await import('https://www.gstatic.com/firebasejs/10.9.0/firebase-storage.js');
+                        const { storage } = await import('./js/firebase-config.js');
+
+                        const uploadToFirebase = async (dataUrl, filename) => {
+                            const storageRef = ref(storage, `promo_graphics/${filename}`);
+                            await uploadString(storageRef, dataUrl, 'data_url');
+                            return await getDownloadURL(storageRef);
+                        };
+
+                        const [socialUrl, flyerUrl] = await Promise.all([
+                            uploadToFirebase(socialDataUrl, socialFilename),
+                            uploadToFirebase(flyerDataUrl, flyerFilename)
+                        ]);
+
+                        formData.socialGraphicUrl = socialUrl;
+                        formData.flyerGraphicUrl = flyerUrl;
+
+                        if (scriptUrl !== 'YOUR_WEB_APP_URL') {
+                            fetch(scriptUrl, {
+                                method: 'POST',
+                                mode: 'no-cors',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(formData)
+                            }).then(() => console.log("Form data with image URLs sent to Google Sheets"))
+                              .catch(error => console.error("Error sending form data:", error));
+                        }
+
+                    } catch (error) {
+                        console.error("Error flattening or uploading graphics:", error);
+                        alert("There was an issue generating the downloadable image. Please right-click the image to save it.");
+                    }
+                }, 1500); // Wait 1.5s for QR code to load
             });
         });
     </script>
