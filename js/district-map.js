@@ -270,16 +270,29 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         let allMarkers = [];
+        window.venueMarkers = {}; // Store markers by venue ID for easy access
 
         venues.forEach((place) => {
             if (!place.lat || !place.lng) return;
 
             // Failsafe: if the description field still contains raw hours data, ignore it.
             const hasRealDescription = place.description && !place.description.trim().startsWith('Hours:');
+            
+            // Generate deep link for this venue
+            const venueShareUrl = window.location.origin + window.location.pathname + '?vote=' + encodeURIComponent(place.id) + '&name=' + encodeURIComponent(place.name);
 
             const popupContent = `
                 <div style="width: 320px; font-family: 'EB Garamond', Georgia, serif; text-align: left; padding: 10px 4px 2px;">
-                    <h4 style="margin: 0 0 5px 0; color: var(--text-primary); font-family: 'EB Garamond', Georgia, serif; font-size: 1.6rem; text-transform: uppercase; line-height: 1.1;">${place.name || 'Unnamed Venue'}</h4>
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px; position: relative;">
+                        <h4 style="margin: 0; color: var(--text-primary); font-family: 'EB Garamond', Georgia, serif; font-size: 1.6rem; text-transform: uppercase; line-height: 1.1; padding-right: 10px;">${place.name || 'Unnamed Venue'}</h4>
+                        <button onclick="navigator.clipboard.writeText('${venueShareUrl}'); const msg = this.nextElementSibling; msg.style.display='block'; setTimeout(() => msg.style.display='none', 2000);" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s;" title="Copy direct link to this venue">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--brand-gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                            </svg>
+                        </button>
+                        <span style="display: none; position: absolute; top: -25px; right: 0; background: var(--brand-gold); color: #0F1626; font-family: var(--font-main); font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; font-weight: bold; white-space: nowrap;">Link Copied!</span>
+                    </div>
                     ${place.address ? `<p style="margin: 0 0 8px 0; font-size: 1rem; color: var(--text-secondary); line-height: 1.3;">${place.address}</p>` : ''}
                     <p style="margin: 0 0 ${hasRealDescription ? '8px' : '20px'} 0; font-size: 1.1rem; color: var(--text-secondary); text-transform: capitalize; font-style: italic;">${place.type ? place.type.replace('_', ' ') : 'Venue'}</p>
                     ${hasRealDescription ? `<p style="margin: 0 0 20px 0; font-size: 0.95rem; color: var(--text-primary); line-height: 1.4;">${place.description}</p>` : ''}
@@ -300,7 +313,19 @@ document.addEventListener("DOMContentLoaded", async () => {
                 marker: marker,
                 isTop10: place.rank && place.rank <= 10
             });
+            
+            window.venueMarkers[place.id] = marker;
         });
+
+        // Global function to open a specific venue's popup
+        window.openMapPopupForVenue = (venueId) => {
+            const marker = window.venueMarkers[venueId];
+            if (marker) {
+                marker.openPopup();
+                // Optionally center map on marker
+                // map.setView(marker.getLatLng(), map.getZoom());
+            }
+        };
     } catch (error) {
         console.error("Error fetching venues from Firestore:", error);
     }
