@@ -38,7 +38,7 @@ function renderVotingModule(district) {
                     <div class="map-filters-inner" style="width: 100%; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: nowrap; gap: 30px;">
                         
                         <div style="display: flex; align-items: center; gap: 20px; padding-right: 30px; border-right: 1px solid rgba(255,255,255,0.2); flex-shrink: 0;">
-                            <span id="legend-round-name" style="color: var(--brand-gold); font-family: var(--font-hero); font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap;">Round 1</span>
+                            <span id="legend-round-name" style="color: var(--text-primary); font-family: var(--font-hero); font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap;">Round 1</span>
                             <div class="countdown-clock small-clock" style="margin: 0; flex-wrap: nowrap;">
                                 <div class="time-box" style="padding: 6px 12px; min-width: 50px;"><span style="font-size: 2rem; line-height: 1;">02</span><label style="font-size: 0.7rem;">Days</label></div>
                                 <div class="time-box" style="padding: 6px 12px; min-width: 50px;"><span style="font-size: 2rem; line-height: 1;">14</span><label style="font-size: 0.7rem;">Hrs</label></div>
@@ -92,7 +92,7 @@ function renderVotingModule(district) {
                         <p style="font-size: 1.1rem; color: var(--text-secondary);">Where are we ending the night? The polls open 14 days before the event.</p>
                     </div>
                     <div class="instruction-box" style="padding: 15px 20px; max-width: 700px; margin: 0 auto 20px auto; text-align: left; background: rgba(15, 22, 38, 0.5);">
-                        <h3 style="margin-bottom: 10px; font-size: 1.1rem; color: var(--brand-gold);">How it works</h3>
+                        <h3 style="margin-bottom: 10px; font-size: 1.1rem; color: var(--text-primary);">How it works</h3>
                         <ul style="margin: 0; padding-left: 20px; font-size: 0.95rem;">
                             <li style="margin-bottom: 5px;"><strong>Round 1:</strong> Voting opens for all districts when the press release drops. Vote for your favorite neighborhood spots. The top 5 advance.</li>
                             <li style="margin-bottom: 5px;"><strong>The Run-Off:</strong> Starts the Monday before the event at 3:00 PM. A final sprint to decide the winner among the top 5.</li>
@@ -114,7 +114,7 @@ function renderVotingModule(district) {
                     <p style="text-align: center; color: var(--text-secondary); margin-bottom: 15px; font-size: 0.9rem;">Use the numbers on the map above to locate venues.</p>
                     
                     <div class="leaderboard" style="margin-bottom: 20px;">
-                        <h3 style="color: var(--brand-gold); font-family: var(--font-hero); font-size: 1.2rem; margin-bottom: 10px; text-transform: uppercase;">Current Leaders</h3>
+                        <h3 style="color: var(--text-primary); font-family: var(--font-hero); font-size: 1.2rem; margin-bottom: 10px; text-transform: uppercase;">Current Leaders</h3>
                         <div class="leaderboard-bar 1st" style="margin-bottom: 6px;">
                             <div class="bar-fill" style="width: 85%;"></div>
                             <div class="bar-content" style="padding: 6px 12px;">
@@ -168,7 +168,7 @@ function renderVotingModule(district) {
                         <p>It's down to the wire! The polls close in:</p>
                     </div>
                     <div class="leaderboard" style="margin-bottom: 20px;">
-                        <h3 style="color: var(--brand-gold); font-family: var(--font-hero); font-size: 1.2rem; margin-bottom: 10px; text-transform: uppercase;">Current Leaders</h3>
+                        <h3 style="color: var(--text-primary); font-family: var(--font-hero); font-size: 1.2rem; margin-bottom: 10px; text-transform: uppercase;">Current Leaders</h3>
                         <div class="leaderboard-bar 1st" style="margin-bottom: 6px;">
                             <div class="bar-fill" style="width: 85%;"></div>
                             <div class="bar-content" style="padding: 6px 12px;">
@@ -286,11 +286,11 @@ function renderVotingModule(district) {
                     <div class="share-modal-body">
                         <div class="share-modal-instructions">
                             <div style="background: rgba(255,255,255,0.05); padding: 12px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); text-align: left; margin-bottom: 0;">
-                                <p style="color: var(--text-secondary); font-family: var(--font-main); font-size: 1.05rem; margin: 0 0 12px 0; line-height: 1.3;">Encourage friends to vote for this business, too! <b style="color: var(--brand-gold);">Save the image below & share as an Instagram story.</b> Use Instagram's text and sticker tools to add the business name and the link to vote for this business.</p>
+                                <p style="color: var(--text-secondary); font-family: var(--font-main); font-size: 1.05rem; margin: 0 0 12px 0; line-height: 1.3;">Encourage friends to vote for this business, too! <b style="color: var(--text-primary);">Save the image below & share as an Instagram story.</b> Use Instagram's text and sticker tools to add the business name and the link to vote for this business.</p>
                                 <input type="text" id="share-url-input" readonly style="position: absolute; left: -9999px;" aria-hidden="true">
                                 <div style="text-align: left;">
                                     <button onclick="window.copyShareUrl()" style="padding: 8px 14px; background: #618A62; color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9rem; font-family: var(--font-main); transition: background 0.2s; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px;">
-                                        <div class="link-icon" style="width: 14px; height: 14px; background-color: var(--brand-gold); opacity: 0.8; -webkit-mask-image: url('assets/link.png'); -webkit-mask-size: contain; -webkit-mask-repeat: no-repeat; -webkit-mask-position: center; mask-image: url('assets/link.png'); mask-size: contain; mask-repeat: no-repeat; mask-position: center; transition: all 0.2s ease;"></div> Copy Link
+                                        <img class="link-icon" src="assets/link.png" alt="" style="width: 14px; height: 14px; object-fit: contain; filter: brightness(0) saturate(100%) invert(72%) sepia(21%) saturate(942%) hue-rotate(354deg) brightness(91%) contrast(88%); opacity: 0.8; transition: all 0.2s ease;"> Copy Link
                                     </button>
                                 </div>
                                 <p id="copy-success-msg" style="color: #7fd99a; font-family: var(--font-main); font-size: 0.85rem; margin: 8px 0 0 0; display: none; text-align: left;">Link copied to clipboard!</p>
@@ -300,13 +300,13 @@ function renderVotingModule(district) {
                         <div class="share-modal-graphics" style="display: flex; justify-content: center; align-items: stretch; gap: 15px;">
                             <div style="position: relative; width: 100%; max-width: 220px; flex-shrink: 0;">
                                 <!-- The graphic is displayed directly without canvas modification -->
-                                <img id="generated-share-graphic" src="" alt="Your Custom Share Graphic" style="width: 100%; height: auto; display: block; border: 2px solid var(--brand-gold); border-radius: 12px; box-sizing: border-box; box-shadow: 0 8px 24px rgba(0,0,0,0.6);">
+                                <img id="generated-share-graphic" src="" alt="Your Custom Share Graphic" style="width: 100%; height: auto; display: block; border: 2px solid var(--text-primary); border-radius: 12px; box-sizing: border-box; box-shadow: 0 8px 24px rgba(0,0,0,0.6);">
                             </div>
                             
                             <div style="position: relative; display: flex; flex-direction: column; flex-grow: 1; max-width: 130px;">
-                                <p style="position: absolute; top: 0%; color: var(--brand-gold); font-family: var(--font-main); font-size: 0.9rem; font-weight: bold; line-height: 1.3; margin: 0;">&lt;&lt; Open image in Instagram as a Story</p>
-                                <p style="position: absolute; top: 35%; color: var(--brand-gold); font-family: var(--font-main); font-size: 0.9rem; font-weight: bold; line-height: 1.3; margin: 0;">&lt;&lt; Use Text Tool to place business name here</p>
-                                <p style="position: absolute; bottom: 12%; color: var(--brand-gold); font-family: var(--font-main); font-size: 0.9rem; font-weight: bold; line-height: 1.3; margin: 0;">&lt;&lt; Use sticker to copy/paste link here</p>
+                                <p style="position: absolute; top: 0%; color: var(--text-primary); font-family: var(--font-main); font-size: 0.9rem; font-weight: bold; line-height: 1.3; margin: 0;">&lt;&lt; Open image in Instagram as a Story</p>
+                                <p style="position: absolute; top: 35%; color: var(--text-primary); font-family: var(--font-main); font-size: 0.9rem; font-weight: bold; line-height: 1.3; margin: 0;">&lt;&lt; Use Text Tool to place business name here</p>
+                                <p style="position: absolute; bottom: 12%; color: var(--text-primary); font-family: var(--font-main); font-size: 0.9rem; font-weight: bold; line-height: 1.3; margin: 0;">&lt;&lt; Use sticker to copy/paste link here</p>
                             </div>
                         </div>
                     </div>
@@ -646,9 +646,9 @@ class EventLayout extends HTMLElement {
                         btn.style.borderColor = '#618A62';
                         
                         if (icon) {
-                            icon.dataset.origBg = icon.style.backgroundColor;
+                            icon.dataset.origFilter = icon.style.filter;
                             icon.dataset.origOp = icon.style.opacity;
-                            icon.style.backgroundColor = '#ffffff';
+                            icon.style.filter = 'brightness(0) saturate(100%) invert(100%)';
                             icon.style.opacity = '1';
                         }
                         
@@ -659,7 +659,7 @@ class EventLayout extends HTMLElement {
                             btn.style.background = origBg;
                             btn.style.borderColor = origBorder;
                             if (icon) {
-                                icon.style.backgroundColor = icon.dataset.origBg;
+                                icon.style.filter = icon.dataset.origFilter;
                                 icon.style.opacity = icon.dataset.origOp;
                             }
                         }, 2000);
