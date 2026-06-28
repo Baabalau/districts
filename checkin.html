@@ -81,7 +81,17 @@
             <p style="margin-bottom: 15px;">Please snap a quick photo to verify your visit!</p>
             <input type="file" id="camera-input" accept="image/*" capture="environment" style="display: none;">
             <button class="btn" id="open-camera-btn" style="display: inline-block; width: 100%; margin-top: 0;">📸 Open Camera</button>
-            <div id="upload-status" style="margin-top: 15px; font-size: 0.9rem; color: var(--text-secondary);"></div>
+            <div id="upload-status" style="margin-top: 15px; font-size: 0.95rem; color: var(--text-secondary); text-align: left; display: none; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+                <div id="step-compress" style="margin-bottom: 8px;">⚪ Compressing photo...</div>
+                <div id="step-upload" style="margin-bottom: 8px;">⚪ Uploading securely...</div>
+                <div id="step-finalize">⚪ Finalizing check-in...</div>
+                
+                <div id="fallback-options" style="display: none; margin-top: 15px; text-align: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+                    <p style="color: #ff6b6b; margin-top: 0; margin-bottom: 10px; font-weight: bold; font-size: 0.9rem;">Upload Interrupted</p>
+                    <button class="btn" id="retry-upload-btn" style="padding: 8px 16px; font-size: 0.85rem; margin: 0 5px; display: inline-block;">Try Again</button>
+                    <button class="btn" id="skip-upload-btn" style="padding: 8px 16px; font-size: 0.85rem; background: transparent; border: 1px solid var(--text-secondary); color: var(--text-secondary); margin: 0 5px; display: inline-block;">Upload Later</button>
+                </div>
+            </div>
             <!-- Canvas to compress image before upload -->
             <canvas id="compress-canvas" style="display: none;"></canvas>
         </div>
@@ -94,7 +104,7 @@
         import { auth, db, storage } from "./js/firebase-config.js";
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
         import { collection, query, where, getDocs, doc, getDoc, updateDoc, setDoc, arrayUnion, increment, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
-        import { ref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-storage.js";
+        import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-storage.js";
 
         const statusMsg = document.getElementById("status-msg");
         const pointsAward = document.getElementById("points-award");
@@ -105,7 +115,21 @@
         const cameraInput = document.getElementById("camera-input");
         const openCameraBtn = document.getElementById("open-camera-btn");
         const uploadStatus = document.getElementById("upload-status");
+        const stepCompress = document.getElementById("step-compress");
+        const stepUpload = document.getElementById("step-upload");
+        const stepFinalize = document.getElementById("step-finalize");
+        const fallbackOptions = document.getElementById("fallback-options");
+        const retryUploadBtn = document.getElementById("retry-upload-btn");
+        const skipUploadBtn = document.getElementById("skip-upload-btn");
         const compressCanvas = document.getElementById("compress-canvas");
+        
+        function resetSteps() {
+            uploadStatus.style.display = "block";
+            stepCompress.innerHTML = "⚪ Compressing photo..."; stepCompress.style.color = "var(--text-secondary)";
+            stepUpload.innerHTML = "⚪ Uploading securely..."; stepUpload.style.color = "var(--text-secondary)";
+            stepFinalize.innerHTML = "⚪ Finalizing check-in..."; stepFinalize.style.color = "var(--text-secondary)";
+            fallbackOptions.style.display = "none";
+        }
 
         const urlParams = new URLSearchParams(window.location.search);
         const venueQrCode = urlParams.get('venue');
@@ -182,7 +206,9 @@
                     if (!file) return;
                     
                     openCameraBtn.style.display = "none";
-                    uploadStatus.textContent = "Compressing photo...";
+                    resetSteps();
+                    stepCompress.innerHTML = "⏳ Compressing photo...";
+                    stepCompress.style.color = "var(--text-primary)";
                     
                     // Compress image using Canvas
                     const reader = new FileReader();
@@ -211,31 +237,72 @@
                             const ctx = compressCanvas.getContext("2d");
                             ctx.drawImage(img, 0, 0, width, height);
                             
-                            // Convert to highly compressed JPEG base64
-                            const dataUrl = compressCanvas.toDataURL("image/jpeg", 0.6);
-                            
-                            try {
-                                uploadStatus.textContent = "Uploading verification...";
-                                // Upload to Firebase Storage
-                                const fileName = `checkins/${venueId}/${user.uid}_${Date.now()}.jpg`;
-                                const storageRef = ref(storage, fileName);
-                                await uploadString(storageRef, dataUrl, 'data_url');
-                                const downloadURL = await getDownloadURL(storageRef);
+                            // Convert to highly compressed JPEG blob
+                            compressCanvas.toBlob(async (blob) => {
+                                if (!blob) {
+                                    stepCompress.innerHTML = "❌ Compression failed"; 
+                                    stepCompress.style.color = "#ff6b6b";
+                                    fallbackOptions.style.display = "block";
+                                    return;
+                                }
                                 
-                                uploadStatus.textContent = "Finalizing check-in...";
-                                
-                                // Finalize Firestore Data
-                                await finalizeCheckIn(venueId, venueName, user, userData, isFirstVisit, visitCount, downloadURL);
-                                
-                            } catch (uploadError) {
-                                console.error("Upload failed", uploadError);
-                                uploadStatus.textContent = "Upload failed. Please try again.";
-                                openCameraBtn.style.display = "inline-block";
-                            }
+                                stepCompress.innerHTML = "✅ Photo compressed"; 
+                                stepCompress.style.color = "var(--brand-red)";
+                                stepUpload.innerHTML = "⏳ Uploading securely..."; 
+                                stepUpload.style.color = "var(--text-primary)";
+
+                                try {
+                                    // Upload to Firebase Storage
+                                    const fileName = `checkins/${venueId}/${user.uid}_${Date.now()}.jpg`;
+                                    const storageRef = ref(storage, fileName);
+                                    
+                                    // Use uploadBytes instead of uploadString (more reliable on mobile/Safari)
+                                    await uploadBytes(storageRef, blob);
+                                    const downloadURL = await getDownloadURL(storageRef);
+                                    
+                                    stepUpload.innerHTML = "✅ Upload complete"; 
+                                    stepUpload.style.color = "var(--brand-red)";
+                                    stepFinalize.innerHTML = "⏳ Finalizing check-in..."; 
+                                    stepFinalize.style.color = "var(--text-primary)";
+                                    
+                                    // Finalize Firestore Data
+                                    await finalizeCheckIn(venueId, venueName, user, userData, isFirstVisit, visitCount, downloadURL);
+                                    
+                                    stepFinalize.innerHTML = "✅ Check-in complete!"; 
+                                    stepFinalize.style.color = "var(--brand-red)";
+                                    
+                                } catch (uploadError) {
+                                    console.error("Upload failed", uploadError);
+                                    const errMsg = uploadError.message ? uploadError.message : uploadError;
+                                    stepUpload.innerHTML = `❌ Upload failed <span style="display:block; font-size: 0.8rem; margin-top:4px; opacity:0.8;">(${errMsg})</span>`; 
+                                    stepUpload.style.color = "#ff6b6b";
+                                    fallbackOptions.style.display = "block";
+                                }
+                            }, "image/jpeg", 0.6);
                         };
                         img.src = readerEvent.target.result;
                     };
                     reader.readAsDataURL(file);
+                });
+
+                retryUploadBtn.addEventListener("click", () => {
+                    cameraInput.click();
+                });
+
+                skipUploadBtn.addEventListener("click", async () => {
+                    fallbackOptions.style.display = "none";
+                    stepFinalize.innerHTML = "⏳ Finalizing without photo..."; 
+                    stepFinalize.style.color = "var(--text-primary)";
+                    
+                    try {
+                        await finalizeCheckIn(venueId, venueName, user, userData, isFirstVisit, visitCount, "pending_upload");
+                        stepFinalize.innerHTML = "✅ Check-in logged!"; 
+                        stepFinalize.style.color = "var(--brand-red)";
+                    } catch (err) {
+                        console.error("Finalize error", err);
+                        stepFinalize.innerHTML = "❌ Finalization failed."; 
+                        stepFinalize.style.color = "#ff6b6b";
+                    }
                 });
 
                 async function finalizeCheckIn(venueId, venueName, user, userData, isFirstVisit, visitCount, imageUrl) {
@@ -243,11 +310,16 @@
                     const customerRef = doc(db, "venues", venueId, "customers", user.uid);
                     const newVisitCount = visitCount + 1;
                     
+                    const photoData = imageUrl === "pending_upload" 
+                        ? { photoStatus: "pending" } 
+                        : { photoStatus: "uploaded", photoUrl: imageUrl };
+                        
                     await setDoc(customerRef, {
                         displayName: userData.displayName || "Crawler",
                         email: user.email,
                         visitCount: newVisitCount,
-                        lastVisit: serverTimestamp()
+                        lastVisit: serverTimestamp(),
+                        ...photoData
                     }, { merge: true });
 
                     // 2. Local Legend (Global) points logic - ONLY ON FIRST VISIT
@@ -288,7 +360,7 @@
                                     patronName: userData.displayName || "Crawler",
                                     email: user.email,
                                     visitCount: newVisitCount,
-                                    photoUrl: imageUrl,
+                                    photoUrl: imageUrl === "pending_upload" ? "Pending Upload" : imageUrl,
                                     timestamp: new Date().toISOString()
                                 })
                             }).catch(e => console.error("Webhook trigger failed (non-critical):", e));
