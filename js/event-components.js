@@ -256,15 +256,11 @@ function renderVotingModule(district) {
                     <button class="close-modal" onclick="window.closeShareModal()" style="top: 20px; right: 20px;">×</button>
                     <h2 id="share-modal-title" style="font-size: 1.6rem; margin-top: 0; margin-bottom: 15px; color: var(--text-primary); font-family: var(--font-hero); text-transform: uppercase; padding-right: 30px; line-height: 1.2;">Vote Confirmed!</h2>
                     
-                    <div style="background: rgba(255,255,255,0.05); padding: 12px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); text-align: left; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; gap: 15px;">
-                        <div style="flex: 1;">
-                            <p style="color: var(--text-secondary); font-family: var(--font-main); font-size: 1.05rem; margin: 0; line-height: 1.3;">Encourage friends to vote for this business, too! <b style="color: var(--brand-gold);">Save the image below & share as an Instagram story.</b> Use Instagram's text and sticker tools to add the business name and the direct link to vote for this business.</p>
-                            <p id="copy-success-msg" style="color: #7fd99a; font-family: var(--font-main); font-size: 0.85rem; margin: 6px 0 0 0; display: none;">Link copied to clipboard!</p>
-                        </div>
-                        <div style="flex-shrink: 0;">
-                            <input type="text" id="share-url-input" readonly style="position: absolute; left: -9999px;" aria-hidden="true">
-                            <button onclick="window.copyShareUrl()" style="padding: 10px 16px; background: #618A62; color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1rem; font-family: var(--font-main); transition: background 0.2s; white-space: nowrap;">Copy Link</button>
-                        </div>
+                    <div style="background: rgba(255,255,255,0.05); padding: 12px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); text-align: left; margin-bottom: 15px;">
+                        <p style="color: var(--text-secondary); font-family: var(--font-main); font-size: 1.05rem; margin: 0 0 12px 0; line-height: 1.3;">Encourage friends to vote for this business, too! <b style="color: var(--brand-gold);">Save the image below & share as an Instagram story.</b> Use Instagram's text and sticker tools to add the business name and the direct link to vote for this business.</p>
+                        <input type="text" id="share-url-input" readonly style="position: absolute; left: -9999px;" aria-hidden="true">
+                        <button onclick="window.copyShareUrl()" style="padding: 10px 16px; background: #618A62; color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1rem; font-family: var(--font-main); transition: background 0.2s; white-space: nowrap;">Copy Link</button>
+                        <p id="copy-success-msg" style="color: #7fd99a; font-family: var(--font-main); font-size: 0.85rem; margin: 8px 0 0 0; display: none;">Link copied to clipboard!</p>
                     </div>
 
                     <div style="display: flex; justify-content: center; align-items: stretch; gap: 15px; margin-bottom: 10px;">
