@@ -223,16 +223,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         let venues = [];
 
         if (querySnapshot.empty) {
-            console.log(`No venues found for district ${districtId.toUpperCase()}. Loading mock data for demonstration.`);
-            // Mock Data for demonstration since the database is empty right now
-            venues = [
-                { name: "The Rusty Nail", type: "bar", lat: config.center[0] + 0.005, lng: config.center[1] + 0.005, rank: 1, description: "Patio crawfish boil" },
-                { name: "Barrel Proof", type: "bar", lat: config.center[0] - 0.002, lng: config.center[1] - 0.008, rank: 2, description: "Brass band on the deck" },
-                { name: "The Tchoup Yard", type: "lounge", lat: config.center[0] - 0.006, lng: config.center[1] + 0.002, rank: 3, description: "Outdoor games & DJ" },
-                { name: "Capulet", type: "restaurant", lat: config.center[0] + 0.008, lng: config.center[1] - 0.004, rank: 4, description: "Frozen cocktails specials" },
-                { name: "Bulldog Mid-City", type: "bar", lat: config.center[0] - 0.004, lng: config.center[1] - 0.012, rank: 5, description: "Pint night deals" },
-                { name: "Finn McCool's", type: "bar", lat: config.center[0] + 0.012, lng: config.center[1] + 0.008, rank: 6, description: "Dog-friendly patio vibes" }
-            ];
+            console.log(`No venues found for district ${districtId.toUpperCase()} in Firestore.`);
         } else {
             querySnapshot.forEach((doc) => {
                 const data = doc.data();
@@ -328,6 +319,69 @@ document.addEventListener("DOMContentLoaded", async () => {
                 // map.setView(marker.getLatLng(), map.getZoom());
             }
         };
+
+        // Populate the voting lists dynamically
+        const populateLists = () => {
+            const eventLayout = document.querySelector('event-layout');
+            if (!eventLayout) {
+                setTimeout(populateLists, 100);
+                return;
+            }
+            
+            // Sort venues by voteCount descending
+            const sortedVenues = [...inDistrictVenues].sort((a, b) => (b.voteCount || 0) - (a.voteCount || 0));
+            
+            // Render a single venue list item
+            const renderVenueItem = (v, i, maxRank) => {
+                let badgeClass = i < 3 ? 'gold' : (i < 5 ? 'silver' : 'dark-gray');
+                const safeName = v.name ? v.name.replace(/'/g, "\\'") : '';
+                return `<li><span class="rank-badge ${badgeClass}">${i + 1}</span> <div class="v-details"><strong>${v.name || 'Unknown'}</strong><br><em>${v.type ? v.type.replace('_', ' ') : ''}</em></div> <button class="brand-btn vote-btn-small" onclick="window.openVoteModal('${v.id}', '${safeName}')">VOTE</button></li>`;
+            };
+
+            // Round 1 List
+            const round1List = eventLayout.querySelector('#state-round-1 .venue-list');
+            if (round1List) {
+                round1List.innerHTML = sortedVenues.map((v, i) => renderVenueItem(v, i, sortedVenues.length)).join('');
+            }
+            
+            // Run-off List (Top 5)
+            const runoffList = eventLayout.querySelector('#state-run-off .venue-list');
+            if (runoffList) {
+                runoffList.innerHTML = sortedVenues.slice(0, 5).map((v, i) => renderVenueItem(v, i, 5)).join('');
+            }
+            
+            // Leaderboards
+            const updateLeaderboard = (selector, limit) => {
+                const leaderboard = eventLayout.querySelector(selector);
+                if (leaderboard) {
+                    const h3 = leaderboard.querySelector('h3');
+                    leaderboard.innerHTML = '';
+                    if (h3) leaderboard.appendChild(h3);
+                    
+                    const maxVotes = sortedVenues.length > 0 ? (sortedVenues[0].voteCount || 1) : 1;
+                    
+                    sortedVenues.slice(0, limit).forEach((v, i) => {
+                        const width = Math.max(10, ((v.voteCount || 0) / maxVotes) * 100);
+                        const ordinal = ['1st', '2nd', '3rd', '4th', '5th'][i] || `${i+1}th`;
+                        leaderboard.innerHTML += `
+                        <div class="leaderboard-bar ${ordinal}" style="margin-bottom: 6px;">
+                            <div class="bar-fill" style="width: ${width}%;"></div>
+                            <div class="bar-content" style="padding: 6px 12px;">
+                                <span class="rank">#${i + 1}</span>
+                                <span class="venue-name">${v.name || 'Unknown'}</span>
+                                <span class="vote-count">${v.voteCount || 0} votes</span>
+                            </div>
+                        </div>`;
+                    });
+                }
+            };
+            
+            updateLeaderboard('#state-round-1 .leaderboard', 3);
+            updateLeaderboard('#state-run-off .leaderboard', 5);
+        };
+        
+        populateLists();
+
     } catch (error) {
         console.error("Error fetching venues from Firestore:", error);
     }

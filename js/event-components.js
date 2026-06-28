@@ -143,16 +143,7 @@ function renderVotingModule(district) {
 
                     <div class="venue-list-container">
                         <ul class="venue-list">
-                            <li><span class="rank-badge gold">1</span> <div class="v-details"><strong>The Rusty Nail</strong><br><em>Patio crawfish boil</em></div> <button class="brand-btn vote-btn-small" onclick="window.openVoteModal('mock_1', 'The Rusty Nail')">VOTE</button></li>
-                            <li><span class="rank-badge gold">2</span> <div class="v-details"><strong>Barrel Proof</strong><br><em>Brass band on the deck</em></div> <button class="brand-btn vote-btn-small" onclick="window.openVoteModal('mock_2', 'Barrel Proof')">VOTE</button></li>
-                            <li><span class="rank-badge gold">3</span> <div class="v-details"><strong>The Tchoup Yard</strong><br><em>Outdoor games & DJ</em></div> <button class="brand-btn vote-btn-small" onclick="window.openVoteModal('mock_3', 'The Tchoup Yard')">VOTE</button></li>
-                            <li><span class="rank-badge silver">4</span> <div class="v-details"><strong>Capulet</strong><br><em>Frozen cocktails specials</em></div> <button class="brand-btn vote-btn-small" onclick="window.openVoteModal('mock_4', 'Capulet')">VOTE</button></li>
-                            <li><span class="rank-badge silver">5</span> <div class="v-details"><strong>Bulldog Mid-City</strong><br><em>Pint night deals</em></div> <button class="brand-btn vote-btn-small" onclick="window.openVoteModal('mock_5', 'Bulldog Mid-City')">VOTE</button></li>
-                            <li><span class="rank-badge dark-gray">6</span> <div class="v-details"><strong>Finn McCool's</strong><br><em>Dog-friendly patio vibes</em></div> <button class="brand-btn vote-btn-small" onclick="window.openVoteModal('mock_6', 'Finn McCool\\'s')">VOTE</button></li>
-                            <li><span class="rank-badge dark-gray">7</span> <div class="v-details"><strong>Pal's Lounge</strong><br><em>Neighborhood classic</em></div> <button class="brand-btn vote-btn-small" onclick="window.openVoteModal('mock_7', 'Pal\\'s Lounge')">VOTE</button></li>
-                            <li><span class="rank-badge dark-gray">8</span> <div class="v-details"><strong>Mick's Irish Pub</strong><br><em>Live sports & pool</em></div> <button class="brand-btn vote-btn-small" onclick="window.openVoteModal('mock_8', 'Mick\\'s Irish Pub')">VOTE</button></li>
-                            <li><span class="rank-badge dark-gray">9</span> <div class="v-details"><strong>Rendon Inn</strong><br><em>Best late night tacos</em></div> <button class="brand-btn vote-btn-small" onclick="window.openVoteModal('mock_9', 'Rendon Inn')">VOTE</button></li>
-                            <li><span class="rank-badge dark-gray">10</span> <div class="v-details"><strong>12 Mile Limit</strong><br><em>Spacious outdoor seating</em></div> <button class="brand-btn vote-btn-small" onclick="window.openVoteModal('mock_10', '12 Mile Limit')">VOTE</button></li>
+                            <!-- Dynamically populated from Firestore -->
                         </ul>
                         <div class="pagination">
                             <button disabled>← Prev</button>
@@ -212,11 +203,7 @@ function renderVotingModule(district) {
                     </div>
                     <div class="venue-list-container">
                         <ul class="venue-list">
-                            <li><span class="rank-badge gold">1</span> <div class="v-details"><strong>The Rusty Nail</strong><br><em>Patio crawfish boil</em></div> <button class="brand-btn vote-btn-small" onclick="window.openVoteModal('mock_1', 'The Rusty Nail')">VOTE</button></li>
-                            <li><span class="rank-badge gold">2</span> <div class="v-details"><strong>Barrel Proof</strong><br><em>Brass band on the deck</em></div> <button class="brand-btn vote-btn-small" onclick="window.openVoteModal('mock_2', 'Barrel Proof')">VOTE</button></li>
-                            <li><span class="rank-badge gold">3</span> <div class="v-details"><strong>The Tchoup Yard</strong><br><em>Outdoor games & DJ</em></div> <button class="brand-btn vote-btn-small" onclick="window.openVoteModal('mock_3', 'The Tchoup Yard')">VOTE</button></li>
-                            <li><span class="rank-badge silver">4</span> <div class="v-details"><strong>Capulet</strong><br><em>Frozen cocktails specials</em></div> <button class="brand-btn vote-btn-small" onclick="window.openVoteModal('mock_4', 'Capulet')">VOTE</button></li>
-                            <li><span class="rank-badge silver">5</span> <div class="v-details"><strong>Bulldog Mid-City</strong><br><em>Pint night deals</em></div> <button class="brand-btn vote-btn-small" onclick="window.openVoteModal('mock_5', 'Bulldog Mid-City')">VOTE</button></li>
+                            <!-- Dynamically populated from Firestore -->
                         </ul>
                     </div>
                 </div>
@@ -542,13 +529,6 @@ class EventLayout extends HTMLElement {
             btn.disabled = true;
 
             try {
-                // If this is a mock venue for testing, bypass Firestore updates to allow unlimited testing
-                if (venueId.startsWith('mock_')) {
-                    console.log("Mock venue selected. Bypassing Firestore writes for testing.");
-                    window.showShareScreen();
-                    return;
-                }
-
                 const userRef = doc(db, "users", currentUser.uid);
                 const userSnap = await getDoc(userRef);
                 
