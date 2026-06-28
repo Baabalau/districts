@@ -586,39 +586,14 @@ class EventLayout extends HTMLElement {
                 urlInput.value = shareUrl;
             }
             
-            // Generate the custom graphic using Canvas
-            const canvas = this.querySelector('#share-canvas');
-            const ctx = canvas.getContext('2d');
-            const img = new Image();
-            img.crossOrigin = "anonymous";
+            // Set the image source directly without using canvas
+            const imgEl = this.querySelector('#generated-share-graphic');
+            if (imgEl) {
+                imgEl.src = `assets/District%20Parings/VoteShare_${districtId}.png`;
+            }
             
-            // Load the district-specific template graphic
-            img.src = `assets/District%20Parings/VoteShare_${districtId}.png`;
-            
-            img.onload = () => {
-                // Convert canvas to a data URL and set it as the image source
-                // We no longer draw the venue name on the graphic for the voter share modal
-                ctx.drawImage(img, 0, 0, 1080, 1920);
-                const dataUrl = canvas.toDataURL('image/png');
-                this.querySelector('#generated-share-graphic').src = dataUrl;
-                
-                // Set up the explicit download button with the custom filename (kept in DOM but hidden as requested)
-                const downloadBtn = this.querySelector('#download-graphic-btn');
-                if (downloadBtn) {
-                    downloadBtn.href = dataUrl;
-                    const safeName = venueName.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_');
-                    downloadBtn.download = `districts_votefor_${safeName}.png`;
-                }
-                
-                // Show the modal
-                this.querySelector('#share-modal').style.display = 'flex';
-            };
-            
-            // Fallback in case image fails to load
-            img.onerror = () => {
-                console.error("Failed to load share graphic template.");
-                this.querySelector('#share-modal').style.display = 'flex';
-            };
+            // Show the modal
+            this.querySelector('#share-modal').style.display = 'flex';
         };
 
         window.closeShareModal = () => {
