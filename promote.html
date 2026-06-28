@@ -8,6 +8,10 @@
     <link rel="stylesheet" href="css/district-page.css">
     <link rel="stylesheet" href="css/event-styles.css">
     <link rel="stylesheet" href="css/site-footer.css">
+    
+    <!-- html2canvas for flattening composite images -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
     <style>
         :root {
             --promo-gutter: clamp(32px, 6vw, 80px);
@@ -1026,22 +1030,8 @@
                 // NOTE: Replace YOUR_WEB_APP_URL with the actual URL after deploying the Apps Script
                 const scriptUrl = 'https://script.google.com/macros/s/AKfycbyiZ-stBQhmx-vq4KYt8ACGq8ahKJieh8lbelzxafCT5ICSiVuMTR0YXgof14MMhCP9/exec';
                 
-                if (scriptUrl !== 'YOUR_WEB_APP_URL') {
-                    fetch(scriptUrl, {
-                        method: 'POST',
-                        mode: 'no-cors', // no-cors is often needed for simple Google Apps Script submissions
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(formData)
-                    }).then(() => {
-                        console.log("Form data sent to Google Sheets");
-                    }).catch(error => {
-                        console.error("Error sending form data:", error);
-                    });
-                } else {
-                    console.log("Form data ready to be pushed to Google Sheets:", formData);
-                }
+                // We will send the fetch request AFTER the images are flattened and uploaded
+                // so we can include the image URLs in the payload.
                 
                 // Fetch QR code
                 const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(votingUrl)}&color=${graphicConfig.qrColors.foreground}&bgcolor=${graphicConfig.qrColors.background}`;
@@ -1105,6 +1095,97 @@
                 // Hide form, show results
                 form.style.display = 'none';
                 formSuccess.style.display = 'block';
+
+                // Flatten images with html2canvas and upload to Firebase Storage
+                setTimeout(async () => {
+                    try {
+                        // 1. Flatten the images locally first (Fast for the user)
+                        const flattenImage = async (elementId) => {
+                            const element = document.getElementById(elementId);
+                            const canvas = await html2canvas(element, { 
+                                useCORS: true, // Crucial for loading external images like the QR code
+                                scale: 2 // Higher resolution
+                            });
+                            return canvas.toDataURL('image/png');
+                        };
+
+                        const timestamp = Date.now();
+                        const socialFilename = `${venueId}-social-${timestamp}.png`;
+                        const flyerFilename = `${venueId}-flyer-${timestamp}.png`;
+
+                        const [socialDataUrl, flyerDataUrl] = await Promise.all([
+                            flattenImage('social-composite'),
+                            flattenImage('flyer-composite')
+                        ]);
+
+                        // 2. Update UI instantly with local data URLs (No CORS issues, works offline/locally)
+                        const socialContainer = document.getElementById('social-composite').parentElement;
+                        
+                        // Create the download button using the local dataUrl
+                        const downloadSocialBtn = document.createElement('a');
+                        downloadSocialBtn.href = socialDataUrl;
+                        downloadSocialBtn.download = socialFilename;
+                        downloadSocialBtn.className = 'brand-btn';
+                        downloadSocialBtn.style.cssText = 'display: inline-block; background: var(--brand-red); color: white; text-decoration: none; padding: 10px 20px; border-radius: 8px; margin-top: 15px; font-weight: bold; text-align: center; width: 100%; box-sizing: border-box; cursor: pointer;';
+                        downloadSocialBtn.textContent = 'Download Social Story';
+                        
+                        const socialHint = socialContainer.querySelector('p');
+                        if (socialHint) {
+                            socialHint.replaceWith(downloadSocialBtn);
+                        } else {
+                            socialContainer.appendChild(downloadSocialBtn);
+                        }
+
+                        // Replace HTML composites with flat images. 
+                        // This allows mobile users to "Long Press -> Save Image" natively and ensures perfect printing.
+                        const replaceWithFlatImage = (elementId, dataUrl) => {
+                            const composite = document.getElementById(elementId);
+                            const flatImg = document.createElement('img');
+                            flatImg.id = elementId; // Keep ID for print CSS
+                            flatImg.src = dataUrl;
+                            flatImg.style.cssText = composite.style.cssText;
+                            composite.replaceWith(flatImg);
+                        };
+
+                        replaceWithFlatImage('social-composite', socialDataUrl);
+                        replaceWithFlatImage('flyer-composite', flyerDataUrl);
+
+                        // Also force a download for the user immediately
+                        downloadSocialBtn.click();
+
+                        // 3. Upload to Firebase & Google Sheets in the background
+                        const { ref, uploadString, getDownloadURL } = await import('https://www.gstatic.com/firebasejs/10.9.0/firebase-storage.js');
+                        const { storage } = await import('./js/firebase-config.js');
+
+                        const uploadToFirebase = async (dataUrl, filename) => {
+                            const storageRef = ref(storage, `promo_graphics/${filename}`);
+                            await uploadString(storageRef, dataUrl, 'data_url');
+                            return await getDownloadURL(storageRef);
+                        };
+
+                        const [socialUrl, flyerUrl] = await Promise.all([
+                            uploadToFirebase(socialDataUrl, socialFilename),
+                            uploadToFirebase(flyerDataUrl, flyerFilename)
+                        ]);
+
+                        formData.socialGraphicUrl = socialUrl;
+                        formData.flyerGraphicUrl = flyerUrl;
+
+                        if (scriptUrl !== 'YOUR_WEB_APP_URL') {
+                            fetch(scriptUrl, {
+                                method: 'POST',
+                                mode: 'no-cors',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(formData)
+                            }).then(() => console.log("Form data with image URLs sent to Google Sheets"))
+                              .catch(error => console.error("Error sending form data:", error));
+                        }
+
+                    } catch (error) {
+                        console.error("Error flattening or uploading graphics:", error);
+                        alert("There was an issue generating the downloadable image. Please right-click the image to save it.");
+                    }
+                }, 1500); // Wait 1.5s for QR code to load
             });
         });
     </script>
