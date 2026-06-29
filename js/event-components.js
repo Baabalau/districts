@@ -245,7 +245,10 @@ function renderVenueExplorer() {
                         </div>
                         <div class="explorer-pane leaderboard-pane">
                             <div class="leaderboard" style="margin-bottom: 0;">
-                                <h3 style="color: var(--text-primary); font-family: var(--font-hero); font-size: 1.2rem; margin-bottom: 10px; text-transform: uppercase;">Current Leaders</h3>
+                                <h3>Current Leaders</h3>
+                                <ul class="venue-list leaderboard-list">
+                                    <!-- Dynamically populated from Firestore -->
+                                </ul>
                             </div>
                         </div>
                         <div class="explorer-pane browse-pane" style="display: none;">

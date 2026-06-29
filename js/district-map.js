@@ -382,37 +382,53 @@ document.addEventListener("DOMContentLoaded", async () => {
             // Render a single venue list item (Browse view). The Browse list is
             // alphabetical, not a ranking, so it shows a type-colored dot (matching
             // the map legend) instead of a gold/silver/bronze medal badge.
-            const renderVenueItem = (v) => {
-                const safeName = v.name ? v.name.replace(/'/g, "\\'") : '';
-                const category = categorizeType(v.type);
+            const buildVenueSubtitle = (v, extraHtml = '') => {
                 const typeStr = (v.type && typeof v.type === 'string') ? v.type.replace('_', ' ') : 'Venue';
-                
-                // Street part only (drop city/state/zip) for the rotating subtitle.
                 let addressSnippet = '';
-                if (v.address) {
-                    addressSnippet = v.address.split(',')[0].trim();
-                }
-                
-                const textRotationHtml = addressSnippet ? `
-                    <div style="position: relative; height: 1.2em; overflow: hidden; color: var(--text-secondary); font-size: 0.85rem; font-style: italic;">
-                        <div class="flipper-container" style="animation: flipText 8s infinite;">
-                            <div style="height: 1.2em; line-height: 1.2em;">${typeStr}</div>
-                            <div style="height: 1.2em; line-height: 1.2em;">${addressSnippet}</div>
-                        </div>
-                    </div>` : `
-                    <em style="color: var(--text-secondary); font-size: 0.85rem; display: block;">${typeStr}</em>`;
+                if (v.address) addressSnippet = v.address.split(',')[0].trim();
 
-                return `<li style="display: flex; align-items: center; padding: 12px 15px;">
-                    <span class="type-dot" style="flex-shrink: 0; background-color: ${categoryColor(category)};" title="${category}"></span>
-                    <div class="v-details" style="flex: 1; text-align: left; padding: 0 15px; min-width: 0;">
-                        <strong style="font-family: 'EB Garamond', Georgia, serif; font-size: 1.5rem; text-transform: uppercase; line-height: 1.1; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-primary); margin-bottom: 4px;">${v.name || 'Unknown'}</strong>
-                        ${textRotationHtml}
-                    </div> 
-                    <div style="display: flex; align-items: stretch; gap: 8px; flex-shrink: 0;">
-                        <button class="brand-btn" style="padding: 0 20px; height: 42px; font-size: 0.95rem; text-align: center; letter-spacing: 0.5px; font-weight: 700; text-transform: uppercase; background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); color: white; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.4);" onclick="window.openVoteModal('${v.id}', '${safeName}')">VOTE FOR THIS BUSINESS</button>
-                        <a href="checkin.html?venue=${v.id}" class="brand-btn" style="background: transparent; border: 2px solid rgba(255,255,255,0.2); color: var(--text-secondary); text-decoration: none; padding: 0; width: 42px; height: 42px; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; border-radius: 6px;" title="Check In to Location" onmouseover="this.style.opacity='1'; this.style.borderColor='var(--text-secondary)';" onmouseout="this.style.opacity='0.8'; this.style.borderColor='rgba(255,255,255,0.2)';">📍</a>
+                const rotation = addressSnippet ? `
+                    <div class="venue-subtitle-flip">
+                        <div class="flipper-container">
+                            <div>${typeStr}</div>
+                            <div>${addressSnippet}</div>
+                        </div>
+                    </div>` : `<em class="venue-subtitle">${typeStr}</em>`;
+
+                return extraHtml ? `${rotation}${extraHtml}` : rotation;
+            };
+
+            const renderVenueActions = (v) => {
+                const safeName = v.name ? v.name.replace(/'/g, "\\'") : '';
+                return `<div class="venue-actions">
+                        <button class="brand-btn venue-vote-btn" onclick="window.openVoteModal('${v.id}', '${safeName}')">VOTE FOR THIS BUSINESS</button>
+                        <a href="checkin.html?venue=${v.id}" class="brand-btn venue-checkin-btn" title="Check In to Location">📍</a>
+                    </div>`;
+            };
+
+            // Shared venue card used by both Browse (type dot) and Leaderboard (rank badge).
+            const renderVenueCard = ({ leftIndicatorHtml, nameHtml, subtitleHtml = '', actionsHtml = '' }) => {
+                return `<li class="venue-card">
+                    ${leftIndicatorHtml}
+                    <div class="v-details">
+                        ${nameHtml}
+                        ${subtitleHtml}
                     </div>
+                    ${actionsHtml}
                 </li>`;
+            };
+
+            const renderVenueItem = (v) => {
+                const category = categorizeType(v.type);
+                const leftIndicator = `<span class="type-dot" style="background-color: ${categoryColor(category)};" title="${category}"></span>`;
+                const nameHtml = `<strong class="venue-name">${v.name || 'Unknown'}</strong>`;
+                const subtitleHtml = buildVenueSubtitle(v);
+                return renderVenueCard({
+                    leftIndicatorHtml: leftIndicator,
+                    nameHtml,
+                    subtitleHtml,
+                    actionsHtml: renderVenueActions(v)
+                });
             };
 
             // Paginated venue lists (avoids one long scroll of businesses)
@@ -459,36 +475,36 @@ document.addEventListener("DOMContentLoaded", async () => {
             // Vote-ranked leaderboard (top 10), shown in the Leaderboard pane.
             const updateLeaderboard = (selector, limit) => {
                 const leaderboard = eventLayout.querySelector(selector);
-                if (leaderboard) {
-                    const h3 = leaderboard.querySelector('h3');
-                    leaderboard.innerHTML = '';
-                    if (h3) leaderboard.appendChild(h3);
-                    
-                    // Filter venues that actually have votes
-                    const venuesWithVotes = sortedVenues.filter(v => (v.voteCount || 0) > 0);
-                    const maxVotes = venuesWithVotes.length > 0 ? venuesWithVotes[0].voteCount : 1;
-                    
-                    let htmlString = '';
-                    for (let i = 0; i < limit; i++) {
-                        const v = venuesWithVotes[i]; // May be undefined if not enough voted venues
-                        const width = v ? Math.max(10, ((v.voteCount || 0) / maxVotes) * 100) : 10;
-                        const ordinal = ['1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th', '10th'][i] || `${i+1}th`;
-                        const name = v ? (v.name || 'Unknown') : '<span style="opacity: 0.5; font-style: italic;">Awaiting Votes...</span>';
-                        const votesStr = v ? `${v.voteCount} votes` : '';
-                        
-                        let badgeClass = i === 0 ? 'gold' : (i === 1 ? 'silver' : (i === 2 ? 'bronze' : 'dark-gray'));
-                        htmlString += `
-                        <div class="leaderboard-bar ${ordinal}" style="margin-bottom: 8px; height: 45px; border-radius: 8px; overflow: hidden; position: relative;">
-                            <div class="bar-fill" style="width: ${width}%;"></div>
-                            <div class="bar-content" style="padding: 6px 15px; display: flex; align-items: center; gap: 15px; position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
-                                <span class="rank-badge ${badgeClass}" style="width: 28px; height: 28px; font-size: 0.95rem; border-width: 2px; flex-shrink: 0;">${i + 1}</span>
-                                <span class="venue-name" style="text-align: left; flex: 1; z-index: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${name}</span>
-                                <span class="vote-count" style="z-index: 1; flex-shrink: 0;">${votesStr}</span>
-                            </div>
-                        </div>`;
+                if (!leaderboard) return;
+
+                const list = leaderboard.querySelector('.leaderboard-list');
+                if (!list) return;
+
+                const venuesWithVotes = sortedVenues.filter(v => (v.voteCount || 0) > 0);
+                let htmlString = '';
+
+                for (let i = 0; i < limit; i++) {
+                    const v = venuesWithVotes[i];
+                    const badgeClass = i === 0 ? 'gold' : (i === 1 ? 'silver' : (i === 2 ? 'bronze' : 'dark-gray'));
+                    const leftIndicator = `<span class="rank-badge ${badgeClass}">${i + 1}</span>`;
+
+                    if (v) {
+                        const voteMeta = `<span class="vote-count-label">${v.voteCount} vote${v.voteCount === 1 ? '' : 's'}</span>`;
+                        htmlString += renderVenueCard({
+                            leftIndicatorHtml: leftIndicator,
+                            nameHtml: `<strong class="venue-name">${v.name || 'Unknown'}</strong>`,
+                            subtitleHtml: buildVenueSubtitle(v, voteMeta),
+                            actionsHtml: renderVenueActions(v)
+                        });
+                    } else {
+                        htmlString += renderVenueCard({
+                            leftIndicatorHtml: leftIndicator,
+                            nameHtml: `<strong class="venue-name venue-name-placeholder">Awaiting Votes...</strong>`
+                        });
                     }
-                    leaderboard.innerHTML += htmlString;
                 }
+
+                list.innerHTML = htmlString;
             };
 
             // Combined Venue Explorer: one component toggling between the vote-ranked

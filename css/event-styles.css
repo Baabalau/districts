@@ -566,9 +566,24 @@
     background: var(--panel-bg);
     border: 2px solid rgba(45, 27, 21, 0.15);
     border-radius: 12px;
-    padding: 15px 20px;
+    padding: 4px 20px 15px;
     margin-bottom: 30px;
     box-shadow: 0 12px 32px rgba(45, 27, 21, 0.1);
+}
+.leaderboard h3 {
+    color: var(--text-primary);
+    font-family: var(--font-hero);
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    margin-top: 0;
+    padding-top: 4px;
+    text-transform: uppercase;
+}
+.leaderboard-list .venue-card {
+    margin-bottom: 5px;
+}
+.leaderboard-list .venue-card:last-child {
+    margin-bottom: 0;
 }
 
 .leaderboard-bar {
@@ -693,11 +708,113 @@
 .venue-list {
     list-style: none; padding: 0; margin: 0;
 }
+.venue-list .venue-card,
 .venue-list li {
-    display: flex; align-items: center; background: var(--bg-secondary); border: 1px solid rgba(255,255,255,0.05);
-    border-radius: 8px; padding: 10px 15px; margin-bottom: 8px; transition: transform 0.2s, border-color 0.2s;
+    display: flex;
+    align-items: center;
+    background: var(--bg-secondary);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 8px;
+    padding: 12px 15px;
+    margin-bottom: 8px;
+    transition: transform 0.2s, border-color 0.2s;
 }
-.venue-list li:hover { transform: translateX(5px); border-color: var(--accent); }
+.venue-list .venue-card:hover,
+.venue-list li:hover {
+    transform: translateX(5px);
+    border-color: var(--accent);
+}
+.venue-list .venue-card .v-details,
+.venue-list li .v-details {
+    flex: 1;
+    text-align: left;
+    padding: 0 15px;
+    min-width: 0;
+}
+.venue-list .venue-name {
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    line-height: 1.1;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+.venue-list .venue-name-placeholder {
+    opacity: 0.5;
+    font-style: italic;
+    text-transform: none;
+    font-size: 1.1rem;
+}
+.venue-subtitle-flip {
+    position: relative;
+    height: 1.2em;
+    overflow: hidden;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    font-style: italic;
+}
+.venue-subtitle-flip .flipper-container {
+    animation: flipText 8s infinite;
+}
+.venue-subtitle-flip .flipper-container div {
+    height: 1.2em;
+    line-height: 1.2em;
+}
+.venue-subtitle {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    display: block;
+}
+.vote-count-label {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--accent);
+    font-style: normal;
+}
+.venue-actions {
+    display: flex;
+    align-items: stretch;
+    gap: 8px;
+    flex-shrink: 0;
+}
+.venue-vote-btn {
+    padding: 0 20px;
+    height: 42px;
+    font-size: 0.95rem;
+    text-align: center;
+    letter-spacing: 0.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+}
+.venue-checkin-btn {
+    background: transparent;
+    border: 2px solid rgba(255,255,255,0.2);
+    color: var(--text-secondary);
+    text-decoration: none;
+    padding: 0;
+    width: 42px;
+    height: 42px;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    border-radius: 6px;
+}
+.venue-checkin-btn:hover {
+    opacity: 1;
+    border-color: var(--text-secondary);
+}
 .rank-badge {
     width: 35px; height: 35px; background: #333; color: #fff; border-radius: 50%;
     display: flex; align-items: center; justify-content: center; font-weight: 900; font-family: var(--font-header);
