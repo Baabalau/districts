@@ -253,6 +253,7 @@
                         <th data-sort="user">User <span class="sort-icon"></span></th>
                         <th data-sort="visits">Total Visits <span class="sort-icon"></span></th>
                         <th>Photo</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="table-body">
@@ -275,6 +276,7 @@
                         <th>District</th>
                         <th>Venue</th>
                         <th>Total Votes</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="votes-table-body"></tbody>
@@ -357,7 +359,7 @@
     <script type="module">
         import { auth, db } from "./js/firebase-config.js";
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
-        import { collection, getDocs, doc, getDoc, setDoc, updateDoc, query, where, orderBy, collectionGroup } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+        import { collection, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, increment, arrayUnion, query, where, orderBy, collectionGroup } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
         const loadingEl = document.getElementById("loading");
         const tableWrapper = document.getElementById("table-wrapper");
@@ -431,6 +433,8 @@
                     
                     allData.push({
                         id: `${venueId}_${custDoc.id}`,
+                        venueId: venueId,
+                        userId: custDoc.id,
                         business: venueName,
                         user: custData.displayName || custData.email || "Unknown User",
                         email: custData.email || "",
@@ -505,6 +509,10 @@
                         </td>
                         <td style="text-align: center;">${row.visits}</td>
                         <td>${photoHTML}</td>
+                        <td style="font-size: 0.8rem;">
+                            <button onclick="window.invalidateCheckin('${row.venueId}', '${row.userId}')" style="margin-bottom: 5px; background: #6b3333; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; width: 100%;">Invalidate Check-in</button><br>
+                            <button onclick="window.banUser('${row.userId}')" style="background: #333; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; width: 100%;">Ban User</button>
+                        </td>
                     </tr>
                 `;
             }).join('');
@@ -620,10 +628,16 @@
             document.getElementById('votes-record-count').textContent = `${filtered.length} venues found`;
             
             votesTbody.innerHTML = filtered.map(v => `
-                <tr>
+                <tr style="cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'" onclick="window.expandVotes('${v.id}')">
                     <td>${v.district}</td>
                     <td>${v.name}</td>
                     <td><strong>${v.votes}</strong></td>
+                    <td><button style="background: transparent; color: var(--text-primary); border: 1px solid var(--text-secondary); padding: 4px 10px; border-radius: 4px; cursor: pointer;">View All Votes</button></td>
+                </tr>
+                <tr id="votes-expand-${v.id}" style="display: none; background: rgba(0,0,0,0.3);">
+                    <td colspan="4" style="padding: 0;">
+                        <div id="votes-content-${v.id}" style="padding: 15px;">Loading votes...</div>
+                    </td>
                 </tr>
             `).join('');
             
@@ -748,6 +762,148 @@
             }
         });
 
+
+        // --- ADMIN ACTIONS ---
+        window.invalidateCheckin = async (venueId, userId) => {
+            if (!confirm("Are you sure you want to invalidate this check-in? This will decrement the venue's visit count and remove the check-in photo.")) return;
+            
+            try {
+                // Delete check-in doc
+                await deleteDoc(doc(db, "venues", venueId, "customers", userId));
+                
+                // Decrement venue total
+                const venueRef = doc(db, "venues", venueId);
+                const venueSnap = await getDoc(venueRef);
+                if (venueSnap.exists() && venueSnap.data().visitCount > 0) {
+                    await updateDoc(venueRef, { visitCount: increment(-1) });
+                }
+                
+                // Add notification to user
+                await updateDoc(doc(db, "users", userId), {
+                    notifications: arrayUnion(`Your check-in at a venue was invalidated. Please ensure your photo clearly shows the required elements.`)
+                });
+                
+                alert("Check-in invalidated.");
+                fetchData(true); // Refresh
+            } catch (e) {
+                console.error("Error invalidating check-in:", e);
+                alert("Error invalidating check-in: " + e.message);
+            }
+        };
+
+        window.banUser = async (userId) => {
+            if (!confirm("Are you sure you want to ban this user? They will no longer be able to check-in or vote.")) return;
+            
+            try {
+                await setDoc(doc(db, "users", userId), { 
+                    isBanned: true,
+                    notifications: arrayUnion("Your account has been suspended due to suspicious activity. You can no longer participate in voting or check-ins.")
+                }, { merge: true });
+                alert("User banned.");
+            } catch (e) {
+                console.error("Error banning user:", e);
+                alert("Error banning user: " + e.message);
+            }
+        };
+
+        window.expandVotes = async (venueId) => {
+            const row = document.getElementById(`votes-expand-${venueId}`);
+            const contentDiv = document.getElementById(`votes-content-${venueId}`);
+            
+            // Toggle visibility
+            if (row.style.display === 'table-row') {
+                row.style.display = 'none';
+                return;
+            }
+            
+            row.style.display = 'table-row';
+            contentDiv.innerHTML = '<span style="color:var(--text-secondary);">Loading vote audit records...</span>';
+            
+            try {
+                const votesSnap = await getDocs(collection(db, "venues", venueId, "votes"));
+                if (votesSnap.empty) {
+                    contentDiv.innerHTML = '<span style="color:#ff6b6b;">No detailed vote audit records found. (Votes cast prior to the audit system update cannot be expanded).</span>';
+                    return;
+                }
+                
+                let html = `
+                    <table style="width: 100%; background: #0b101c; border-radius: 8px;">
+                        <thead>
+                            <tr>
+                                <th style="padding: 8px; font-size:0.85rem;">Time</th>
+                                <th style="padding: 8px; font-size:0.85rem;">User</th>
+                                <th style="padding: 8px; font-size:0.85rem;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                votesSnap.forEach(d => {
+                    const data = d.data();
+                    const t = data.timestamp && data.timestamp.toDate ? data.timestamp.toDate().toLocaleString() : 'Unknown Time';
+                    html += `
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <td style="padding: 8px; font-size:0.85rem; color:var(--text-secondary);">${t}</td>
+                            <td style="padding: 8px; font-size:0.85rem;">${data.displayName} <br><span style="opacity:0.6">${data.email}</span></td>
+                            <td style="padding: 8px; font-size:0.85rem;">
+                                <button onclick="window.invalidateVote('${venueId}', '${d.id}', event)" style="margin-right: 5px; background: #6b3333; color: white; border: none; padding: 2px 6px; border-radius: 4px; cursor: pointer; font-size:0.75rem;">Invalidate Vote</button>
+                                <button onclick="window.banUser('${d.id}'); event.stopPropagation();" style="background: #333; color: white; border: none; padding: 2px 6px; border-radius: 4px; cursor: pointer; font-size:0.75rem;">Ban User</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                html += '</tbody></table>';
+                contentDiv.innerHTML = html;
+                
+            } catch (e) {
+                console.error("Error expanding votes:", e);
+                contentDiv.innerHTML = `<span style="color:#ff6b6b;">Error: ${e.message}</span>`;
+            }
+        };
+
+        window.invalidateVote = async (venueId, userId, event) => {
+            event.stopPropagation(); // prevent row collapse
+            if (!confirm("Are you sure you want to invalidate this vote? This will decrement the venue's vote count.")) return;
+            
+            try {
+                // Delete vote audit record
+                await deleteDoc(doc(db, "venues", venueId, "votes", userId));
+                
+                // Remove vote from user's object
+                const userRef = doc(db, "users", userId);
+                const userSnap = await getDoc(userRef);
+                if (userSnap.exists()) {
+                    let votes = userSnap.data().votes || {};
+                    if (votes[venueId]) {
+                        delete votes[venueId];
+                        await setDoc(userRef, { votes: votes }, { merge: true });
+                    }
+                    
+                    // Send notification
+                    await setDoc(userRef, {
+                        notifications: arrayUnion(`Your vote for a venue was invalidated.`)
+                    }, { merge: true });
+                }
+                
+                // Decrement venue total
+                const venueRef = doc(db, "venues", venueId);
+                const venueSnap = await getDoc(venueRef);
+                if (venueSnap.exists() && venueSnap.data().voteCount > 0) {
+                    await updateDoc(venueRef, { voteCount: increment(-1) });
+                }
+                
+                alert("Vote invalidated.");
+                // refresh sub-table
+                window.expandVotes(venueId); // close
+                window.expandVotes(venueId); // reopen to reload
+            } catch (e) {
+                console.error("Error invalidating vote:", e);
+                alert("Error invalidating vote: " + e.message);
+            }
+        };
+
     </script>
+
 </body>
 </html>

@@ -794,6 +794,15 @@ class EventLayout extends HTMLElement {
                 const userSnap = await getDoc(userRef);
                 
                 let userData = userSnap.exists() ? userSnap.data() : {};
+                
+                if (userData.isBanned) {
+                    errorMsg.textContent = `Your account is suspended.`;
+                    errorMsg.style.display = 'block';
+                    btn.innerText = 'Submit Vote';
+                    btn.disabled = false;
+                    return;
+                }
+                
                 let votes = userData.votes || {};
                 
                 // Check if user already voted for this specific venue
@@ -813,6 +822,15 @@ class EventLayout extends HTMLElement {
                 const venueRef = doc(db, "venues", venueId);
                 await updateDoc(venueRef, {
                     voteCount: increment(1)
+                });
+                
+                // Add a detailed audit record
+                const voteRecordRef = doc(db, "venues", venueId, "votes", currentUser.uid);
+                await setDoc(voteRecordRef, {
+                    uid: currentUser.uid,
+                    displayName: currentUser.displayName || userData.displayName || "Unknown User",
+                    email: currentUser.email || userData.email || "",
+                    timestamp: new Date()
                 });
                 
                 window.showShareScreen();
