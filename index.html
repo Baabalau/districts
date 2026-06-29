@@ -49,15 +49,15 @@
         }
 
         /* --- FLOATING MENU --- */
-        .menu-toggle, .menu-close {
+        .menu-toggle {
             position: fixed;
             top: 30px;
             left: 40px;
             width: 72px;
             height: 72px;
             border-radius: 50%;
-            background: var(--text-primary);
-            color: var(--bg-primary);
+            background: transparent;
+            color: transparent;
             border: none;
             font-family: var(--font-header);
             font-weight: 900;
@@ -65,18 +65,23 @@
             cursor: pointer;
             z-index: 1000;
             transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.3s;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            box-shadow: none;
             display: flex;
             align-items: center;
             justify-content: center;
             text-transform: uppercase;
-        }
-        
-        .menu-toggle {
-            background: transparent;
-            color: transparent;
-            box-shadow: none;
             perspective: 1000px;
+        }
+
+        .menu-close {
+            position: fixed;
+            z-index: 1001;
+            border: none;
+            font-family: var(--font-header);
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: transform 0.3s ease, background 0.3s ease, opacity 0.3s ease, visibility 0.3s ease;
         }
 
         .menu-toggle::before, .menu-toggle::after {
@@ -134,62 +139,115 @@
             color: var(--bg-primary);
         }
         
-        .menu-toggle:active, .menu-close:active {
+        .menu-toggle:active,
+        .menu-close:active {
             transform: scale(0.95);
-        }
-
-        .menu-close {
-            background: var(--text-primary);
-            color: var(--accent);
-        }
-
-        .menu-close:hover {
-            transform: scale(1.1) rotate(-5deg);
-            background: var(--bg-primary);
-            color: var(--text-primary);
         }
 
         .menu-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
+            inset: 0;
             width: 100%;
             height: 100vh;
+            height: 100dvh;
             background: linear-gradient(160deg, var(--brand-red) 0%, var(--accent) 55%, #0F1626 100%);
             z-index: 999;
-            /* Start as a small circle hidden behind the toggle button on the left */
             clip-path: circle(0px at 76px 66px);
             transition: clip-path 0.7s cubic-bezier(0.77, 0, 0.175, 1);
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: flex-end;
-            padding-right: 15%;
+            padding: calc(30px + 72px + 100px) clamp(24px, 8vw, 120px) 48px;
+            overflow: hidden;
         }
 
         .menu-overlay.active {
-            /* Expand to cover screen */
             clip-path: circle(150vw at 76px 66px);
+        }
+
+        .menu-close {
+            top: 30px;
+            right: 40px;
+            left: auto;
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: rgba(15, 22, 38, 0.38);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            color: rgba(203, 160, 82, 0.78);
+            border: 1px solid rgba(203, 160, 82, 0.22);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.16);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .menu-close-icon {
+            width: 26px;
+            height: 26px;
+            display: block;
+            flex-shrink: 0;
+        }
+
+        .menu-overlay.active .menu-close {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        .menu-close:hover {
+            background: rgba(15, 22, 38, 0.52);
+            color: rgba(203, 160, 82, 0.95);
+            border-color: rgba(203, 160, 82, 0.38);
+            transform: scale(1.04);
+        }
+
+        .menu-overlay nav.menu-links,
+        .menu-links {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 2px;
+            width: min(100%, 360px);
+            margin: 0;
+            padding: 0;
         }
 
         .menu-links a {
             display: block;
+            width: 100%;
             font-family: var(--font-header);
-            font-size: clamp(3rem, 6vw, 5rem);
+            font-size: clamp(1.15rem, 2.2vw, 1.55rem);
             color: var(--bg-primary);
             text-decoration: none;
             text-transform: uppercase;
             font-weight: 900;
-            margin-bottom: 25px;
-            transition: color 0.3s ease, transform 0.3s ease;
+            letter-spacing: 0.1em;
+            line-height: 1.35;
+            padding: 12px 0;
+            transition: color 0.2s ease, transform 0.2s ease;
             text-align: right;
-            text-shadow: 3px 3px 0px var(--text-primary);
+            text-shadow: none;
+            border-bottom: 1px solid rgba(15, 22, 38, 0.18);
+        }
+
+        .menu-links a:last-child {
+            border-bottom: none;
         }
 
         .menu-links a:hover {
             color: var(--text-primary);
-            text-shadow: none;
-            transform: translateX(-20px);
+            transform: translateX(-6px);
+        }
+
+        body.menu-open {
+            overflow: hidden;
         }
 
         /* --- BRAND BUTTON --- */
@@ -646,7 +704,7 @@
 
         /* --- PURPOSE MODULE (3D trim) --- */
         .purpose-section {
-            padding: 72px 0 88px;
+            padding: 60px 0 20px;
             background: var(--bg-primary);
         }
 
@@ -1167,15 +1225,19 @@
     <button class="menu-toggle" id="menuToggle">MENU</button>
     
     <div class="menu-overlay" id="menuOverlay">
-        <button class="menu-close" id="menuClose">CLOSE</button>
-        <div class="menu-links">
+        <button class="menu-close" id="menuClose" aria-label="Close menu">
+            <svg class="menu-close-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+        </button>
+        <nav class="menu-links" aria-label="Site navigation">
             <a href="#">Home</a>
             <a href="#events">Events</a>
             <a href="promote.html">Your Business</a>
             <a href="#about">About</a>
             <a href="#">Partners</a>
             <a href="login.html" id="authLink">Log In / Sign Up</a>
-        </div>
+        </nav>
     </div>
 
     <header class="hero js-reveal reveal-opacity">
@@ -1468,20 +1530,35 @@
         const menuClose = document.getElementById('menuClose');
         const menuOverlay = document.getElementById('menuOverlay');
 
-        menuToggle.addEventListener('click', () => {
+        const openMenu = () => {
             menuOverlay.classList.add('active');
+            document.body.classList.add('menu-open');
+        };
+
+        const closeMenu = () => {
+            menuOverlay.classList.remove('active');
+            document.body.classList.remove('menu-open');
+        };
+
+        menuToggle.addEventListener('click', openMenu);
+        menuClose.addEventListener('click', closeMenu);
+
+        menuOverlay.addEventListener('click', (event) => {
+            if (!event.target.closest('.menu-links') && !event.target.closest('.menu-close')) {
+                closeMenu();
+            }
         });
 
-        menuClose.addEventListener('click', () => {
-            menuOverlay.classList.remove('active');
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && menuOverlay.classList.contains('active')) {
+                closeMenu();
+            }
         });
         
         // Also close menu when a link is clicked
         const menuLinks = document.querySelectorAll('.menu-links a');
         menuLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                menuOverlay.classList.remove('active');
-            });
+            link.addEventListener('click', closeMenu);
         });
 
         // --- LEAFLET MAP INITIALIZATION ---

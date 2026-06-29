@@ -6,8 +6,10 @@
     <title>Your Business | Districts After Dark</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Montserrat:wght@700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/district-page.css">
+    <link rel="stylesheet" href="css/floating-menu.css">
     <link rel="stylesheet" href="css/event-styles.css">
     <link rel="stylesheet" href="css/site-footer.css">
+    <script type="module" src="js/components/floating-menu.js"></script>
     
     <!-- html2canvas for flattening composite images -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -17,7 +19,7 @@
             --promo-gutter: clamp(32px, 6vw, 80px);
         }
 
-        nav {
+        body > nav {
             padding-left: var(--promo-gutter);
             padding-right: var(--promo-gutter);
         }
@@ -448,11 +450,100 @@
             cursor: pointer;
             margin: 0;
         }
+
+        /* Integrated form — compact sizing */
+        #integrated-form-container {
+            padding: 20px clamp(20px, 3vw, 40px) 28px;
+            scroll-margin-top: 88px;
+        }
+
+        #integrated-form-container > h2 {
+            font-family: var(--font-header);
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin-top: 0;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        #integrated-form-container #step-intro p {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        #integrated-form-container .generator-form {
+            margin-top: 20px;
+        }
+
+        #integrated-form-container .form-step h3 {
+            font-size: 1.1rem;
+            padding: 8px 14px;
+            margin-bottom: 16px;
+        }
+
+        #integrated-form-container .generator-form input:not([type="checkbox"]):not([type="file"]),
+        #integrated-form-container .generator-form select,
+        #integrated-form-container textarea {
+            padding: 10px 12px;
+            font-size: 0.95rem;
+            margin-bottom: 14px;
+            border-radius: 6px;
+        }
+
+        #integrated-form-container .generator-form input[type="file"] {
+            padding: 8px;
+            font-size: 0.9rem;
+            margin-bottom: 14px;
+        }
+
+        #integrated-form-container .custom-google-form label {
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
+
+        #integrated-form-container .custom-google-form label span {
+            font-size: 0.8rem;
+        }
+
+        #integrated-form-container .custom-google-form .checkbox-group {
+            padding: 10px 12px;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        #integrated-form-container .custom-google-form .checkbox-group label {
+            font-size: 0.9rem;
+            gap: 8px;
+        }
+
+        #integrated-form-container .custom-google-form .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+        }
+
+        #integrated-form-container .brand-btn {
+            font-size: 0.95rem;
+            padding: 10px 20px;
+            border-radius: 6px;
+        }
+
+        #integrated-form-container #form-success h2 {
+            font-size: 1.4rem;
+        }
+
+        #integrated-form-container #form-success > p {
+            font-size: 0.95rem;
+        }
+
+        #integrated-form-container #form-success h3 {
+            font-size: 1.1rem;
+        }
     </style>
 </head>
 <body>
     <nav>
-        <div class="logo">District <span>After Dark</span></div>
+        <div class="logo">Districts <span class="logo-accent">After</span> <span class="logo-brand">Dark</span></div>
         <div class="nav-links">
             <a href="index.html">Home</a>
             <a href="index.html#events">Events</a>
@@ -460,6 +551,8 @@
             <a href="login.html" id="authLink">Log In / Sign Up</a>
         </div>
     </nav>
+
+    <floating-menu scroll-trigger></floating-menu>
 
     <div class="promo-hero">
         <div class="promo-hero-inner">
@@ -533,19 +626,19 @@
         
         <!-- Multi-Step Integrated Form -->
         <div class="generator-tool" id="integrated-form-container" style="margin-top: 60px; margin-bottom: 60px;">
-            <h2 style="font-family: var(--font-header); font-size: 2rem; color: var(--text-primary); margin-top: 0; margin-bottom: 15px; text-transform: uppercase;">Join the Map & Generate Promo Graphics</h2>
+            <h2>Join the Map & Generate Promo Graphics</h2>
             <div id="step-intro" style="text-align: left;">
-                <p style="color: var(--text-secondary); font-size: 1.1rem; line-height: 1.6; max-width: 800px; margin: 0 0 20px 0;">
+                <p style="color: var(--text-secondary); max-width: 800px; margin: 0 0 20px 0;">
                     Complete this form to request your business be added to the official Districts After Dark map. 
                     Once completed, you'll instantly receive your customized social media graphic and printable check-in flyer.
                 </p>
-                <button type="button" id="start-form-btn" class="brand-btn" style="background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); font-size: 1.2rem; padding: 15px 30px; border: none; cursor: pointer; color: white; border-radius: 8px;">Get Started</button>
+                <button type="button" id="start-form-btn" class="brand-btn" style="background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); border: none; cursor: pointer; color: white;">Get Started</button>
             </div>
             
             <form id="multi-step-form" class="generator-form custom-google-form" style="display: none;">
                 
                 <!-- Step 1 -->
-                <div class="form-step" id="step-1">
+                <div class="form-step" id="intake-step-1">
                     <h3>Step 1 of 4: Business Details</h3>
                     
                     <label for="biz-name">Business Name</label>
@@ -562,7 +655,7 @@
                     <label for="biz-address">Street Address</label>
                     <input type="text" id="biz-address" placeholder="e.g., 123 Main St, New Orleans, LA 70112" required>
                     
-                    <label for="biz-url">Business Website URL <span style="font-size: 0.9rem; font-weight: normal; color: var(--text-secondary); text-transform: none;">(Optional)</span></label>
+                    <label for="biz-url">Business Website URL <span style="font-weight: normal; color: var(--text-secondary); text-transform: none;">(Optional)</span></label>
                     <input type="url" id="biz-url" placeholder="https://yourbusiness.com">
                     
                     <label for="op-relationship">Your Relationship to the Business</label>
@@ -576,12 +669,12 @@
                     </select>
                     
                     <div style="margin-top: 20px;">
-                        <button type="button" class="brand-btn next-btn" style="background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); font-size: 1.2rem; padding: 15px 30px; border: none; cursor: pointer; color: white; border-radius: 8px;">Next</button>
+                        <button type="button" class="brand-btn next-btn" style="background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); border: none; cursor: pointer; color: white;">Next</button>
                     </div>
                 </div>
                 
                 <!-- Step 2 -->
-                <div class="form-step" id="step-2" style="display: none;">
+                <div class="form-step" id="intake-step-2" style="display: none;">
                     <h3>Step 2 of 4: Contact Information</h3>
                     
                     <label for="op-name">Your Name</label>
@@ -594,13 +687,13 @@
                     <input type="tel" id="op-phone" placeholder="e.g., (504) 555-0199" required>
                     
                     <div style="margin-top: 20px; display: flex; gap: 15px;">
-                        <button type="button" class="brand-btn prev-btn" style="background: transparent; border: 2px solid var(--text-secondary); color: var(--text-secondary); font-size: 1.2rem; padding: 15px 30px; cursor: pointer; border-radius: 8px;">Back</button>
-                        <button type="button" class="brand-btn next-btn" style="background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); font-size: 1.2rem; padding: 15px 30px; border: none; cursor: pointer; color: white; border-radius: 8px;">Next</button>
+                        <button type="button" class="brand-btn prev-btn" style="background: transparent; border: 2px solid var(--text-secondary); color: var(--text-secondary); cursor: pointer;">Back</button>
+                        <button type="button" class="brand-btn next-btn" style="background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); border: none; cursor: pointer; color: white;">Next</button>
                     </div>
                 </div>
                 
                 <!-- Step 3 -->
-                <div class="form-step" id="step-3" style="display: none;">
+                <div class="form-step" id="intake-step-3" style="display: none;">
                     <h3>Step 3 of 4: Map & Branding</h3>
                     
                     <label for="biz-district">Council District</label>
@@ -614,17 +707,17 @@
                         <option value="Not Sure">I'm not sure</option>
                     </select>
                     
-                    <label for="biz-logo" style="margin-top: 15px;">Upload Your Logo <span style="font-size: 0.9rem; font-weight: normal; color: var(--text-secondary); text-transform: none;">(Optional - Used on your promo graphics instead of text)</span></label>
+                    <label for="biz-logo" style="margin-top: 15px;">Upload Your Logo <span style="font-weight: normal; color: var(--text-secondary); text-transform: none;">(Optional - Used on your promo graphics instead of text)</span></label>
                     <input type="file" id="biz-logo" accept="image/*" style="background: rgba(255,255,255,0.05); color: white;">
                     
                     <div style="margin-top: 20px; display: flex; gap: 15px;">
-                        <button type="button" class="brand-btn prev-btn" style="background: transparent; border: 2px solid var(--text-secondary); color: var(--text-secondary); font-size: 1.2rem; padding: 15px 30px; cursor: pointer; border-radius: 8px;">Back</button>
-                        <button type="button" class="brand-btn next-btn" style="background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); font-size: 1.2rem; padding: 15px 30px; border: none; cursor: pointer; color: white; border-radius: 8px;">Next</button>
+                        <button type="button" class="brand-btn prev-btn" style="background: transparent; border: 2px solid var(--text-secondary); color: var(--text-secondary); cursor: pointer;">Back</button>
+                        <button type="button" class="brand-btn next-btn" style="background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); border: none; cursor: pointer; color: white;">Next</button>
                     </div>
                 </div>
                 
                 <!-- Step 4 -->
-                <div class="form-step" id="step-4" style="display: none;">
+                <div class="form-step" id="intake-step-4" style="display: none;">
                     <h3>Step 4 of 4: Confirmations</h3>
                     
                     <div class="checkbox-group">
@@ -648,29 +741,29 @@
                         </label>
                     </div>
                     
-                    <label for="op-comments" style="margin-top: 15px;">Additional Comments or Questions <span style="font-size: 0.9rem; font-weight: normal; color: var(--text-secondary); text-transform: none;">(Optional)</span></label>
-                    <textarea id="op-comments" rows="4" placeholder="Anything else we should know?" style="width: 100%; padding: 16px; margin-bottom: 20px; border-radius: 8px; border: 2px solid var(--text-secondary); background: rgba(255,255,255,0.05); color: white; font-family: inherit; resize: vertical;"></textarea>
+                    <label for="op-comments" style="margin-top: 15px;">Additional Comments or Questions <span style="font-weight: normal; color: var(--text-secondary); text-transform: none;">(Optional)</span></label>
+                    <textarea id="op-comments" rows="3" placeholder="Anything else we should know?" style="width: 100%; border: 2px solid var(--text-secondary); background: rgba(255,255,255,0.05); color: white; font-family: inherit; resize: vertical;"></textarea>
                     
                     <div style="margin-top: 20px; display: flex; gap: 15px;">
-                        <button type="button" class="brand-btn prev-btn" style="background: transparent; border: 2px solid var(--text-secondary); color: var(--text-secondary); font-size: 1.2rem; padding: 15px 30px; cursor: pointer; border-radius: 8px;">Back</button>
-                        <button type="submit" id="submit-form-btn" class="brand-btn" style="background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); font-size: 1.2rem; padding: 15px 30px; border: none; cursor: pointer; color: white; border-radius: 8px;">Submit & Generate Graphics</button>
+                        <button type="button" class="brand-btn prev-btn" style="background: transparent; border: 2px solid var(--text-secondary); color: var(--text-secondary); cursor: pointer;">Back</button>
+                        <button type="submit" id="submit-form-btn" class="brand-btn" style="background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); border: none; cursor: pointer; color: white;">Submit & Generate Graphics</button>
                     </div>
                 </div>
             </form>
             
             <div id="form-success" style="display:none; text-align: left; margin-top: 20px;">
                 <h2 style="color: var(--neon-cyan); margin-bottom: 10px;">Success! Request Submitted.</h2>
-                <p style="color: var(--text-secondary); font-size: 1.1rem; line-height: 1.6; margin-bottom: 30px;">
+                <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 30px;">
                     Thank you! We've automatically generated your custom promotional graphics below. 
                     <br><strong>Right-click (or long-press on mobile) to save these images.</strong>
                 </p>
 
                 <div style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 25px; margin-bottom: 40px; max-width: 600px;">
-                    <h3 style="font-family: var(--font-header); color: var(--text-primary); font-size: 1.3rem; margin-top: 0; margin-bottom: 15px; text-transform: uppercase;">Your Unique Voting Link</h3>
-                    <p style="color: white; font-size: 1rem; margin-bottom: 15px;">Share this link directly with your followers so they can vote for you!</p>
+                    <h3 style="font-family: var(--font-header); color: var(--text-primary); margin-top: 0; margin-bottom: 15px; text-transform: uppercase;">Your Unique Voting Link</h3>
+                    <p style="color: white; margin-bottom: 15px;">Share this link directly with your followers so they can vote for you!</p>
                     <div style="display: flex; gap: 10px;">
-                        <input type="text" id="generated-voting-url" readonly style="flex: 1; padding: 12px 15px; border-radius: 8px; border: 2px solid var(--text-secondary); background: rgba(255,255,255,0.9); font-size: 1rem; color: #333;">
-                        <button type="button" id="copy-link-btn" class="brand-btn" style="background: var(--brand-red); color: white; border: none; padding: 0 20px; border-radius: 8px; cursor: pointer; font-weight: bold; white-space: nowrap;">Copy Link</button>
+                        <input type="text" id="generated-voting-url" readonly style="flex: 1; padding: 10px 12px; border-radius: 6px; border: 2px solid var(--text-secondary); background: rgba(255,255,255,0.9); font-size: 0.95rem; color: #333;">
+                        <button type="button" id="copy-link-btn" class="brand-btn" style="background: var(--brand-red); color: white; border: none; padding: 0 16px; border-radius: 6px; cursor: pointer; font-weight: bold; white-space: nowrap;">Copy Link</button>
                     </div>
                 </div>
                 
@@ -733,10 +826,10 @@
             const introSection = document.getElementById('step-intro');
             const form = document.getElementById('multi-step-form');
             const steps = [
-                document.getElementById('step-1'),
-                document.getElementById('step-2'),
-                document.getElementById('step-3'),
-                document.getElementById('step-4')
+                document.getElementById('intake-step-1'),
+                document.getElementById('intake-step-2'),
+                document.getElementById('intake-step-3'),
+                document.getElementById('intake-step-4')
             ];
             
             let currentStep = 0;
@@ -800,12 +893,21 @@
                 }
             });
 
-            // Start button logic
-            startBtn.addEventListener('click', () => {
+            function showStep(index) {
+                steps.forEach((step, i) => {
+                    step.style.display = (i === index) ? 'block' : 'none';
+                });
+                currentStep = index;
+            }
+
+            function openFormAtStep(stepIndex) {
                 introSection.style.display = 'none';
                 form.style.display = 'flex';
-                showStep(0);
-            });
+                showStep(stepIndex);
+            }
+
+            // Start button logic
+            startBtn.addEventListener('click', () => openFormAtStep(0));
 
             // Next / Prev button logic
             const nextBtns = document.querySelectorAll('.next-btn');
@@ -837,11 +939,16 @@
                 });
             });
 
-            function showStep(index) {
-                steps.forEach((step, i) => {
-                    step.style.display = (i === index) ? 'block' : 'none';
+            const stepHash = window.location.hash.match(/^#step-(\d+)$/);
+            if (stepHash) {
+                const stepIndex = Math.min(Math.max(parseInt(stepHash[1], 10) - 1, 0), steps.length - 1);
+                openFormAtStep(stepIndex);
+                const formContainer = document.getElementById('integrated-form-container');
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        formContainer?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    });
                 });
-                currentStep = index;
             }
 
             // Logo file preview reader
