@@ -364,15 +364,34 @@ document.addEventListener("DOMContentLoaded", async () => {
             const renderVenueItem = (v, i, maxRank) => {
                 let badgeClass = i === 0 ? 'gold' : (i === 1 ? 'silver' : (i === 2 ? 'bronze' : 'dark-gray'));
                 const safeName = v.name ? v.name.replace(/'/g, "\\'") : '';
-                return `<li style="display: flex; align-items: center;">
+                const typeStr = (v.type && typeof v.type === 'string') ? v.type.replace('_', ' ') : 'Venue';
+                
+                // For rotating text: Type vs Address.
+                // Assuming address format is "123 Main St, New Orleans, LA 70119" and we only want the first part.
+                let addressSnippet = '';
+                if (v.address) {
+                    addressSnippet = v.address.split(',')[0].trim();
+                }
+                
+                // We'll create an animation for rotating text if an address exists
+                const textRotationHtml = addressSnippet ? `
+                    <div style="position: relative; height: 1.2em; overflow: hidden; color: var(--text-secondary); font-size: 0.85rem; font-style: italic;">
+                        <div class="flipper-container" style="animation: flipText 8s infinite;">
+                            <div style="height: 1.2em; line-height: 1.2em;">${typeStr}</div>
+                            <div style="height: 1.2em; line-height: 1.2em;">${addressSnippet}</div>
+                        </div>
+                    </div>` : `
+                    <em style="color: var(--text-secondary); font-size: 0.85rem; display: block;">${typeStr}</em>`;
+
+                return `<li style="display: flex; align-items: center; padding: 12px 15px;">
                     <span class="rank-badge ${badgeClass}" style="flex-shrink: 0;">${i + 1}</span> 
                     <div class="v-details" style="flex: 1; text-align: left; padding: 0 15px; min-width: 0;">
-                        <strong style="font-size: 1.1rem; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${v.name || 'Unknown'}</strong>
-                        <em style="color: var(--text-secondary); font-size: 0.85rem;">${(v.type && typeof v.type === 'string') ? v.type.replace('_', ' ') : ''}</em>
+                        <strong style="font-family: 'EB Garamond', Georgia, serif; font-size: 1.5rem; text-transform: uppercase; line-height: 1.1; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-primary); margin-bottom: 4px;">${v.name || 'Unknown'}</strong>
+                        ${textRotationHtml}
                     </div> 
-                    <div style="display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; min-width: 170px;">
-                        <button class="brand-btn" style="width: 100%; padding: 8px 10px; font-size: 0.85rem; text-align: center; letter-spacing: 0.5px; font-weight: 700; text-transform: uppercase; background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); color: white; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.4);" onclick="window.openVoteModal('${v.id}', '${safeName}')">VOTE FOR THIS BUSINESS</button>
-                        <a href="checkin.html?venue=${v.id}" class="brand-btn" style="width: 100%; background: transparent; border: 2px solid rgba(255,255,255,0.2); color: var(--text-secondary); text-decoration: none; padding: 6px 10px; font-size: 0.75rem; text-align: center; letter-spacing: 0.5px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-weight: 600; transition: all 0.2s ease;" onmouseover="this.style.opacity='1'; this.style.borderColor='var(--text-secondary)';" onmouseout="this.style.opacity='0.8'; this.style.borderColor='rgba(255,255,255,0.2)';">CHECK IN TO LOCATION</a>
+                    <div style="display: flex; align-items: stretch; gap: 8px; flex-shrink: 0;">
+                        <button class="brand-btn" style="padding: 0 20px; height: 42px; font-size: 0.95rem; text-align: center; letter-spacing: 0.5px; font-weight: 700; text-transform: uppercase; background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); color: white; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.4);" onclick="window.openVoteModal('${v.id}', '${safeName}')">VOTE FOR THIS BUSINESS</button>
+                        <a href="checkin.html?venue=${v.id}" class="brand-btn" style="background: transparent; border: 2px solid rgba(255,255,255,0.2); color: var(--text-secondary); text-decoration: none; padding: 0; width: 42px; height: 42px; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; border-radius: 6px;" title="Check In to Location" onmouseover="this.style.opacity='1'; this.style.borderColor='var(--text-secondary)';" onmouseout="this.style.opacity='0.8'; this.style.borderColor='rgba(255,255,255,0.2)';">📍</a>
                     </div>
                 </li>`;
             };

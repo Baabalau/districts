@@ -630,6 +630,13 @@
     opacity: 0.9;
 }
 
+/* Venue Type/Address Flipper Animation */
+@keyframes flipText {
+    0%, 45% { transform: translateY(0); }
+    50%, 95% { transform: translateY(-1.2em); }
+    100% { transform: translateY(0); }
+}
+
 /* State controls (Dev only) */
 .state-controls button {
     background: transparent; border: 1px solid var(--text-secondary); color: var(--text-secondary);
@@ -1081,3 +1088,13 @@
 
 .delay-200 { transition-delay: 0.2s; }
 .delay-400 { transition-delay: 0.4s; }
+
+
+/* Venue Type/Address Flipper Animation */
+@keyframes flipText {
+    0%, 45% { transform: translateY(0); }
+    50%, 95% { transform: translateY(-1.2em); }
+    100% { transform: translateY(0); }
+}
+
+/* State controls (Dev only) */
