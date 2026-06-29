@@ -378,14 +378,21 @@
         let currentSort = { column: 'time', direction: 'desc' };
         let globalVenues = null; // Cache to save database reads
 
-        // Authentication check
+        // Authentication check & Authorization
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
                 window.location.href = "login.html";
-            } else {
-                await fetchGlobalVenues();
-                fetchData();
+                return;
             }
+
+            // Check if user is the admin
+            if (user.email !== "robhenigbell@gmail.com") {
+                loadingEl.innerHTML = `<span style="color:#ff6b6b">Access Denied: You do not have permission to view this page.</span>`;
+                return;
+            }
+
+            await fetchGlobalVenues();
+            fetchData();
         });
 
         async function fetchGlobalVenues(force = false) {
