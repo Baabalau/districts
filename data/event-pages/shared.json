@@ -8,8 +8,8 @@
     "rsvpButton": "Vote for District {district}'s Last Stop of the Night"
   },
   "behindSeries": {
-    "heading": "Our Southern Hospitality needs Summer Sustainability",
-    "body": "Too many New Orleans businesses are struggling to keep their doors open during the slow summer months. Districts After Dark is an initiative of the Mayor’s Office of Nighttime Economy that brings together residents, businesses, City staff, and lawmakers to find ways to make our long summer season more sustainable. The best place to start: over food & drinks on a hot summer night out on the town!"
+    "heading": "Our Southern Hospitality needs some Summer Sustainability",
+    "body": "Too many New Orleans businesses are struggling to keep their doors open during the slow summer months. Districts After Dark is an initiative of the Mayor’s Office of Nighttime Economy bringing together residents, businesses, City staff, and lawmakers to find ways to make our long summer season more sustainable. A good place to start: over food & drinks on a hot summer night!"
   },
   "itinerary": {
     "heading": "Crawl-tinery"
@@ -29,7 +29,7 @@
     "heading": "Venue Operators",
     "body": "Don't see your business? Want to make a change?",
     "ctaText": "My Business",
-    "ctaHref": "#"
+    "ctaHref": "promote.html#step-1"
   },
   "dialogueDen": {
     "heading": "The Dialogue Den",

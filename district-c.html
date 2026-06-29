@@ -8,14 +8,16 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <link rel="stylesheet" href="css/district-page.css">
+    <link rel="stylesheet" href="css/floating-menu.css">
     <link rel="stylesheet" href="css/event-styles.css?v=13">
     <link rel="stylesheet" href="css/site-footer.css">
+    <script type="module" src="js/components/floating-menu.js"></script>
     <script type="module" src="js/components/site-footer.js"></script>
 <script type="module" src="js/event-components.js?v=19"></script>
 </head>
 <body>
     <nav>
-        <div class="logo">District <span>After Dark</span></div>
+        <div class="logo">Districts <span class="logo-accent">After</span> <span class="logo-brand">Dark</span></div>
         <div class="nav-links">
             <a href="index.html">Home</a>
             <a href="index.html#events">Events</a>
@@ -23,6 +25,8 @@
             <a href="login.html" id="authLink">Log In / Sign Up</a>
         </div>
     </nav>
+
+    <floating-menu scroll-trigger></floating-menu>
 
     <event-layout district="C"></event-layout>
 
