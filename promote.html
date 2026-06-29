@@ -23,7 +23,7 @@
         }
 
         .promo-hero {
-            padding: 10px var(--promo-gutter) 80px;
+            padding: 40px var(--promo-gutter) 80px;
             background: linear-gradient(rgba(15, 22, 38, 0.92), rgba(15, 22, 38, 0.98)), url('https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover;
             border-bottom: 4px solid var(--text-primary);
             display: flex;
@@ -164,21 +164,21 @@
         @media (max-width: 991px) {
             .promo-hero-inner {
                 flex-direction: column;
-                align-items: center;
+                align-items: flex-start;
             }
             .promo-hero-content {
-                text-align: center;
+                text-align: left;
                 margin-bottom: 20px;
             }
             .subtitle {
-                text-align: center;
-                margin: 20px auto 40px;
+                text-align: left;
+                margin: 20px 0 40px;
             }
             .subtitle-follow {
-                text-align: center;
+                text-align: left;
             }
             .promo-hero-visual {
-                justify-content: center;
+                justify-content: flex-start;
                 margin-top: 40px;
                 margin-bottom: 16px;
             }
@@ -198,9 +198,9 @@
                 left: 50px;
             }
             .promo-hero .title-3d {
-                font-size: clamp(2.5rem, 8vw, 4rem);
+                font-size: clamp(3.5rem, 11vw, 5.5rem);
                 margin-bottom: 20px;
-                text-align: center;
+                text-align: left;
             }
         }
         
@@ -714,13 +714,13 @@
         // Configuration for graphic overlays
         const graphicConfig = {
             social: {
-                logo: { top: '70%', left: '30%', maxWidth: '40%', maxHeight: '12%', transform: 'translate(0, -50%)' },
-                text: { top: '70%', left: '30%', width: '40%', fontSize: '1.2rem', color: '#8a2d24', transform: 'translate(0, -50%)', textAlign: 'left', whiteSpace: 'nowrap', textShadow: 'none' }
+                logo: { top: '70%', left: '30%', maxWidth: '40%', maxHeight: '12%', transform: 'translate(0, -50%)', objectFit: 'contain' },
+                text: { top: '70%', left: '30%', width: '40%', fontSize: '1.2rem', color: '#8a2d24', transform: 'translate(0, -50%)', textAlign: 'center', whiteSpace: 'normal', wordWrap: 'break-word', lineHeight: '1.2', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '12%', textShadow: 'none' }
             },
             flyer: {
-                logo: { top: '71%', left: '12%', maxWidth: '35%', maxHeight: '12%', transform: 'translate(0, -50%)' },
+                logo: { top: '71%', left: '12%', maxWidth: '35%', maxHeight: '12%', transform: 'translate(0, -50%)', objectFit: 'contain' },
                 qr: { bottom: '27%', left: '78%', width: '18%', transform: 'translate(-50%, 50%)' },
-                text: { top: '71%', left: '12%', width: '35%', fontSize: '1.1rem', color: '#8a2d24', transform: 'translate(0, -50%)', textAlign: 'left', whiteSpace: 'nowrap' }
+                text: { top: '71%', left: '12%', width: '35%', fontSize: '1.1rem', color: '#8a2d24', transform: 'translate(0, -50%)', textAlign: 'center', whiteSpace: 'normal', wordWrap: 'break-word', lineHeight: '1.2', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '12%' }
             },
             qrColors: {
                 foreground: 'eecd7e', // Gold
