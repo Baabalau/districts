@@ -534,9 +534,8 @@
 
 /* Voting Section */
 .voting-section {
-    width: 80%;
-    max-width: 1400px;
-    margin: 80px auto;
+    width: 100%;
+    margin: 0 auto;
     padding: 0;
 }
 
@@ -567,7 +566,7 @@
     background: var(--panel-bg);
     border: 2px solid rgba(45, 27, 21, 0.15);
     border-radius: 12px;
-    padding: 20px;
+    padding: 15px 20px;
     margin-bottom: 30px;
     box-shadow: 0 12px 32px rgba(45, 27, 21, 0.1);
 }
@@ -674,7 +673,15 @@
 
 /* List View (Round 1 & Run-Off) */
 .venue-list-container {
-    max-width: 700px; margin: 0 auto;
+    width: 100%;
+    margin: 0 auto;
+}
+.venue-list-container::-webkit-scrollbar {
+    width: 6px;
+}
+.venue-list-container::-webkit-scrollbar-thumb {
+    background: rgba(203, 160, 82, 0.3);
+    border-radius: 4px;
 }
 .venue-list {
     list-style: none; padding: 0; margin: 0;
@@ -691,6 +698,7 @@
 }
 .rank-badge.gold { background: #CBA052; color: #0F1626; }
 .rank-badge.silver { background: #94A3B8; color: #0F1626; }
+.rank-badge.bronze { background: #CD7F32; color: #0F1626; }
 .rank-badge.dark-gray { background: #475569; color: #fff; border-color: #182238; }
 
 .v-details { flex-grow: 1; }
@@ -928,7 +936,7 @@
 .itinerary-section {
     width: 80%;
     max-width: 1400px;
-    margin: 80px auto;
+    margin: 30px auto;
     padding: 0;
 }
 
@@ -1011,7 +1019,7 @@
 .quotes-section {
     width: 80%;
     max-width: 1400px;
-    margin: 80px auto;
+    margin: 30px auto;
     padding: 0 0 80px;
     display: flex;
     flex-direction: column;

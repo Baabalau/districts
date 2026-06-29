@@ -221,8 +221,8 @@ function renderMapLegend() {
 
 function renderVotingStates(district) {
     return `
-            <div class="voting-section js-reveal reveal-y delay-200" id="voting-module">
-                <div id="state-round-1" class="voting-state-container" style="display: none;">
+            <div class="voting-section" id="voting-module">
+                <div id="state-round-1" class="voting-state-container" style="display: block;">
                     <div class="voting-header" style="display: none;">
                         <h2>Round 1: Choose Your Final Stop</h2>
                         <p>The top 10 venues will advance to the run-off in:</p>
@@ -232,7 +232,7 @@ function renderVotingStates(district) {
                             <div class="time-box"><span>20</span><label>Mins</label></div>
                         </div>
                     </div>
-                    <p style="text-align: center; color: var(--text-secondary); margin-bottom: 15px; font-size: 0.9rem;">Use the numbers on the map above to locate venues.</p>
+                    
                     
                     <div class="leaderboard" style="margin-bottom: 20px;">
                         <h3 style="color: var(--text-primary); font-family: var(--font-hero); font-size: 1.2rem; margin-bottom: 10px; text-transform: uppercase;">Current Leaders</h3>
@@ -242,11 +242,7 @@ function renderVotingStates(district) {
                         <ul class="venue-list">
                             <!-- Dynamically populated from Firestore -->
                         </ul>
-                        <div class="pagination">
-                            <button disabled>← Prev</button>
-                            <span>Page 1 of 4</span>
-                            <button>Next →</button>
-                        </div>
+                        <div class="pagination" style="display: none;"></div>
                     </div>
                 </div>
 
@@ -382,32 +378,11 @@ class EventLayout extends HTMLElement {
             const districtCopy = await districtResponse.json();
             const vars = buildTemplateVars(districtCopy);
 
-            // Determine active state based on schedule
-            const scheduleRef = doc(db, "settings", "schedule");
-            const schedSnap = await getDoc(scheduleRef);
-            let activeState = 'round-1'; // Default
-            let winnerId = null;
-
-            if (schedSnap.exists() && schedSnap.data()[districtId.toUpperCase()]) {
-                const sched = schedSnap.data()[districtId.toUpperCase()];
-                const now = new Date();
-                
-                const parseDate = (d) => d && d.toDate ? d.toDate() : new Date(d);
-                if (sched.postEvent && now >= parseDate(sched.postEvent)) {
-                    activeState = 'post-event';
-                } else if (sched.winnerAnnounce && now >= parseDate(sched.winnerAnnounce)) {
-                    activeState = 'post-election';
-                    winnerId = sched.winnerId;
-                } else if (sched.runOffStart && now >= parseDate(sched.runOffStart)) {
-                    activeState = 'run-off';
-                } else {
-                    activeState = 'round-1';
-                }
-                
-                // Store globally so district-map.js can access it
-                window.currentElectionState = activeState;
-                window.electionWinnerId = winnerId;
-            }
+            // Render immediately with a safe default state. The election schedule is
+            // fetched asynchronously AFTER render (see applyElectionSchedule) so a slow,
+            // throttled, or failed Firestore read can never block the page from loading.
+            window.currentElectionState = window.currentElectionState || 'round-1';
+            window.electionWinnerId = window.electionWinnerId || null;
 
 
             this.innerHTML = `
@@ -634,18 +609,52 @@ class EventLayout extends HTMLElement {
         `;
             this.initScrollAnimations();
             this.initVotingPortal();
+            // Non-blocking: resolve the live election state after the page is on screen.
+            this.applyElectionSchedule(districtId);
         } catch (error) {
             console.error('CRITICAL ERROR loading event page:', error);
-            this.innerHTML = `<p style="padding: 2rem; text-align: center; color: red;">Unable to load event content: ${error.message}</p>`;
+            this.innerHTML = `<p style="padding: 2rem; margin-top: 100px; text-align: center; color: red; font-size: 2rem; z-index: 9999; position: relative;">Unable to load event content: ${error.message}</p>`;
+        }
+    }
+
+    async applyElectionSchedule(districtId) {
+        try {
+            const scheduleRef = doc(db, "settings", "schedule");
+            const schedSnap = await getDoc(scheduleRef);
+            if (!schedSnap.exists() || !schedSnap.data()[districtId.toUpperCase()]) return;
+
+            const sched = schedSnap.data()[districtId.toUpperCase()];
+            const now = new Date();
+            const parseDate = (d) => (d && d.toDate ? d.toDate() : new Date(d));
+
+            let activeState = 'round-1';
+            let winnerId = null;
+            if (sched.postEvent && now >= parseDate(sched.postEvent)) {
+                activeState = 'post-event';
+            } else if (sched.winnerAnnounce && now >= parseDate(sched.winnerAnnounce)) {
+                activeState = 'post-election';
+                winnerId = sched.winnerId;
+            } else if (sched.runOffStart && now >= parseDate(sched.runOffStart)) {
+                activeState = 'run-off';
+            }
+
+            window.currentElectionState = activeState;
+            window.electionWinnerId = winnerId;
+            if (window.setVotingState) window.setVotingState(activeState);
+        } catch (err) {
+            console.warn('Election schedule unavailable; defaulting to round-1 state.', err);
         }
     }
 
     initScrollAnimations() {
         setTimeout(() => {
+            // threshold 0: reveal as soon as any part enters the viewport. A higher
+            // threshold breaks for very tall sections (e.g. the full venue list), which
+            // can never occupy 15% of the screen and would otherwise stay invisible.
             const observerOptions = {
                 root: null,
-                rootMargin: '0px',
-                threshold: 0.15
+                rootMargin: '0px 0px -40px 0px',
+                threshold: 0
             };
             const observer = new IntersectionObserver((entries, scrollObserver) => {
                 entries.forEach(entry => {

@@ -351,7 +351,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         // Populate the voting lists dynamically
         const populateLists = () => {
             const eventLayout = document.querySelector('event-layout');
-            if (!eventLayout) {
+            // Wait until the innerHTML is actually populated by checking for the voting-module
+            if (!eventLayout || !eventLayout.querySelector('#voting-module')) {
                 setTimeout(populateLists, 100);
                 return;
             }
@@ -361,30 +362,69 @@ document.addEventListener("DOMContentLoaded", async () => {
             
             // Render a single venue list item
             const renderVenueItem = (v, i, maxRank) => {
-                let badgeClass = i < 3 ? 'gold' : (i < 5 ? 'silver' : 'dark-gray');
+                let badgeClass = i === 0 ? 'gold' : (i === 1 ? 'silver' : (i === 2 ? 'bronze' : 'dark-gray'));
                 const safeName = v.name ? v.name.replace(/'/g, "\\'") : '';
-                return `<li>
-                    <span class="rank-badge ${badgeClass}">${i + 1}</span> 
-                    <div class="v-details"><strong>${v.name || 'Unknown'}</strong><br><em>${(v.type && typeof v.type === 'string') ? v.type.replace('_', ' ') : ''}</em></div> 
-                    <div style="display: flex; gap: 8px;">
-                        <a href="checkin.html?venue=${v.id}" class="brand-btn vote-btn-small" style="background: var(--text-primary); color: var(--bg-primary); text-decoration: none; padding: 6px 12px; display: inline-flex; align-items: center; justify-content: center;" title="Check In">📍</a>
-                        <button class="brand-btn vote-btn-small" onclick="window.openVoteModal('${v.id}', '${safeName}')">VOTE</button>
+                return `<li style="display: flex; align-items: center;">
+                    <span class="rank-badge ${badgeClass}" style="flex-shrink: 0;">${i + 1}</span> 
+                    <div class="v-details" style="flex: 1; text-align: left; padding: 0 15px; min-width: 0;">
+                        <strong style="font-size: 1.1rem; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${v.name || 'Unknown'}</strong>
+                        <em style="color: var(--text-secondary); font-size: 0.85rem;">${(v.type && typeof v.type === 'string') ? v.type.replace('_', ' ') : ''}</em>
+                    </div> 
+                    <div style="display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; min-width: 170px;">
+                        <button class="brand-btn" style="width: 100%; padding: 8px 10px; font-size: 0.85rem; text-align: center; letter-spacing: 0.5px; font-weight: 700; text-transform: uppercase; background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); color: white; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.4);" onclick="window.openVoteModal('${v.id}', '${safeName}')">VOTE FOR THIS BUSINESS</button>
+                        <a href="checkin.html?venue=${v.id}" class="brand-btn" style="width: 100%; background: transparent; border: 2px solid rgba(255,255,255,0.2); color: var(--text-secondary); text-decoration: none; padding: 6px 10px; font-size: 0.75rem; text-align: center; letter-spacing: 0.5px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-weight: 600; transition: all 0.2s ease;" onmouseover="this.style.opacity='1'; this.style.borderColor='var(--text-secondary)';" onmouseout="this.style.opacity='0.8'; this.style.borderColor='rgba(255,255,255,0.2)';">CHECK IN TO LOCATION</a>
                     </div>
                 </li>`;
             };
 
-            // Round 1 List
-            const round1List = eventLayout.querySelector('#state-round-1 .venue-list');
-            if (round1List) {
-                round1List.innerHTML = sortedVenues.map((v, i) => renderVenueItem(v, i, sortedVenues.length)).join('');
-            }
-            
+            // Paginated venue lists (avoids one long scroll of businesses)
+            const PAGE_SIZE = 10;
+            const renderPaginatedList = (stateSelector, venues) => {
+                const container = eventLayout.querySelector(`${stateSelector} .venue-list-container`);
+                if (!container) return;
+                const list = container.querySelector('.venue-list');
+                if (!list) return;
+
+                let pagination = container.querySelector('.pagination');
+                if (!pagination) {
+                    pagination = document.createElement('div');
+                    pagination.className = 'pagination';
+                    container.appendChild(pagination);
+                }
+
+                const totalPages = Math.max(1, Math.ceil(venues.length / PAGE_SIZE));
+
+                const renderPage = (page) => {
+                    const currentPage = Math.min(Math.max(1, page), totalPages);
+                    const start = (currentPage - 1) * PAGE_SIZE;
+                    const pageItems = venues.slice(start, start + PAGE_SIZE);
+                    // Keep global ranking (start + idx) so numbering/medals continue across pages
+                    list.innerHTML = pageItems.map((v, idx) => renderVenueItem(v, start + idx, venues.length)).join('');
+
+                    if (venues.length <= PAGE_SIZE) {
+                        pagination.style.display = 'none';
+                        return;
+                    }
+                    pagination.style.display = 'flex';
+                    pagination.innerHTML = `
+                        <button class="page-prev" ${currentPage === 1 ? 'disabled' : ''}>← Prev</button>
+                        <span>Page ${currentPage} of ${totalPages}</span>
+                        <button class="page-next" ${currentPage === totalPages ? 'disabled' : ''}>Next →</button>`;
+                    const prevBtn = pagination.querySelector('.page-prev');
+                    const nextBtn = pagination.querySelector('.page-next');
+                    if (prevBtn) prevBtn.addEventListener('click', () => renderPage(currentPage - 1));
+                    if (nextBtn) nextBtn.addEventListener('click', () => renderPage(currentPage + 1));
+                };
+
+                renderPage(1);
+            };
+
+            // Round 1 List (all qualifying venues, paginated)
+            renderPaginatedList('#state-round-1', sortedVenues);
+
             // Run-off List (Top 10, filtering out opt-outs)
-            const runoffList = eventLayout.querySelector('#state-run-off .venue-list');
-            if (runoffList) {
-                const qualifiedForRunoff = sortedVenues.filter(v => !v.optOutRunoff).slice(0, 10);
-                runoffList.innerHTML = qualifiedForRunoff.map((v, i) => renderVenueItem(v, i, 10)).join('');
-            }
+            const qualifiedForRunoff = sortedVenues.filter(v => !v.optOutRunoff).slice(0, 10);
+            renderPaginatedList('#state-run-off', qualifiedForRunoff);
             
             // Leaderboards
             const updateLeaderboard = (selector, limit) => {
@@ -398,6 +438,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     const venuesWithVotes = sortedVenues.filter(v => (v.voteCount || 0) > 0);
                     const maxVotes = venuesWithVotes.length > 0 ? venuesWithVotes[0].voteCount : 1;
                     
+                    let htmlString = '';
                     for (let i = 0; i < limit; i++) {
                         const v = venuesWithVotes[i]; // May be undefined if not enough voted venues
                         const width = v ? Math.max(10, ((v.voteCount || 0) / maxVotes) * 100) : 10;
@@ -405,16 +446,18 @@ document.addEventListener("DOMContentLoaded", async () => {
                         const name = v ? (v.name || 'Unknown') : '<span style="opacity: 0.5; font-style: italic;">Awaiting Votes...</span>';
                         const votesStr = v ? `${v.voteCount} votes` : '';
                         
-                        leaderboard.innerHTML += `
-                        <div class="leaderboard-bar ${ordinal}" style="margin-bottom: 6px;">
+                        let badgeClass = i === 0 ? 'gold' : (i === 1 ? 'silver' : (i === 2 ? 'bronze' : 'dark-gray'));
+                        htmlString += `
+                        <div class="leaderboard-bar ${ordinal}" style="margin-bottom: 8px; height: 45px; border-radius: 8px; overflow: hidden; position: relative;">
                             <div class="bar-fill" style="width: ${width}%;"></div>
-                            <div class="bar-content" style="padding: 6px 12px;">
-                                <span class="rank">#${i + 1}</span>
-                                <span class="venue-name">${name}</span>
-                                <span class="vote-count">${votesStr}</span>
+                            <div class="bar-content" style="padding: 6px 15px; display: flex; align-items: center; gap: 15px; position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+                                <span class="rank-badge ${badgeClass}" style="width: 28px; height: 28px; font-size: 0.95rem; border-width: 2px; flex-shrink: 0;">${i + 1}</span>
+                                <span class="venue-name" style="text-align: left; flex: 1; z-index: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${name}</span>
+                                <span class="vote-count" style="z-index: 1; flex-shrink: 0;">${votesStr}</span>
                             </div>
                         </div>`;
                     }
+                    leaderboard.innerHTML += htmlString;
                 }
             };
             
