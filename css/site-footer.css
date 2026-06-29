@@ -1,10 +1,14 @@
-/* Shared site footer — index + event pages */
+/* Shared site footer */
 
 .site-footer {
     margin-top: 0;
     padding: 2rem 1.25rem 2.5rem;
     border-top-width: 3px;
     border-top-style: solid;
+    /* Use the map blue background */
+    background: var(--bg-primary, #0F1626);
+    color: var(--text-primary, #CBA052);
+    border-top-color: var(--text-primary, #CBA052);
 }
 
 .site-footer-inner {
@@ -14,22 +18,13 @@
     text-align: center;
 }
 
-.site-footer-label {
-    font-size: 0.65rem;
-    font-weight: 700;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    margin-bottom: 1rem;
-    opacity: 0.85;
-}
-
 .site-footer-links {
     list-style: none;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    gap: 0.75rem 1.5rem;
+    gap: 1.5rem 3rem;
     font-size: 0.95rem;
 }
 
@@ -39,51 +34,34 @@
 }
 
 .site-footer-links a {
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    transition: opacity 0.2s ease, color 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    color: var(--text-primary, #CBA052);
+    font-weight: 600;
 }
 
 .site-footer-links a:hover {
     opacity: 0.9;
-}
-
-/* index.html — warm palette (inherits page :root where present) */
-.site-footer--index {
-    background: var(--text-primary, #1D1A16);
-    color: var(--bg-primary, #D5BC8A);
-    border-top-color: var(--brand-red, #2B3561);
-}
-
-.site-footer--index .site-footer-label {
+    transform: translateY(-2px);
     color: var(--bg-secondary, #E8D5AD);
 }
 
-.site-footer--index .site-footer-links a {
-    color: var(--accent, #D2A039);
-    font-weight: 600;
+.site-footer-links a span {
+    text-decoration: underline;
+    text-underline-offset: 3px;
 }
 
-.site-footer--index .site-footer-links a:hover {
-    color: var(--bg-primary, #D5BC8A);
+.footer-seal {
+    width: 68px;
+    height: 68px;
+    object-fit: contain;
 }
 
-/* District / event pages — same warm palette as index */
-.site-footer--event {
-    background: var(--text-primary, #1D1A16);
-    color: var(--bg-primary, #D5BC8A);
-    border-top-color: var(--brand-red, #2B3561);
+.footer-seal-nighttime {
+    border: 1px solid #ffffff;
+    border-radius: 50%;
 }
 
-.site-footer--event .site-footer-label {
-    color: var(--bg-secondary, #E8D5AD);
-}
-
-.site-footer--event .site-footer-links a {
-    color: var(--accent, #D2A039);
-    font-weight: 600;
-}
-
-.site-footer--event .site-footer-links a:hover {
-    color: var(--bg-primary, #D5BC8A);
-}

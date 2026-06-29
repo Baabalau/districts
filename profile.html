@@ -139,6 +139,7 @@
             font-weight: 600;
         }
     </style>
+    <link rel="stylesheet" href="css/site-footer.css">
 </head>
 <body>
 
@@ -171,6 +172,13 @@
             </div>
         </div>
         
+        <div id="notifications-section" class="list-section" style="display: none; background: rgba(138, 47, 37, 0.1); border-left: 4px solid var(--accent); padding: 15px;">
+            <h3 style="color: var(--accent); margin-bottom: 10px;">Important Notices</h3>
+            <div id="notifications-list" style="font-size: 0.95rem; color: #ffebcd;">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+
         <div class="list-section">
             <h3>Your Check-Ins</h3>
             <div id="checkins-list">
@@ -303,5 +311,7 @@
             });
         });
     </script>
+    <site-footer></site-footer>
+    <script type="module" src="js/components/site-footer.js"></script>
 </body>
 </html>
