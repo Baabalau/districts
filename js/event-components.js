@@ -219,6 +219,46 @@ function renderMapLegend() {
             `;
 }
 
+// Reusable Venue Explorer: one component that toggles between a vote-ranked
+// Leaderboard view and a Browse view (A-Z/Z-A sort + business-type filter).
+// Used in both the round-1 and run-off states to avoid duplicated markup.
+function renderVenueExplorer() {
+    return `
+                    <div class="venue-explorer">
+                        <div class="explorer-tabs">
+                            <button type="button" class="explorer-tab active" data-view="leaderboard">Leaderboard</button>
+                            <button type="button" class="explorer-tab" data-view="browse">Browse All</button>
+                        </div>
+                        <div class="explorer-controls" style="display: none;">
+                            <select class="sort-select" aria-label="Sort venues">
+                                <option value="az">Name: A&ndash;Z</option>
+                                <option value="za">Name: Z&ndash;A</option>
+                            </select>
+                            <select class="type-filter" aria-label="Filter by business type">
+                                <option value="all">All Types</option>
+                                <option value="Bar">Bar</option>
+                                <option value="Restaurant">Restaurant</option>
+                                <option value="Live Venue">Live Venue</option>
+                                <option value="Museum/Gallery">Museum/Gallery</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="explorer-pane leaderboard-pane">
+                            <div class="leaderboard" style="margin-bottom: 0;">
+                                <h3 style="color: var(--text-primary); font-family: var(--font-hero); font-size: 1.2rem; margin-bottom: 10px; text-transform: uppercase;">Current Leaders</h3>
+                            </div>
+                        </div>
+                        <div class="explorer-pane browse-pane" style="display: none;">
+                            <div class="venue-list-container">
+                                <ul class="venue-list">
+                                    <!-- Dynamically populated from Firestore -->
+                                </ul>
+                                <div class="pagination" style="display: none;"></div>
+                            </div>
+                        </div>
+                    </div>`;
+}
+
 function renderVotingStates(district) {
     return `
             <div class="voting-section" id="voting-module">
@@ -232,18 +272,7 @@ function renderVotingStates(district) {
                             <div class="time-box"><span>20</span><label>Mins</label></div>
                         </div>
                     </div>
-                    
-                    
-                    <div class="leaderboard" style="margin-bottom: 20px;">
-                        <h3 style="color: var(--text-primary); font-family: var(--font-hero); font-size: 1.2rem; margin-bottom: 10px; text-transform: uppercase;">Current Leaders</h3>
-                    </div>
-
-                    <div class="venue-list-container">
-                        <ul class="venue-list">
-                            <!-- Dynamically populated from Firestore -->
-                        </ul>
-                        <div class="pagination" style="display: none;"></div>
-                    </div>
+                    ${renderVenueExplorer()}
                 </div>
 
                 <div id="state-run-off" class="voting-state-container" style="display: none;">
@@ -251,14 +280,7 @@ function renderVotingStates(district) {
                         <h2>The Run-Off: Top 10</h2>
                         <p>It's down to the wire! The polls close in:</p>
                     </div>
-                    <div class="leaderboard" style="margin-bottom: 20px;">
-                        <h3 style="color: var(--text-primary); font-family: var(--font-hero); font-size: 1.2rem; margin-bottom: 10px; text-transform: uppercase;">Current Leaders</h3>
-                    </div>
-                    <div class="venue-list-container">
-                        <ul class="venue-list">
-                            <!-- Dynamically populated from Firestore -->
-                        </ul>
-                    </div>
+                    ${renderVenueExplorer()}
                 </div>
 
                 <div id="state-post-election" class="voting-state-container" style="display: none;">

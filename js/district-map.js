@@ -360,20 +360,39 @@ document.addEventListener("DOMContentLoaded", async () => {
             // Sort venues by voteCount descending
             const sortedVenues = [...inDistrictVenues].sort((a, b) => (b.voteCount || 0) - (a.voteCount || 0));
             
-            // Render a single venue list item
-            const renderVenueItem = (v, i, maxRank) => {
-                let badgeClass = i === 0 ? 'gold' : (i === 1 ? 'silver' : (i === 2 ? 'bronze' : 'dark-gray'));
+            // Map a raw venue type to one of the 5 map-legend categories
+            // (mirrors the substring matching used in getVenueIcon).
+            const categorizeType = (type) => {
+                if (!type || typeof type !== 'string') return 'Other';
+                const t = type.toLowerCase();
+                if (t.includes('bar')) return 'Bar';
+                if (t.includes('restaurant')) return 'Restaurant';
+                if (t.includes('performance') || t.includes('music') || t.includes('adult')) return 'Live Venue';
+                if (t.includes('museum') || t.includes('gallery')) return 'Museum/Gallery';
+                return 'Other';
+            };
+            const categoryColor = (category) => ({
+                'Bar': '#D2A039',
+                'Restaurant': '#B32424',
+                'Live Venue': '#D946EF',
+                'Museum/Gallery': '#45B7D1',
+                'Other': '#A87B28'
+            }[category] || '#A87B28');
+
+            // Render a single venue list item (Browse view). The Browse list is
+            // alphabetical, not a ranking, so it shows a type-colored dot (matching
+            // the map legend) instead of a gold/silver/bronze medal badge.
+            const renderVenueItem = (v) => {
                 const safeName = v.name ? v.name.replace(/'/g, "\\'") : '';
+                const category = categorizeType(v.type);
                 const typeStr = (v.type && typeof v.type === 'string') ? v.type.replace('_', ' ') : 'Venue';
                 
-                // For rotating text: Type vs Address.
-                // Assuming address format is "123 Main St, New Orleans, LA 70119" and we only want the first part.
+                // Street part only (drop city/state/zip) for the rotating subtitle.
                 let addressSnippet = '';
                 if (v.address) {
                     addressSnippet = v.address.split(',')[0].trim();
                 }
                 
-                // We'll create an animation for rotating text if an address exists
                 const textRotationHtml = addressSnippet ? `
                     <div style="position: relative; height: 1.2em; overflow: hidden; color: var(--text-secondary); font-size: 0.85rem; font-style: italic;">
                         <div class="flipper-container" style="animation: flipText 8s infinite;">
@@ -384,7 +403,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <em style="color: var(--text-secondary); font-size: 0.85rem; display: block;">${typeStr}</em>`;
 
                 return `<li style="display: flex; align-items: center; padding: 12px 15px;">
-                    <span class="rank-badge ${badgeClass}" style="flex-shrink: 0;">${i + 1}</span> 
+                    <span class="type-dot" style="flex-shrink: 0; background-color: ${categoryColor(category)};" title="${category}"></span>
                     <div class="v-details" style="flex: 1; text-align: left; padding: 0 15px; min-width: 0;">
                         <strong style="font-family: 'EB Garamond', Georgia, serif; font-size: 1.5rem; text-transform: uppercase; line-height: 1.1; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-primary); margin-bottom: 4px;">${v.name || 'Unknown'}</strong>
                         ${textRotationHtml}
@@ -417,8 +436,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     const currentPage = Math.min(Math.max(1, page), totalPages);
                     const start = (currentPage - 1) * PAGE_SIZE;
                     const pageItems = venues.slice(start, start + PAGE_SIZE);
-                    // Keep global ranking (start + idx) so numbering/medals continue across pages
-                    list.innerHTML = pageItems.map((v, idx) => renderVenueItem(v, start + idx, venues.length)).join('');
+                    list.innerHTML = pageItems.map((v) => renderVenueItem(v)).join('');
 
                     if (venues.length <= PAGE_SIZE) {
                         pagination.style.display = 'none';
@@ -438,14 +456,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 renderPage(1);
             };
 
-            // Round 1 List (all qualifying venues, paginated)
-            renderPaginatedList('#state-round-1', sortedVenues);
-
-            // Run-off List (Top 10, filtering out opt-outs)
-            const qualifiedForRunoff = sortedVenues.filter(v => !v.optOutRunoff).slice(0, 10);
-            renderPaginatedList('#state-run-off', qualifiedForRunoff);
-            
-            // Leaderboards
+            // Vote-ranked leaderboard (top 10), shown in the Leaderboard pane.
             const updateLeaderboard = (selector, limit) => {
                 const leaderboard = eventLayout.querySelector(selector);
                 if (leaderboard) {
@@ -479,9 +490,60 @@ document.addEventListener("DOMContentLoaded", async () => {
                     leaderboard.innerHTML += htmlString;
                 }
             };
-            
-            updateLeaderboard('#state-round-1 .leaderboard', 10);
-            updateLeaderboard('#state-run-off .leaderboard', 10);
+
+            // Combined Venue Explorer: one component toggling between the vote-ranked
+            // Leaderboard and a Browse view (A-Z/Z-A sort + business-type filter).
+            // Everything operates on the already-fetched in-memory array -> 0 extra reads.
+            const setupVenueExplorer = (stateSelector, browseVenues) => {
+                const explorer = eventLayout.querySelector(`${stateSelector} .venue-explorer`);
+                if (!explorer) return;
+
+                // Leaderboard pane (vote rankings)
+                updateLeaderboard(`${stateSelector} .leaderboard`, 10);
+
+                // Browse pane: alphabetical sort + type filter, applied client-side
+                const sortSelect = explorer.querySelector('.sort-select');
+                const typeFilter = explorer.querySelector('.type-filter');
+
+                const applyBrowse = () => {
+                    const sortVal = sortSelect ? sortSelect.value : 'az';
+                    const typeVal = typeFilter ? typeFilter.value : 'all';
+                    let list = browseVenues.slice();
+                    if (typeVal !== 'all') {
+                        list = list.filter(v => categorizeType(v.type) === typeVal);
+                    }
+                    list.sort((a, b) => {
+                        const an = (a.name || '').toLowerCase();
+                        const bn = (b.name || '').toLowerCase();
+                        return sortVal === 'za' ? bn.localeCompare(an) : an.localeCompare(bn);
+                    });
+                    renderPaginatedList(stateSelector, list);
+                };
+
+                if (sortSelect) sortSelect.addEventListener('change', applyBrowse);
+                if (typeFilter) typeFilter.addEventListener('change', applyBrowse);
+                applyBrowse();
+
+                // Tab toggle between Leaderboard and Browse panes
+                const tabs = explorer.querySelectorAll('.explorer-tab');
+                const controls = explorer.querySelector('.explorer-controls');
+                const lbPane = explorer.querySelector('.leaderboard-pane');
+                const browsePane = explorer.querySelector('.browse-pane');
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        const isBrowse = tab.dataset.view === 'browse';
+                        tabs.forEach(t => t.classList.toggle('active', t === tab));
+                        if (controls) controls.style.display = isBrowse ? 'flex' : 'none';
+                        if (lbPane) lbPane.style.display = isBrowse ? 'none' : 'block';
+                        if (browsePane) browsePane.style.display = isBrowse ? 'block' : 'none';
+                    });
+                });
+            };
+
+            // Round 1: all qualifying venues. Run-off: top 10 (excluding opt-outs).
+            setupVenueExplorer('#state-round-1', sortedVenues);
+            const qualifiedForRunoff = sortedVenues.filter(v => !v.optOutRunoff).slice(0, 10);
+            setupVenueExplorer('#state-run-off', qualifiedForRunoff);
         };
         
         populateLists();
