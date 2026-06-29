@@ -8,6 +8,14 @@ function interpolate(text, vars) {
     return text.replace(/\{(\w+)\}/g, (_, key) => vars[key] ?? `{${key}}`);
 }
 
+function renderHeroIntro(intro, vars) {
+    const paragraphs = Array.isArray(intro) ? intro : [intro];
+    return paragraphs
+        .filter(Boolean)
+        .map((paragraph) => `<p>${interpolate(paragraph, vars)}</p>`)
+        .join('');
+}
+
 function buildTemplateVars(districtCopy) {
     return {
         district: districtCopy.district,
@@ -15,30 +23,163 @@ function buildTemplateVars(districtCopy) {
         time: districtCopy.time,
         location: districtCopy.location,
         councilName: districtCopy.councilName,
-        influencerName: districtCopy.influencerName
+        influencerName: districtCopy.influencerName,
+        councilImg: districtCopy.councilImg,
+        influencerImg: districtCopy.influencerImg
     };
 }
 
 function renderItineraryStops(stops, vars) {
-    return stops.map((stop, index) => `
-                    <div class="stop-card stop-${index + 1}">
-                        <div class="stop-number">${stop.number}</div>
-                        <h3>${interpolate(stop.title, vars)}</h3>
-                        <p>${interpolate(stop.body, vars)}</p>
-                    </div>`).join('');
+    const isMobile = window.innerWidth <= 768;
+    return `
+    <style>
+        .itinerary-grid-custom {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 40px;
+            position: relative;
+        }
+        @media (min-width: 768px) {
+            .itinerary-grid-custom {
+                grid-template-columns: 1fr 1fr;
+            }
+            .stop-3-full {
+                grid-column: 1 / -1;
+                max-width: 800px;
+                margin: 0 auto;
+                width: 100%;
+            }
+            .connecting-line {
+                position: absolute;
+                top: 80px;
+                left: 25%;
+                width: 50%;
+                height: 30px;
+                background-image: radial-gradient(circle at 100% 100%, transparent 15px, var(--accent) 15px, var(--accent) 18px, transparent 18px),
+                                  radial-gradient(circle at 0 0, transparent 15px, var(--accent) 15px, var(--accent) 18px, transparent 18px);
+                background-size: 30px 100%;
+                background-position: 0 0, 15px 0;
+                background-repeat: repeat-x;
+                opacity: 0.4;
+                z-index: 0;
+            }
+        }
+        .stop-card-custom {
+            background: linear-gradient(165deg, rgba(15, 22, 38, 0.8) 0%, rgba(15, 22, 38, 0.6) 100%);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 12px;
+            text-align: left;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .stop-avatar-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        .stop-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--accent);
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--accent);
+        }
+        .stop-business-placeholder {
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            border: 1px dashed rgba(255,255,255,0.2);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .stop-business-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.3);
+            font-size: 1.5rem;
+        }
+        .stop-business-info h4 {
+            margin: 0 0 5px 0;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+        }
+        .stop-business-info p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+    </style>
+    <div class="itinerary-grid-custom">
+        <div class="connecting-line"></div>
+        ${stops.map((stop, index) => {
+            let avatarHtml = '';
+            if (index === 0) {
+                avatarHtml = `<img src="${vars.influencerImg}" class="stop-avatar" alt="${vars.influencerName}">`;
+            } else if (index === 1) {
+                avatarHtml = `<img src="${vars.councilImg}" class="stop-avatar" alt="${vars.councilName}">`;
+            } else {
+                avatarHtml = `<div class="stop-avatar">?</div>`;
+            }
+
+            const businessHtml = `
+                <div class="stop-business-placeholder">
+                    <div class="stop-business-img">🖼️</div>
+                    <div class="stop-business-info">
+                        <h4>Venue Name</h4>
+                        <p>123 Venue Street</p>
+                    </div>
+                </div>
+            `;
+
+            const cardClass = index === 2 ? 'stop-card-custom stop-3-full' : 'stop-card-custom';
+
+            return `
+            <div class="${cardClass} stop-${index + 1}">
+                <div class="stop-avatar-container">
+                    ${avatarHtml}
+                    <div>
+                        <div class="stop-number" style="position: static; font-size: 1.2rem; margin-bottom: 5px; color: var(--accent); opacity: 1;">${stop.number}</div>
+                        <h3 style="margin: 0; font-size: 1.4rem;">${interpolate(stop.title, vars)}</h3>
+                    </div>
+                </div>
+                <p style="margin: 0; font-size: 1rem; line-height: 1.5;">${interpolate(stop.body, vars)}</p>
+                ${businessHtml}
+            </div>`;
+        }).join('')}
+    </div>`;
 }
 
 function renderScheduleItems(items) {
     return items.map((item) => `<li>${item}</li>`).join('\n                            ');
 }
 
-function renderVotingModule(district) {
+function renderMapLegend() {
     return `
-                <div class="map-filters-viewport" style="background: var(--bg-secondary); margin-top: 0; margin-bottom: 40px; padding: 20px 0; border-radius: 0 0 8px 8px; width: 100%;">
+                <div class="map-filters-viewport" style="background: var(--bg-secondary); margin-top: 0; margin-bottom: 0px; padding: 20px 0; border-radius: 0 0 8px 8px; width: 100%;">
                     <div class="map-filters-inner" style="width: 100%; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: nowrap; gap: 30px;">
                         
-                        <div style="display: flex; align-items: center; gap: 20px; padding-right: 30px; border-right: 1px solid rgba(255,255,255,0.2); flex-shrink: 0;">
-                            <span id="legend-round-name" style="color: var(--text-primary); font-family: var(--font-hero); font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap;">Round 1</span>
+                        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 10px; border-right: 1px solid rgba(255,255,255,0.2);">
+                            <div style="text-align: center;">
+                                <div id="legend-round-subtitle" style="color: var(--text-secondary); font-size: 1.2rem; font-family: var(--font-hero); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px;">RUN-OFF BEGINS IN</div>
+                            </div>
                             <div class="countdown-clock small-clock" style="margin: 0; flex-wrap: nowrap;">
                                 <div class="time-box" style="padding: 6px 12px; min-width: 50px;"><span style="font-size: 2rem; line-height: 1;">02</span><label style="font-size: 0.7rem;">Days</label></div>
                                 <div class="time-box" style="padding: 6px 12px; min-width: 50px;"><span style="font-size: 2rem; line-height: 1;">14</span><label style="font-size: 0.7rem;">Hrs</label></div>
@@ -46,7 +187,7 @@ function renderVotingModule(district) {
                             </div>
                         </div>
 
-                        <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: center; justify-content: flex-start; flex-grow: 1;">
+                        <div style="flex: 1; display: flex; gap: 20px; flex-wrap: wrap; align-items: center; justify-content: center;">
                             <div style="display: flex; align-items: center; gap: 6px;">
                                 <div style="width: 12px; height: 12px; border-radius: 50%; background-color: #D2A039; box-shadow: 0 0 8px #D2A039;"></div>
                                 <span style="color: var(--text-primary); font-family: var(--font-header); font-size: 0.85rem; font-weight: 700; text-transform: uppercase;">Bar</span>
@@ -69,143 +210,80 @@ function renderVotingModule(district) {
                             </div>
                             <div style="display: flex; align-items: center; gap: 6px; border-left: 1px solid rgba(203, 160, 82, 0.3); padding-left: 15px;">
                                 <div style="width: 12px; height: 12px; border-radius: 50%; background-color: transparent; border: 2px solid #fff;"></div>
-                                <span style="color: var(--text-secondary); font-family: var(--font-header); font-size: 0.8rem; font-style: italic;">Top 10</span>
+                                <span style="color: var(--text-secondary); font-family: var(--font-header); font-size: 0.8rem; font-style: italic;">Currently Top 10</span>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            </div>
 
-            <div class="voting-section js-reveal reveal-y delay-200" id="voting-module">
-                <div class="state-controls" style="text-align: center; margin-bottom: 20px;">
-                    <span style="color: var(--text-secondary); margin-right: 10px; font-weight: bold; font-size: 0.9rem; text-transform: uppercase;">Preview States:</span>
-                    <button onclick="window.setVotingState('pre-voting')">Pre-Voting</button>
-                    <button onclick="window.setVotingState('round-1')">Round 1</button>
-                    <button onclick="window.setVotingState('run-off')">Run-Off</button>
-                    <button onclick="window.setVotingState('post-election')">Post-Election</button>
-                </div>
+            `;
+}
 
-                <div id="state-pre-voting" class="voting-state-container">
-                    <div class="voting-header" style="margin-bottom: 10px;">
-                        <h2 style="font-size: 2.5rem; margin-bottom: 5px;">The Election: Stop 3</h2>
-                        <p style="font-size: 1.1rem; color: var(--text-secondary);">Where are we ending the night? The polls open 14 days before the event.</p>
-                    </div>
-                    <div class="instruction-box" style="padding: 15px 20px; max-width: 700px; margin: 0 auto 20px auto; text-align: left; background: rgba(15, 22, 38, 0.5);">
-                        <h3 style="margin-bottom: 10px; font-size: 1.1rem; color: var(--text-primary);">How it works</h3>
-                        <ul style="margin: 0; padding-left: 20px; font-size: 0.95rem;">
-                            <li style="margin-bottom: 5px;"><strong>Round 1:</strong> Voting opens for all districts when the press release drops. Vote for your favorite neighborhood spots. The top 5 advance.</li>
-                            <li style="margin-bottom: 5px;"><strong>The Run-Off:</strong> Starts the Monday before the event at 3:00 PM. A final sprint to decide the winner among the top 5.</li>
-                            <li style="margin-bottom: 0;"><strong>The Prize:</strong> The winning venue hosts the final stop. Every vote is an entry into the Golden Ticket Raffle!</li>
-                        </ul>
-                    </div>
-                </div>
+// Reusable Venue Explorer: one component that toggles between a vote-ranked
+// Leaderboard view and a Browse view (A-Z/Z-A sort + business-type filter).
+// Used in both the round-1 and run-off states to avoid duplicated markup.
+function renderVenueExplorer() {
+    return `
+                    <div class="venue-explorer">
+                        <div class="explorer-tabs">
+                            <button type="button" class="explorer-tab active" data-view="leaderboard">Leaderboard</button>
+                            <button type="button" class="explorer-tab" data-view="browse">Browse All</button>
+                        </div>
+                        <div class="explorer-controls" style="display: none;">
+                            <select class="sort-select" aria-label="Sort venues">
+                                <option value="az">Name: A&ndash;Z</option>
+                                <option value="za">Name: Z&ndash;A</option>
+                            </select>
+                            <select class="type-filter" aria-label="Filter by business type">
+                                <option value="all">All Types</option>
+                                <option value="Bar">Bar</option>
+                                <option value="Restaurant">Restaurant</option>
+                                <option value="Live Venue">Live Venue</option>
+                                <option value="Museum/Gallery">Museum/Gallery</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="explorer-pane leaderboard-pane">
+                            <div class="leaderboard" style="margin-bottom: 0;">
+                                <h3>Current Leaders</h3>
+                                <ul class="venue-list leaderboard-list">
+                                    <!-- Dynamically populated from Firestore -->
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="explorer-pane browse-pane" style="display: none;">
+                            <div class="venue-list-container">
+                                <ul class="venue-list">
+                                    <!-- Dynamically populated from Firestore -->
+                                </ul>
+                                <div class="pagination" style="display: none;"></div>
+                            </div>
+                        </div>
+                    </div>`;
+}
 
-                <div id="state-round-1" class="voting-state-container" style="display: none;">
+function renderVotingStates(district) {
+    return `
+            <div class="voting-section" id="voting-module">
+                <div id="state-round-1" class="voting-state-container" style="display: block;">
                     <div class="voting-header" style="display: none;">
                         <h2>Round 1: Choose Your Final Stop</h2>
-                        <p>The top 5 venues will advance to the run-off in:</p>
+                        <p>The top 10 venues will advance to the run-off in:</p>
                         <div class="countdown-clock small-clock">
                             <div class="time-box"><span>02</span><label>Days</label></div>
                             <div class="time-box"><span>14</span><label>Hrs</label></div>
                             <div class="time-box"><span>20</span><label>Mins</label></div>
                         </div>
                     </div>
-                    <p style="text-align: center; color: var(--text-secondary); margin-bottom: 15px; font-size: 0.9rem;">Use the numbers on the map above to locate venues.</p>
-                    
-                    <div class="leaderboard" style="margin-bottom: 20px;">
-                        <h3 style="color: var(--text-primary); font-family: var(--font-hero); font-size: 1.2rem; margin-bottom: 10px; text-transform: uppercase;">Current Leaders</h3>
-                        <div class="leaderboard-bar 1st" style="margin-bottom: 6px;">
-                            <div class="bar-fill" style="width: 85%;"></div>
-                            <div class="bar-content" style="padding: 6px 12px;">
-                                <span class="rank">#1</span>
-                                <span class="venue-name">The Rusty Nail</span>
-                                <span class="vote-count">1,245 votes</span>
-                            </div>
-                        </div>
-                        <div class="leaderboard-bar 2nd" style="margin-bottom: 6px;">
-                            <div class="bar-fill" style="width: 65%;"></div>
-                            <div class="bar-content" style="padding: 6px 12px;">
-                                <span class="rank">#2</span>
-                                <span class="venue-name">Barrel Proof</span>
-                                <span class="vote-count">980 votes</span>
-                            </div>
-                        </div>
-                        <div class="leaderboard-bar 3rd" style="margin-bottom: 6px;">
-                            <div class="bar-fill" style="width: 45%;"></div>
-                            <div class="bar-content" style="padding: 6px 12px;">
-                                <span class="rank">#3</span>
-                                <span class="venue-name">The Tchoup Yard</span>
-                                <span class="vote-count">650 votes</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="venue-list-container">
-                        <ul class="venue-list">
-                            <!-- Dynamically populated from Firestore -->
-                        </ul>
-                        <div class="pagination">
-                            <button disabled>← Prev</button>
-                            <span>Page 1 of 4</span>
-                            <button>Next →</button>
-                        </div>
-                    </div>
+                    ${renderVenueExplorer()}
                 </div>
 
                 <div id="state-run-off" class="voting-state-container" style="display: none;">
                     <div class="voting-header" style="display: none;">
-                        <h2>The Run-Off: Top 5</h2>
+                        <h2>The Run-Off: Top 10</h2>
                         <p>It's down to the wire! The polls close in:</p>
                     </div>
-                    <div class="leaderboard" style="margin-bottom: 20px;">
-                        <h3 style="color: var(--text-primary); font-family: var(--font-hero); font-size: 1.2rem; margin-bottom: 10px; text-transform: uppercase;">Current Leaders</h3>
-                        <div class="leaderboard-bar 1st" style="margin-bottom: 6px;">
-                            <div class="bar-fill" style="width: 85%;"></div>
-                            <div class="bar-content" style="padding: 6px 12px;">
-                                <span class="rank">#1</span>
-                                <span class="venue-name">The Rusty Nail</span>
-                                <span class="vote-count">1,245 votes</span>
-                            </div>
-                        </div>
-                        <div class="leaderboard-bar 2nd" style="margin-bottom: 6px;">
-                            <div class="bar-fill" style="width: 65%;"></div>
-                            <div class="bar-content" style="padding: 6px 12px;">
-                                <span class="rank">#2</span>
-                                <span class="venue-name">Barrel Proof</span>
-                                <span class="vote-count">980 votes</span>
-                            </div>
-                        </div>
-                        <div class="leaderboard-bar 3rd" style="margin-bottom: 6px;">
-                            <div class="bar-fill" style="width: 45%;"></div>
-                            <div class="bar-content" style="padding: 6px 12px;">
-                                <span class="rank">#3</span>
-                                <span class="venue-name">The Tchoup Yard</span>
-                                <span class="vote-count">650 votes</span>
-                            </div>
-                        </div>
-                        <div class="leaderboard-bar 4th" style="margin-bottom: 6px;">
-                            <div class="bar-fill" style="width: 35%;"></div>
-                            <div class="bar-content" style="padding: 6px 12px;">
-                                <span class="rank">#4</span>
-                                <span class="venue-name">Capulet</span>
-                                <span class="vote-count">420 votes</span>
-                            </div>
-                        </div>
-                        <div class="leaderboard-bar 5th" style="margin-bottom: 6px;">
-                            <div class="bar-fill" style="width: 25%;"></div>
-                            <div class="bar-content" style="padding: 6px 12px;">
-                                <span class="rank">#5</span>
-                                <span class="venue-name">Bulldog Mid-City</span>
-                                <span class="vote-count">295 votes</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="venue-list-container">
-                        <ul class="venue-list">
-                            <!-- Dynamically populated from Firestore -->
-                        </ul>
-                    </div>
+                    ${renderVenueExplorer()}
                 </div>
 
                 <div id="state-post-election" class="voting-state-container" style="display: none;">
@@ -220,6 +298,12 @@ function renderVotingModule(district) {
                         <p>With 1,842 total votes, The Rusty Nail is the official Stop 3 for the Nightcrawl!</p>
                         <button id="rsvp-btn" class="brand-btn" style="margin-top: 15px;">RSVP NOW</button>
                         <p id="rsvp-msg" style="margin-top: 10px; color: var(--accent); font-weight: bold; display: none;"></p>
+                    </div>
+                </div>
+                <div id="state-post-event" class="voting-state-container" style="display: none; padding: 40px 0; text-align: center;">
+                    <div class="voting-header">
+                        <h2 style="font-family: var(--font-header); font-size: 2.5rem; text-transform: uppercase; color: var(--text-primary); margin-bottom: 20px;">What a Night</h2>
+                        <p style="font-size: 1.1rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto;">Thank you to everyone who came out to District ${district} and supported our local nighttime economy. We'll see you at the next one!</p>
                     </div>
                 </div>
             </div>
@@ -319,12 +403,19 @@ class EventLayout extends HTMLElement {
             const districtCopy = await districtResponse.json();
             const vars = buildTemplateVars(districtCopy);
 
+            // Render immediately with a safe default state. The election schedule is
+            // fetched asynchronously AFTER render (see applyElectionSchedule) so a slow,
+            // throttled, or failed Firestore read can never block the page from loading.
+            window.currentElectionState = window.currentElectionState || 'round-1';
+            window.electionWinnerId = window.electionWinnerId || null;
+
+
             this.innerHTML = `
             <div class="event-hero" style="background: linear-gradient(rgba(15, 22, 38, 0.85), rgba(15, 22, 38, 0.95)), url('${districtCopy.bgImg}') center/cover; background-attachment: fixed;">
                 <div class="hero-left">
-                    <h1 class="title-3d" style="margin-bottom: 10px;">${interpolate(shared.hero.title, vars)}</h1>
-                    <h2>${districtCopy.date} | ${districtCopy.time} | ${districtCopy.location}</h2>
-                    <p>${interpolate(districtCopy.heroIntro, vars)}</p>
+                    <h1 class="title-3d">${interpolate(shared.hero.title, vars)}</h1>
+                    <h2>${districtCopy.date}</h2>
+                    ${renderHeroIntro(districtCopy.heroIntro, vars)}
                     <button type="button" id="vote-scroll-btn" class="brand-btn" style="margin-top: 20px; font-size: 1.1rem; padding: 15px 30px;" onclick="document.getElementById('map-section').scrollIntoView({behavior: 'smooth'})">${interpolate(shared.hero.rsvpButton, vars)}</button>
                 </div>
                 <div class="hero-right" style="display: flex; justify-content: center; align-items: center; height: 100%;">
@@ -342,7 +433,7 @@ class EventLayout extends HTMLElement {
                 </div>
             </div>
 
-            <div class="purpose-section js-reveal reveal-opacity" style="padding-top: 40px; padding-bottom: 40px; background: transparent;">
+            <div class="purpose-section js-reveal reveal-opacity" style="margin: 30px 0; background: transparent;">
                 <div class="purpose-module">
                     <div class="purpose-frame js-reveal reveal-y delay-200">
                         <h2>${shared.behindSeries.heading}</h2>
@@ -351,51 +442,88 @@ class EventLayout extends HTMLElement {
                 </div>
             </div>
 
-            <div class="map-section-wrapper js-reveal reveal-opacity" id="map-section">
+            <!-- Election Intro & Features ABOVE the map -->
+            <div class="election-intro-section js-reveal reveal-opacity" style="padding: 30px 0; background: transparent;">
+                <div class="page-module" style="width: 80%; max-width: 1400px; margin: 0 auto; text-align: center;">
+                <div class="voting-header" style="margin-bottom: 20px;">
+                    <h2 style="font-size: 2.5rem; margin-bottom: 5px; font-family: var(--font-header); text-transform: uppercase; color: var(--text-primary);">The Election: Stop 3</h2>
+                    <p style="font-size: 1.1rem; color: var(--text-secondary);">Where are we ending the night? The polls open 14 days before the event.</p>
+                </div>
+                <div class="instruction-box" style="padding: 30px; max-width: 900px; margin: 0 auto 40px auto; text-align: left; background: rgba(15, 22, 38, 0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;">
+                    <h3 style="margin-bottom: 15px; font-size: 1.4rem; color: var(--text-primary); font-family: var(--font-header); text-transform: uppercase; letter-spacing: 1px;">How it works</h3>
+                    <ul style="margin: 0; padding-left: 20px; font-size: 1rem; color: var(--text-main); line-height: 1.6;">
+                        <li style="margin-bottom: 10px;"><strong>Round 1:</strong> Voting opens for all districts when the press release drops. Vote for your favorite neighborhood spots. The top 10 advance.</li>
+                        <li style="margin-bottom: 10px;"><strong>The Run-Off:</strong> Starts the Monday before the event at 3:00 PM. A final sprint to decide the winner among the top 10.</li>
+                        <li style="margin-bottom: 0;"><strong>The Prize:</strong> The winning venue hosts the final stop. Every vote is an entry into the Golden Ticket Raffle!</li>
+                    </ul>
+                </div>
+                
+                <div class="map-features-layout" style="margin-top: 40px; padding-top: 0;">
+                    <div class="map-features">
+                        <div class="feature-box" style="flex: 1; text-align: left;">
+                            <h3 style="font-family: var(--font-hero); text-transform: uppercase; letter-spacing: 1px;">${shared.venueVoting.heading}</h3>
+                            <p style="margin-bottom: 10px;"><strong>Goals:</strong> ${shared.venueVoting.goals}</p>
+                            <p style="margin-bottom: 10px;"><strong>Rules:</strong> ${interpolate(shared.venueVoting.rules, vars)}</p>
+                            <p><strong>${shared.venueVoting.scheduleLabel}</strong></p>
+                            <ul style="padding-left: 20px; color: var(--text-secondary); font-size: 0.95rem; margin-top: 5px;">
+                                ${renderScheduleItems(shared.venueVoting.schedule)}
+                            </ul>
+                        </div>
+                        <div class="feature-box" style="flex: 1; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                            <h3 style="font-family: var(--font-hero); text-transform: uppercase; letter-spacing: 1px;">${shared.venueOperators.heading}</h3>
+                            <p style="margin-bottom: 20px;">${shared.venueOperators.body}</p>
+                            <a href="${shared.venueOperators.ctaHref}" class="brand-btn" style="padding: 10px 20px; font-size: 0.9rem;">${shared.venueOperators.ctaText}</a>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+
+            <!-- Map Section -->
+            <div class="map-section-wrapper js-reveal reveal-opacity" id="map-section" style="margin-bottom: 0;">
                 <h2 class="title-3d map-title"><u>District ${districtCopy.district}</u><br><span style="font-size: 0.8em; color: var(--accent);">${districtCopy.location}</span></h2>
                 <div id="map"></div>
-                ${renderVotingModule(districtCopy.district)}
-
-            <div class="leaderboard-section js-reveal reveal-y delay-200" style="margin: 40px auto; max-width: 800px; padding: 0 20px;">
-                <district-leaderboard></district-leaderboard>
+                ${renderMapLegend()}
             </div>
 
-            <div class="itinerary-section js-reveal reveal-y delay-200">
-                <h2>${shared.itinerary.heading}</h2>
-                <div class="itinerary-grid">${renderItineraryStops(districtCopy.itinerary.stops, vars)}
+            <!-- Voting States Below Map -->
+            <div class="voting-states-section js-reveal reveal-y delay-200" style="padding: 30px 0; background: transparent;">
+                <div class="page-module" style="width: 80%; max-width: 1400px; margin: 0 auto; text-align: center;">
+                ${renderVotingStates(districtCopy.district)}
                 </div>
             </div>
-            
-            <div class="map-features-layout js-reveal reveal-y delay-400">
-                <div class="map-features">
-                    <div class="feature-box" style="flex: 1;">
-                        <h3>${shared.venueVoting.heading}</h3>
-                        <p style="margin-bottom: 10px;"><strong>Goals:</strong> ${shared.venueVoting.goals}</p>
-                        <p style="margin-bottom: 10px;"><strong>Rules:</strong> ${interpolate(shared.venueVoting.rules, vars)}</p>
-                        <p><strong>${shared.venueVoting.scheduleLabel}</strong></p>
-                        <ul style="padding-left: 20px; color: var(--text-secondary); font-size: 0.95rem; margin-top: 5px;">
-                            ${renderScheduleItems(shared.venueVoting.schedule)}
-                        </ul>
+
+            <!-- Crawl-tinery Pulled Up Beneath Map -->
+            <div class="itinerary-section js-reveal reveal-y delay-200" style="padding: 30px 0; background: transparent;">
+                <div class="page-module" style="width: 80%; max-width: 1400px; margin: 0 auto;">
+                <h2 style="font-family: var(--font-header); font-size: 2.5rem; text-align: left; text-transform: uppercase; color: var(--text-primary); margin-bottom: 40px;">${shared.itinerary.heading}</h2>
+                <div class="itinerary-grid">${renderItineraryStops(districtCopy.itinerary.stops, vars)}</div>
+                </div>
+            </div>
+
+            <!-- Local Legends Photo Wall Bento Grid -->
+            <div class="local-legends-section js-reveal reveal-opacity" style="padding: 30px 0; background: var(--bg-primary); width: 100%; overflow: hidden;">
+                <h2 style="text-align: center; font-family: var(--font-hero); font-size: 3.5rem; color: var(--text-primary); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 40px; text-shadow: 2px 2px 0px var(--brand-red);">Local Legends</h2>
+                
+                <div class="bento-photo-wall">
+                    <div class="bento-item bento-large" style="background-image: url('assets/district_d_image.jpg');">
+                        <div class="bento-overlay"><span>Community First</span></div>
                     </div>
-                    <div class="feature-box" style="flex: 1; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                        <h3>${shared.venueOperators.heading}</h3>
-                        <p style="margin-bottom: 20px;">${shared.venueOperators.body}</p>
-                        <a href="${shared.venueOperators.ctaHref}" class="brand-btn" style="padding: 10px 20px; font-size: 0.9rem;">${shared.venueOperators.ctaText}</a>
+                    <div class="bento-item" style="background-image: url('https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=600&h=400&fit=crop');">
+                        <div class="bento-overlay"><span>Live Music</span></div>
+                    </div>
+                    <div class="bento-item bento-tall" style="background-image: url('https://images.unsplash.com/photo-1520862238258-005eec06c04b?w=600&h=800&fit=crop');">
+                        <div class="bento-overlay"><span>The Vibe</span></div>
+                    </div>
+                    <div class="bento-item bento-wide" style="background-image: url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&h=400&fit=crop');">
+                        <div class="bento-overlay"><span>Good Eats</span></div>
+                    </div>
+                    <div class="bento-item" style="background-image: url('https://images.unsplash.com/photo-1572116469696-31de0f17cc34?w=600&h=400&fit=crop');">
+                        <div class="bento-overlay"><span>Cheers</span></div>
                     </div>
                 </div>
             </div>
 
-            <div class="quotes-section">
-                <div class="quote-block quote-left js-reveal reveal-y delay-200">
-                    "${interpolate(districtCopy.councilQuote, vars)}"
-                    <span class="quote-author">— ${districtCopy.councilName}</span>
-                </div>
-                <div class="quote-block quote-right js-reveal reveal-y delay-400">
-                    "${interpolate(districtCopy.influencerQuote, vars)}"
-                    <span class="quote-author">— ${districtCopy.influencerName}</span>
-                </div>
-            </div>
-            
             <style>
                 @keyframes float {
                     0% { transform: translateY(0px) rotate(-1.2deg) scale(1.03); }
@@ -425,23 +553,133 @@ class EventLayout extends HTMLElement {
                         7px 7px 0px var(--brand-red),
                         10px 12px 15px rgba(0,0,0,0.45);
                 }
+                
+                /* Local Legends Bento Wall Styles */
+                .bento-photo-wall {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                    grid-auto-rows: 250px;
+                    grid-auto-flow: dense;
+                    gap: 15px;
+                    padding: 0 15px;
+                    max-width: 1400px;
+                    margin: 0 auto;
+                }
+                
+                .bento-item {
+                    position: relative;
+                    border-radius: 12px;
+                    overflow: hidden;
+                    background-size: cover;
+                    background-position: center;
+                    background-color: #1a1a1a;
+                    transition: transform 0.4s ease, box-shadow 0.4s ease;
+                    cursor: pointer;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                }
+                
+                .bento-item:hover {
+                    transform: scale(1.02);
+                    box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+                    z-index: 2;
+                }
+                
+                .bento-overlay {
+                    position: absolute;
+                    inset: 0;
+                    background: linear-gradient(to top, rgba(15,22,38,0.9) 0%, rgba(15,22,38,0.2) 50%, rgba(15,22,38,0) 100%);
+                    display: flex;
+                    align-items: flex-end;
+                    padding: 20px;
+                    opacity: 0;
+                    transition: opacity 0.3s ease;
+                }
+                
+                .bento-item:hover .bento-overlay {
+                    opacity: 1;
+                }
+                
+                .bento-overlay span {
+                    color: var(--text-primary);
+                    font-family: var(--font-hero);
+                    font-size: 1.5rem;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                    transform: translateY(15px);
+                    transition: transform 0.3s ease;
+                }
+                
+                .bento-item:hover .bento-overlay span {
+                    transform: translateY(0);
+                }
+                
+                @media (min-width: 768px) {
+                    .bento-photo-wall {
+                        grid-template-columns: repeat(4, 1fr);
+                    }
+                    .bento-large {
+                        grid-column: span 2;
+                        grid-row: span 2;
+                    }
+                    .bento-wide {
+                        grid-column: span 2;
+                        grid-row: span 1;
+                    }
+                    .bento-tall {
+                        grid-column: span 1;
+                        grid-row: span 2;
+                    }
+                }
             </style>
         `;
-
             this.initScrollAnimations();
             this.initVotingPortal();
+            // Non-blocking: resolve the live election state after the page is on screen.
+            this.applyElectionSchedule(districtId);
         } catch (error) {
-            console.error('Error loading event page copy:', error);
-            this.innerHTML = '<p style="padding: 2rem; text-align: center;">Unable to load event content. Please refresh the page.</p>';
+            console.error('CRITICAL ERROR loading event page:', error);
+            this.innerHTML = `<p style="padding: 2rem; margin-top: 100px; text-align: center; color: red; font-size: 2rem; z-index: 9999; position: relative;">Unable to load event content: ${error.message}</p>`;
+        }
+    }
+
+    async applyElectionSchedule(districtId) {
+        try {
+            const scheduleRef = doc(db, "settings", "schedule");
+            const schedSnap = await getDoc(scheduleRef);
+            if (!schedSnap.exists() || !schedSnap.data()[districtId.toUpperCase()]) return;
+
+            const sched = schedSnap.data()[districtId.toUpperCase()];
+            const now = new Date();
+            const parseDate = (d) => (d && d.toDate ? d.toDate() : new Date(d));
+
+            let activeState = 'round-1';
+            let winnerId = null;
+            if (sched.postEvent && now >= parseDate(sched.postEvent)) {
+                activeState = 'post-event';
+            } else if (sched.winnerAnnounce && now >= parseDate(sched.winnerAnnounce)) {
+                activeState = 'post-election';
+                winnerId = sched.winnerId;
+            } else if (sched.runOffStart && now >= parseDate(sched.runOffStart)) {
+                activeState = 'run-off';
+            }
+
+            window.currentElectionState = activeState;
+            window.electionWinnerId = winnerId;
+            if (window.setVotingState) window.setVotingState(activeState);
+        } catch (err) {
+            console.warn('Election schedule unavailable; defaulting to round-1 state.', err);
         }
     }
 
     initScrollAnimations() {
         setTimeout(() => {
+            // threshold 0: reveal as soon as any part enters the viewport. A higher
+            // threshold breaks for very tall sections (e.g. the full venue list), which
+            // can never occupy 15% of the screen and would otherwise stay invisible.
             const observerOptions = {
                 root: null,
-                rootMargin: '0px',
-                threshold: 0.15
+                rootMargin: '0px 0px -40px 0px',
+                threshold: 0
             };
             const observer = new IntersectionObserver((entries, scrollObserver) => {
                 entries.forEach(entry => {
@@ -533,6 +771,15 @@ class EventLayout extends HTMLElement {
                 const userSnap = await getDoc(userRef);
                 
                 let userData = userSnap.exists() ? userSnap.data() : {};
+                
+                if (userData.isBanned) {
+                    errorMsg.textContent = `Your account is suspended.`;
+                    errorMsg.style.display = 'block';
+                    btn.innerText = 'Submit Vote';
+                    btn.disabled = false;
+                    return;
+                }
+                
                 let votes = userData.votes || {};
                 
                 // Check if user already voted for this specific venue
@@ -552,6 +799,15 @@ class EventLayout extends HTMLElement {
                 const venueRef = doc(db, "venues", venueId);
                 await updateDoc(venueRef, {
                     voteCount: increment(1)
+                });
+                
+                // Add a detailed audit record
+                const voteRecordRef = doc(db, "venues", venueId, "votes", currentUser.uid);
+                await setDoc(voteRecordRef, {
+                    uid: currentUser.uid,
+                    displayName: currentUser.displayName || userData.displayName || "Unknown User",
+                    email: currentUser.email || userData.email || "",
+                    timestamp: new Date()
                 });
                 
                 window.showShareScreen();
@@ -650,25 +906,36 @@ class EventLayout extends HTMLElement {
             }
         };
 
+        
         window.setVotingState = (stateId) => {
-            const states = ['pre-voting', 'round-1', 'run-off', 'post-election'];
+            const states = ['round-1', 'run-off', 'post-election', 'post-event'];
             
-            // Update map legend round name based on state
-            const legendRoundName = this.querySelector('#legend-round-name');
-            if (legendRoundName) {
-                if (stateId === 'pre-voting') legendRoundName.innerText = 'Voting Opens Soon';
-                else if (stateId === 'round-1') legendRoundName.innerText = 'Round 1';
-                else if (stateId === 'run-off') legendRoundName.innerText = 'Run-Off';
-                else if (stateId === 'post-election') legendRoundName.innerText = 'Results';
+            // Update map legend subtitle based on state
+            const legendSubtitle = document.querySelector('#legend-round-subtitle');
+            if (legendSubtitle) {
+                if (stateId === 'round-1') {
+                    legendSubtitle.innerText = 'RUN-OFF BEGINS IN';
+                } else if (stateId === 'run-off') {
+                    legendSubtitle.innerText = 'VOTING CLOSES IN';
+                } else if (stateId === 'post-election') {
+                    legendSubtitle.innerText = 'VOTING CLOSED';
+                } else {
+                    legendSubtitle.innerText = 'EVENT COMPLETE';
+                }
             }
             
             states.forEach(s => {
                 const el = this.querySelector('#state-' + s);
-                if (el) {
-                    el.style.display = s === stateId ? 'block' : 'none';
-                }
+                if (el) el.style.display = s === stateId ? 'block' : 'none';
             });
         };
+        
+        if (window.currentElectionState) {
+            setTimeout(() => {
+                window.setVotingState(window.currentElectionState);
+            }, 100);
+        }
+
 
         setTimeout(() => {
             const urlParams = new URLSearchParams(window.location.search);

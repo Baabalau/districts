@@ -4,12 +4,12 @@
     "council": "The Policy Pro"
   },
   "hero": {
-    "title": "District {district} Crawl",
-    "rsvpButton": "Vote to Decide Our Final Stop"
+    "title": "District {district} Nightcrawl",
+    "rsvpButton": "Vote for District {district}'s Last Stop of the Night"
   },
   "behindSeries": {
-    "heading": "Behind the Series",
-    "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+    "heading": "Our Southern Hospitality needs Summer Sustainability",
+    "body": "Too many New Orleans businesses are struggling to keep their doors open during the slow summer months. Districts After Dark is an initiative of the Mayor’s Office of Nighttime Economy that brings together residents, businesses, City staff, and lawmakers to find ways to make our long summer season more sustainable. The best place to start: over food & drinks on a hot summer night out on the town!"
   },
   "itinerary": {
     "heading": "Crawl-tinery"
