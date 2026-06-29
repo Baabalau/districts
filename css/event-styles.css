@@ -795,6 +795,26 @@
     color: white;
     border: none;
     box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.venue-vote-btn .mobile-text {
+    display: none;
+}
+
+@media (max-width: 900px) {
+    .venue-vote-btn {
+        padding: 0;
+        width: 42px;
+    }
+    .venue-vote-btn .desktop-text {
+        display: none;
+    }
+    .venue-vote-btn .mobile-text {
+        display: inline;
+        font-size: 1.2rem;
+    }
 }
 .venue-checkin-btn {
     background: transparent;

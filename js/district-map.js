@@ -401,7 +401,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             const renderVenueActions = (v) => {
                 const safeName = v.name ? v.name.replace(/'/g, "\\'") : '';
                 return `<div class="venue-actions">
-                        <button class="brand-btn venue-vote-btn" onclick="window.openVoteModal('${v.id}', '${safeName}')">VOTE FOR THIS BUSINESS</button>
+                        <button class="brand-btn venue-vote-btn" onclick="window.openVoteModal('${v.id}', '${safeName}')" title="Vote for this Business">
+                            <span class="desktop-text">VOTE FOR THIS BUSINESS</span>
+                            <span class="mobile-text">🗳️</span>
+                        </button>
                         <a href="checkin.html?venue=${v.id}" class="brand-btn venue-checkin-btn" title="Check In to Location">📍</a>
                     </div>`;
             };
