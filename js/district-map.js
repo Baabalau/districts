@@ -270,7 +270,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             const hasRealDescription = place.description && !place.description.trim().startsWith('Hours:');
             
             // Generate deep link for this venue
-            const venueShareUrl = window.location.origin + window.location.pathname + '?vote=' + encodeURIComponent(place.id) + '&name=' + encodeURIComponent(place.name);
+            const venueNameStr = place.name || 'Unnamed Venue';
+            const venueShareUrl = window.location.origin + window.location.pathname + '?vote=' + encodeURIComponent(place.id) + '&name=' + encodeURIComponent(venueNameStr);
             const safeVenueShareUrl = venueShareUrl.replace(/'/g, "\\'");
 
                     // Use website URL if available, otherwise hide the placeholder
@@ -311,7 +312,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                             </div>
                             
                             <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 5px; padding-bottom: 4px;">
-                                <button class="brand-btn" style="width: 100%; padding: 14px 12px; font-size: 1.05rem; text-align: center; letter-spacing: 1px; font-weight: 700; text-transform: uppercase; background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); color: white; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.4);" onclick="window.openVoteModal('${place.id}', '${place.name.replace(/'/g, "\\'")}')">Vote For This Business</button>
+                                <button class="brand-btn" style="width: 100%; padding: 14px 12px; font-size: 1.05rem; text-align: center; letter-spacing: 1px; font-weight: 700; text-transform: uppercase; background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); color: white; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.4);" onclick="window.openVoteModal('${place.id}', '${venueNameStr.replace(/'/g, "\\'")}')">Vote For This Business</button>
                                 
                                 <a href="checkin.html?venue=${place.id}" class="brand-btn" style="width: 100%; background: transparent; border: 2px solid rgba(255,255,255,0.2); color: var(--text-secondary); text-decoration: none; padding: 10px 12px; font-size: 0.95rem; text-align: center; letter-spacing: 0.5px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-weight: 500; opacity: 0.7; transition: all 0.2s ease;" onmouseover="this.style.opacity='1'; this.style.borderColor='var(--text-secondary)';" onmouseout="this.style.opacity='0.7'; this.style.borderColor='rgba(255,255,255,0.2)';">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> Check In to Location
