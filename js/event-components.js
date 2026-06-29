@@ -8,6 +8,14 @@ function interpolate(text, vars) {
     return text.replace(/\{(\w+)\}/g, (_, key) => vars[key] ?? `{${key}}`);
 }
 
+function renderHeroIntro(intro, vars) {
+    const paragraphs = Array.isArray(intro) ? intro : [intro];
+    return paragraphs
+        .filter(Boolean)
+        .map((paragraph) => `<p>${interpolate(paragraph, vars)}</p>`)
+        .join('');
+}
+
 function buildTemplateVars(districtCopy) {
     return {
         district: districtCopy.district,
@@ -168,10 +176,9 @@ function renderMapLegend() {
                 <div class="map-filters-viewport" style="background: var(--bg-secondary); margin-top: 0; margin-bottom: 0px; padding: 20px 0; border-radius: 0 0 8px 8px; width: 100%;">
                     <div class="map-filters-inner" style="width: 100%; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: nowrap; gap: 30px;">
                         
-                        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; padding-right: 30px; border-right: 1px solid rgba(255,255,255,0.2); flex-shrink: 0;">
+                        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 10px; border-right: 1px solid rgba(255,255,255,0.2);">
                             <div style="text-align: center;">
-                                <div id="legend-round-name" style="display: none; color: var(--text-primary); font-family: var(--font-hero); font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; line-height: 1.2;">Round 1</div>
-                                <div style="color: var(--text-secondary); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px;">Opening Vote ends in</div>
+                                <div id="legend-round-subtitle" style="color: var(--text-secondary); font-size: 1.2rem; font-family: var(--font-hero); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px;">RUN-OFF BEGINS IN</div>
                             </div>
                             <div class="countdown-clock small-clock" style="margin: 0; flex-wrap: nowrap;">
                                 <div class="time-box" style="padding: 6px 12px; min-width: 50px;"><span style="font-size: 2rem; line-height: 1;">02</span><label style="font-size: 0.7rem;">Days</label></div>
@@ -180,7 +187,7 @@ function renderMapLegend() {
                             </div>
                         </div>
 
-                        <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: center; justify-content: flex-start; flex-grow: 1;">
+                        <div style="flex: 1; display: flex; gap: 20px; flex-wrap: wrap; align-items: center; justify-content: center;">
                             <div style="display: flex; align-items: center; gap: 6px;">
                                 <div style="width: 12px; height: 12px; border-radius: 50%; background-color: #D2A039; box-shadow: 0 0 8px #D2A039;"></div>
                                 <span style="color: var(--text-primary); font-family: var(--font-header); font-size: 0.85rem; font-weight: 700; text-transform: uppercase;">Bar</span>
@@ -229,30 +236,6 @@ function renderVotingStates(district) {
                     
                     <div class="leaderboard" style="margin-bottom: 20px;">
                         <h3 style="color: var(--text-primary); font-family: var(--font-hero); font-size: 1.2rem; margin-bottom: 10px; text-transform: uppercase;">Current Leaders</h3>
-                        <div class="leaderboard-bar 1st" style="margin-bottom: 6px;">
-                            <div class="bar-fill" style="width: 85%;"></div>
-                            <div class="bar-content" style="padding: 6px 12px;">
-                                <span class="rank">#1</span>
-                                <span class="venue-name">The Rusty Nail</span>
-                                <span class="vote-count">1,245 votes</span>
-                            </div>
-                        </div>
-                        <div class="leaderboard-bar 2nd" style="margin-bottom: 6px;">
-                            <div class="bar-fill" style="width: 65%;"></div>
-                            <div class="bar-content" style="padding: 6px 12px;">
-                                <span class="rank">#2</span>
-                                <span class="venue-name">Barrel Proof</span>
-                                <span class="vote-count">980 votes</span>
-                            </div>
-                        </div>
-                        <div class="leaderboard-bar 3rd" style="margin-bottom: 6px;">
-                            <div class="bar-fill" style="width: 45%;"></div>
-                            <div class="bar-content" style="padding: 6px 12px;">
-                                <span class="rank">#3</span>
-                                <span class="venue-name">The Tchoup Yard</span>
-                                <span class="vote-count">650 votes</span>
-                            </div>
-                        </div>
                     </div>
 
                     <div class="venue-list-container">
@@ -274,46 +257,6 @@ function renderVotingStates(district) {
                     </div>
                     <div class="leaderboard" style="margin-bottom: 20px;">
                         <h3 style="color: var(--text-primary); font-family: var(--font-hero); font-size: 1.2rem; margin-bottom: 10px; text-transform: uppercase;">Current Leaders</h3>
-                        <div class="leaderboard-bar 1st" style="margin-bottom: 6px;">
-                            <div class="bar-fill" style="width: 85%;"></div>
-                            <div class="bar-content" style="padding: 6px 12px;">
-                                <span class="rank">#1</span>
-                                <span class="venue-name">The Rusty Nail</span>
-                                <span class="vote-count">1,245 votes</span>
-                            </div>
-                        </div>
-                        <div class="leaderboard-bar 2nd" style="margin-bottom: 6px;">
-                            <div class="bar-fill" style="width: 65%;"></div>
-                            <div class="bar-content" style="padding: 6px 12px;">
-                                <span class="rank">#2</span>
-                                <span class="venue-name">Barrel Proof</span>
-                                <span class="vote-count">980 votes</span>
-                            </div>
-                        </div>
-                        <div class="leaderboard-bar 3rd" style="margin-bottom: 6px;">
-                            <div class="bar-fill" style="width: 45%;"></div>
-                            <div class="bar-content" style="padding: 6px 12px;">
-                                <span class="rank">#3</span>
-                                <span class="venue-name">The Tchoup Yard</span>
-                                <span class="vote-count">650 votes</span>
-                            </div>
-                        </div>
-                        <div class="leaderboard-bar 4th" style="margin-bottom: 6px;">
-                            <div class="bar-fill" style="width: 35%;"></div>
-                            <div class="bar-content" style="padding: 6px 12px;">
-                                <span class="rank">#4</span>
-                                <span class="venue-name">Capulet</span>
-                                <span class="vote-count">420 votes</span>
-                            </div>
-                        </div>
-                        <div class="leaderboard-bar 5th" style="margin-bottom: 6px;">
-                            <div class="bar-fill" style="width: 25%;"></div>
-                            <div class="bar-content" style="padding: 6px 12px;">
-                                <span class="rank">#5</span>
-                                <span class="venue-name">Bulldog Mid-City</span>
-                                <span class="vote-count">295 votes</span>
-                            </div>
-                        </div>
                     </div>
                     <div class="venue-list-container">
                         <ul class="venue-list">
@@ -470,9 +413,9 @@ class EventLayout extends HTMLElement {
             this.innerHTML = `
             <div class="event-hero" style="background: linear-gradient(rgba(15, 22, 38, 0.85), rgba(15, 22, 38, 0.95)), url('${districtCopy.bgImg}') center/cover; background-attachment: fixed;">
                 <div class="hero-left">
-                    <h1 class="title-3d" style="margin-bottom: 10px;">${interpolate(shared.hero.title, vars)}</h1>
-                    <h2>${districtCopy.date} | ${districtCopy.time} | ${districtCopy.location}</h2>
-                    <p>${interpolate(districtCopy.heroIntro, vars)}</p>
+                    <h1 class="title-3d">${interpolate(shared.hero.title, vars)}</h1>
+                    <h2>${districtCopy.date}</h2>
+                    ${renderHeroIntro(districtCopy.heroIntro, vars)}
                     <button type="button" id="vote-scroll-btn" class="brand-btn" style="margin-top: 20px; font-size: 1.1rem; padding: 15px 30px;" onclick="document.getElementById('map-section').scrollIntoView({behavior: 'smooth'})">${interpolate(shared.hero.rsvpButton, vars)}</button>
                 </div>
                 <div class="hero-right" style="display: flex; justify-content: center; align-items: center; height: 100%;">
@@ -490,7 +433,7 @@ class EventLayout extends HTMLElement {
                 </div>
             </div>
 
-            <div class="purpose-section js-reveal reveal-opacity" style="margin: 80px 0; background: transparent;">
+            <div class="purpose-section js-reveal reveal-opacity" style="margin: 30px 0; background: transparent;">
                 <div class="purpose-module">
                     <div class="purpose-frame js-reveal reveal-y delay-200">
                         <h2>${shared.behindSeries.heading}</h2>
@@ -500,7 +443,7 @@ class EventLayout extends HTMLElement {
             </div>
 
             <!-- Election Intro & Features ABOVE the map -->
-            <div class="election-intro-section js-reveal reveal-opacity" style="padding: 80px 0; background: transparent;">
+            <div class="election-intro-section js-reveal reveal-opacity" style="padding: 30px 0; background: transparent;">
                 <div class="page-module" style="width: 80%; max-width: 1400px; margin: 0 auto; text-align: center;">
                 <div class="voting-header" style="margin-bottom: 20px;">
                     <h2 style="font-size: 2.5rem; margin-bottom: 5px; font-family: var(--font-header); text-transform: uppercase; color: var(--text-primary);">The Election: Stop 3</h2>
@@ -544,14 +487,14 @@ class EventLayout extends HTMLElement {
             </div>
 
             <!-- Voting States Below Map -->
-            <div class="voting-states-section js-reveal reveal-y delay-200" style="padding: 80px 0; background: transparent;">
+            <div class="voting-states-section js-reveal reveal-y delay-200" style="padding: 30px 0; background: transparent;">
                 <div class="page-module" style="width: 80%; max-width: 1400px; margin: 0 auto; text-align: center;">
                 ${renderVotingStates(districtCopy.district)}
                 </div>
             </div>
 
             <!-- Crawl-tinery Pulled Up Beneath Map -->
-            <div class="itinerary-section js-reveal reveal-y delay-200" style="padding: 80px 0; background: transparent;">
+            <div class="itinerary-section js-reveal reveal-y delay-200" style="padding: 30px 0; background: transparent;">
                 <div class="page-module" style="width: 80%; max-width: 1400px; margin: 0 auto;">
                 <h2 style="font-family: var(--font-header); font-size: 2.5rem; text-align: left; text-transform: uppercase; color: var(--text-primary); margin-bottom: 40px;">${shared.itinerary.heading}</h2>
                 <div class="itinerary-grid">${renderItineraryStops(districtCopy.itinerary.stops, vars)}</div>
@@ -559,7 +502,7 @@ class EventLayout extends HTMLElement {
             </div>
 
             <!-- Local Legends Photo Wall Bento Grid -->
-            <div class="local-legends-section js-reveal reveal-opacity" style="padding: 80px 0; background: var(--bg-primary); width: 100%; overflow: hidden;">
+            <div class="local-legends-section js-reveal reveal-opacity" style="padding: 30px 0; background: var(--bg-primary); width: 100%; overflow: hidden;">
                 <h2 style="text-align: center; font-family: var(--font-hero); font-size: 3.5rem; color: var(--text-primary); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 40px; text-shadow: 2px 2px 0px var(--brand-red);">Local Legends</h2>
                 
                 <div class="bento-photo-wall">
@@ -933,37 +876,30 @@ class EventLayout extends HTMLElement {
         window.setVotingState = (stateId) => {
             const states = ['round-1', 'run-off', 'post-election', 'post-event'];
             
-            // Update map legend round name based on state
-            const legendRoundName = document.querySelector('#legend-round-name');
-            const legendContext = legendRoundName ? legendRoundName.nextElementSibling : null;
-            
-            if (legendRoundName && legendContext) {
+            // Update map legend subtitle based on state
+            const legendSubtitle = document.querySelector('#legend-round-subtitle');
+            if (legendSubtitle) {
                 if (stateId === 'round-1') {
-                    legendRoundName.innerText = 'Round 1';
-                    legendRoundName.style.display = 'block';
-                    legendContext.innerText = 'Run-off begins in';
+                    legendSubtitle.innerText = 'RUN-OFF BEGINS IN';
                 } else if (stateId === 'run-off') {
-                    legendRoundName.innerText = 'Run-Off (Top 10)';
-                    legendRoundName.style.display = 'block';
-                    legendContext.innerText = 'Voting closes in';
+                    legendSubtitle.innerText = 'VOTING CLOSES IN';
                 } else if (stateId === 'post-election') {
-                    legendRoundName.innerText = 'Results';
-                    legendRoundName.style.display = 'block';
-                    legendContext.innerText = 'Voting Closed';
+                    legendSubtitle.innerText = 'VOTING CLOSED';
                 } else {
-                    legendRoundName.style.display = 'none';
-                    legendContext.innerText = 'Event Concluded';
+                    legendSubtitle.innerText = 'EVENT COMPLETE';
                 }
             }
             
             states.forEach(s => {
-                const el = document.querySelector('#state-' + s);
+                const el = this.querySelector('#state-' + s);
                 if (el) el.style.display = s === stateId ? 'block' : 'none';
             });
         };
         
         if (window.currentElectionState) {
-            window.setVotingState(window.currentElectionState);
+            setTimeout(() => {
+                window.setVotingState(window.currentElectionState);
+            }, 100);
         }
 
 
