@@ -35,7 +35,7 @@ function renderItineraryStops(stops, vars) {
         .proceedings-container {
             position: relative;
             padding: 40px 0 80px;
-            max-width: 1100px;
+            width: 100%;
             margin: 0 auto;
         }
         
@@ -71,7 +71,7 @@ function renderItineraryStops(stops, vars) {
             box-shadow: 0 12px 30px rgba(0,0,0,0.6);
         }
         .proc-step.center .proc-card {
-            max-width: 850px;
+            max-width: 100%;
             border-color: var(--brand-red);
             border-width: 2px;
             box-shadow: 0 0 25px rgba(138, 47, 37, 0.25);
@@ -117,20 +117,34 @@ function renderItineraryStops(stops, vars) {
         .proc-instructions li { margin-bottom: 12px; }
         .proc-instructions li:last-child { margin-bottom: 0; }
 
+        .desktop-path { display: inline; }
+        .mobile-path { display: none; }
+
         @media (max-width: 900px) {
             .proc-step.left, .proc-step.right, .proc-step.center { justify-content: center; margin-bottom: 40px; }
-            .proceedings-path { display: none; }
+            .desktop-path { display: none; }
+            .mobile-path { display: inline; }
         }
     </style>
     
     <div class="proceedings-container">
-        <!-- 3D Winding SVG Path (visible on desktop) -->
+        <!-- 3D Winding SVG Path (responsive) -->
         <svg class="proceedings-path" viewBox="0 0 100 100" preserveAspectRatio="none">
-            <!-- Layers for the 3D stroke effect, using non-scaling-stroke so thickness stays uniform -->
-            <path d="M 25,10 C 25,35 75,35 75,55 C 75,75 50,75 50,95" fill="none" stroke="rgba(138,47,37,0.35)" stroke-width="22" vector-effect="non-scaling-stroke" transform="translate(6, 6)" />
-            <path d="M 25,10 C 25,35 75,35 75,55 C 75,75 50,75 50,95" fill="none" stroke="var(--text-primary)" stroke-width="16" vector-effect="non-scaling-stroke" transform="translate(4, 4)" />
-            <path d="M 25,10 C 25,35 75,35 75,55 C 75,75 50,75 50,95" fill="none" stroke="var(--accent)" stroke-width="10" vector-effect="non-scaling-stroke" transform="translate(2, 2)" />
-            <path d="M 25,10 C 25,35 75,35 75,55 C 75,75 50,75 50,95" fill="none" stroke="var(--brand-red)" stroke-width="4" vector-effect="non-scaling-stroke" />
+            <!-- DESKTOP Layers ('S' shape) -->
+            <g class="desktop-path">
+                <path d="M 25,10 C 25,35 75,35 75,55 C 75,75 50,75 50,95" fill="none" stroke="rgba(138,47,37,0.35)" stroke-width="22" vector-effect="non-scaling-stroke" transform="translate(6, 6)" />
+                <path d="M 25,10 C 25,35 75,35 75,55 C 75,75 50,75 50,95" fill="none" stroke="var(--text-primary)" stroke-width="16" vector-effect="non-scaling-stroke" transform="translate(4, 4)" />
+                <path d="M 25,10 C 25,35 75,35 75,55 C 75,75 50,75 50,95" fill="none" stroke="var(--accent)" stroke-width="10" vector-effect="non-scaling-stroke" transform="translate(2, 2)" />
+                <path d="M 25,10 C 25,35 75,35 75,55 C 75,75 50,75 50,95" fill="none" stroke="var(--brand-red)" stroke-width="4" vector-effect="non-scaling-stroke" />
+            </g>
+            
+            <!-- MOBILE Layers (Gentle centered wave) -->
+            <g class="mobile-path">
+                <path d="M 50,5 C 80,35 20,65 50,95" fill="none" stroke="rgba(138,47,37,0.35)" stroke-width="22" vector-effect="non-scaling-stroke" transform="translate(6, 6)" />
+                <path d="M 50,5 C 80,35 20,65 50,95" fill="none" stroke="var(--text-primary)" stroke-width="16" vector-effect="non-scaling-stroke" transform="translate(4, 4)" />
+                <path d="M 50,5 C 80,35 20,65 50,95" fill="none" stroke="var(--accent)" stroke-width="10" vector-effect="non-scaling-stroke" transform="translate(2, 2)" />
+                <path d="M 50,5 C 80,35 20,65 50,95" fill="none" stroke="var(--brand-red)" stroke-width="4" vector-effect="non-scaling-stroke" />
+            </g>
         </svg>
 
         ${stops.map((stop, index) => {
@@ -181,8 +195,13 @@ function renderItineraryStops(stops, vars) {
     </div>`;
 }
 
-function renderScheduleItems(items) {
-    return items.map((item) => `<li>${item}</li>`).join('\n                            ');
+function renderVenueOperatorsStrip(shared) {
+    return `
+        <div class="venue-operators-strip">
+            <span class="venue-operators-label">${shared.venueOperators.heading}</span>
+            <span class="venue-operators-text">${shared.venueOperators.body}</span>
+            <a href="${shared.venueOperators.ctaHref}" class="brand-btn venue-operators-btn">${shared.venueOperators.ctaText}</a>
+        </div>`;
 }
 
 function renderMapLegend() {
@@ -457,35 +476,11 @@ class EventLayout extends HTMLElement {
             </div>
 
             <!-- Night's Proceedings & Election Intro -->
-            <div class="proceedings-section js-reveal reveal-y delay-200" style="padding: 40px 0; background: transparent;">
-                <div class="page-module" style="width: 90%; max-width: 1400px; margin: 0 auto; text-align: center;">
-                    <h2 style="font-family: var(--font-hero); font-size: 3.5rem; text-transform: uppercase; color: var(--text-primary); margin-bottom: 15px; letter-spacing: 2px;">${shared.itinerary.heading}</h2>
+            <div class="proceedings-section js-reveal reveal-y delay-200" style="padding: 20px 0; background: transparent;">
+                <div class="page-module" style="width: 80%; max-width: 1400px; margin: 0 auto; text-align: center;">
+                    <h2 style="font-family: var(--font-hero); font-size: 3.5rem; text-transform: uppercase; color: var(--text-primary); margin-top: 20px; margin-bottom: 15px; letter-spacing: 2px;">${shared.itinerary.heading}</h2>
                     <p style="font-size: 1.15rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto 10px;">Follow the trail and cast your vote to decide where District ${districtCopy.district} ends the night.</p>
                     ${renderItineraryStops(districtCopy.itinerary.stops, vars)}
-                </div>
-            </div>
-
-            <!-- Venue Voting / Operator Info -->
-            <div class="election-info-section js-reveal reveal-opacity" style="padding: 10px 0 40px; background: transparent;">
-                <div class="page-module" style="width: 80%; max-width: 1400px; margin: 0 auto;">
-                    <div class="map-features-layout" style="margin-top: 0; padding-top: 0;">
-                        <div class="map-features">
-                            <div class="feature-box" style="flex: 1; text-align: left;">
-                                <h3 style="font-family: var(--font-hero); text-transform: uppercase; letter-spacing: 1px;">${shared.venueVoting.heading}</h3>
-                                <p style="margin-bottom: 10px;"><strong>Goals:</strong> ${shared.venueVoting.goals}</p>
-                                <p style="margin-bottom: 10px;"><strong>Rules:</strong> ${interpolate(shared.venueVoting.rules, vars)}</p>
-                                <p><strong>${shared.venueVoting.scheduleLabel}</strong></p>
-                                <ul style="padding-left: 20px; color: var(--text-secondary); font-size: 0.95rem; margin-top: 5px;">
-                                    ${renderScheduleItems(shared.venueVoting.schedule)}
-                                </ul>
-                            </div>
-                            <div class="feature-box" style="flex: 1; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                                <h3 style="font-family: var(--font-hero); text-transform: uppercase; letter-spacing: 1px;">${shared.venueOperators.heading}</h3>
-                                <p style="margin-bottom: 20px;">${shared.venueOperators.body}</p>
-                                <a href="${shared.venueOperators.ctaHref}" class="brand-btn" style="padding: 10px 20px; font-size: 0.9rem;">${shared.venueOperators.ctaText}</a>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -500,6 +495,7 @@ class EventLayout extends HTMLElement {
             <div class="voting-states-section js-reveal reveal-y delay-200" style="padding: 30px 0; background: transparent;">
                 <div class="page-module" style="width: 80%; max-width: 1400px; margin: 0 auto; text-align: center;">
                 ${renderVotingStates(districtCopy.district)}
+                ${renderVenueOperatorsStrip(shared)}
                 </div>
             </div>
 
