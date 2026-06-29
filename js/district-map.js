@@ -165,7 +165,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         };
         
         let color = colors['default'];
-        if (type) {
+        if (type && typeof type === 'string') {
             const normalizedType = type.toLowerCase();
             for (const key in colors) {
                 if (normalizedType.includes(key)) {
@@ -296,7 +296,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                             </div>
                             
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: ${hasRealDescription ? '10px' : '15px'}; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px;">
-                                <p style="margin: 0; font-size: 1.05rem; color: var(--text-secondary); text-transform: capitalize; font-style: italic;">${place.type ? place.type.replace('_', ' ') : 'Venue'}</p>
+                                <p style="margin: 0; font-size: 1.05rem; color: var(--text-secondary); text-transform: capitalize; font-style: italic;">${(place.type && typeof place.type === 'string') ? place.type.replace('_', ' ') : 'Venue'}</p>
                                 
                                 <div style="position: relative; flex-shrink: 0;">
                                     <button onclick="const btn = this; navigator.clipboard.writeText('${safeVenueShareUrl}').then(() => { const msg = btn.nextElementSibling; const icon = btn.querySelector('.link-icon'); btn.style.background = '#618A62'; btn.style.borderColor = '#618A62'; if(icon){ icon.style.filter = 'brightness(0) saturate(100%) invert(100%)'; icon.style.opacity = '1'; } msg.style.display='block'; setTimeout(() => { msg.style.display='none'; btn.style.background = 'rgba(255,255,255,0.05)'; btn.style.borderColor = 'rgba(255,255,255,0.2)'; if(icon){ icon.style.filter = 'brightness(0) saturate(100%) invert(72%) sepia(21%) saturate(942%) hue-rotate(354deg) brightness(91%) contrast(88%)'; icon.style.opacity = '0.8'; } }, 2000); }).catch(e => console.error(e));" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; width: 34px; height: 34px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;" title="Copy direct link to this venue">
@@ -365,7 +365,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const safeName = v.name ? v.name.replace(/'/g, "\\'") : '';
                 return `<li>
                     <span class="rank-badge ${badgeClass}">${i + 1}</span> 
-                    <div class="v-details"><strong>${v.name || 'Unknown'}</strong><br><em>${v.type ? v.type.replace('_', ' ') : ''}</em></div> 
+                    <div class="v-details"><strong>${v.name || 'Unknown'}</strong><br><em>${(v.type && typeof v.type === 'string') ? v.type.replace('_', ' ') : ''}</em></div> 
                     <div style="display: flex; gap: 8px;">
                         <a href="checkin.html?venue=${v.id}" class="brand-btn vote-btn-small" style="background: var(--text-primary); color: var(--bg-primary); text-decoration: none; padding: 6px 12px; display: inline-flex; align-items: center; justify-content: center;" title="Check In">📍</a>
                         <button class="brand-btn vote-btn-small" onclick="window.openVoteModal('${v.id}', '${safeName}')">VOTE</button>

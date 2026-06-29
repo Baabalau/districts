@@ -1601,9 +1601,9 @@
                 'default': '#A87B28'
             };
             
-            let color = colors['default'];
-            if (type) {
-                const normalizedType = type.toLowerCase();
+        let color = colors['default'];
+        if (type && typeof type === 'string') {
+            const normalizedType = type.toLowerCase();
                 for (const key in colors) {
                     if (normalizedType.includes(key)) {
                         color = colors[key];
