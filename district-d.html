@@ -10,7 +10,8 @@
     <link rel="stylesheet" href="css/district-page.css">
     <link rel="stylesheet" href="css/event-styles.css">
     <link rel="stylesheet" href="css/site-footer.css">
-    <script type="module" src="js/event-components.js?v=5"></script>
+    <script type="module" src="js/components/site-footer.js"></script>
+<script type="module" src="js/event-components.js?v=5"></script>
 </head>
 <body>
     <nav>
@@ -25,15 +26,7 @@
 
     <event-layout district="D"></event-layout>
 
-    <footer class="site-footer site-footer--event" role="contentinfo">
-        <div class="site-footer-inner">
-            <p class="site-footer-label">City partners</p>
-            <ul class="site-footer-links">
-                <li><a href="https://nola.gov/night" target="_blank" rel="noopener noreferrer">Mayor’s Office of Nighttime Economy</a></li>
-                <li><a href="https://council.nola.gov/" target="_blank" rel="noopener noreferrer">New Orleans City Council</a></li>
-            </ul>
-        </div>
-    </footer>
+    <site-footer></site-footer>
 
     <script>
         function upvote(btn, count) {
