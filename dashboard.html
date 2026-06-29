@@ -146,6 +146,76 @@
             font-size: 1.2rem;
             color: var(--text-secondary);
         }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(203, 160, 82, 0.2);
+            padding-bottom: 10px;
+        }
+        .tab-btn {
+            padding: 10px 20px;
+            background: transparent;
+            color: var(--text-secondary);
+            border: none;
+            font-family: var(--font-header);
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .tab-btn:hover {
+            color: var(--text-primary);
+        }
+        .tab-btn.active {
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--text-primary);
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        /* Toggle Switch Styles */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+        .switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #333;
+            transition: .4s;
+            border-radius: 20px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: var(--brand-red, #B32424);
+        }
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
     </style>
 </head>
 <body>
@@ -158,32 +228,127 @@
         </div>
     </header>
 
-    <div class="controls">
-        <input type="text" id="search-input" placeholder="Search user or business..." style="width: 250px;">
-        <button id="refresh-btn" class="btn">Refresh Data</button>
-        <span id="record-count" style="color: var(--text-secondary); font-size: 0.9rem;"></span>
+        <div class="tabs">
+        <button class="tab-btn active" data-target="checkins-view">Check-Ins</button>
+        <button class="tab-btn" data-target="votes-view">Votes</button>
+        <button class="tab-btn" data-target="runoff-view">Run-Off Admin</button>
+        <button class="tab-btn" data-target="schedule-view">Schedule</button>
     </div>
 
-    <div id="loading">Loading check-in data...</div>
+    <div id="checkins-view" class="tab-content active">
+        <div class="controls">
+            <input type="text" id="search-input" placeholder="Search user or business..." style="width: 250px;">
+            <button id="refresh-btn" class="btn">Refresh Data</button>
+            <span id="record-count" style="color: var(--text-secondary); font-size: 0.9rem;"></span>
+        </div>
 
-    <div class="table-container" style="display: none;" id="table-wrapper">
-        <table id="data-table">
-            <thead>
-                <tr>
-                    <th data-sort="time">Last Visit <span class="sort-icon">▼</span></th>
-                    <th data-sort="business">Business <span class="sort-icon"></span></th>
-                    <th data-sort="user">User <span class="sort-icon"></span></th>
-                    <th data-sort="visits">Total Visits <span class="sort-icon"></span></th>
-                    <th>Photo</th>
-                </tr>
-            </thead>
-            <tbody id="table-body">
-                <!-- Rows will be injected here via JS -->
-            </tbody>
-        </table>
+        <div id="loading" style="display:none;">Loading check-in data...</div>
+
+        <div class="table-container" style="display: none;" id="table-wrapper">
+            <table id="data-table">
+                <thead>
+                    <tr>
+                        <th data-sort="time">Last Visit <span class="sort-icon">▼</span></th>
+                        <th data-sort="business">Business <span class="sort-icon"></span></th>
+                        <th data-sort="user">User <span class="sort-icon"></span></th>
+                        <th data-sort="visits">Total Visits <span class="sort-icon"></span></th>
+                        <th>Photo</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <!-- Image Modal -->
+    <div id="votes-view" class="tab-content">
+        <div class="controls">
+            <input type="text" id="votes-search" placeholder="Search venue..." style="width: 250px;">
+            <button id="votes-refresh-btn" class="btn">Refresh Votes</button>
+            <span id="votes-record-count" style="color: var(--text-secondary); font-size: 0.9rem;"></span>
+        </div>
+        <div id="votes-loading" style="display:none;">Loading voting data...</div>
+        <div class="table-container" style="display: none;" id="votes-table-wrapper">
+            <table id="votes-table">
+                <thead>
+                    <tr>
+                        <th>District</th>
+                        <th>Venue</th>
+                        <th>Total Votes</th>
+                    </tr>
+                </thead>
+                <tbody id="votes-table-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="runoff-view" class="tab-content">
+        <div class="controls">
+            <select id="runoff-district-select">
+                <option value="A">District A</option>
+                <option value="B">District B</option>
+                <option value="C">District C</option>
+                <option value="D">District D</option>
+                <option value="E">District E</option>
+            </select>
+            <button id="runoff-refresh-btn" class="btn">Load Venues</button>
+        </div>
+        <p style="color: var(--text-secondary); margin-bottom: 20px;">Use the toggle to disqualify a venue from entering the Top 10 Run-Off.</p>
+        <div id="runoff-loading" style="display:none;">Loading venues...</div>
+        <div class="table-container" style="display: none;" id="runoff-table-wrapper">
+            <table id="runoff-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Venue</th>
+                        <th>Votes</th>
+                        <th>Disqualify (Opt-Out)</th>
+                    </tr>
+                </thead>
+                <tbody id="runoff-table-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="schedule-view" class="tab-content">
+        <div class="controls">
+            <select id="schedule-district-select">
+                <option value="A">District A</option>
+                <option value="B">District B</option>
+                <option value="C">District C</option>
+                <option value="D">District D</option>
+                <option value="E">District E</option>
+            </select>
+            <button id="schedule-refresh-btn" class="btn">Load Schedule</button>
+            <button id="schedule-save-btn" class="btn" style="background: var(--brand-red, #B32424);">Save Changes</button>
+            <span id="schedule-save-msg" style="color: #45B7D1; display: none; margin-left: 10px;">Saved!</span>
+        </div>
+        
+        <div id="schedule-form" style="display: none; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; max-width: 600px;">
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px;">Round 1 Opens:</label>
+                <input type="datetime-local" id="sched-round-1" style="width: 100%;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px;">Run-Off Starts (Top 10):</label>
+                <input type="datetime-local" id="sched-run-off" style="width: 100%;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px;">Winner Announced:</label>
+                <input type="datetime-local" id="sched-winner" style="width: 100%;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px;">Event Concludes (Post-Event State):</label>
+                <input type="datetime-local" id="sched-post" style="width: 100%;">
+            </div>
+            <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px; color: var(--text-primary);">Official Winner (Venue ID):</label>
+                <input type="text" id="sched-winner-id" placeholder="Paste venue document ID here" style="width: 100%;">
+            </div>
+        </div>
+    </div>
+<!-- Image Modal -->
     <div id="image-modal">
         <img id="modal-img" src="" alt="Full check-in photo">
         <button id="close-modal" class="btn">Close</button>
@@ -192,7 +357,7 @@
     <script type="module">
         import { auth, db } from "./js/firebase-config.js";
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
-        import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+        import { collection, getDocs, doc, getDoc, setDoc, updateDoc, query, where, orderBy, collectionGroup } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
         const loadingEl = document.getElementById("loading");
         const tableWrapper = document.getElementById("table-wrapper");
@@ -207,70 +372,91 @@
         const modalImg = document.getElementById("modal-img");
         const closeModal = document.getElementById("close-modal");
 
-        let allData = [];
+                let allData = [];
         let currentSort = { column: 'time', direction: 'desc' };
+        let globalVenues = null; // Cache to save database reads
 
         // Authentication check
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (!user) {
                 window.location.href = "login.html";
             } else {
+                await fetchGlobalVenues();
                 fetchData();
             }
         });
+
+        async function fetchGlobalVenues(force = false) {
+            if (globalVenues && !force) return;
+            globalVenues = {};
+            try {
+                const snap = await getDocs(collection(db, "venues"));
+                snap.forEach(d => {
+                    globalVenues[d.id] = { id: d.id, ...d.data() };
+                });
+                console.log("Cached " + Object.keys(globalVenues).length + " venues to save reads.");
+            } catch (e) {
+                console.error("Error caching venues:", e);
+            }
+        }
+
 
         logoutBtn.addEventListener("click", () => {
             signOut(auth);
         });
 
-        async function fetchData() {
+        async function fetchData(forceRefresh = false) {
             loadingEl.style.display = "block";
             tableWrapper.style.display = "none";
             allData = [];
 
             try {
-                // 1. Fetch all venues to get their IDs and Names
-                const venuesSnapshot = await getDocs(collection(db, "venues"));
+                if (!globalVenues || forceRefresh) {
+                    await fetchGlobalVenues(true);
+                }
                 
-                // 2. Loop through each venue and fetch its "customers" subcollection
-                const fetchPromises = venuesSnapshot.docs.map(async (venueDoc) => {
-                    const venueId = venueDoc.id;
-                    const venueName = venueDoc.data().name || "Unknown Business";
+                // Use collectionGroup to fetch ALL check-ins with 1 read per checkin, instead of 700+ empty queries
+                const customersSnapshot = await getDocs(collectionGroup(db, "customers"));
+                
+                customersSnapshot.forEach((custDoc) => {
+                    const custData = custDoc.data();
+                    const venueId = custDoc.ref.parent.parent.id;
+                    const venueName = globalVenues[venueId] ? globalVenues[venueId].name : "Unknown Business";
                     
-                    const customersSnapshot = await getDocs(collection(db, "venues", venueId, "customers"));
+                    // Parse timestamp
+                    let timeObj = new Date(0);
+                    if (custData.lastVisit && custData.lastVisit.toDate) {
+                        timeObj = custData.lastVisit.toDate();
+                    }
                     
-                    customersSnapshot.forEach((custDoc) => {
-                        const custData = custDoc.data();
-                        
-                        // Parse timestamp
-                        let timeObj = new Date(0);
-                        if (custData.lastVisit && custData.lastVisit.toDate) {
-                            timeObj = custData.lastVisit.toDate();
-                        }
-                        
-                        allData.push({
-                            id: `${venueId}_${custDoc.id}`,
-                            business: venueName,
-                            user: custData.displayName || custData.email || "Unknown User",
-                            email: custData.email || "",
-                            time: timeObj,
-                            timeFormatted: timeObj.toLocaleString(),
-                            visits: custData.visitCount || 1,
-                            photoUrl: custData.photoUrl || null,
-                            photoStatus: custData.photoStatus || "none"
-                        });
+                    allData.push({
+                        id: `${venueId}_${custDoc.id}`,
+                        business: venueName,
+                        user: custData.displayName || custData.email || "Unknown User",
+                        email: custData.email || "",
+                        time: timeObj,
+                        timeFormatted: timeObj.toLocaleString(),
+                        visits: custData.visitCount || 1,
+                        photoUrl: custData.photoUrl || null,
+                        photoStatus: custData.photoStatus || "none"
                     });
                 });
-
-                await Promise.all(fetchPromises);
                 
                 // Initial sort (newest first)
-                sortData();
-                renderTable();
+                if (allData.length === 0) {
+                    loadingEl.innerHTML = `<span>No check-in data found.</span>`;
+                    loadingEl.style.display = "block";
+                    tableWrapper.style.display = "none";
+                } else {
+                    sortData();
+                    renderTable();
+                }
 
             } catch (error) {
                 console.error("Error fetching data:", error);
                 loadingEl.innerHTML = `<span style="color:#ff6b6b">Error loading data: ${error.message}</span>`;
+                loadingEl.style.display = "block";
+                tableWrapper.style.display = "none";
             }
         }
 
@@ -357,12 +543,209 @@
 
         // Search and Refresh
         searchInput.addEventListener('input', renderTable);
-        refreshBtn.addEventListener('click', fetchData);
+        refreshBtn.addEventListener('click', () => fetchData(true));
 
         // Modal close
         closeModal.addEventListener('click', () => { imageModal.style.display = 'none'; });
         imageModal.addEventListener('click', (e) => {
             if (e.target === imageModal) imageModal.style.display = 'none';
+        });
+
+    
+        
+
+        // Tab Switching Logic
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                e.target.classList.add('active');
+                document.getElementById(e.target.dataset.target).classList.add('active');
+
+                // Auto-load data based on tab
+                const target = e.target.dataset.target;
+                if (target === 'votes-view' && allVotes.length === 0) fetchVotes();
+                if (target === 'runoff-view') fetchRunoffVenues();
+                if (target === 'schedule-view') fetchSchedule();
+            });
+        });
+
+        // --- VOTES LOGIC ---
+        let allVotes = [];
+        const votesLoading = document.getElementById('votes-loading');
+        const votesTableWrapper = document.getElementById('votes-table-wrapper');
+        const votesTbody = document.getElementById('votes-table-body');
+        
+        async function fetchVotes(forceRefresh = false) {
+            votesLoading.style.display = 'block';
+            votesTableWrapper.style.display = 'none';
+            allVotes = [];
+            
+            try {
+                if (!globalVenues || forceRefresh) {
+                    await fetchGlobalVenues(true);
+                }
+                
+                Object.values(globalVenues).forEach(data => {
+                    if (data.voteCount > 0) {
+                        allVotes.push({
+                            id: data.id,
+                            name: data.name,
+                            district: data.district || 'Unknown',
+                            votes: data.voteCount
+                        });
+                    }
+                });
+                
+                if (allVotes.length === 0) {
+                    votesLoading.innerHTML = "No voting data found.";
+                    votesLoading.style.display = 'block';
+                    votesTableWrapper.style.display = 'none';
+                } else {
+                    allVotes.sort((a, b) => b.votes - a.votes);
+                    renderVotesTable();
+                }
+            } catch(e) {
+                console.error(e);
+                votesLoading.innerHTML = "Error loading votes: " + e.message;
+                votesLoading.style.display = 'block';
+            }
+        }
+        
+        function renderVotesTable() {
+            const searchTerm = document.getElementById('votes-search').value.toLowerCase();
+            const filtered = allVotes.filter(v => v.name.toLowerCase().includes(searchTerm) || v.district.toLowerCase().includes(searchTerm));
+            
+            document.getElementById('votes-record-count').textContent = `${filtered.length} venues found`;
+            
+            votesTbody.innerHTML = filtered.map(v => `
+                <tr>
+                    <td>${v.district}</td>
+                    <td>${v.name}</td>
+                    <td><strong>${v.votes}</strong></td>
+                </tr>
+            `).join('');
+            
+            votesLoading.style.display = 'none';
+            votesTableWrapper.style.display = 'block';
+        }
+        
+        document.getElementById('votes-search').addEventListener('input', renderVotesTable);
+        document.getElementById('votes-refresh-btn').addEventListener('click', () => fetchVotes(true));
+
+
+        // --- RUN-OFF LOGIC ---
+        let runoffVenues = [];
+        const runoffLoading = document.getElementById('runoff-loading');
+        const runoffTbody = document.getElementById('runoff-table-body');
+        const runoffSelect = document.getElementById('runoff-district-select');
+
+        async function fetchRunoffVenues(forceRefresh = false) {
+            runoffLoading.style.display = 'block';
+            document.getElementById('runoff-table-wrapper').style.display = 'none';
+            const dist = runoffSelect.value;
+            runoffVenues = [];
+            
+            try {
+                if (!globalVenues || forceRefresh) {
+                    await fetchGlobalVenues(true);
+                }
+                
+                Object.values(globalVenues).forEach(d => {
+                    if (d.district === dist) {
+                        runoffVenues.push(d);
+                    }
+                });
+                
+                runoffVenues.sort((a, b) => (b.voteCount || 0) - (a.voteCount || 0));
+                
+                runoffTbody.innerHTML = runoffVenues.map((v, i) => `
+                    <tr>
+                        <td>${i + 1}</td>
+                        <td>${v.name || 'Unnamed'}</td>
+                        <td>${v.voteCount || 0}</td>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox" onchange="window.toggleOptOut('${v.id}', this.checked)" ${v.optOutRunoff ? 'checked' : ''}>
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                    </tr>
+                `).join('');
+                
+                runoffLoading.style.display = 'none';
+                document.getElementById('runoff-table-wrapper').style.display = 'block';
+            } catch(e) {
+                console.error(e);
+            }
+        }
+
+        document.getElementById('runoff-refresh-btn').addEventListener('click', () => fetchRunoffVenues(true));
+        runoffSelect.addEventListener('change', () => fetchRunoffVenues(false));
+
+        window.toggleOptOut = async (venueId, isOptOut) => {
+            try {
+                await updateDoc(doc(db, "venues", venueId), { optOutRunoff: isOptOut });
+            } catch(e) {
+                console.error("Error updating opt-out:", e);
+                alert("Failed to update status.");
+            }
+        };
+
+        // --- SCHEDULE LOGIC ---
+        const schedSelect = document.getElementById('schedule-district-select');
+        
+        function formatForDateTimeLocal(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr);
+            if (isNaN(d)) return '';
+            return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+        }
+
+        async function fetchSchedule() {
+            const dist = schedSelect.value;
+            document.getElementById('schedule-form').style.display = 'none';
+            try {
+                const snap = await getDoc(doc(db, "settings", "schedule"));
+                if (snap.exists() && snap.data()[dist]) {
+                    const data = snap.data()[dist];
+                    const parseD = (d) => d && d.toDate ? d.toDate() : d;
+                    document.getElementById('sched-round-1').value = formatForDateTimeLocal(parseD(data.roundOneStart));
+                    document.getElementById('sched-run-off').value = formatForDateTimeLocal(parseD(data.runOffStart));
+                    document.getElementById('sched-winner').value = formatForDateTimeLocal(parseD(data.winnerAnnounce));
+                    document.getElementById('sched-post').value = formatForDateTimeLocal(parseD(data.postEvent));
+                    document.getElementById('sched-winner-id').value = data.winnerId || '';
+                    document.getElementById('schedule-form').style.display = 'block';
+                }
+            } catch (e) {
+                console.error("Error loading schedule:", e);
+            }
+        }
+
+        document.getElementById('schedule-refresh-btn').addEventListener('click', fetchSchedule);
+        schedSelect.addEventListener('change', fetchSchedule);
+
+        document.getElementById('schedule-save-btn').addEventListener('click', async () => {
+            const dist = schedSelect.value;
+            const updates = {};
+            updates[dist] = {
+                roundOneStart: new Date(document.getElementById('sched-round-1').value),
+                runOffStart: new Date(document.getElementById('sched-run-off').value),
+                winnerAnnounce: new Date(document.getElementById('sched-winner').value),
+                postEvent: new Date(document.getElementById('sched-post').value),
+                winnerId: document.getElementById('sched-winner-id').value || null
+            };
+            
+            try {
+                await updateDoc(doc(db, "settings", "schedule"), updates);
+                const msg = document.getElementById('schedule-save-msg');
+                msg.style.display = 'inline';
+                setTimeout(() => msg.style.display = 'none', 2000);
+            } catch(e) {
+                console.error("Save error:", e);
+                alert("Failed to save schedule.");
+            }
         });
 
     </script>

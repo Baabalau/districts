@@ -215,25 +215,10 @@ function renderMapLegend() {
 function renderVotingStates(district) {
     return `
             <div class="voting-section js-reveal reveal-y delay-200" id="voting-module">
-                <div class="state-controls" style="text-align: center; margin-bottom: 20px;">
-                    <span style="color: var(--text-secondary); margin-right: 10px; font-weight: bold; font-size: 0.9rem; text-transform: uppercase;">Preview States:</span>
-                    <button onclick="window.setVotingState('pre-voting')">Pre-Voting</button>
-                    <button onclick="window.setVotingState('round-1')">Round 1</button>
-                    <button onclick="window.setVotingState('run-off')">Run-Off</button>
-                    <button onclick="window.setVotingState('post-election')">Post-Election</button>
-                </div>
-
-                <div id="state-pre-voting" class="voting-state-container">
-                    <div style="text-align: center; padding: 40px 20px;">
-                        <h3 style="font-size: 1.8rem; color: var(--text-primary); font-family: var(--font-hero); text-transform: uppercase;">Voting Opens Soon!</h3>
-                        <p style="font-size: 1.1rem; color: var(--text-secondary); margin-top: 10px;">Explore the venues on the map. Voting will begin 14 days before the event.</p>
-                    </div>
-                </div>
-
                 <div id="state-round-1" class="voting-state-container" style="display: none;">
                     <div class="voting-header" style="display: none;">
                         <h2>Round 1: Choose Your Final Stop</h2>
-                        <p>The top 5 venues will advance to the run-off in:</p>
+                        <p>The top 10 venues will advance to the run-off in:</p>
                         <div class="countdown-clock small-clock">
                             <div class="time-box"><span>02</span><label>Days</label></div>
                             <div class="time-box"><span>14</span><label>Hrs</label></div>
@@ -284,7 +269,7 @@ function renderVotingStates(district) {
 
                 <div id="state-run-off" class="voting-state-container" style="display: none;">
                     <div class="voting-header" style="display: none;">
-                        <h2>The Run-Off: Top 5</h2>
+                        <h2>The Run-Off: Top 10</h2>
                         <p>It's down to the wire! The polls close in:</p>
                     </div>
                     <div class="leaderboard" style="margin-bottom: 20px;">
@@ -349,6 +334,12 @@ function renderVotingStates(district) {
                         <p>With 1,842 total votes, The Rusty Nail is the official Stop 3 for the Nightcrawl!</p>
                         <button id="rsvp-btn" class="brand-btn" style="margin-top: 15px;">RSVP NOW</button>
                         <p id="rsvp-msg" style="margin-top: 10px; color: var(--accent); font-weight: bold; display: none;"></p>
+                    </div>
+                </div>
+                <div id="state-post-event" class="voting-state-container" style="display: none; padding: 40px 0; text-align: center;">
+                    <div class="voting-header">
+                        <h2 style="font-family: var(--font-header); font-size: 2.5rem; text-transform: uppercase; color: var(--text-primary); margin-bottom: 20px;">What a Night</h2>
+                        <p style="font-size: 1.1rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto;">Thank you to everyone who came out to District ${district} and supported our local nighttime economy. We'll see you at the next one!</p>
                     </div>
                 </div>
             </div>
@@ -448,6 +439,34 @@ class EventLayout extends HTMLElement {
             const districtCopy = await districtResponse.json();
             const vars = buildTemplateVars(districtCopy);
 
+            // Determine active state based on schedule
+            const scheduleRef = doc(db, "settings", "schedule");
+            const schedSnap = await getDoc(scheduleRef);
+            let activeState = 'round-1'; // Default
+            let winnerId = null;
+
+            if (schedSnap.exists() && schedSnap.data()[districtId.toUpperCase()]) {
+                const sched = schedSnap.data()[districtId.toUpperCase()];
+                const now = new Date();
+                
+                const parseDate = (d) => d && d.toDate ? d.toDate() : new Date(d);
+                if (sched.postEvent && now >= parseDate(sched.postEvent)) {
+                    activeState = 'post-event';
+                } else if (sched.winnerAnnounce && now >= parseDate(sched.winnerAnnounce)) {
+                    activeState = 'post-election';
+                    winnerId = sched.winnerId;
+                } else if (sched.runOffStart && now >= parseDate(sched.runOffStart)) {
+                    activeState = 'run-off';
+                } else {
+                    activeState = 'round-1';
+                }
+                
+                // Store globally so district-map.js can access it
+                window.currentElectionState = activeState;
+                window.electionWinnerId = winnerId;
+            }
+
+
             this.innerHTML = `
             <div class="event-hero" style="background: linear-gradient(rgba(15, 22, 38, 0.85), rgba(15, 22, 38, 0.95)), url('${districtCopy.bgImg}') center/cover; background-attachment: fixed;">
                 <div class="hero-left">
@@ -490,8 +509,8 @@ class EventLayout extends HTMLElement {
                 <div class="instruction-box" style="padding: 30px; max-width: 900px; margin: 0 auto 40px auto; text-align: left; background: rgba(15, 22, 38, 0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;">
                     <h3 style="margin-bottom: 15px; font-size: 1.4rem; color: var(--text-primary); font-family: var(--font-header); text-transform: uppercase; letter-spacing: 1px;">How it works</h3>
                     <ul style="margin: 0; padding-left: 20px; font-size: 1rem; color: var(--text-main); line-height: 1.6;">
-                        <li style="margin-bottom: 10px;"><strong>Round 1:</strong> Voting opens for all districts when the press release drops. Vote for your favorite neighborhood spots. The top 5 advance.</li>
-                        <li style="margin-bottom: 10px;"><strong>The Run-Off:</strong> Starts the Monday before the event at 3:00 PM. A final sprint to decide the winner among the top 5.</li>
+                        <li style="margin-bottom: 10px;"><strong>Round 1:</strong> Voting opens for all districts when the press release drops. Vote for your favorite neighborhood spots. The top 10 advance.</li>
+                        <li style="margin-bottom: 10px;"><strong>The Run-Off:</strong> Starts the Monday before the event at 3:00 PM. A final sprint to decide the winner among the top 10.</li>
                         <li style="margin-bottom: 0;"><strong>The Prize:</strong> The winning venue hosts the final stop. Every vote is an entry into the Golden Ticket Raffle!</li>
                     </ul>
                 </div>
@@ -673,8 +692,8 @@ class EventLayout extends HTMLElement {
             this.initScrollAnimations();
             this.initVotingPortal();
         } catch (error) {
-            console.error('Error loading event page copy:', error);
-            this.innerHTML = '<p style="padding: 2rem; text-align: center;">Unable to load event content. Please refresh the page.</p>';
+            console.error('CRITICAL ERROR loading event page:', error);
+            this.innerHTML = `<p style="padding: 2rem; text-align: center; color: red;">Unable to load event content: ${error.message}</p>`;
         }
     }
 
@@ -892,25 +911,43 @@ class EventLayout extends HTMLElement {
             }
         };
 
+        
         window.setVotingState = (stateId) => {
-            const states = ['pre-voting', 'round-1', 'run-off', 'post-election'];
+            const states = ['round-1', 'run-off', 'post-election', 'post-event'];
             
             // Update map legend round name based on state
-            const legendRoundName = this.querySelector('#legend-round-name');
-            if (legendRoundName) {
-                if (stateId === 'pre-voting') legendRoundName.innerText = 'Voting Opens Soon';
-                else if (stateId === 'round-1') legendRoundName.innerText = 'Round 1';
-                else if (stateId === 'run-off') legendRoundName.innerText = 'Run-Off';
-                else if (stateId === 'post-election') legendRoundName.innerText = 'Results';
+            const legendRoundName = document.querySelector('#legend-round-name');
+            const legendContext = legendRoundName ? legendRoundName.nextElementSibling : null;
+            
+            if (legendRoundName && legendContext) {
+                if (stateId === 'round-1') {
+                    legendRoundName.innerText = 'Round 1';
+                    legendRoundName.style.display = 'block';
+                    legendContext.innerText = 'Run-off begins in';
+                } else if (stateId === 'run-off') {
+                    legendRoundName.innerText = 'Run-Off (Top 10)';
+                    legendRoundName.style.display = 'block';
+                    legendContext.innerText = 'Voting closes in';
+                } else if (stateId === 'post-election') {
+                    legendRoundName.innerText = 'Results';
+                    legendRoundName.style.display = 'block';
+                    legendContext.innerText = 'Voting Closed';
+                } else {
+                    legendRoundName.style.display = 'none';
+                    legendContext.innerText = 'Event Concluded';
+                }
             }
             
             states.forEach(s => {
-                const el = this.querySelector('#state-' + s);
-                if (el) {
-                    el.style.display = s === stateId ? 'block' : 'none';
-                }
+                const el = document.querySelector('#state-' + s);
+                if (el) el.style.display = s === stateId ? 'block' : 'none';
             });
         };
+        
+        if (window.currentElectionState) {
+            window.setVotingState(window.currentElectionState);
+        }
+
 
         setTimeout(() => {
             const urlParams = new URLSearchParams(window.location.search);
