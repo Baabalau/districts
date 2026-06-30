@@ -692,7 +692,7 @@
                     <div class="checkbox-group">
                         <label>
                             <input type="checkbox" id="chk-host">
-                            Yes, our business would like to host <span id="dynamic-district-name">District [B]</span>'s final stop of the night on <span id="dynamic-district-date">[Tuesday, July 28th]</span>
+                            <span>Yes, our business would like to host <span id="dynamic-district-name">District [B]</span>'s final stop of the night on <span id="dynamic-district-date">[Tuesday, July 28th]</span></span>
                         </label>
                     </div>
 
@@ -1212,29 +1212,56 @@
 
                 // Flatten images with html2canvas and upload to Firebase Storage
                 setTimeout(async () => {
+                    const socialFilename = `${venueId}-social.png`;
+                    const flyerFilename = `${venueId}-flyer.png`;
+
+                    // Guard so a stalled html2canvas / upload can never block the claim submission
+                    const withTimeout = (promise, ms, label) => Promise.race([
+                        promise,
+                        new Promise((_, reject) => setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms))
+                    ]);
+
+                    const flattenImage = async (elementId) => {
+                        const element = document.getElementById(elementId);
+                        const canvas = await html2canvas(element, {
+                            useCORS: true, // Crucial for loading external images like the QR code
+                            scale: 2, // Higher resolution
+                            backgroundColor: null,
+                            imageTimeout: 8000,
+                            logging: false
+                        });
+                        return canvas.toDataURL('image/png');
+                    };
+
+                    let claimSent = false;
+                    const sendClaim = () => {
+                        if (claimSent || scriptUrl === 'YOUR_WEB_APP_URL') return;
+                        claimSent = true;
+                        fetch(scriptUrl, {
+                            method: 'POST',
+                            mode: 'no-cors',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(formData)
+                        }).then(() => console.log("Form data sent to Google Sheets"))
+                          .catch(error => console.error("Error sending form data:", error));
+                    };
+
                     try {
+                        // Ensure custom fonts are fully loaded so html2canvas doesn't drop overlay text
+                        if (document.fonts && document.fonts.ready) {
+                            try { await withTimeout(document.fonts.ready, 4000, 'Font loading'); } catch (e) { /* proceed anyway */ }
+                        }
+
                         // 1. Flatten the images locally first (Fast for the user)
-                        const flattenImage = async (elementId) => {
-                            const element = document.getElementById(elementId);
-                            const canvas = await html2canvas(element, { 
-                                useCORS: true, // Crucial for loading external images like the QR code
-                                scale: 2 // Higher resolution
-                            });
-                            return canvas.toDataURL('image/png');
-                        };
-
-                        const socialFilename = `${venueId}-social.png`;
-                        const flyerFilename = `${venueId}-flyer.png`;
-
-                        const [socialDataUrl, flyerDataUrl] = await Promise.all([
+                        const [socialDataUrl, flyerDataUrl] = await withTimeout(Promise.all([
                             flattenImage('social-composite'),
                             flattenImage('flyer-composite')
-                        ]);
+                        ]), 15000, 'Image flattening');
 
                         // 2. Update UI instantly with local data URLs (No CORS issues, works offline/locally)
                         const socialContainer = document.getElementById('social-composite').parentElement;
                         const flyerContainer = document.getElementById('flyer-composite').parentElement;
-                        
+
                         // Create the download button for Social Story
                         const downloadSocialBtn = document.createElement('a');
                         downloadSocialBtn.href = socialDataUrl;
@@ -1242,7 +1269,7 @@
                         downloadSocialBtn.className = 'brand-btn';
                         downloadSocialBtn.style.cssText = 'display: inline-block; background: var(--brand-red); color: white; text-decoration: none; padding: 10px 20px; border-radius: 8px; margin-top: 15px; font-weight: bold; text-align: center; width: 100%; box-sizing: border-box; cursor: pointer;';
                         downloadSocialBtn.textContent = 'Download Social Story';
-                        
+
                         const socialHint = socialContainer.querySelector('p');
                         if (socialHint) {
                             socialHint.replaceWith(downloadSocialBtn);
@@ -1265,7 +1292,7 @@
                             flyerContainer.appendChild(downloadFlyerBtn);
                         }
 
-                        // Replace HTML composites with flat images. 
+                        // Replace HTML composites with flat images.
                         // This allows mobile users to "Long Press -> Save Image" natively and ensures perfect printing.
                         const replaceWithFlatImage = (elementId, dataUrl) => {
                             const composite = document.getElementById(elementId);
@@ -1279,55 +1306,33 @@
                         replaceWithFlatImage('social-composite', socialDataUrl);
                         replaceWithFlatImage('flyer-composite', flyerDataUrl);
 
-                        // 3. Upload to Firebase & Google Sheets in the background
-                        const { ref, uploadString, getDownloadURL } = await import('https://www.gstatic.com/firebasejs/10.9.0/firebase-storage.js');
-                        const { storage } = await import('./js/firebase-config.js');
-
-                        const uploadToFirebase = async (dataUrl, filename) => {
-                            const storageRef = ref(storage, `promo_graphics/${filename}`);
-                            await uploadString(storageRef, dataUrl, 'data_url');
-                            return await getDownloadURL(storageRef);
-                        };
-
-                        let socialUrl = "";
-                        let flyerUrl = "";
+                        // 3. Upload to Firebase Storage (guarded so it can't hang the claim)
                         try {
-                            const [sUrl, fUrl] = await Promise.all([
+                            const { ref, uploadString, getDownloadURL } = await import('https://www.gstatic.com/firebasejs/10.9.0/firebase-storage.js');
+                            const { storage } = await import('./js/firebase-config.js');
+
+                            const uploadToFirebase = async (dataUrl, filename) => {
+                                const storageRef = ref(storage, `promo_graphics/${filename}`);
+                                await uploadString(storageRef, dataUrl, 'data_url');
+                                return await getDownloadURL(storageRef);
+                            };
+
+                            const [sUrl, fUrl] = await withTimeout(Promise.all([
                                 uploadToFirebase(socialDataUrl, socialFilename),
                                 uploadToFirebase(flyerDataUrl, flyerFilename)
-                            ]);
-                            socialUrl = sUrl;
-                            flyerUrl = fUrl;
+                            ]), 15000, 'Firebase upload');
+
+                            formData.socialGraphicUrl = sUrl;
+                            formData.flyerGraphicUrl = fUrl;
                         } catch (uploadError) {
-                            console.error("Firebase upload failed. Check Storage Rules.", uploadError);
+                            console.error("Firebase upload failed (check Storage Rules / billing). Claim will still be recorded.", uploadError);
                         }
-
-                        formData.socialGraphicUrl = socialUrl;
-                        formData.flyerGraphicUrl = flyerUrl;
-
-                        if (scriptUrl !== 'YOUR_WEB_APP_URL') {
-                            fetch(scriptUrl, {
-                                method: 'POST',
-                                mode: 'no-cors',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify(formData)
-                            }).then(() => console.log("Form data sent to Google Sheets"))
-                              .catch(error => console.error("Error sending form data:", error));
-                        }
-
                     } catch (error) {
                         console.error("Error flattening graphics:", error);
                         alert("There was an issue generating the downloadable image. Please right-click the image to save it.");
-                        
-                        // Still try to send the form data even if image generation completely fails
-                        if (scriptUrl !== 'YOUR_WEB_APP_URL') {
-                            fetch(scriptUrl, {
-                                method: 'POST',
-                                mode: 'no-cors',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify(formData)
-                            });
-                        }
+                    } finally {
+                        // Always record the claim in Google Sheets, with image URLs if we got them
+                        sendClaim();
                     }
                 }, 1500); // Wait 1.5s for QR code to load
             });
