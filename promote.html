@@ -810,8 +810,8 @@
         // Configuration for graphic overlays
         const graphicConfig = {
             social: {
-                logo: { top: '70%', left: '30%', maxWidth: '40%', maxHeight: '12%', transform: 'translate(0, -50%)', objectFit: 'contain' },
-                text: { top: '70%', left: '30%', width: '40%', fontSize: '1.2rem', color: '#8a2d24', transform: 'translate(0, -50%)', textAlign: 'center', whiteSpace: 'normal', wordWrap: 'break-word', lineHeight: '1.2', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '12%', textShadow: 'none' }
+                logo: { top: '74%', left: '30%', maxWidth: '40%', maxHeight: '12%', transform: 'translate(-50%, -50%)', objectFit: 'contain' },
+                text: { top: '74%', left: '30%', width: '40%', fontSize: '1.2rem', color: '#8a2d24', transform: 'translate(-50%, -50%)', textAlign: 'center', whiteSpace: 'normal', wordWrap: 'break-word', lineHeight: '1.2', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '12%', textShadow: 'none' }
             },
             flyer: {
                 logo: { top: '77%', left: '30%', maxWidth: '35%', maxHeight: '12%', transform: 'translate(-50%, -50%)', objectFit: 'contain' },
@@ -1136,7 +1136,7 @@
 
                 // Send data to Google Sheets via Web App
                 // NOTE: Replace YOUR_WEB_APP_URL with the actual URL after deploying the Apps Script
-                const scriptUrl = 'https://script.google.com/macros/s/AKfycbyiZ-stBQhmx-vq4KYt8ACGq8ahKJieh8lbelzxafCT5ICSiVuMTR0YXgof14MMhCP9/exec';
+                const scriptUrl = 'https://script.google.com/macros/s/AKfycbyvPA-iw7mTb4-89H0B-zE-cbSHXygpc0xkcL1Z34Ucc_Ud-97o08MfQcN74U-gomzfwg/exec';
                 
                 // We will send the fetch request AFTER the images are flattened and uploaded
                 // so we can include the image URLs in the payload.
