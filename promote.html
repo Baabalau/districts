@@ -814,9 +814,9 @@
                 text: { top: '70%', left: '30%', width: '40%', fontSize: '1.2rem', color: '#8a2d24', transform: 'translate(0, -50%)', textAlign: 'center', whiteSpace: 'normal', wordWrap: 'break-word', lineHeight: '1.2', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '12%', textShadow: 'none' }
             },
             flyer: {
-                logo: { top: '65%', left: '30%', maxWidth: '35%', maxHeight: '12%', transform: 'translate(-50%, -50%)', objectFit: 'contain' },
+                logo: { top: '77%', left: '30%', maxWidth: '35%', maxHeight: '12%', transform: 'translate(-50%, -50%)', objectFit: 'contain' },
                 qr: { bottom: '27%', left: '78%', width: '18%', transform: 'translate(-50%, 50%)' },
-                text: { top: '65%', left: '30%', width: '35%', fontSize: '1.1rem', color: '#8a2d24', transform: 'translate(-50%, -50%)', textAlign: 'center', whiteSpace: 'normal', wordWrap: 'break-word', lineHeight: '1.2', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '12%' }
+                text: { top: '77%', left: '30%', width: '35%', fontSize: '1.1rem', color: '#8a2d24', transform: 'translate(-50%, -50%)', textAlign: 'center', whiteSpace: 'normal', wordWrap: 'break-word', lineHeight: '1.2', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '12%' }
             },
             qrColors: {
                 foreground: 'eecd7e', // Gold
@@ -1324,8 +1324,9 @@
 
                             formData.socialGraphicUrl = sUrl;
                             formData.flyerGraphicUrl = fUrl;
+                            console.log("Firebase upload succeeded:", sUrl, fUrl);
                         } catch (uploadError) {
-                            console.error("Firebase upload failed (check Storage Rules / billing). Claim will still be recorded.", uploadError);
+                            console.error("FIREBASE UPLOAD FAILED — code:", uploadError && uploadError.code, "| message:", uploadError && uploadError.message, uploadError);
                         }
                     } catch (error) {
                         console.error("Error flattening graphics:", error);
