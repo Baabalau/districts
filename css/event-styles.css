@@ -25,9 +25,9 @@
     color: var(--bg-primary);
     border: 1px solid rgba(255, 255, 255, 0.4);
     border-radius: 8px;
-    font-family: var(--font-main);
+    font-family: var(--font-hero);
     font-size: 18px;
-    font-weight: 800;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 2px;
     cursor: pointer;
@@ -68,6 +68,11 @@
 }
 
 /* Hero Section */
+.event-hero-wrap {
+    width: 100%;
+    min-height: 50vh;
+}
+
 .event-hero {
     display: flex;
     justify-content: space-between;
@@ -303,6 +308,11 @@
 
 .purpose-frame p + p {
     margin-top: 1rem;
+}
+
+.purpose-copy {
+    max-width: 750px;
+    margin: 0 auto;
 }
 
 @media (max-width: 900px) {
