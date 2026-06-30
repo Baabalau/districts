@@ -30,145 +30,178 @@ function buildTemplateVars(districtCopy) {
 }
 
 function renderItineraryStops(stops, vars) {
-    const isMobile = window.innerWidth <= 768;
     return `
     <style>
-        .itinerary-grid-custom {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 40px;
+        .proceedings-container {
             position: relative;
+            padding: 40px 0 80px;
+            width: 100%;
+            margin: 0 auto;
         }
-        @media (min-width: 768px) {
-            .itinerary-grid-custom {
-                grid-template-columns: 1fr 1fr;
-            }
-            .stop-3-full {
-                grid-column: 1 / -1;
-                max-width: 800px;
-                margin: 0 auto;
-                width: 100%;
-            }
-            .connecting-line {
-                position: absolute;
-                top: 80px;
-                left: 25%;
-                width: 50%;
-                height: 30px;
-                background-image: radial-gradient(circle at 100% 100%, transparent 15px, var(--accent) 15px, var(--accent) 18px, transparent 18px),
-                                  radial-gradient(circle at 0 0, transparent 15px, var(--accent) 15px, var(--accent) 18px, transparent 18px);
-                background-size: 30px 100%;
-                background-position: 0 0, 15px 0;
-                background-repeat: repeat-x;
-                opacity: 0.4;
-                z-index: 0;
-            }
+        
+        .proceedings-path {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
         }
-        .stop-card-custom {
-            background: linear-gradient(165deg, rgba(15, 22, 38, 0.8) 0%, rgba(15, 22, 38, 0.6) 100%);
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 30px;
-            border-radius: 12px;
-            text-align: left;
+
+        .proc-step {
             position: relative;
             z-index: 1;
+            margin-bottom: 80px;
             display: flex;
-            flex-direction: column;
-            gap: 15px;
         }
+        .proc-step.left { justify-content: flex-start; }
+        .proc-step.right { justify-content: flex-end; }
+        .proc-step.center { justify-content: center; margin-bottom: 0; }
+
+        .proc-card {
+            width: 100%;
+            max-width: 500px;
+            background: linear-gradient(165deg, rgba(15, 22, 38, 0.95) 0%, rgba(15, 22, 38, 0.8) 100%);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 35px;
+            border-radius: 16px;
+            text-align: left;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+        }
+        .proc-step.center .proc-card {
+            max-width: 100%;
+            border-color: var(--brand-red);
+            border-width: 2px;
+            box-shadow: 0 0 25px rgba(138, 47, 37, 0.25);
+            text-align: center;
+        }
+
         .stop-avatar-container {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 10px;
+            display: flex; align-items: center; gap: 18px; margin-bottom: 20px;
         }
+        .proc-step.center .stop-avatar-container {
+            justify-content: center;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
         .stop-avatar {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid var(--accent);
-            background: var(--bg-secondary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            color: var(--accent);
+            width: 80px; height: 80px; border-radius: 50%; object-fit: cover;
+            border: 2px solid var(--accent); background: var(--bg-secondary);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.2rem; color: var(--accent); flex-shrink: 0;
         }
-        .stop-business-placeholder {
-            background: rgba(255,255,255,0.05);
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 15px;
-            border: 1px dashed rgba(255,255,255,0.2);
-            display: flex;
-            gap: 15px;
-            align-items: center;
+        .proc-step.center .stop-avatar {
+            width: 90px; height: 90px; font-size: 2.8rem;
+            box-shadow: 0 0 15px rgba(203, 160, 82, 0.4);
         }
-        .stop-business-img {
-            width: 80px;
-            height: 80px;
-            border-radius: 8px;
-            background: rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: rgba(255,255,255,0.3);
-            font-size: 1.5rem;
+        
+        .proc-instructions {
+            background: rgba(0,0,0,0.4);
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 35px;
+            border-left: 4px solid var(--accent);
+            text-align: left;
+            border: 1px solid rgba(255,255,255,0.05);
         }
-        .stop-business-info h4 {
-            margin: 0 0 5px 0;
-            color: var(--text-primary);
-            font-size: 1.1rem;
+        .proc-instructions h4 {
+            color: var(--text-primary); margin: 0 0 15px 0; font-size: 1.3rem; font-family: var(--font-header); text-transform: uppercase; letter-spacing: 1px;
         }
-        .stop-business-info p {
-            margin: 0;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
+        .proc-instructions ul {
+            margin: 0; padding-left: 20px; color: var(--text-main); font-size: 1.05rem; line-height: 1.6;
+        }
+        .proc-instructions li { margin-bottom: 12px; }
+        .proc-instructions li:last-child { margin-bottom: 0; }
+
+        .desktop-path { display: inline; }
+        .mobile-path { display: none; }
+
+        @media (max-width: 900px) {
+            .proc-step.left, .proc-step.right, .proc-step.center { justify-content: center; margin-bottom: 40px; }
+            .desktop-path { display: none; }
+            .mobile-path { display: inline; }
         }
     </style>
-    <div class="itinerary-grid-custom">
-        <div class="connecting-line"></div>
+    
+    <div class="proceedings-container">
+        <!-- 3D Winding SVG Path (responsive) -->
+        <svg class="proceedings-path" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <!-- DESKTOP Layers ('S' shape) -->
+            <g class="desktop-path">
+                <path d="M 25,10 C 25,35 75,35 75,55 C 75,75 50,75 50,95" fill="none" stroke="rgba(138,47,37,0.35)" stroke-width="22" vector-effect="non-scaling-stroke" transform="translate(6, 6)" />
+                <path d="M 25,10 C 25,35 75,35 75,55 C 75,75 50,75 50,95" fill="none" stroke="var(--text-primary)" stroke-width="16" vector-effect="non-scaling-stroke" transform="translate(4, 4)" />
+                <path d="M 25,10 C 25,35 75,35 75,55 C 75,75 50,75 50,95" fill="none" stroke="var(--accent)" stroke-width="10" vector-effect="non-scaling-stroke" transform="translate(2, 2)" />
+                <path d="M 25,10 C 25,35 75,35 75,55 C 75,75 50,75 50,95" fill="none" stroke="var(--brand-red)" stroke-width="4" vector-effect="non-scaling-stroke" />
+            </g>
+            
+            <!-- MOBILE Layers (Gentle centered wave) -->
+            <g class="mobile-path">
+                <path d="M 50,5 C 80,35 20,65 50,95" fill="none" stroke="rgba(138,47,37,0.35)" stroke-width="22" vector-effect="non-scaling-stroke" transform="translate(6, 6)" />
+                <path d="M 50,5 C 80,35 20,65 50,95" fill="none" stroke="var(--text-primary)" stroke-width="16" vector-effect="non-scaling-stroke" transform="translate(4, 4)" />
+                <path d="M 50,5 C 80,35 20,65 50,95" fill="none" stroke="var(--accent)" stroke-width="10" vector-effect="non-scaling-stroke" transform="translate(2, 2)" />
+                <path d="M 50,5 C 80,35 20,65 50,95" fill="none" stroke="var(--brand-red)" stroke-width="4" vector-effect="non-scaling-stroke" />
+            </g>
+        </svg>
+
         ${stops.map((stop, index) => {
+            const alignClass = index === 0 ? 'left' : (index === 1 ? 'right' : 'center');
+            
             let avatarHtml = '';
             if (index === 0) {
                 avatarHtml = `<img src="${vars.influencerImg}" class="stop-avatar" alt="${vars.influencerName}">`;
             } else if (index === 1) {
                 avatarHtml = `<img src="${vars.councilImg}" class="stop-avatar" alt="${vars.councilName}">`;
             } else {
-                avatarHtml = `<div class="stop-avatar">?</div>`;
+                avatarHtml = `<div class="stop-avatar">🗳️</div>`;
             }
 
-            const businessHtml = `
-                <div class="stop-business-placeholder">
-                    <div class="stop-business-img">🖼️</div>
-                    <div class="stop-business-info">
-                        <h4>Venue Name</h4>
-                        <p>123 Venue Street</p>
+            let extraHtml = '';
+            let subtitleHtml = `<p style="margin: 0; font-size: 1.1rem; line-height: 1.6; color: var(--text-secondary);">${interpolate(stop.body, vars)}</p>`;
+            
+            if (index === 2) {
+                // Combine the "How it works" instructions into the third stop to unify the narrative
+                subtitleHtml = `<p style="margin: 0; font-size: 1.15rem; line-height: 1.6; color: var(--text-secondary);">Where are we ending the night? The polls open 14 days before the event.</p>`;
+                extraHtml = `
+                    <div class="proc-instructions">
+                        <h4>How it works</h4>
+                        <ul>
+                            <li><strong>Round 1:</strong> Voting opens for all districts when the press release drops. Vote for your favorite neighborhood spots. The top 10 advance.</li>
+                            <li><strong>The Run-Off:</strong> Starts the Monday before the event at 3:00 PM. A final sprint to decide the winner among the top 10.</li>
+                            <li><strong>The Prize:</strong> The winning venue hosts the final stop. Every vote is an entry into the Golden Ticket Raffle!</li>
+                        </ul>
                     </div>
-                </div>
-            `;
-
-            const cardClass = index === 2 ? 'stop-card-custom stop-3-full' : 'stop-card-custom';
+                `;
+            }
 
             return `
-            <div class="${cardClass} stop-${index + 1}">
-                <div class="stop-avatar-container">
-                    ${avatarHtml}
-                    <div>
-                        <div class="stop-number" style="position: static; font-size: 1.2rem; margin-bottom: 5px; color: var(--accent); opacity: 1;">${stop.number}</div>
-                        <h3 style="margin: 0; font-size: 1.4rem;">${interpolate(stop.title, vars)}</h3>
+            <div class="proc-step ${alignClass} stop-${index + 1}">
+                <div class="proc-card">
+                    <div class="stop-avatar-container">
+                        ${avatarHtml}
+                        <div style="text-align: ${index === 2 ? 'center' : 'left'};">
+                            <div class="stop-number" style="font-size: 1.2rem; margin-bottom: 4px; color: var(--accent); font-weight: bold; letter-spacing: 1px;">STOP ${stop.number}</div>
+                            <h3 style="margin: 0; font-size: 1.7rem; font-family: var(--font-header); text-transform: uppercase;">${index === 2 ? 'The Election: Stop 3' : interpolate(stop.title, vars)}</h3>
+                        </div>
                     </div>
+                    ${subtitleHtml}
+                    ${extraHtml}
                 </div>
-                <p style="margin: 0; font-size: 1rem; line-height: 1.5;">${interpolate(stop.body, vars)}</p>
-                ${businessHtml}
             </div>`;
         }).join('')}
     </div>`;
 }
 
-function renderScheduleItems(items) {
-    return items.map((item) => `<li>${item}</li>`).join('\n                            ');
+function renderVenueOperatorsStrip(shared) {
+    return `
+        <div class="venue-operators-strip">
+            <span class="venue-operators-label">${shared.venueOperators.heading}</span>
+            <span class="venue-operators-text">${shared.venueOperators.body}</span>
+            <a href="${shared.venueOperators.ctaHref}" class="brand-btn venue-operators-btn">${shared.venueOperators.ctaText}</a>
+        </div>`;
 }
 
 function renderMapLegend() {
@@ -442,40 +475,12 @@ class EventLayout extends HTMLElement {
                 </div>
             </div>
 
-            <!-- Election Intro & Features ABOVE the map -->
-            <div class="election-intro-section js-reveal reveal-opacity" style="padding: 30px 0; background: transparent;">
+            <!-- Night's Proceedings & Election Intro -->
+            <div class="proceedings-section js-reveal reveal-y delay-200" style="padding: 20px 0; background: transparent;">
                 <div class="page-module" style="width: 80%; max-width: 1400px; margin: 0 auto; text-align: center;">
-                <div class="voting-header" style="margin-bottom: 20px;">
-                    <h2 style="font-size: 2.5rem; margin-bottom: 5px; font-family: var(--font-header); text-transform: uppercase; color: var(--text-primary);">The Election: Stop 3</h2>
-                    <p style="font-size: 1.1rem; color: var(--text-secondary);">Where are we ending the night? The polls open 14 days before the event.</p>
-                </div>
-                <div class="instruction-box" style="padding: 30px; max-width: 900px; margin: 0 auto 40px auto; text-align: left; background: rgba(15, 22, 38, 0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;">
-                    <h3 style="margin-bottom: 15px; font-size: 1.4rem; color: var(--text-primary); font-family: var(--font-header); text-transform: uppercase; letter-spacing: 1px;">How it works</h3>
-                    <ul style="margin: 0; padding-left: 20px; font-size: 1rem; color: var(--text-main); line-height: 1.6;">
-                        <li style="margin-bottom: 10px;"><strong>Round 1:</strong> Voting opens for all districts when the press release drops. Vote for your favorite neighborhood spots. The top 10 advance.</li>
-                        <li style="margin-bottom: 10px;"><strong>The Run-Off:</strong> Starts the Monday before the event at 3:00 PM. A final sprint to decide the winner among the top 10.</li>
-                        <li style="margin-bottom: 0;"><strong>The Prize:</strong> The winning venue hosts the final stop. Every vote is an entry into the Golden Ticket Raffle!</li>
-                    </ul>
-                </div>
-                
-                <div class="map-features-layout" style="margin-top: 40px; padding-top: 0;">
-                    <div class="map-features">
-                        <div class="feature-box" style="flex: 1; text-align: left;">
-                            <h3 style="font-family: var(--font-hero); text-transform: uppercase; letter-spacing: 1px;">${shared.venueVoting.heading}</h3>
-                            <p style="margin-bottom: 10px;"><strong>Goals:</strong> ${shared.venueVoting.goals}</p>
-                            <p style="margin-bottom: 10px;"><strong>Rules:</strong> ${interpolate(shared.venueVoting.rules, vars)}</p>
-                            <p><strong>${shared.venueVoting.scheduleLabel}</strong></p>
-                            <ul style="padding-left: 20px; color: var(--text-secondary); font-size: 0.95rem; margin-top: 5px;">
-                                ${renderScheduleItems(shared.venueVoting.schedule)}
-                            </ul>
-                        </div>
-                        <div class="feature-box" style="flex: 1; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                            <h3 style="font-family: var(--font-hero); text-transform: uppercase; letter-spacing: 1px;">${shared.venueOperators.heading}</h3>
-                            <p style="margin-bottom: 20px;">${shared.venueOperators.body}</p>
-                            <a href="${shared.venueOperators.ctaHref}" class="brand-btn" style="padding: 10px 20px; font-size: 0.9rem;">${shared.venueOperators.ctaText}</a>
-                        </div>
-                    </div>
-                </div>
+                    <h2 style="font-family: var(--font-hero); font-size: 3.5rem; text-transform: uppercase; color: var(--text-primary); margin-top: 20px; margin-bottom: 15px; letter-spacing: 2px;">${shared.itinerary.heading}</h2>
+                    <p style="font-size: 1.15rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto 10px;">Follow the trail and cast your vote to decide where District ${districtCopy.district} ends the night.</p>
+                    ${renderItineraryStops(districtCopy.itinerary.stops, vars)}
                 </div>
             </div>
 
@@ -490,14 +495,7 @@ class EventLayout extends HTMLElement {
             <div class="voting-states-section js-reveal reveal-y delay-200" style="padding: 30px 0; background: transparent;">
                 <div class="page-module" style="width: 80%; max-width: 1400px; margin: 0 auto; text-align: center;">
                 ${renderVotingStates(districtCopy.district)}
-                </div>
-            </div>
-
-            <!-- Crawl-tinery Pulled Up Beneath Map -->
-            <div class="itinerary-section js-reveal reveal-y delay-200" style="padding: 30px 0; background: transparent;">
-                <div class="page-module" style="width: 80%; max-width: 1400px; margin: 0 auto;">
-                <h2 style="font-family: var(--font-header); font-size: 2.5rem; text-align: left; text-transform: uppercase; color: var(--text-primary); margin-bottom: 40px;">${shared.itinerary.heading}</h2>
-                <div class="itinerary-grid">${renderItineraryStops(districtCopy.itinerary.stops, vars)}</div>
+                ${renderVenueOperatorsStrip(shared)}
                 </div>
             </div>
 
