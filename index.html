@@ -257,9 +257,9 @@
             color: var(--bg-primary);
             border: none;
             border-radius: 8px;
-            font-family: var(--font-main);
+            font-family: var(--font-hero);
             font-size: 18px;
-            font-weight: 800;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 2px;
             cursor: pointer;
@@ -681,7 +681,7 @@
         }
 
         .flow-label {
-            text-align: left;
+            text-align: center;
             font-family: var(--font-header);
             font-size: 0.7rem;
             font-weight: 800;
@@ -718,6 +718,9 @@
         }
 
         .purpose-frame {
+            --purpose-copy-max: 750px;
+            max-width: calc(var(--purpose-copy-max) + 2 * clamp(1.2rem, 3vw, 1.5rem));
+            margin-inline: auto;
             position: relative;
             padding: clamp(1.5rem, 4vw, 2rem) clamp(1.2rem, 3vw, 1.5rem);
             background: linear-gradient(168deg, #1A243D 0%, var(--bg-secondary) 42%, #0A0F1A 100%);
@@ -802,6 +805,11 @@
 
         .purpose-frame p + p {
             margin-top: 1rem;
+        }
+
+        .purpose-copy {
+            max-width: var(--purpose-copy-max, 750px);
+            margin: 0 auto;
         }
 
         @media (max-width: 900px) {
@@ -1234,8 +1242,6 @@
             <a href="#">Home</a>
             <a href="#events">Events</a>
             <a href="promote.html">Your Business</a>
-            <a href="#about">About</a>
-            <a href="#">Partners</a>
             <a href="login.html" id="authLink">Log In / Sign Up</a>
         </nav>
     </div>
@@ -1393,10 +1399,12 @@
     <section id="purpose" class="purpose-section js-reveal reveal-opacity">
         <div class="purpose-module">
             <div class="purpose-frame js-reveal reveal-y delay-200">
-                <h2>Summer Sustainability for Southern Hospitality</h2>
-                <p class="purpose-lead">The New Orleans summer is long, hot and just for us. Let's embrace it!</p>
-                <p>Many New Orleans businesses are struggling to keep their doors open during the slow summer months. Festival and football seasons, the winter holidays and carnival are all reliably profitable times for both established institutions and new establishments. The long, hot summer is when tourism slows and many locals stay home to avoid the heat. The dynamic isn’t new, but recent trends make it clear that solutions are needed.</p>
-                <p>Districts After Dark shines a spotlight on the need to tackle this challenge head on and provides ways for New Orleanians to step up in support of their neighborhood hospitality businesses. We invite you to join us and our partners in the City Council in finding ways to make our summer nights not just a good time, but sustainable for New Orleans culture of hospitality for years to come.</p>
+                <div class="purpose-copy">
+                    <h2>Summer Sustainability for Southern Hospitality</h2>
+                    <p class="purpose-lead">The New Orleans summer is long, hot and just for us. Let's embrace it!</p>
+                    <p>Many New Orleans businesses are struggling to keep their doors open during the slow summer months. Festival and football seasons, the winter holidays and carnival are all reliably profitable times for both established institutions and new establishments. The long, hot summer is when tourism slows and many locals stay home to avoid the heat. The dynamic isn’t new, but recent trends make it clear that solutions are needed.</p>
+                    <p>Districts After Dark shines a spotlight on the need to tackle this challenge head on and provides ways for New Orleanians to step up in support of their neighborhood hospitality businesses. We invite you to join us and our partners in the City Council in finding ways to make our summer nights not just a good time, but sustainable for New Orleans culture of hospitality for years to come.</p>
+                </div>
             </div>
         </div>
     </section>
