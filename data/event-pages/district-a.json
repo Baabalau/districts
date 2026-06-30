@@ -7,10 +7,10 @@
   "councilImg": "assets/Aimee-McCarron_2.png",
   "influencerName": "Aubrey Avocado",
   "influencerImg": "assets/aubreyavo.jpg",
-  "bgImg": "https://images.unsplash.com/photo-1517650862521-d580d5348145?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+  "bgImg": "assets/district_a_image.jpeg",
   "heroIntro": [
     "This summer, Councilmember Aimee McCarron and Aubrey Avocado are supporting local hospitality businesses with a visit to three local favorites across Uptown, Carrollton, Holly Grove, Mid-City, Bayou Saint John and Lakeview!",
-    "Join in by earning points to support your neighborhood businesses and voting to decide Aimee & Aubreyís last stop of the night!"
+    "Join in by earning points to support your neighborhood businesses and voting to decide Aimee & Aubrey?s last stop of the night!"
   ],
   "councilQuote": "This isn't just about nightlife; it's about connecting with the community where they are. We're breaking down the walls of City Hall.",
   "influencerQuote": "District {district} has some of the most vibrant, unsung spots in the city. I can't wait to show everyone what makes this neighborhood tick.",
@@ -19,7 +19,7 @@
       {
         "number": "01",
         "title": "{influencerName}'s Lakeview Kickoff",
-        "body": "Start the night where {location} keeps its best secretsù{influencerName} opens the crawl at a Uptown spot built for conversation, cocktails, and a first look at what makes District A after dark."
+        "body": "Start the night where {location} keeps its best secrets?{influencerName} opens the crawl at a Uptown spot built for conversation, cocktails, and a first look at what makes District A after dark."
       },
       {
         "number": "02",

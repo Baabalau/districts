@@ -29,6 +29,19 @@ function buildTemplateVars(districtCopy) {
     };
 }
 
+// Matches homepage event cards (index.html #events)
+const DISTRICT_HERO_IMAGES = {
+    a: 'assets/district_a_image.jpeg',
+    b: 'assets/district_b_image.jpg',
+    c: 'assets/district_c_image.png',
+    d: 'assets/district_d_image.jpg',
+    e: 'assets/district_e_image.jpg'
+};
+
+function getDistrictHeroImage(districtId, fallback) {
+    return DISTRICT_HERO_IMAGES[districtId] || fallback;
+}
+
 function renderItineraryStops(stops, vars) {
     return `
     <style>
@@ -443,8 +456,11 @@ class EventLayout extends HTMLElement {
             window.electionWinnerId = window.electionWinnerId || null;
 
 
+            const heroBg = getDistrictHeroImage(districtId, districtCopy.bgImg);
+
             this.innerHTML = `
-            <div class="event-hero" style="background: linear-gradient(rgba(15, 22, 38, 0.85), rgba(15, 22, 38, 0.95)), url('${districtCopy.bgImg}') center/cover; background-attachment: fixed;">
+            <div class="event-hero-wrap" style="background-image: linear-gradient(rgba(15, 22, 38, 0.85), rgba(15, 22, 38, 0.95)), url('${heroBg}'); background-position: center; background-size: cover; background-attachment: fixed;">
+                <div class="event-hero">
                 <div class="hero-left">
                     <h1 class="title-3d">${interpolate(shared.hero.title, vars)}</h1>
                     <h2>${districtCopy.date}</h2>
@@ -465,12 +481,15 @@ class EventLayout extends HTMLElement {
                     </div>
                 </div>
             </div>
+            </div>
 
             <div class="purpose-section js-reveal reveal-opacity" style="margin: 30px 0; background: transparent;">
                 <div class="purpose-module">
                     <div class="purpose-frame js-reveal reveal-y delay-200">
-                        <h2>${shared.behindSeries.heading}</h2>
-                        <p>${shared.behindSeries.body}</p>
+                        <div class="purpose-copy">
+                            <h2>${shared.behindSeries.heading}</h2>
+                            <p>${shared.behindSeries.body}</p>
+                        </div>
                     </div>
                 </div>
             </div>
