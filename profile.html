@@ -122,8 +122,9 @@
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            gap: 15px;
+            gap: 20px;
             border-bottom: 2px solid var(--text-primary);
+            padding-top: 10px;
             padding-bottom: 25px;
             margin-bottom: 30px;
         }
@@ -133,7 +134,7 @@
             font-size: 2.5rem;
             text-transform: uppercase;
             line-height: 1.05;
-            margin-bottom: 15px;
+            margin-bottom: 0;
         }
 
         .profile-score-bottom {
@@ -300,6 +301,9 @@
             padding: 5px 12px;
             border-radius: 5px;
             transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .dc-tab.active {
@@ -308,7 +312,7 @@
             font-weight: 700;
         }
 
-        .dc-tab-content { display: none; }
+        .dc-tab-content { display: none; padding-top: 5px; }
         .dc-tab-content.active { display: block; }
 
         .dc-count {
@@ -318,6 +322,7 @@
             padding: 1px 9px;
             font-size: 0.8rem;
             font-weight: 700;
+            display: inline-block;
         }
 
         .dc-tab-content ul { list-style: none; padding-left: 2px; }
@@ -415,14 +420,14 @@
                     <h2>Hi, <span id="user-name">Crawler</span></h2>
                 </div>
                 <div class="list-section" style="margin-bottom: 0; width: 100%;">
-                    <p class="section-hint" style="margin-bottom: 8px;">Claim your districts to feature them:</p>
+                    <p class="section-hint" style="margin-bottom: 8px;">Your districts:</p>
                     <div class="claim-controls" id="claim-controls"></div>
                 </div>
             </div>
 
             <div class="list-section">
-                <h3>Your Districts</h3>
-                <p class="section-hint">The districts you represent. Check-ins come first, then your votes.</p>
+                <h3>Your District(s)</h3>
+                <p class="section-hint">Where you live & where you are in New Orleans. Track points gained from checking in at businesses and your votes.</p>
                 <div id="claimed-districts"></div>
             </div>
 
@@ -487,6 +492,7 @@
             const votes = dataObj.votes || [];
             const pts = checkins.length * POINTS_PER_CHECKIN;
             const label = district === 'Unknown' ? 'Other Venues' : 'District ' + district;
+            const cardId = 'dc-' + Math.random().toString(36).substr(2, 9);
 
             const card = document.createElement('div');
             card.className = 'district-card' + (isPrimary ? ' is-primary' : '') + (openByDefault ? ' open' : '');
@@ -505,14 +511,16 @@
                     </span>
                 </button>
                 <div class="district-card-body">
-                    <div class="dc-group">
-                        <h5>Check-ins <span class="dc-count">${checkins.length}</span></h5>
+                    <div class="dc-tabs">
+                        <button type="button" class="dc-tab active" data-target="checkins-${cardId}">Check-ins <span class="dc-count">${checkins.length}</span></button>
+                        <button type="button" class="dc-tab" data-target="votes-${cardId}">Votes <span class="dc-count">${votes.length}</span></button>
+                    </div>
+                    <div class="dc-tab-content active" data-content="checkins-${cardId}">
                         ${checkins.length
                             ? `<ul>${checkins.map(n => `<li>${escapeHtml(n)}</li>`).join('')}</ul>`
                             : `<p class="empty-msg">No check-ins yet.</p>`}
                     </div>
-                    <div class="dc-group">
-                        <h5>Votes <span class="dc-count">${votes.length}</span></h5>
+                    <div class="dc-tab-content" data-content="votes-${cardId}">
                         ${votes.length
                             ? `<ul>${votes.map(n => `<li>${escapeHtml(n)}</li>`).join('')}</ul>`
                             : `<p class="empty-msg">No votes yet.</p>`}
@@ -525,6 +533,19 @@
                 const isOpen = card.classList.toggle('open');
                 header.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
             });
+
+            const tabs = card.querySelectorAll('.dc-tab');
+            const contents = card.querySelectorAll('.dc-tab-content');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    tabs.forEach(t => t.classList.remove('active'));
+                    contents.forEach(c => c.classList.remove('active'));
+                    tab.classList.add('active');
+                    card.querySelector(`.dc-tab-content[data-content="${tab.dataset.target}"]`).classList.add('active');
+                });
+            });
+
             return card;
         }
 
