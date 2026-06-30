@@ -571,12 +571,12 @@
             <div class="promo-hero-visual">
                 <div class="cards-container">
                     <div class="hero-image-wrapper wrapper-1">
-                        <img src="assets/District%20Parings/BIZ%20Promo_D.png" class="hero-image" alt="Social Media Graphic Preview">
+                        <img src="assets/BIZ%20Promo_E_preview.png" class="hero-image" alt="Social Media Graphic Preview" loading="lazy">
                         <div class="image-caption">Customized Social Media Story</div>
                     </div>
                     
                     <div class="hero-image-wrapper wrapper-2">
-                            <img src="assets/Districts_Standup_Flyer/Districts_Standup_D.png" class="hero-image" alt="Printable Flyer Preview">
+                            <img src="assets/Districts_Standup_preview.png" class="hero-image" alt="Printable Flyer Preview" loading="lazy">
                         <div class="image-caption">Customized Printable Flyer</div>
                     </div>
                 </div>
@@ -585,47 +585,9 @@
     </div>
 
     <div class="content-container">
-        
-        <!-- Simplified Instructional Guide -->
-        <div class="guide-section" id="social-guide" style="margin-top: 40px; background: transparent; border: none; box-shadow: none; padding: 0;">
-            <h2 style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px;">Share Customized Social Graphics Promoting Your Business</h2>
-            
-            <div class="instruction-row">
-                <div class="instruction-steps">
-                    <div class="simple-step" style="background: transparent; border-left: none; padding: 10px 0; box-shadow: none;">
-                        <div class="step-text">
-                            <h4>Download & Import</h4>
-                            <p>Save the blank graphic to your phone and open it as a background in Instagram Stories or TikTok.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="simple-step" style="background: transparent; border-left: none; padding: 10px 0; box-shadow: none;">
-                        <div class="step-text">
-                            <h4>Add Your Logo</h4>
-                            <p>You can also use the app's native tools to place your logo over the designated center box.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="simple-step" style="background: transparent; border-left: none; padding: 10px 0; box-shadow: none;">
-                        <div class="step-text">
-                            <h4>Add The Link & Share</h4>
-                            <p>Generate your link below, place a "Link Sticker" over the bottom arrow, and post it to your followers!</p>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="instruction-visual">
-                    <img src="assets/District%20Parings/BIZ%20Promo_D.png" alt="Customization Visual">
-                    <div class="visual-pointer">
-                        PLACE LOGO HERE
-                        <span>(Using the native sticker tool)</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
         <!-- Multi-Step Integrated Form -->
-        <div class="generator-tool" id="integrated-form-container" style="margin-top: 60px; margin-bottom: 60px;">
+        <div class="generator-tool" id="integrated-form-container" style="margin-top: 40px; margin-bottom: 60px;">
             <h2>Join the Map & Generate Promo Graphics</h2>
             <div id="step-intro" style="text-align: left;">
                 <p style="color: var(--text-secondary); max-width: 800px; margin: 0 0 20px 0;">
@@ -730,7 +692,7 @@
                     <div class="checkbox-group">
                         <label>
                             <input type="checkbox" id="chk-host">
-                            Yes, our business would like to host District [B]'s final stop of the night on [Tuesday, July 28th]
+                            Yes, our business would like to host <span id="dynamic-district-name">District [B]</span>'s final stop of the night on <span id="dynamic-district-date">[Tuesday, July 28th]</span>
                         </label>
                     </div>
 
@@ -796,6 +758,46 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Simplified Instructional Guide -->
+        <div class="guide-section" id="social-guide" style="margin-top: 40px; background: transparent; border: none; box-shadow: none; padding: 0;">
+            <h2 style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px;">Share Customized Social Graphics Promoting Your Business</h2>
+            
+            <div class="instruction-row">
+                <div class="instruction-steps">
+                    <div class="simple-step" style="background: transparent; border-left: none; padding: 10px 0; box-shadow: none;">
+                        <div class="step-text">
+                            <h4>Download & Import</h4>
+                            <p>Save the blank graphic to your phone and open it as a background in Instagram Stories or TikTok.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="simple-step" style="background: transparent; border-left: none; padding: 10px 0; box-shadow: none;">
+                        <div class="step-text">
+                            <h4>Add Your Logo</h4>
+                            <p>You can also use the app's native tools to place your logo over the designated center box.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="simple-step" style="background: transparent; border-left: none; padding: 10px 0; box-shadow: none;">
+                        <div class="step-text">
+                            <h4>Add The Link & Share</h4>
+                            <p>Generate your link below, place a "Link Sticker" over the bottom arrow, and post it to your followers!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="instruction-visual">
+                    <img src="assets/District%20Parings/BIZ%20Promo_D.png" alt="Customization Visual" loading="lazy">
+                    <div class="visual-pointer">
+                        PLACE LOGO HERE
+                        <span>(Using the native sticker tool)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        </div>
 
     </div>
 
@@ -812,9 +814,9 @@
                 text: { top: '70%', left: '30%', width: '40%', fontSize: '1.2rem', color: '#8a2d24', transform: 'translate(0, -50%)', textAlign: 'center', whiteSpace: 'normal', wordWrap: 'break-word', lineHeight: '1.2', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '12%', textShadow: 'none' }
             },
             flyer: {
-                logo: { top: '71%', left: '12%', maxWidth: '35%', maxHeight: '12%', transform: 'translate(0, -50%)', objectFit: 'contain' },
+                logo: { top: '65%', left: '30%', maxWidth: '35%', maxHeight: '12%', transform: 'translate(-50%, -50%)', objectFit: 'contain' },
                 qr: { bottom: '27%', left: '78%', width: '18%', transform: 'translate(-50%, 50%)' },
-                text: { top: '71%', left: '12%', width: '35%', fontSize: '1.1rem', color: '#8a2d24', transform: 'translate(0, -50%)', textAlign: 'center', whiteSpace: 'normal', wordWrap: 'break-word', lineHeight: '1.2', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '12%' }
+                text: { top: '65%', left: '30%', width: '35%', fontSize: '1.1rem', color: '#8a2d24', transform: 'translate(-50%, -50%)', textAlign: 'center', whiteSpace: 'normal', wordWrap: 'break-word', lineHeight: '1.2', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '12%' }
             },
             qrColors: {
                 foreground: 'eecd7e', // Gold
@@ -927,6 +929,24 @@
                     });
 
                     if (isValid && currentStep < steps.length - 1) {
+                        // Update dynamic text before showing Step 4
+                        if (currentStep + 1 === 3) {
+                            const bizDistrict = document.getElementById('biz-district').value;
+                            if (bizDistrict && bizDistrict.startsWith('District')) {
+                                const districtLetter = bizDistrict.split(' ')[1].toUpperCase();
+                                document.getElementById('dynamic-district-name').textContent = `District ${districtLetter}`;
+                                
+                                let districtEventDate = '[Tuesday, July 28th]';
+                                switch(districtLetter) {
+                                    case 'A': districtEventDate = 'Tuesday, August 25th'; break;
+                                    case 'B': districtEventDate = 'Tuesday, August 18th'; break;
+                                    case 'C': districtEventDate = 'Tuesday, August 4th'; break;
+                                    case 'D': districtEventDate = 'Tuesday, August 11th'; break;
+                                    case 'E': districtEventDate = 'Tuesday, July 21st'; break;
+                                }
+                                document.getElementById('dynamic-district-date').textContent = districtEventDate;
+                            }
+                        }
                         showStep(currentStep + 1);
                     }
                 });
@@ -1077,12 +1097,22 @@
                 const bizName = rawBizName.replace(/\s*\(.*\)$/, '').trim();
                 
                 // Construct pseudo-unique venue id and district page URL
-                const venueId = bizName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                const venueId = matchedVenueId || bizName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
                 let districtPage = 'index.html';
                 let districtLetter = 'A';
+                let districtEventDate = '[Tuesday, July 28th]';
                 if (bizDistrict.startsWith('District')) {
                     districtLetter = bizDistrict.split(' ')[1].toUpperCase();
                     districtPage = `district-${districtLetter.toLowerCase()}.html`;
+                    
+                    // Set event date based on district
+                    switch(districtLetter) {
+                        case 'A': districtEventDate = 'Tuesday, August 25th'; break;
+                        case 'B': districtEventDate = 'Tuesday, August 18th'; break;
+                        case 'C': districtEventDate = 'Tuesday, August 4th'; break;
+                        case 'D': districtEventDate = 'Tuesday, August 11th'; break;
+                        case 'E': districtEventDate = 'Tuesday, July 21st'; break;
+                    }
                 }
                 const votingUrl = `${window.location.origin}/${districtPage}?vote=${venueId}`;
                 
@@ -1112,7 +1142,9 @@
                 // so we can include the image URLs in the payload.
                 
                 // Fetch QR code
-                const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(votingUrl)}&color=${graphicConfig.qrColors.foreground}&bgcolor=${graphicConfig.qrColors.background}`;
+                // Use the full URL (including scheme and host) so the QR code is scannable
+                const fullVotingUrl = votingUrl.startsWith('http') ? votingUrl : `${window.location.origin}${votingUrl.startsWith('/') ? '' : '/'}${votingUrl}`;
+                const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(fullVotingUrl)}&color=${graphicConfig.qrColors.foreground}&bgcolor=${graphicConfig.qrColors.background}`;
 
                 // Set Graphic Previews
                 const formSuccess = document.getElementById('form-success');
@@ -1127,6 +1159,10 @@
                 // Update base images based on district
                 socialBaseImg.src = `assets/District Parings/BIZ Promo_${districtLetter}.png`;
                 flyerBaseImg.src = `assets/Districts_Standup_Flyer/Districts_Standup_${districtLetter}.png`;
+
+                // Update confirmation text dynamically
+                document.getElementById('dynamic-district-name').textContent = `District ${districtLetter}`;
+                document.getElementById('dynamic-district-date').textContent = districtEventDate;
 
                 // Apply Config Styles
                 Object.assign(socialLogo.style, graphicConfig.social.logo);
@@ -1155,11 +1191,11 @@
                 
                 // Set Voting URL UI
                 const urlInput = document.getElementById('generated-voting-url');
-                urlInput.value = votingUrl;
+                urlInput.value = fullVotingUrl;
                 
                 const copyBtn = document.getElementById('copy-link-btn');
                 copyBtn.addEventListener('click', () => {
-                    navigator.clipboard.writeText(votingUrl).then(() => {
+                    navigator.clipboard.writeText(fullVotingUrl).then(() => {
                         const originalText = copyBtn.textContent;
                         copyBtn.textContent = 'Copied!';
                         copyBtn.style.background = '#2f533a'; // Darker green
@@ -1187,9 +1223,8 @@
                             return canvas.toDataURL('image/png');
                         };
 
-                        const timestamp = Date.now();
-                        const socialFilename = `${venueId}-social-${timestamp}.png`;
-                        const flyerFilename = `${venueId}-flyer-${timestamp}.png`;
+                        const socialFilename = `${venueId}-social.png`;
+                        const flyerFilename = `${venueId}-flyer.png`;
 
                         const [socialDataUrl, flyerDataUrl] = await Promise.all([
                             flattenImage('social-composite'),
@@ -1254,10 +1289,18 @@
                             return await getDownloadURL(storageRef);
                         };
 
-                        const [socialUrl, flyerUrl] = await Promise.all([
-                            uploadToFirebase(socialDataUrl, socialFilename),
-                            uploadToFirebase(flyerDataUrl, flyerFilename)
-                        ]);
+                        let socialUrl = "";
+                        let flyerUrl = "";
+                        try {
+                            const [sUrl, fUrl] = await Promise.all([
+                                uploadToFirebase(socialDataUrl, socialFilename),
+                                uploadToFirebase(flyerDataUrl, flyerFilename)
+                            ]);
+                            socialUrl = sUrl;
+                            flyerUrl = fUrl;
+                        } catch (uploadError) {
+                            console.error("Firebase upload failed. Check Storage Rules.", uploadError);
+                        }
 
                         formData.socialGraphicUrl = socialUrl;
                         formData.flyerGraphicUrl = flyerUrl;
@@ -1268,13 +1311,23 @@
                                 mode: 'no-cors',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify(formData)
-                            }).then(() => console.log("Form data with image URLs sent to Google Sheets"))
+                            }).then(() => console.log("Form data sent to Google Sheets"))
                               .catch(error => console.error("Error sending form data:", error));
                         }
 
                     } catch (error) {
-                        console.error("Error flattening or uploading graphics:", error);
+                        console.error("Error flattening graphics:", error);
                         alert("There was an issue generating the downloadable image. Please right-click the image to save it.");
+                        
+                        // Still try to send the form data even if image generation completely fails
+                        if (scriptUrl !== 'YOUR_WEB_APP_URL') {
+                            fetch(scriptUrl, {
+                                method: 'POST',
+                                mode: 'no-cors',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(formData)
+                            });
+                        }
                     }
                 }, 1500); // Wait 1.5s for QR code to load
             });
