@@ -571,12 +571,12 @@
             <div class="promo-hero-visual">
                 <div class="cards-container">
                     <div class="hero-image-wrapper wrapper-1">
-                        <img src="assets/District%20Parings/BIZ%20Promo_D.png" class="hero-image" alt="Social Media Graphic Preview">
+                        <img src="assets/BIZ%20Promo_E_preview.png" class="hero-image" alt="Social Media Graphic Preview" loading="lazy">
                         <div class="image-caption">Customized Social Media Story</div>
                     </div>
                     
                     <div class="hero-image-wrapper wrapper-2">
-                            <img src="assets/Districts_Standup_Flyer/Districts_Standup_D.png" class="hero-image" alt="Printable Flyer Preview">
+                            <img src="assets/Districts_Standup_preview.png" class="hero-image" alt="Printable Flyer Preview" loading="lazy">
                         <div class="image-caption">Customized Printable Flyer</div>
                     </div>
                 </div>
@@ -585,47 +585,9 @@
     </div>
 
     <div class="content-container">
-        
-        <!-- Simplified Instructional Guide -->
-        <div class="guide-section" id="social-guide" style="margin-top: 40px; background: transparent; border: none; box-shadow: none; padding: 0;">
-            <h2 style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px;">Share Customized Social Graphics Promoting Your Business</h2>
-            
-            <div class="instruction-row">
-                <div class="instruction-steps">
-                    <div class="simple-step" style="background: transparent; border-left: none; padding: 10px 0; box-shadow: none;">
-                        <div class="step-text">
-                            <h4>Download & Import</h4>
-                            <p>Save the blank graphic to your phone and open it as a background in Instagram Stories or TikTok.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="simple-step" style="background: transparent; border-left: none; padding: 10px 0; box-shadow: none;">
-                        <div class="step-text">
-                            <h4>Add Your Logo</h4>
-                            <p>You can also use the app's native tools to place your logo over the designated center box.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="simple-step" style="background: transparent; border-left: none; padding: 10px 0; box-shadow: none;">
-                        <div class="step-text">
-                            <h4>Add The Link & Share</h4>
-                            <p>Generate your link below, place a "Link Sticker" over the bottom arrow, and post it to your followers!</p>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="instruction-visual">
-                    <img src="assets/District%20Parings/BIZ%20Promo_D.png" alt="Customization Visual">
-                    <div class="visual-pointer">
-                        PLACE LOGO HERE
-                        <span>(Using the native sticker tool)</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
         <!-- Multi-Step Integrated Form -->
-        <div class="generator-tool" id="integrated-form-container" style="margin-top: 60px; margin-bottom: 60px;">
+        <div class="generator-tool" id="integrated-form-container" style="margin-top: 40px; margin-bottom: 60px;">
             <h2>Join the Map & Generate Promo Graphics</h2>
             <div id="step-intro" style="text-align: left;">
                 <p style="color: var(--text-secondary); max-width: 800px; margin: 0 0 20px 0;">
@@ -730,7 +692,7 @@
                     <div class="checkbox-group">
                         <label>
                             <input type="checkbox" id="chk-host">
-                            Yes, our business would like to host District [B]'s final stop of the night on [Tuesday, July 28th]
+                            <span>Yes, our business would like to host <span id="dynamic-district-name">District [B]</span>'s final stop of the night on <span id="dynamic-district-date">[Tuesday, July 28th]</span></span>
                         </label>
                     </div>
 
@@ -796,6 +758,46 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Simplified Instructional Guide -->
+        <div class="guide-section" id="social-guide" style="margin-top: 40px; background: transparent; border: none; box-shadow: none; padding: 0;">
+            <h2 style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px;">Share Customized Social Graphics Promoting Your Business</h2>
+            
+            <div class="instruction-row">
+                <div class="instruction-steps">
+                    <div class="simple-step" style="background: transparent; border-left: none; padding: 10px 0; box-shadow: none;">
+                        <div class="step-text">
+                            <h4>Download & Import</h4>
+                            <p>Save the blank graphic to your phone and open it as a background in Instagram Stories or TikTok.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="simple-step" style="background: transparent; border-left: none; padding: 10px 0; box-shadow: none;">
+                        <div class="step-text">
+                            <h4>Add Your Logo</h4>
+                            <p>You can also use the app's native tools to place your logo over the designated center box.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="simple-step" style="background: transparent; border-left: none; padding: 10px 0; box-shadow: none;">
+                        <div class="step-text">
+                            <h4>Add The Link & Share</h4>
+                            <p>Generate your link below, place a "Link Sticker" over the bottom arrow, and post it to your followers!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="instruction-visual">
+                    <img src="assets/District%20Parings/BIZ%20Promo_D.png" alt="Customization Visual" loading="lazy">
+                    <div class="visual-pointer">
+                        PLACE LOGO HERE
+                        <span>(Using the native sticker tool)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        </div>
 
     </div>
 
@@ -808,13 +810,13 @@
         // Configuration for graphic overlays
         const graphicConfig = {
             social: {
-                logo: { top: '70%', left: '30%', maxWidth: '40%', maxHeight: '12%', transform: 'translate(0, -50%)', objectFit: 'contain' },
-                text: { top: '70%', left: '30%', width: '40%', fontSize: '1.2rem', color: '#8a2d24', transform: 'translate(0, -50%)', textAlign: 'center', whiteSpace: 'normal', wordWrap: 'break-word', lineHeight: '1.2', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '12%', textShadow: 'none' }
+                logo: { top: '74%', left: '30%', maxWidth: '40%', maxHeight: '12%', transform: 'translate(-50%, -50%)', objectFit: 'contain' },
+                text: { top: '74%', left: '30%', width: '40%', fontSize: '1.2rem', color: '#8a2d24', transform: 'translate(-50%, -50%)', textAlign: 'center', whiteSpace: 'normal', wordWrap: 'break-word', lineHeight: '1.2', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '12%', textShadow: 'none' }
             },
             flyer: {
-                logo: { top: '71%', left: '12%', maxWidth: '35%', maxHeight: '12%', transform: 'translate(0, -50%)', objectFit: 'contain' },
+                logo: { top: '77%', left: '30%', maxWidth: '35%', maxHeight: '12%', transform: 'translate(-50%, -50%)', objectFit: 'contain' },
                 qr: { bottom: '27%', left: '78%', width: '18%', transform: 'translate(-50%, 50%)' },
-                text: { top: '71%', left: '12%', width: '35%', fontSize: '1.1rem', color: '#8a2d24', transform: 'translate(0, -50%)', textAlign: 'center', whiteSpace: 'normal', wordWrap: 'break-word', lineHeight: '1.2', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '12%' }
+                text: { top: '77%', left: '30%', width: '35%', fontSize: '1.1rem', color: '#8a2d24', transform: 'translate(-50%, -50%)', textAlign: 'center', whiteSpace: 'normal', wordWrap: 'break-word', lineHeight: '1.2', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '12%' }
             },
             qrColors: {
                 foreground: 'eecd7e', // Gold
@@ -927,6 +929,24 @@
                     });
 
                     if (isValid && currentStep < steps.length - 1) {
+                        // Update dynamic text before showing Step 4
+                        if (currentStep + 1 === 3) {
+                            const bizDistrict = document.getElementById('biz-district').value;
+                            if (bizDistrict && bizDistrict.startsWith('District')) {
+                                const districtLetter = bizDistrict.split(' ')[1].toUpperCase();
+                                document.getElementById('dynamic-district-name').textContent = `District ${districtLetter}`;
+                                
+                                let districtEventDate = '[Tuesday, July 28th]';
+                                switch(districtLetter) {
+                                    case 'A': districtEventDate = 'Tuesday, August 25th'; break;
+                                    case 'B': districtEventDate = 'Tuesday, August 18th'; break;
+                                    case 'C': districtEventDate = 'Tuesday, August 4th'; break;
+                                    case 'D': districtEventDate = 'Tuesday, August 11th'; break;
+                                    case 'E': districtEventDate = 'Tuesday, July 21st'; break;
+                                }
+                                document.getElementById('dynamic-district-date').textContent = districtEventDate;
+                            }
+                        }
                         showStep(currentStep + 1);
                     }
                 });
@@ -1077,12 +1097,22 @@
                 const bizName = rawBizName.replace(/\s*\(.*\)$/, '').trim();
                 
                 // Construct pseudo-unique venue id and district page URL
-                const venueId = bizName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                const venueId = matchedVenueId || bizName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
                 let districtPage = 'index.html';
                 let districtLetter = 'A';
+                let districtEventDate = '[Tuesday, July 28th]';
                 if (bizDistrict.startsWith('District')) {
                     districtLetter = bizDistrict.split(' ')[1].toUpperCase();
                     districtPage = `district-${districtLetter.toLowerCase()}.html`;
+                    
+                    // Set event date based on district
+                    switch(districtLetter) {
+                        case 'A': districtEventDate = 'Tuesday, August 25th'; break;
+                        case 'B': districtEventDate = 'Tuesday, August 18th'; break;
+                        case 'C': districtEventDate = 'Tuesday, August 4th'; break;
+                        case 'D': districtEventDate = 'Tuesday, August 11th'; break;
+                        case 'E': districtEventDate = 'Tuesday, July 21st'; break;
+                    }
                 }
                 const votingUrl = `${window.location.origin}/${districtPage}?vote=${venueId}`;
                 
@@ -1106,13 +1136,15 @@
 
                 // Send data to Google Sheets via Web App
                 // NOTE: Replace YOUR_WEB_APP_URL with the actual URL after deploying the Apps Script
-                const scriptUrl = 'https://script.google.com/macros/s/AKfycbyiZ-stBQhmx-vq4KYt8ACGq8ahKJieh8lbelzxafCT5ICSiVuMTR0YXgof14MMhCP9/exec';
+                const scriptUrl = 'https://script.google.com/macros/s/AKfycbyvPA-iw7mTb4-89H0B-zE-cbSHXygpc0xkcL1Z34Ucc_Ud-97o08MfQcN74U-gomzfwg/exec';
                 
                 // We will send the fetch request AFTER the images are flattened and uploaded
                 // so we can include the image URLs in the payload.
                 
                 // Fetch QR code
-                const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(votingUrl)}&color=${graphicConfig.qrColors.foreground}&bgcolor=${graphicConfig.qrColors.background}`;
+                // Use the full URL (including scheme and host) so the QR code is scannable
+                const fullVotingUrl = votingUrl.startsWith('http') ? votingUrl : `${window.location.origin}${votingUrl.startsWith('/') ? '' : '/'}${votingUrl}`;
+                const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(fullVotingUrl)}&color=${graphicConfig.qrColors.foreground}&bgcolor=${graphicConfig.qrColors.background}`;
 
                 // Set Graphic Previews
                 const formSuccess = document.getElementById('form-success');
@@ -1127,6 +1159,10 @@
                 // Update base images based on district
                 socialBaseImg.src = `assets/District Parings/BIZ Promo_${districtLetter}.png`;
                 flyerBaseImg.src = `assets/Districts_Standup_Flyer/Districts_Standup_${districtLetter}.png`;
+
+                // Update confirmation text dynamically
+                document.getElementById('dynamic-district-name').textContent = `District ${districtLetter}`;
+                document.getElementById('dynamic-district-date').textContent = districtEventDate;
 
                 // Apply Config Styles
                 Object.assign(socialLogo.style, graphicConfig.social.logo);
@@ -1155,11 +1191,11 @@
                 
                 // Set Voting URL UI
                 const urlInput = document.getElementById('generated-voting-url');
-                urlInput.value = votingUrl;
+                urlInput.value = fullVotingUrl;
                 
                 const copyBtn = document.getElementById('copy-link-btn');
                 copyBtn.addEventListener('click', () => {
-                    navigator.clipboard.writeText(votingUrl).then(() => {
+                    navigator.clipboard.writeText(fullVotingUrl).then(() => {
                         const originalText = copyBtn.textContent;
                         copyBtn.textContent = 'Copied!';
                         copyBtn.style.background = '#2f533a'; // Darker green
@@ -1176,30 +1212,56 @@
 
                 // Flatten images with html2canvas and upload to Firebase Storage
                 setTimeout(async () => {
+                    const socialFilename = `${venueId}-social.png`;
+                    const flyerFilename = `${venueId}-flyer.png`;
+
+                    // Guard so a stalled html2canvas / upload can never block the claim submission
+                    const withTimeout = (promise, ms, label) => Promise.race([
+                        promise,
+                        new Promise((_, reject) => setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms))
+                    ]);
+
+                    const flattenImage = async (elementId) => {
+                        const element = document.getElementById(elementId);
+                        const canvas = await html2canvas(element, {
+                            useCORS: true, // Crucial for loading external images like the QR code
+                            scale: 2, // Higher resolution
+                            backgroundColor: null,
+                            imageTimeout: 8000,
+                            logging: false
+                        });
+                        return canvas.toDataURL('image/png');
+                    };
+
+                    let claimSent = false;
+                    const sendClaim = () => {
+                        if (claimSent || scriptUrl === 'YOUR_WEB_APP_URL') return;
+                        claimSent = true;
+                        fetch(scriptUrl, {
+                            method: 'POST',
+                            mode: 'no-cors',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(formData)
+                        }).then(() => console.log("Form data sent to Google Sheets"))
+                          .catch(error => console.error("Error sending form data:", error));
+                    };
+
                     try {
+                        // Ensure custom fonts are fully loaded so html2canvas doesn't drop overlay text
+                        if (document.fonts && document.fonts.ready) {
+                            try { await withTimeout(document.fonts.ready, 4000, 'Font loading'); } catch (e) { /* proceed anyway */ }
+                        }
+
                         // 1. Flatten the images locally first (Fast for the user)
-                        const flattenImage = async (elementId) => {
-                            const element = document.getElementById(elementId);
-                            const canvas = await html2canvas(element, { 
-                                useCORS: true, // Crucial for loading external images like the QR code
-                                scale: 2 // Higher resolution
-                            });
-                            return canvas.toDataURL('image/png');
-                        };
-
-                        const timestamp = Date.now();
-                        const socialFilename = `${venueId}-social-${timestamp}.png`;
-                        const flyerFilename = `${venueId}-flyer-${timestamp}.png`;
-
-                        const [socialDataUrl, flyerDataUrl] = await Promise.all([
+                        const [socialDataUrl, flyerDataUrl] = await withTimeout(Promise.all([
                             flattenImage('social-composite'),
                             flattenImage('flyer-composite')
-                        ]);
+                        ]), 15000, 'Image flattening');
 
                         // 2. Update UI instantly with local data URLs (No CORS issues, works offline/locally)
                         const socialContainer = document.getElementById('social-composite').parentElement;
                         const flyerContainer = document.getElementById('flyer-composite').parentElement;
-                        
+
                         // Create the download button for Social Story
                         const downloadSocialBtn = document.createElement('a');
                         downloadSocialBtn.href = socialDataUrl;
@@ -1207,7 +1269,7 @@
                         downloadSocialBtn.className = 'brand-btn';
                         downloadSocialBtn.style.cssText = 'display: inline-block; background: var(--brand-red); color: white; text-decoration: none; padding: 10px 20px; border-radius: 8px; margin-top: 15px; font-weight: bold; text-align: center; width: 100%; box-sizing: border-box; cursor: pointer;';
                         downloadSocialBtn.textContent = 'Download Social Story';
-                        
+
                         const socialHint = socialContainer.querySelector('p');
                         if (socialHint) {
                             socialHint.replaceWith(downloadSocialBtn);
@@ -1230,7 +1292,7 @@
                             flyerContainer.appendChild(downloadFlyerBtn);
                         }
 
-                        // Replace HTML composites with flat images. 
+                        // Replace HTML composites with flat images.
                         // This allows mobile users to "Long Press -> Save Image" natively and ensures perfect printing.
                         const replaceWithFlatImage = (elementId, dataUrl) => {
                             const composite = document.getElementById(elementId);
@@ -1244,37 +1306,34 @@
                         replaceWithFlatImage('social-composite', socialDataUrl);
                         replaceWithFlatImage('flyer-composite', flyerDataUrl);
 
-                        // 3. Upload to Firebase & Google Sheets in the background
-                        const { ref, uploadString, getDownloadURL } = await import('https://www.gstatic.com/firebasejs/10.9.0/firebase-storage.js');
-                        const { storage } = await import('./js/firebase-config.js');
+                        // 3. Upload to Firebase Storage (guarded so it can't hang the claim)
+                        try {
+                            const { ref, uploadString, getDownloadURL } = await import('https://www.gstatic.com/firebasejs/10.9.0/firebase-storage.js');
+                            const { storage } = await import('./js/firebase-config.js');
 
-                        const uploadToFirebase = async (dataUrl, filename) => {
-                            const storageRef = ref(storage, `promo_graphics/${filename}`);
-                            await uploadString(storageRef, dataUrl, 'data_url');
-                            return await getDownloadURL(storageRef);
-                        };
+                            const uploadToFirebase = async (dataUrl, filename) => {
+                                const storageRef = ref(storage, `promo_graphics/${filename}`);
+                                await uploadString(storageRef, dataUrl, 'data_url');
+                                return await getDownloadURL(storageRef);
+                            };
 
-                        const [socialUrl, flyerUrl] = await Promise.all([
-                            uploadToFirebase(socialDataUrl, socialFilename),
-                            uploadToFirebase(flyerDataUrl, flyerFilename)
-                        ]);
+                            const [sUrl, fUrl] = await withTimeout(Promise.all([
+                                uploadToFirebase(socialDataUrl, socialFilename),
+                                uploadToFirebase(flyerDataUrl, flyerFilename)
+                            ]), 15000, 'Firebase upload');
 
-                        formData.socialGraphicUrl = socialUrl;
-                        formData.flyerGraphicUrl = flyerUrl;
-
-                        if (scriptUrl !== 'YOUR_WEB_APP_URL') {
-                            fetch(scriptUrl, {
-                                method: 'POST',
-                                mode: 'no-cors',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify(formData)
-                            }).then(() => console.log("Form data with image URLs sent to Google Sheets"))
-                              .catch(error => console.error("Error sending form data:", error));
+                            formData.socialGraphicUrl = sUrl;
+                            formData.flyerGraphicUrl = fUrl;
+                            console.log("Firebase upload succeeded:", sUrl, fUrl);
+                        } catch (uploadError) {
+                            console.error("FIREBASE UPLOAD FAILED — code:", uploadError && uploadError.code, "| message:", uploadError && uploadError.message, uploadError);
                         }
-
                     } catch (error) {
-                        console.error("Error flattening or uploading graphics:", error);
+                        console.error("Error flattening graphics:", error);
                         alert("There was an issue generating the downloadable image. Please right-click the image to save it.");
+                    } finally {
+                        // Always record the claim in Google Sheets, with image URLs if we got them
+                        sendClaim();
                     }
                 }, 1500); // Wait 1.5s for QR code to load
             });
