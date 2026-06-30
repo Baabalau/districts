@@ -14,16 +14,34 @@ document.addEventListener("DOMContentLoaded", async () => {
         clearInterval(mapContainerInterval);
 
         const districtConfigs = {
-        'a': { center: [29.985, -90.10], zoom: 14 },
-        'b': { center: [29.9546, -90.0673], zoom: 15 },
+        'a': { center: [29.970, -90.107], zoom: 13 },
+        'b': { center: [29.942, -90.090], zoom: 14 },
         'c': { center: [29.958, -90.04], zoom: 12 },
-        'd': { center: [30.01, -90.05], zoom: 14 },
-        'e': { center: [30.00, -89.99], zoom: 13 }
+        'd': { center: [30.000, -90.064], zoom: 13 },
+        'e': { center: [30.060, -89.831], zoom: 11 },
     };
 
     // Initial map framing per district (full district remains pannable via maxBounds below).
     // sw/ne = south-west and north-east corners as [lat, lng].
     const districtInitialView = {
+        // Lakeview / Uptown — explicit framing so load matches designed viewport (see district-a map)
+        'a': {
+            center: [29.970, -90.107],
+            zoom: 13,
+            mobile: {
+                center: [29.970, -90.107],
+                zoom: 12
+            }
+        },
+        // French Quarter / CBD — explicit framing so load matches designed viewport (see district-b map)
+        'b': {
+            center: [29.942, -90.090],
+            zoom: 14,
+            mobile: {
+                center: [29.942, -90.090],
+                zoom: 13
+            }
+        },
         // Marigny / French Quarter — mobile uses explicit center+zoom (fitBounds is unreliable on narrow viewports)
         'c': {
             sw: [29.954, -90.068],
@@ -34,11 +52,23 @@ document.addEventListener("DOMContentLoaded", async () => {
                 zoom: 14
             }
         },
-        // Western half of District E — New Orleans East off-screen until user pans east
+        // Gentilly / St. Roch — explicit framing so load matches designed viewport (see district-d map)
+        'd': {
+            center: [30.000, -90.064],
+            zoom: 13,
+            mobile: {
+                center: [30.000, -90.064],
+                zoom: 12
+            }
+        },
+        // New Orleans East / Lower 9th — explicit framing so full district loads centered (see district-e map)
         'e': {
-            sw: [29.962, -90.032],
-            ne: [30.105, -89.945],
-            padding: [6, 6]
+            center: [30.060, -89.831],
+            zoom: 11,
+            mobile: {
+                center: [30.060, -89.831],
+                zoom: 10
+            }
         }
     };
 
@@ -127,6 +157,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 if (initialView?.mobile && isMobile) {
                     map.setView(initialView.mobile.center, initialView.mobile.zoom);
+                } else if (initialView?.center && initialView?.zoom != null && !initialView.sw) {
+                    map.setView(initialView.center, initialView.zoom);
                 } else if (initialView) {
                     const initialBounds = L.latLngBounds(initialView.sw, initialView.ne);
                     map.fitBounds(initialBounds, { padding: initialView.padding || [20, 20] });
