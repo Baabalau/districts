@@ -859,7 +859,7 @@ class EventLayout extends HTMLElement {
             </div>
 
             <!-- Voting States Below Map -->
-            <div class="voting-states-section js-reveal reveal-y delay-200" style="padding: 30px 0; background: transparent;">
+            <div class="voting-states-section js-reveal reveal-y delay-200" style="padding: 30px 0; margin-bottom: 30px; background: transparent;">
                 <div class="page-module">
                 ${renderVotingStates(districtCopy.district)}
                 ${renderVenueOperatorsStrip(shared)}
