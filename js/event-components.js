@@ -471,12 +471,12 @@ class EventLayout extends HTMLElement {
                     <div class="hero-cards-stack">
                         <div class="flow-card council-card" style="animation: float 6s ease-in-out infinite 1s;">
                             <img src="${districtCopy.councilImg}" alt="${districtCopy.councilName}">
-                            <div class="card-caption">${districtCopy.councilName}<span>${shared.roles.council}</span></div>
+                            <div class="card-caption"><span class="interior-hosts">${districtCopy.councilName}</span><span class="interior-neighborhoods">${shared.roles.council}</span></div>
                         </div>
                         <div class="couple-ampersand stack-ampersand" style="animation: float 6s ease-in-out infinite 1.5s;">&amp;</div>
                         <div class="flow-card influencer-card" style="animation: float 6s ease-in-out infinite;">
                             <img src="${districtCopy.influencerImg}" alt="${districtCopy.influencerName}">
-                            <div class="card-caption">${districtCopy.influencerName}<span>${districtCopy.influencerAccountTitle || shared.roles.influencer}</span></div>
+                            <div class="card-caption"><span class="interior-hosts">${districtCopy.influencerName}</span><span class="interior-neighborhoods">${districtCopy.influencerAccountTitle || shared.roles.influencer}</span></div>
                         </div>
                     </div>
                 </div>
