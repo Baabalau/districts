@@ -476,7 +476,7 @@ class EventLayout extends HTMLElement {
                         <div class="couple-ampersand stack-ampersand" style="animation: float 6s ease-in-out infinite 1.5s;">&amp;</div>
                         <div class="flow-card influencer-card" style="animation: float 6s ease-in-out infinite;">
                             <img src="${districtCopy.influencerImg}" alt="${districtCopy.influencerName}">
-                            <div class="card-caption">${districtCopy.influencerName}<span>${shared.roles.influencer}</span></div>
+                            <div class="card-caption">${districtCopy.influencerName}<span>${districtCopy.influencerAccountTitle || shared.roles.influencer}</span></div>
                         </div>
                     </div>
                 </div>

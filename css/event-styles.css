@@ -71,14 +71,14 @@
 .event-hero-wrap {
     width: 100%;
     min-height: 50vh;
-    overflow-x: hidden;
+    overflow-x: clip;
 }
 
 .event-hero {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 0 20px;
+    padding: 20px 0 60px;
     width: 80%;
     max-width: 1400px;
     margin: 0 auto;

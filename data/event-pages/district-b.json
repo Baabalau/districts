@@ -1,12 +1,13 @@
 {
   "district": "B",
-  "date": "March 12",
+  "date": "Wednesday, August 5th",
   "time": "7:00 PM - 10:00 PM",
   "location": "French Quarter / CBD",
   "councilName": "Lesli Harris",
   "councilImg": "assets/Lesli-Harris-New-Headshot.png",
-  "influencerName": "10th Ward Buck",
-  "influencerImg": "assets/10thwardbuck.jpg",
+  "influencerName": "Nicole Ralston",
+  "influencerAccountTitle": "EatenPathNola",
+  "influencerImg": "assets/nicole_ralston_eatenpathnola.png",
   "bgImg": "assets/district_b_image.jpg",
   "heroIntro": "Get your boots on the ground with council member {councilName} and popular influencer {influencerName} on a three stop tour to experience the nightlife and support local businesses while building a relationship with your council member.",
   "councilQuote": "This isn't just about nightlife; it's about connecting with the community where they are. We're breaking down the walls of City Hall.",
@@ -16,12 +17,12 @@
       {
         "number": "01",
         "title": "{influencerName}'s Quarter Debut",
-        "body": "The crawl begins in the heart of {location} at a spot {influencerName} calls essentialólive energy, strong pours, and the kind of room that sets the tone for the whole night."
+        "body": "The crawl begins in the heart of {location} at a spot {influencerName} calls essentialùlive energy, strong pours, and the kind of room that sets the tone for the whole night."
       },
       {
         "number": "02",
         "title": "{councilName}'s CBD Pick",
-        "body": "Councilmember {councilName} takes the group to a trusted institution where regulars, workers, and visitors mixóperfect for talking policy without leaving the party behind."
+        "body": "Councilmember {councilName} takes the group to a trusted institution where regulars, workers, and visitors mixùperfect for talking policy without leaving the party behind."
       },
       {
         "number": "03",
