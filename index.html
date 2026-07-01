@@ -1070,6 +1070,7 @@
             box-shadow: 0 8px 24px rgba(0,0,0,0.1);
             display: flex;
             flex-direction: column;
+            cursor: pointer;
         }
 
         @media (min-width: 768px) {
@@ -1135,11 +1136,7 @@
         }
 
         .event-info .brand-btn {
-            padding: 10px 40px;
-            font-size: 14px;
-            width: fit-content;
-            height: 40px;
-            text-align: center;
+            display: none;
         }
 
         @media (max-width: 767px) {
@@ -1184,9 +1181,7 @@
             }
 
             .event-info .brand-btn {
-                padding: 9px 36px;
-                font-size: 12px;
-                height: 36px;
+                display: none;
             }
 
             .event-card:hover {
@@ -1283,119 +1278,8 @@
     <section class="flow-section" aria-label="Featured councilmembers and influencers">
         <p class="flow-label">Councilmembers &amp; influencers</p>
         <div class="flow-row flow-row--people">
-            <div class="flow-track flow-track--left">
-                <!-- Group 1 -->
-                <div class="flow-couple">
-                    <div class="flow-card">
-                        <img src="assets/aubreyavo.jpg" alt="Aubrey Avo">
-                        <div class="card-caption">Aubrey Avo<span>Influencer</span></div>
-                    </div>
-                    <div class="couple-ampersand">&amp;</div>
-                    <div class="flow-card">
-                        <img src="assets/Aimee-McCarron_2.png" alt="Aimee McCarron">
-                        <div class="card-caption">Aimee McCarron<span>Councilmember District A</span></div>
-                    </div>
-                </div>
-                <div class="flow-couple">
-                    <div class="flow-card">
-                        <img src="assets/10thwardbuck.jpg" alt="10th Ward Buck">
-                        <div class="card-caption">10th Ward Buck<span>Influencer</span></div>
-                    </div>
-                    <div class="couple-ampersand">&amp;</div>
-                    <div class="flow-card">
-                        <img src="assets/Lesli-Harris-New-Headshot.png" alt="Lesli Harris">
-                        <div class="card-caption">Lesli Harris<span>Councilmember District B</span></div>
-                    </div>
-                </div>
-                <div class="flow-couple">
-                    <div class="flow-card">
-                        <img src="assets/caseyferrand.jpg" alt="Casey Ferrand">
-                        <div class="card-caption">Casey Ferrand<span>Influencer</span></div>
-                    </div>
-                    <div class="couple-ampersand">&amp;</div>
-                    <div class="flow-card">
-                        <img src="assets/freddie-king-iii-headshot.jpg" alt="Freddie King III">
-                        <div class="card-caption">Freddie King III<span>Councilmember District C</span></div>
-                    </div>
-                </div>
-                <div class="flow-couple">
-                    <div class="flow-card">
-                        <img src="assets/quinnbishop.jpg" alt="Quinn Bishop">
-                        <div class="card-caption">Quinn Bishop<span>Influencer</span></div>
-                    </div>
-                    <div class="couple-ampersand">&amp;</div>
-                    <div class="flow-card">
-                        <img src="assets/EugeneGreen.png" alt="Eugene Green">
-                        <div class="card-caption">Eugene Green<span>Councilmember District D</span></div>
-                    </div>
-                </div>
-                <div class="flow-couple">
-                    <div class="flow-card">
-                        <img src="assets/ronorleans.png" alt="Ron Orleans">
-                        <div class="card-caption">Ron Orleans<span>Influencer</span></div>
-                    </div>
-                    <div class="couple-ampersand">&amp;</div>
-                    <div class="flow-card">
-                        <img src="assets/jason-hughes_1.png" alt="Jason Hughes">
-                        <div class="card-caption">Jason Hughes<span>Councilmember District E</span></div>
-                    </div>
-                </div>
-                <!-- Group 2 (repeated for seamless scroll) -->
-                <div class="flow-couple">
-                    <div class="flow-card">
-                        <img src="assets/aubreyavo.jpg" alt="Aubrey Avo">
-                        <div class="card-caption">Aubrey Avo<span>Influencer</span></div>
-                    </div>
-                    <div class="couple-ampersand">&amp;</div>
-                    <div class="flow-card">
-                        <img src="assets/Aimee-McCarron_2.png" alt="Aimee McCarron">
-                        <div class="card-caption">Aimee McCarron<span>Councilmember District A</span></div>
-                    </div>
-                </div>
-                <div class="flow-couple">
-                    <div class="flow-card">
-                        <img src="assets/10thwardbuck.jpg" alt="10th Ward Buck">
-                        <div class="card-caption">10th Ward Buck<span>Influencer</span></div>
-                    </div>
-                    <div class="couple-ampersand">&amp;</div>
-                    <div class="flow-card">
-                        <img src="assets/Lesli-Harris-New-Headshot.png" alt="Lesli Harris">
-                        <div class="card-caption">Lesli Harris<span>Councilmember District B</span></div>
-                    </div>
-                </div>
-                <div class="flow-couple">
-                    <div class="flow-card">
-                        <img src="assets/caseyferrand.jpg" alt="Casey Ferrand">
-                        <div class="card-caption">Casey Ferrand<span>Influencer</span></div>
-                    </div>
-                    <div class="couple-ampersand">&amp;</div>
-                    <div class="flow-card">
-                        <img src="assets/freddie-king-iii-headshot.jpg" alt="Freddie King III">
-                        <div class="card-caption">Freddie King III<span>Councilmember District C</span></div>
-                    </div>
-                </div>
-                <div class="flow-couple">
-                    <div class="flow-card">
-                        <img src="assets/quinnbishop.jpg" alt="Quinn Bishop">
-                        <div class="card-caption">Quinn Bishop<span>Influencer</span></div>
-                    </div>
-                    <div class="couple-ampersand">&amp;</div>
-                    <div class="flow-card">
-                        <img src="assets/EugeneGreen.png" alt="Eugene Green">
-                        <div class="card-caption">Eugene Green<span>Councilmember District D</span></div>
-                    </div>
-                </div>
-                <div class="flow-couple">
-                    <div class="flow-card">
-                        <img src="assets/ronorleans.png" alt="Ron Orleans">
-                        <div class="card-caption">Ron Orleans<span>Influencer</span></div>
-                    </div>
-                    <div class="couple-ampersand">&amp;</div>
-                    <div class="flow-card">
-                        <img src="assets/jason-hughes_1.png" alt="Jason Hughes">
-                        <div class="card-caption">Jason Hughes<span>Councilmember District E</span></div>
-                    </div>
-                </div>
+            <div class="flow-track flow-track--left" id="flow-track">
+                <!-- Populated from data/event-pages/district-*.json -->
             </div>
         </div>
     </section>
@@ -1475,53 +1359,48 @@
         <h2 class="section-title js-reveal reveal-opacity">Upcoming <span>Crawls</span></h2>
         <div class="event-grid">
             
-            <div class="event-card js-reveal reveal-y">
+            <div class="event-card js-reveal reveal-y" onclick="window.location.href='district-a.html'" style="cursor: pointer;">
                 <div class="event-img" style="background-image: url('assets/district_a_image.jpeg');"></div>
                 <div class="event-info">
                     <h3>District A</h3>
                     <p class="event-location">Lakeview / Uptown</p>
-                    <p class="event-datetime"><strong>March 5 | 7 PM - 10 PM</strong></p>
-                    <a href="district-a.html" class="brand-btn">view event</a>
+                    <p class="event-datetime" data-district="a"><strong>Loading...</strong></p>
                 </div>
             </div>
 
-            <div class="event-card js-reveal reveal-y delay-200">
+            <div class="event-card js-reveal reveal-y delay-200" onclick="window.location.href='district-b.html'" style="cursor: pointer;">
                 <div class="event-img" style="background-image: url('assets/district_b_image.jpg');"></div>
                 <div class="event-info">
                     <h3>District B</h3>
                     <p class="event-location">French Quarter / CBD</p>
-                    <p class="event-datetime"><strong>March 12 | 7 PM - 10 PM</strong></p>
-                    <a href="district-b.html" class="brand-btn">view event</a>
+                    <p class="event-datetime" data-district="b"><strong>Loading...</strong></p>
                 </div>
             </div>
 
-            <div class="event-card js-reveal reveal-y">
+            <div class="event-card js-reveal reveal-y" onclick="window.location.href='district-c.html'" style="cursor: pointer;">
                 <div class="event-img" style="background-image: url('assets/district_c_image.png');"></div>
                 <div class="event-info">
                     <h3>District C</h3>
                     <p class="event-location">Algiers / French Quarter / Bywater</p>
-                    <p class="event-datetime"><strong>March 19 | 7 PM - 10 PM</strong></p>
-                    <a href="district-c.html" class="brand-btn">view event</a>
+                    <p class="event-datetime" data-district="c"><strong>Loading...</strong></p>
                 </div>
             </div>
 
-            <div class="event-card js-reveal reveal-y delay-200">
+            <div class="event-card js-reveal reveal-y delay-200" onclick="window.location.href='district-d.html'" style="cursor: pointer;">
                 <div class="event-img" style="background-image: url('assets/district_d_image.jpg');"></div>
                 <div class="event-info">
                     <h3>District D</h3>
                     <p class="event-location">Gentilly / St. Roch</p>
-                    <p class="event-datetime"><strong>March 26 | 7 PM - 10 PM</strong></p>
-                    <a href="district-d.html" class="brand-btn">view event</a>
+                    <p class="event-datetime" data-district="d"><strong>Loading...</strong></p>
                 </div>
             </div>
 
-            <div class="event-card js-reveal reveal-y">
+            <div class="event-card js-reveal reveal-y" onclick="window.location.href='district-e.html'" style="cursor: pointer;">
                 <div class="event-img" style="background-image: url('assets/district_e_image.jpg');"></div>
                 <div class="event-info">
                     <h3>District E</h3>
                     <p class="event-location">New Orleans East / Lower 9th</p>
-                    <p class="event-datetime"><strong>April 2 | 7 PM - 10 PM</strong></p>
-                    <a href="district-e.html" class="brand-btn">view event</a>
+                    <p class="event-datetime" data-district="e"><strong>Loading...</strong></p>
                 </div>
             </div>
 
@@ -1536,6 +1415,69 @@
     <script type="module">
         import { db } from "./js/firebase-config.js";
         import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+
+        // --- LOAD EVENT DATES FROM JSON ---
+        async function loadEventDates() {
+            const districtIds = ['a', 'b', 'c', 'd', 'e'];
+            
+            for (const id of districtIds) {
+                try {
+                    const response = await fetch(`data/event-pages/district-${id}.json`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        const dateEl = document.querySelector(`.event-datetime[data-district="${id}"]`);
+                        if (dateEl && data.date) {
+                            dateEl.innerHTML = `<strong>${data.date}</strong>`;
+                        }
+                    }
+                } catch (error) {
+                    console.error(`Error loading date for district ${id}:`, error);
+                }
+            }
+        }
+
+        function renderFlowCouple(data) {
+            const influencerSubtitle = data.influencerAccountTitle || 'Influencer';
+            const councilSubtitle = `Councilmember District ${data.district}`;
+
+            return `
+                <div class="flow-couple">
+                    <div class="flow-card">
+                        <img src="${data.influencerImg}" alt="${data.influencerName}">
+                        <div class="card-caption">${data.influencerName}<span>${influencerSubtitle}</span></div>
+                    </div>
+                    <div class="couple-ampersand">&amp;</div>
+                    <div class="flow-card">
+                        <img src="${data.councilImg}" alt="${data.councilName}">
+                        <div class="card-caption">${data.councilName}<span>${councilSubtitle}</span></div>
+                    </div>
+                </div>`;
+        }
+
+        async function loadFlowCouples() {
+            const track = document.getElementById('flow-track');
+            if (!track) return;
+
+            const districtIds = ['a', 'b', 'c', 'd', 'e'];
+
+            try {
+                const districts = await Promise.all(
+                    districtIds.map(async (id) => {
+                        const response = await fetch(`data/event-pages/district-${id}.json`);
+                        if (!response.ok) throw new Error(`Failed to load district-${id}.json`);
+                        return response.json();
+                    })
+                );
+
+                const couplesHtml = districts.map(renderFlowCouple).join('');
+                track.innerHTML = couplesHtml + couplesHtml;
+            } catch (error) {
+                console.error('Error loading flow couples:', error);
+            }
+        }
+        
+        loadEventDates();
+        loadFlowCouples();
 
         // --- MENU LOGIC ---
         const menuToggle = document.getElementById('menuToggle');
