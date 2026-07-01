@@ -56,13 +56,18 @@
             margin-bottom: 20px;
             align-items: center;
         }
-        select, input {
+        select, input, textarea {
             padding: 8px;
             background: var(--bg-secondary);
             border: 1px solid rgba(203, 160, 82, 0.3);
             color: var(--text-primary);
             border-radius: 4px;
             font-family: var(--font-main);
+        }
+        textarea {
+            resize: vertical;
+            font-size: 1rem;
+            line-height: 1.4;
         }
         .table-container {
             width: 100%;
@@ -347,6 +352,27 @@
             <div style="margin-bottom: 15px;">
                 <label style="display:block; margin-bottom:5px; color: var(--text-primary);">Official Winner (Venue ID):</label>
                 <input type="text" id="sched-winner-id" placeholder="Paste venue document ID here" style="width: 100%;">
+            </div>
+
+            <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+            <h3 style="font-family: var(--font-header); text-transform: uppercase; font-size: 1.1rem; letter-spacing: 1px; margin: 0 0 6px;">Crawl-tinery Run-Off Reveal</h3>
+            <p style="color: var(--text-secondary); font-size: 0.85rem; margin: 0 0 15px;">Revealed on the event page once the Run-Off begins. Paste the venue document ID for each host's selected stop &mdash; the business name, photo, website, and map link are pulled automatically. The body text is the blurb shown on the card.</p>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px;">Influencer's Pick &mdash; Venue ID:</label>
+                <input type="text" id="sched-influencer-pick-id" placeholder="Paste venue document ID here" style="width: 100%;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px;">Influencer's Pick &mdash; Body Text:</label>
+                <textarea id="sched-influencer-pick-body" rows="3" placeholder="Why the influencer chose this stop..." style="width: 100%;"></textarea>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px;">Council's Pick &mdash; Venue ID:</label>
+                <input type="text" id="sched-council-pick-id" placeholder="Paste venue document ID here" style="width: 100%;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px;">Council's Pick &mdash; Body Text:</label>
+                <textarea id="sched-council-pick-body" rows="3" placeholder="Why the councilmember chose this stop..." style="width: 100%;"></textarea>
             </div>
         </div>
     </div>
@@ -737,6 +763,10 @@
                     document.getElementById('sched-winner').value = formatForDateTimeLocal(parseD(data.winnerAnnounce));
                     document.getElementById('sched-post').value = formatForDateTimeLocal(parseD(data.postEvent));
                     document.getElementById('sched-winner-id').value = data.winnerId || '';
+                    document.getElementById('sched-influencer-pick-id').value = data.influencerPickId || '';
+                    document.getElementById('sched-influencer-pick-body').value = data.influencerPickBody || '';
+                    document.getElementById('sched-council-pick-id').value = data.councilPickId || '';
+                    document.getElementById('sched-council-pick-body').value = data.councilPickBody || '';
                     document.getElementById('schedule-form').style.display = 'block';
                 }
             } catch (e) {
@@ -755,7 +785,11 @@
                 runOffStart: new Date(document.getElementById('sched-run-off').value),
                 winnerAnnounce: new Date(document.getElementById('sched-winner').value),
                 postEvent: new Date(document.getElementById('sched-post').value),
-                winnerId: document.getElementById('sched-winner-id').value || null
+                winnerId: document.getElementById('sched-winner-id').value || null,
+                influencerPickId: document.getElementById('sched-influencer-pick-id').value.trim() || null,
+                influencerPickBody: document.getElementById('sched-influencer-pick-body').value.trim() || null,
+                councilPickId: document.getElementById('sched-council-pick-id').value.trim() || null,
+                councilPickBody: document.getElementById('sched-council-pick-body').value.trim() || null
             };
             
             try {

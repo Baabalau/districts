@@ -42,7 +42,7 @@ function getDistrictHeroImage(districtId, fallback) {
     return DISTRICT_HERO_IMAGES[districtId] || fallback;
 }
 
-function renderItineraryStops(stops, vars) {
+function itineraryStyles() {
     return `
     <style>
         .proceedings-container {
@@ -130,6 +130,74 @@ function renderItineraryStops(stops, vars) {
         .proc-instructions li { margin-bottom: 12px; }
         .proc-instructions li:last-child { margin-bottom: 0; }
 
+        /* Run-off "revealed pick" cards */
+        .reveal-card { padding-top: 0; overflow: hidden; }
+        .reveal-card-media {
+            display: block;
+            width: calc(100% + 70px);
+            margin: -35px -35px 22px -35px;
+            height: 210px;
+            object-fit: cover;
+            background: var(--bg-secondary);
+        }
+        .reveal-card-media[hidden] { display: none; }
+        .reveal-role-label {
+            display: inline-block;
+            font-family: var(--font-header);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-size: 0.8rem;
+            color: var(--accent);
+            margin-bottom: 6px;
+        }
+        .reveal-stop-number {
+            font-size: 1.1rem; margin-bottom: 4px; color: var(--text-secondary);
+            font-weight: bold; letter-spacing: 1px;
+        }
+        .reveal-business-name {
+            margin: 0 0 16px 0;
+            font-size: 1.9rem;
+            font-family: var(--font-header);
+            text-transform: uppercase;
+            color: var(--text-primary);
+            line-height: 1.05;
+        }
+        .reveal-body {
+            margin: 0 0 22px 0;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+        .reveal-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+        .reveal-actions .reveal-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-family: var(--font-header);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            padding: 11px 18px;
+            border-radius: 24px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        .reveal-btn.reveal-map-link {
+            background: var(--brand-red);
+            color: #fff;
+            border: 1px solid var(--brand-red);
+        }
+        .reveal-btn.reveal-map-link:hover { filter: brightness(1.12); }
+        .reveal-btn.reveal-web-link {
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid rgba(203,160,82,0.5);
+        }
+        .reveal-btn.reveal-web-link:hover { border-color: var(--text-primary); }
+        .reveal-btn.reveal-web-link[hidden] { display: none; }
+
         .desktop-path { display: inline; }
         .mobile-path { display: none; }
 
@@ -138,9 +206,11 @@ function renderItineraryStops(stops, vars) {
             .desktop-path { display: none; }
             .mobile-path { display: inline; }
         }
-    </style>
-    
-    <div class="proceedings-container">
+    </style>`;
+}
+
+function proceedingsPathSvg() {
+    return `
         <!-- 3D Winding SVG Path (responsive) -->
         <svg class="proceedings-path" viewBox="0 0 100 100" preserveAspectRatio="none">
             <!-- DESKTOP Layers ('S' shape) -->
@@ -158,27 +228,46 @@ function renderItineraryStops(stops, vars) {
                 <path d="M 50,5 C 80,35 20,65 50,95" fill="none" stroke="var(--accent)" stroke-width="10" vector-effect="non-scaling-stroke" transform="translate(2, 2)" />
                 <path d="M 50,5 C 80,35 20,65 50,95" fill="none" stroke="var(--brand-red)" stroke-width="4" vector-effect="non-scaling-stroke" />
             </g>
-        </svg>
+        </svg>`;
+}
 
-        ${stops.map((stop, index) => {
-            const alignClass = index === 0 ? 'left' : (index === 1 ? 'right' : 'center');
-            
-            let avatarHtml = '';
-            if (index === 0) {
-                avatarHtml = `<img src="${vars.influencerImg}" class="stop-avatar" alt="${vars.influencerName}">`;
-            } else if (index === 1) {
-                avatarHtml = `<img src="${vars.councilImg}" class="stop-avatar" alt="${vars.councilName}">`;
-            } else {
-                avatarHtml = `<div class="stop-avatar">🗳️</div>`;
-            }
+// A single teaser stop card (used for the influencer & council stops in the
+// default, pre-run-off Crawl-tinery).
+function renderHostStop(stop, index, vars) {
+    const alignClass = index === 0 ? 'left' : 'right';
+    const avatarHtml = index === 0
+        ? `<img src="${vars.influencerImg}" class="stop-avatar" alt="${vars.influencerName}">`
+        : `<img src="${vars.councilImg}" class="stop-avatar" alt="${vars.councilName}">`;
 
-            let extraHtml = '';
-            let subtitleHtml = `<p style="margin: 0; font-size: 1.1rem; line-height: 1.6; color: var(--text-secondary);">${interpolate(stop.body, vars)}</p>`;
-            
-            if (index === 2) {
-                // Combine the "How it works" instructions into the third stop to unify the narrative
-                subtitleHtml = `<p style="margin: 0; font-size: 1.15rem; line-height: 1.6; color: var(--text-secondary);">Where are we ending the night? The polls open 14 days before the event.</p>`;
-                extraHtml = `
+    return `
+            <div class="proc-step ${alignClass} stop-${index + 1}">
+                <div class="proc-card">
+                    <div class="stop-avatar-container">
+                        ${avatarHtml}
+                        <div style="text-align: left;">
+                            <div class="stop-number" style="font-size: 1.2rem; margin-bottom: 4px; color: var(--accent); font-weight: bold; letter-spacing: 1px;">STOP ${stop.number}</div>
+                            <h3 style="margin: 0; font-size: 1.7rem; font-family: var(--font-header); text-transform: uppercase;">${interpolate(stop.title, vars)}</h3>
+                        </div>
+                    </div>
+                    <p style="margin: 0; font-size: 1.1rem; line-height: 1.6; color: var(--text-secondary);">${interpolate(stop.body, vars)}</p>
+                </div>
+            </div>`;
+}
+
+// The final "Stop 3 / The Election" card. Shared by both Crawl-tinery variants
+// since the third stop is decided by the public vote in every phase.
+function renderElectionStop() {
+    return `
+            <div class="proc-step center stop-3">
+                <div class="proc-card">
+                    <div class="stop-avatar-container">
+                        <div class="stop-avatar">🗳️</div>
+                        <div style="text-align: center;">
+                            <div class="stop-number" style="font-size: 1.2rem; margin-bottom: 4px; color: var(--accent); font-weight: bold; letter-spacing: 1px;">STOP 03</div>
+                            <h3 style="margin: 0; font-size: 1.7rem; font-family: var(--font-header); text-transform: uppercase;">The Election: Stop 3</h3>
+                        </div>
+                    </div>
+                    <p style="margin: 0; font-size: 1.15rem; line-height: 1.6; color: var(--text-secondary);">Where are we ending the night? The polls open 14 days before the event.</p>
                     <div class="proc-instructions">
                         <h4>How it works</h4>
                         <ul>
@@ -187,24 +276,70 @@ function renderItineraryStops(stops, vars) {
                             <li><strong>The Prize:</strong> The winning venue hosts the final stop. Every vote is an entry into the Golden Ticket Raffle!</li>
                         </ul>
                     </div>
-                `;
-            }
-
-            return `
-            <div class="proc-step ${alignClass} stop-${index + 1}">
-                <div class="proc-card">
-                    <div class="stop-avatar-container">
-                        ${avatarHtml}
-                        <div style="text-align: ${index === 2 ? 'center' : 'left'};">
-                            <div class="stop-number" style="font-size: 1.2rem; margin-bottom: 4px; color: var(--accent); font-weight: bold; letter-spacing: 1px;">STOP ${stop.number}</div>
-                            <h3 style="margin: 0; font-size: 1.7rem; font-family: var(--font-header); text-transform: uppercase;">${index === 2 ? 'The Election: Stop 3' : interpolate(stop.title, vars)}</h3>
-                        </div>
-                    </div>
-                    ${subtitleHtml}
-                    ${extraHtml}
                 </div>
             </div>`;
-        }).join('')}
+}
+
+// A single "revealed pick" card for the run-off Crawl-tinery. Content is
+// populated at runtime from the venue doc + schedule (see populateRunoffCrawltinery).
+function renderRevealCard({ role, roleLabel, stopNumber, alignClass }) {
+    return `
+            <div class="proc-step ${alignClass}" data-pick-role="${role}">
+                <div class="proc-card reveal-card">
+                    <img class="reveal-card-media" data-field="image" src="" alt="" hidden>
+                    <div class="reveal-role-label">${roleLabel}'s Pick</div>
+                    <div class="reveal-stop-number">STOP ${stopNumber}</div>
+                    <h3 class="reveal-business-name" data-field="name">To Be Revealed</h3>
+                    <p class="reveal-body" data-field="body"></p>
+                    <div class="reveal-actions">
+                        <button type="button" class="reveal-btn reveal-map-link" data-field="map">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            Find on Map
+                        </button>
+                        <a class="reveal-btn reveal-web-link" data-field="website" href="#" target="_blank" rel="noopener noreferrer" hidden>
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                            Visit Website
+                        </a>
+                    </div>
+                </div>
+            </div>`;
+}
+
+// Default (pre-run-off) Crawl-tinery: teases the two host stops + the election.
+function renderDefaultCrawltinery(stops, vars) {
+    return `
+    <div class="proceedings-container">
+        ${proceedingsPathSvg()}
+        ${renderHostStop(stops[0], 0, vars)}
+        ${renderHostStop(stops[1], 1, vars)}
+        ${renderElectionStop()}
+    </div>`;
+}
+
+// Run-off Crawl-tinery: reveals the two businesses the hosts selected, then the
+// still-live election for the third stop.
+function renderRunoffCrawltinery(vars, influencerRole, councilRole) {
+    return `
+    <div class="proceedings-container">
+        ${proceedingsPathSvg()}
+        ${renderRevealCard({ role: 'influencer', roleLabel: influencerRole, stopNumber: '01', alignClass: 'left' })}
+        ${renderRevealCard({ role: 'council', roleLabel: councilRole, stopNumber: '02', alignClass: 'right' })}
+        ${renderElectionStop()}
+    </div>`;
+}
+
+// Renders both Crawl-tinery variants. The run-off variant is hidden until the
+// run-off begins; setVotingState() toggles between them based on the schedule.
+function renderItinerary(districtCopy, vars, shared) {
+    const influencerRole = districtCopy.influencerAccountTitle || shared.roles.influencer;
+    const councilRole = shared.roles.council;
+    return `
+    ${itineraryStyles()}
+    <div id="crawltinery-default">
+        ${renderDefaultCrawltinery(districtCopy.itinerary.stops, vars)}
+    </div>
+    <div id="crawltinery-runoff" style="display: none;">
+        ${renderRunoffCrawltinery(vars, influencerRole, councilRole)}
     </div>`;
 }
 
@@ -499,7 +634,7 @@ class EventLayout extends HTMLElement {
                 <div class="page-module" style="width: 80%; max-width: 1400px; margin: 0 auto; text-align: center;">
                     <h2 style="font-family: var(--font-hero); font-size: 3.5rem; text-transform: uppercase; color: var(--text-primary); margin-top: 20px; margin-bottom: 15px; letter-spacing: 2px;">${shared.itinerary.heading}</h2>
                     <p style="font-size: 1.15rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto 10px;">Follow the trail and cast your vote to decide where District ${districtCopy.district} ends the night.</p>
-                    ${renderItineraryStops(districtCopy.itinerary.stops, vars)}
+                    ${renderItinerary(districtCopy, vars, shared)}
                 </div>
             </div>
 
@@ -682,9 +817,69 @@ class EventLayout extends HTMLElement {
 
             window.currentElectionState = activeState;
             window.electionWinnerId = winnerId;
+
+            // Populate the run-off Crawl-tinery cards from the schedule's picks so
+            // they are ready before we toggle them into view.
+            this.populateRunoffCrawltinery(sched);
+
             if (window.setVotingState) window.setVotingState(activeState);
         } catch (err) {
             console.warn('Election schedule unavailable; defaulting to round-1 state.', err);
+        }
+    }
+
+    // Fills the run-off Crawl-tinery "revealed pick" cards. The business identity
+    // (name, photo, website, map location) is pulled from each venue doc so the
+    // admin only has to paste a venue ID + write the blurb in the dashboard.
+    async populateRunoffCrawltinery(sched) {
+        if (!sched) return;
+        const picks = [
+            { role: 'influencer', id: sched.influencerPickId, body: sched.influencerPickBody },
+            { role: 'council', id: sched.councilPickId, body: sched.councilPickBody }
+        ];
+
+        for (const pick of picks) {
+            const card = this.querySelector(`[data-pick-role="${pick.role}"]`);
+            if (!card) continue;
+
+            const bodyEl = card.querySelector('[data-field="body"]');
+            if (bodyEl && pick.body) bodyEl.textContent = pick.body;
+
+            if (!pick.id) continue;
+
+            try {
+                const venueSnap = await getDoc(doc(db, "venues", pick.id));
+                if (!venueSnap.exists()) continue;
+                const venue = venueSnap.data();
+
+                const nameEl = card.querySelector('[data-field="name"]');
+                if (nameEl && venue.name) nameEl.textContent = venue.name;
+
+                const imgEl = card.querySelector('[data-field="image"]');
+                if (imgEl && venue.image) {
+                    imgEl.src = venue.image;
+                    imgEl.alt = venue.name || '';
+                    imgEl.hidden = false;
+                }
+
+                const webEl = card.querySelector('[data-field="website"]');
+                const websiteUrl = venue.website || venue.facebook;
+                if (webEl && websiteUrl) {
+                    webEl.href = websiteUrl;
+                    webEl.hidden = false;
+                }
+
+                const mapBtn = card.querySelector('[data-field="map"]');
+                if (mapBtn) {
+                    mapBtn.addEventListener('click', () => {
+                        if (window.openMapPopupForVenue) window.openMapPopupForVenue(pick.id);
+                        const mapSection = document.getElementById('map-section');
+                        if (mapSection) mapSection.scrollIntoView({ behavior: 'smooth' });
+                    });
+                }
+            } catch (err) {
+                console.warn(`Unable to load run-off pick for ${pick.role}:`, err);
+            }
         }
     }
 
@@ -926,6 +1121,15 @@ class EventLayout extends HTMLElement {
         
         window.setVotingState = (stateId) => {
             const states = ['round-1', 'run-off', 'post-election', 'post-event'];
+
+            // Toggle the Crawl-tinery variant: the default teaser shows only in
+            // round-1 (and pre-launch); once the run-off begins the host picks stay
+            // revealed for every later phase.
+            const defaultCrawl = this.querySelector('#crawltinery-default');
+            const runoffCrawl = this.querySelector('#crawltinery-runoff');
+            const picksRevealed = stateId !== 'round-1';
+            if (defaultCrawl) defaultCrawl.style.display = picksRevealed ? 'none' : 'block';
+            if (runoffCrawl) runoffCrawl.style.display = picksRevealed ? 'block' : 'none';
             
             // Update map legend subtitle based on state
             const legendSubtitle = document.querySelector('#legend-round-subtitle');
