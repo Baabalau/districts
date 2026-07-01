@@ -471,7 +471,7 @@
             margin-top: 20px;
             margin-bottom: 25px;
             display: block;
-            text-shadow: 1px 1px 0px rgba(255,255,255,0.3);
+            text-shadow: 1px 2px 4px rgba(0, 0, 0, 0.8);
         }
 
         .subtitle strong {
@@ -956,71 +956,420 @@
             display: none;
         }
 
-        .participate-list {
-            margin: 0;
-            padding-left: 1.35rem;
-            color: var(--text-primary);
-            font-size: 1.05rem;
-            font-weight: 500;
-            line-height: 1.65;
+        /* Redesigned participate views (residents / businesses):
+           a copy column with icon feature cards + a visual preview column
+           that reuses real product assets (share graphic, flyer, map popup). */
+        .pv-panel {
+            animation: pvFade 0.35s ease;
         }
 
-        .participate-list li {
-            margin-bottom: 0.85rem;
+        @keyframes pvFade {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: none; }
         }
 
-        .participate-list li:last-child {
-            margin-bottom: 0;
+        .pv-split {
+            display: flex;
+            gap: clamp(28px, 5vw, 56px);
+            align-items: center;
         }
 
-        .participate-list li::marker {
-            color: var(--brand-red);
-        }
-
-        .participate-districts {
-            margin-top: 2rem;
-            padding-top: 1.75rem;
-            border-top: 1px solid rgba(29, 26, 22, 0.18);
+        .pv-copy {
+            flex: 1 1 55%;
+            min-width: 0;
             text-align: left;
         }
 
-        .participate-districts-label {
-            display: block;
-            font-weight: 700;
-            font-size: 1rem;
-            color: var(--text-primary);
-            margin-bottom: 1rem;
-        }
-
-        .participate-district-links {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: flex-start;
-            align-items: center;
-            gap: 0.35rem 0.5rem;
-            font-family: var(--font-header);
-            font-weight: 800;
-            font-size: 1.05rem;
-        }
-
-        .participate-district-links a {
-            color: var(--brand-red);
-            text-decoration: underline;
-            text-underline-offset: 4px;
-            padding: 0.2rem 0.45rem;
-            border-radius: 4px;
-            transition: background 0.2s ease, color 0.2s ease;
-        }
-
-        .participate-district-links a:hover {
-            background: rgba(43, 53, 97, 0.12);
-            color: var(--text-primary);
-        }
-
-        .participate-district-sep {
+        .pv-intro {
+            font-size: 1.15rem;
+            line-height: 1.6;
             color: var(--text-secondary);
-            user-select: none;
-            opacity: 0.7;
+            margin: 0 0 1.75rem;
+            max-width: 46ch;
+        }
+
+        .pv-features {
+            list-style: none;
+            margin: 0 0 2rem;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 1.15rem;
+        }
+
+        .pv-feature {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .pv-icon {
+            flex-shrink: 0;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.45rem;
+            box-sizing: border-box;
+            border: 3px solid transparent;
+            background:
+                linear-gradient(var(--bg-primary), var(--bg-primary)) padding-box,
+                conic-gradient(from -45deg, var(--text-primary), var(--accent), var(--brand-red), var(--text-primary)) border-box;
+            filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.4));
+        }
+
+        .pv-feature h5 {
+            margin: 2px 0 5px;
+            font-family: var(--font-header);
+            text-transform: uppercase;
+            font-size: 1.12rem;
+            letter-spacing: 0.03em;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .pv-feature p {
+            margin: 0;
+            font-size: 0.98rem;
+            line-height: 1.55;
+            color: var(--text-secondary);
+        }
+
+        .pv-chip {
+            font-family: var(--font-hero);
+            font-size: 0.62rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--bg-primary);
+            background: var(--text-primary);
+            padding: 3px 9px;
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+
+        .pv-media {
+            flex: 0 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .pv-media-caption {
+            font-family: var(--font-hero);
+            text-transform: uppercase;
+            font-size: 0.72rem;
+            letter-spacing: 0.12em;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        /* Residents: shareable "I Voted" graphic in a phone frame */
+        .pv-phone {
+            width: 240px;
+            max-width: 60vw;
+            border-radius: 30px;
+            padding: 10px;
+            background: linear-gradient(160deg, #2a3350, #0b1120);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 22px 48px rgba(0, 0, 0, 0.55);
+        }
+
+        .pv-phone img {
+            display: block;
+            width: 100%;
+            border-radius: 20px;
+        }
+
+        /* Businesses: overlapping flyer + map popup previews (promote.html pattern) */
+        .pv-biz-stack {
+            position: relative;
+            width: 320px;
+            height: 380px;
+            max-width: 74vw;
+        }
+
+        .pv-biz-card {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), z-index 0.4s, box-shadow 0.4s ease;
+            outline: none;
+        }
+
+        .pv-biz-card:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 4px;
+            border-radius: 14px;
+        }
+
+        .pv-biz-card--flyer {
+            top: 10px;
+            left: 0;
+            width: 74%;
+            --pv-rot: -8deg;
+            transform: rotate(-8deg);
+            z-index: 2;
+        }
+
+        .pv-biz-card--popup {
+            top: 48px;
+            left: 46px;
+            width: 62%;
+            --pv-rot: 5deg;
+            transform: rotate(5deg);
+            z-index: 1;
+        }
+
+        .pv-biz-stack:not(.is-active) .pv-biz-card {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .pv-biz-stack.is-active .pv-biz-card--flyer {
+            animation: pvCardEnter 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.05s both;
+            pointer-events: auto;
+        }
+
+        .pv-biz-stack.is-active .pv-biz-card--popup {
+            animation: pvCardEnter 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.22s both;
+            pointer-events: auto;
+        }
+
+        @keyframes pvCardEnter {
+            from {
+                opacity: 0;
+                transform: translateY(28px) scale(0.88) rotate(calc(var(--pv-rot) - 6deg));
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1) rotate(var(--pv-rot));
+            }
+        }
+
+        .pv-biz-card--flyer:hover,
+        .pv-biz-card--flyer.is-front {
+            transform: rotate(-12deg) translateY(-20px) scale(1.05);
+            z-index: 3;
+        }
+
+        .pv-biz-card--popup:hover,
+        .pv-biz-card--popup.is-front {
+            transform: rotate(8deg) translateY(-20px) scale(1.05);
+            z-index: 3;
+        }
+
+        .pv-flyer {
+            display: block;
+            width: 100%;
+            border-radius: 12px;
+            border: 3px solid var(--text-primary);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+            transition: box-shadow 0.4s ease;
+        }
+
+        .pv-biz-card:hover .pv-flyer,
+        .pv-biz-card.is-front .pv-flyer {
+            box-shadow: 0 26px 52px rgba(0, 0, 0, 0.65);
+        }
+
+        .pv-card-caption {
+            font-family: var(--font-header);
+            color: var(--brand-red);
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.8);
+            text-align: center;
+            margin-top: 10px;
+            background: rgba(15, 22, 38, 0.85);
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateY(6px);
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+
+        .pv-biz-card:hover .pv-card-caption,
+        .pv-biz-card.is-front .pv-card-caption {
+            opacity: 1;
+            transform: none;
+        }
+
+        .pv-popup {
+            width: 100%;
+            background: var(--bg-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 12px;
+            padding: 14px 14px 16px;
+            box-shadow: 0 16px 34px rgba(0, 0, 0, 0.6);
+            text-align: left;
+            transition: box-shadow 0.4s ease;
+        }
+
+        .pv-biz-card:hover .pv-popup,
+        .pv-biz-card.is-front .pv-popup {
+            box-shadow: 0 24px 44px rgba(0, 0, 0, 0.7);
+        }
+
+        .pv-popup-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 8px;
+            position: relative;
+        }
+
+        .pv-popup-link-wrap {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .pv-popup h4 {
+            margin: 0;
+            font-family: var(--font-header);
+            text-transform: uppercase;
+            font-size: 1.1rem;
+            line-height: 1.1;
+            color: var(--text-primary);
+        }
+
+        .pv-popup-link {
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            padding: 0;
+            transition: background 0.2s ease, border-color 0.2s ease;
+        }
+
+        .pv-popup-link.is-copied {
+            background: #618A62;
+            border-color: #618A62;
+        }
+
+        .pv-popup-link.is-copied img {
+            filter: brightness(0) saturate(100%) invert(100%);
+            opacity: 1;
+        }
+
+        .pv-popup-copied {
+            display: none;
+            position: absolute;
+            top: -32px;
+            right: 0;
+            background: #618A62;
+            color: white;
+            font-family: var(--font-main);
+            font-size: 0.72rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .pv-popup-copied.is-visible {
+            display: block;
+        }
+
+        .pv-popup-link img {
+            width: 11px;
+            height: 11px;
+            opacity: 0.8;
+            filter: brightness(0) saturate(100%) invert(72%) sepia(21%) saturate(942%) hue-rotate(354deg) brightness(91%) contrast(88%);
+        }
+
+        .pv-popup-addr {
+            margin: 4px 0 8px;
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+        }
+
+        .pv-popup-type {
+            margin: 0 0 12px;
+            padding-bottom: 12px;
+            font-style: italic;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .pv-popup-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .pv-popup-vote {
+            text-align: center;
+            font-family: var(--font-header);
+            text-transform: uppercase;
+            font-weight: 700;
+            font-size: 0.82rem;
+            letter-spacing: 0.04em;
+            color: #fff;
+            background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%);
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.15s ease, filter 0.15s ease;
+        }
+
+        .pv-popup-vote.is-pressed {
+            transform: scale(0.97);
+            filter: brightness(1.12);
+        }
+
+        .pv-popup-checkin {
+            text-align: center;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            padding: 8px;
+            border-radius: 6px;
+        }
+
+        @media (max-width: 820px) {
+            .pv-split {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .pv-media {
+                align-self: center;
+                order: -1;
+            }
+
+            .pv-biz-stack {
+                margin: 0 auto;
+                height: 340px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .pv-biz-stack.is-active .pv-biz-card--flyer,
+            .pv-biz-stack.is-active .pv-biz-card--popup {
+                animation: none;
+                opacity: 1;
+            }
+
+            .pv-biz-card {
+                transition: none;
+            }
         }
 
         .participate-form-wrap {
@@ -1277,7 +1626,7 @@
         <div class="hero-inner">
             <div class="hero-content js-reveal reveal-y delay-200">
                 <h1 class="title-3d"><span class="title-3d-line">Districts</span><span class="title-3d-line">After Dark</span></h1>
-                <span class="subtitle">The Mayor's Office of Nighttime Economy, City Councilmembers and special guests are teaming up for nightcrawls in each district to support hospitality and culture this summer.<span class="subtitle-follow">Vote to decide where they&#39;ll go and become a district hero by supporting your neighborhood hospitality businesses all summer long!</span></span>
+                <span class="subtitle">The Mayor's Office of Nighttime Economy, City Councilmembers and special guests are teaming up for nightcrawls in each council district to support New Orleans hospitality businesses this summer.<span class="subtitle-follow">Vote to decide where we'll go and become a local legend by supporting your neighborhood favorites all summer long!</span></span>
                 <a href="#events" class="brand-btn">Find Your District Crawl</a>
             </div>
             <div class="hero-map">
@@ -1348,39 +1697,103 @@
 
         <div class="participate-block js-reveal reveal-y delay-200">
             <h3 class="participate-heading">Ways to participate</h3>
-            <div class="participate-toggle" role="tablist" aria-label="Participate as a resident or venue">
+            <div class="participate-toggle" role="tablist" aria-label="Participate as a resident or business">
                 <button type="button" role="tab" id="tab-participate-residents" aria-selected="true" aria-controls="panel-participate-residents">Residents</button>
-                <button type="button" role="tab" id="tab-participate-venues" aria-selected="false" aria-controls="panel-participate-venues">Nighttime venues</button>
+                <button type="button" role="tab" id="tab-participate-venues" aria-selected="false" aria-controls="panel-participate-venues">Businesses</button>
             </div>
-            <div class="participate-panel" role="tabpanel" id="panel-participate-residents" aria-labelledby="tab-participate-residents">
-                <ul class="participate-list">
-                    <li>Vote for where your councilmember will hold a nighttime townhall this summer</li>
-                    <li>Submit questions for the townhall</li>
-                    <li>Fill out a bingo card to support local organizations</li>
-                </ul>
-                <div class="participate-districts">
-                    <span class="participate-districts-label">Select your council district</span>
-                    <div class="participate-district-links">
-                        <a href="district-a.html">District A</a>
-                        <span class="participate-district-sep" aria-hidden="true">·</span>
-                        <a href="district-b.html">District B</a>
-                        <span class="participate-district-sep" aria-hidden="true">·</span>
-                        <a href="district-c.html">District C</a>
-                        <span class="participate-district-sep" aria-hidden="true">·</span>
-                        <a href="district-d.html">District D</a>
-                        <span class="participate-district-sep" aria-hidden="true">·</span>
-                        <a href="district-e.html">District E</a>
+            <div class="participate-panel pv-panel" role="tabpanel" id="panel-participate-residents" aria-labelledby="tab-participate-residents">
+                <div class="pv-split">
+                    <div class="pv-copy">
+                        <p class="pv-intro">Your neighborhood, your call. Here's how to shape summer nights in your district.</p>
+                        <ul class="pv-features">
+                            <li class="pv-feature">
+                                <span class="pv-icon" aria-hidden="true">🗳️</span>
+                                <div>
+                                    <h5>Vote for the last stop</h5>
+                                    <p>Browse every bar, restaurant and venue in your district on the map and vote for where the crawl should end. The top 10 advance to a run-off.</p>
+                                </div>
+                            </li>
+                            <li class="pv-feature">
+                                <span class="pv-icon" aria-hidden="true">🏅</span>
+                                <div>
+                                    <h5>Become a Local Legend <span class="pv-chip">+50 pts / check-in</span></h5>
+                                    <p>Check in at participating businesses to earn points. Reach 500 to unlock Local Legend status and a spot on your district's photo wall.</p>
+                                </div>
+                            </li>
+                            <li class="pv-feature">
+                                <span class="pv-icon" aria-hidden="true">📲</span>
+                                <div>
+                                    <h5>Share who you voted for</h5>
+                                    <p>Grab a custom "I Voted" graphic to post to your story and rally friends and followers behind your favorite spot.</p>
+                                </div>
+                            </li>
+                        </ul>
+                        <a href="#events" class="participate-form-link">Find your crawl</a>
+                    </div>
+                    <div class="pv-media">
+                        <div class="pv-phone">
+                            <img src="assets/District%20Parings/VoteShare_C.png" alt="Custom 'I Voted' share graphic for a district crawl" loading="lazy">
+                        </div>
+                        <span class="pv-media-caption">Post your pick as an Instagram story</span>
                     </div>
                 </div>
             </div>
-            <div class="participate-panel" role="tabpanel" id="panel-participate-venues" aria-labelledby="tab-participate-venues" hidden>
-                <ul class="participate-list">
-                    <li>Make sure your business is represented</li>
-                    <li>Promote your venue to host the Support Your Ward townhall this summer</li>
-                    <li>Showcase a summer special</li>
-                </ul>
-                <div class="participate-form-wrap">
-                    <a href="#" class="participate-form-link">Fill out this form</a>
+            <div class="participate-panel pv-panel" role="tabpanel" id="panel-participate-venues" aria-labelledby="tab-participate-venues" hidden>
+                <div class="pv-split">
+                    <div class="pv-copy">
+                        <p class="pv-intro">Turn your regulars into a voting bloc and land the final stop of the crawl.</p>
+                        <ul class="pv-features">
+                            <li class="pv-feature">
+                                <span class="pv-icon" aria-hidden="true">📣</span>
+                                <div>
+                                    <h5>Rally your followers</h5>
+                                    <p>Share your direct vote link and a ready-made social graphic with your email list and following to bring the votes home.</p>
+                                </div>
+                            </li>
+                            <li class="pv-feature">
+                                <span class="pv-icon" aria-hidden="true">🖨️</span>
+                                <div>
+                                    <h5>Print a check-in flyer</h5>
+                                    <p>Generate a custom flyer with your logo and QR code so patrons can check in and rack up support in seconds.</p>
+                                </div>
+                            </li>
+                            <li class="pv-feature">
+                                <span class="pv-icon" aria-hidden="true">📍</span>
+                                <div>
+                                    <h5>Get on the map</h5>
+                                    <p>Claim your spot so residents can find, vote for and check in at your business all summer long.</p>
+                                </div>
+                            </li>
+                        </ul>
+                        <a href="promote.html" class="participate-form-link">Promote your business</a>
+                    </div>
+                    <div class="pv-media">
+                        <div class="pv-biz-stack" id="pv-biz-stack" aria-label="Interactive previews of business promotional materials">
+                            <div class="pv-biz-card pv-biz-card--flyer" tabindex="0" role="button" aria-label="Preview printable check-in flyer">
+                                <img class="pv-flyer" src="assets/Districts_Standup_preview.png" alt="Printable check-in flyer preview" loading="lazy">
+                                <span class="pv-card-caption">Printable Flyer</span>
+                            </div>
+                            <div class="pv-biz-card pv-biz-card--popup" tabindex="0" aria-label="Preview map listing popup">
+                                <div class="pv-popup">
+                                    <div class="pv-popup-head">
+                                        <h4>Your Business</h4>
+                                        <span class="pv-popup-link-wrap">
+                                            <button type="button" class="pv-popup-link" aria-label="Copy vote link (demo)"><img src="assets/link.png" alt=""></button>
+                                            <span class="pv-popup-copied">Copied!</span>
+                                        </span>
+                                    </div>
+                                    <p class="pv-popup-addr">123 Your Street, New Orleans</p>
+                                    <p class="pv-popup-type">Bar &middot; Restaurant &middot; Live music</p>
+                                    <div class="pv-popup-actions">
+                                        <span class="pv-popup-vote">Vote For This Business</span>
+                                        <span class="pv-popup-checkin">Check In to Location</span>
+                                    </div>
+                                </div>
+                                <span class="pv-card-caption">Map Listing</span>
+                            </div>
+                        </div>
+                        <span class="pv-media-caption">Hover or tap a preview to explore</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1766,6 +2179,80 @@
 
             const participateTabs = document.querySelectorAll('.participate-toggle [role="tab"]');
             const participatePanels = document.querySelectorAll('#about .participate-panel');
+            const bizStack = document.getElementById('pv-biz-stack');
+            const venuesPanel = document.getElementById('panel-participate-venues');
+
+            function activateBizStack() {
+                if (!bizStack) return;
+                bizStack.classList.remove('is-active');
+                void bizStack.offsetWidth;
+                bizStack.classList.add('is-active');
+            }
+
+            function activateBizStackWhenVisible() {
+                if (!bizStack || venuesPanel.hidden) return;
+                const rect = bizStack.getBoundingClientRect();
+                const inView = rect.top < window.innerHeight * 0.85 && rect.bottom > window.innerHeight * 0.15;
+                if (inView) {
+                    activateBizStack();
+                    return;
+                }
+                const once = new IntersectionObserver((entries) => {
+                    if (entries[0].isIntersecting) {
+                        activateBizStack();
+                        once.disconnect();
+                    }
+                }, { threshold: 0.25 });
+                once.observe(bizStack);
+            }
+
+            function initBizStackCards() {
+                if (!bizStack) return;
+
+                bizStack.querySelectorAll('.pv-biz-card').forEach((card) => {
+                    const bringFront = () => {
+                        bizStack.querySelectorAll('.pv-biz-card').forEach((c) => c.classList.remove('is-front'));
+                        card.classList.add('is-front');
+                    };
+
+                    card.addEventListener('click', (e) => {
+                        if (e.target.closest('.pv-popup-link')) return;
+                        bringFront();
+                    });
+
+                    card.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            bringFront();
+                        }
+                    });
+                });
+
+                const linkBtn = bizStack.querySelector('.pv-popup-link');
+                const copiedMsg = bizStack.querySelector('.pv-popup-copied');
+                const voteBtn = bizStack.querySelector('.pv-popup-vote');
+
+                if (linkBtn && copiedMsg) {
+                    linkBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        linkBtn.classList.add('is-copied');
+                        copiedMsg.classList.add('is-visible');
+                        setTimeout(() => {
+                            linkBtn.classList.remove('is-copied');
+                            copiedMsg.classList.remove('is-visible');
+                        }, 2000);
+                    });
+                }
+
+                if (voteBtn) {
+                    voteBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        voteBtn.classList.add('is-pressed');
+                        setTimeout(() => voteBtn.classList.remove('is-pressed'), 180);
+                    });
+                }
+            }
+
             participateTabs.forEach((tab) => {
                 tab.addEventListener('click', () => {
                     const panelId = tab.getAttribute('aria-controls');
@@ -1773,8 +2260,13 @@
                     participatePanels.forEach((p) => {
                         p.hidden = p.id !== panelId;
                     });
+                    if (panelId === 'panel-participate-venues') {
+                        activateBizStackWhenVisible();
+                    }
                 });
             });
+
+            initBizStackCards();
         });
     </script>
 </body>

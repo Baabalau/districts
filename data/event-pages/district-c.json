@@ -18,13 +18,13 @@
     "stops": [
       {
         "number": "01",
-        "title": "{influencerName}'s Downtown Opener",
-        "body": "{influencerName} starts us on the {location} side of the river with a stop that blends music, mood, and a crowd that knows how to show up for local business."
+        "title": "{influencerName}'s Westbank Opener",
+        "body": "{influencerName} starts us on the far side of the river with a stop that blends music, mood, and a crowd that knows how to show up for local business."
       },
       {
         "number": "02",
-        "title": "{councilName}'s Cross-River Choice",
-        "body": "Councilmember {councilName} picks a second stop that bridges Downtown and Algiersùsomewhere with history, hospitality, and room for real neighborhood conversation."
+        "title": "{councilName}'s Difficult Decision",
+        "body": "Councilmember {councilName} picks a second stop hosts history, hospitality, and room for real neighborhood conversation."
       },
       {
         "number": "03",

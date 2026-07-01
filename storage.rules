@@ -1,0 +1,35 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // --- Helpers ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function isImage() {
+      return request.resource.contentType.matches('image/.*');
+    }
+    function underMax(mb) {
+      return request.resource.size < mb * 1024 * 1024;
+    }
+
+    // Check-in photos: publicly readable (used by the Local Legends wall).
+    // Writes require a signed-in user and must be a reasonably sized image.
+    match /checkins/{venueId}/{fileName} {
+      allow read: if true;
+      allow write: if isSignedIn() && isImage() && underMax(10);
+    }
+
+    // Promo/business-claim graphics: the promote page has no login gate, so
+    // anonymous writes are allowed, still constrained to reasonably sized images.
+    match /promo_graphics/{fileName} {
+      allow read: if true;
+      allow write: if isImage() && underMax(10);
+    }
+
+    // Default deny: anything not matched above is denied.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -18,13 +18,13 @@
     "stops": [
       {
         "number": "01",
-        "title": "{influencerName}'s St. Roch Start",
+        "title": "{influencerName}'s 7th Ward Roots",
         "body": "The night kicks off in {location} at a spot {influencerName} wants more people to know�local flavor, strong community ties, and the energy that keeps this corridor moving."
       },
       {
         "number": "02",
-        "title": "{councilName}'s Gentilly Classic",
-        "body": "Stop two is Councilmember {councilName}'s pick: a Gentilly institution where longtime residents and newcomers can share a table and talk about what the ward needs next."
+        "title": "{councilName}'s Lakeside Classic",
+        "body": "Stop two is Councilmember {councilName}'s pick: a lakefront institution where longtime residents and newcomers can share a table and talk about what the ward needs next."
       },
       {
         "number": "03",
