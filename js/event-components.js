@@ -26,8 +26,21 @@ function buildTemplateVars(districtCopy) {
         councilName: districtCopy.councilName,
         influencerName: districtCopy.influencerName,
         councilImg: districtCopy.councilImg,
-        influencerImg: districtCopy.influencerImg
+        influencerImg: districtCopy.influencerImg,
+        influencerSocialUrl: districtCopy.influencerSocialUrl,
+        councilBioUrl: districtCopy.councilBioUrl
     };
+}
+
+// Pulls a readable @handle out of a social profile URL (falls back to a
+// generic label if the URL shape is unexpected).
+function socialHandleFromUrl(url) {
+    try {
+        const path = new URL(url).pathname.replace(/\/+$/, '').split('/').pop();
+        return path ? `@${path}` : 'Profile';
+    } catch {
+        return 'Profile';
+    }
 }
 
 // Matches homepage event cards (index.html #events)
@@ -103,16 +116,54 @@ function itineraryStyles() {
         }
 
         .stop-avatar {
-            width: 80px; height: 80px; border-radius: 50%; object-fit: cover;
-            border: 2px solid var(--accent); background: var(--bg-secondary);
+            width: 95px; height: 95px; border-radius: 50%; object-fit: cover;
+            box-sizing: border-box;
+            border: 3px solid transparent;
+            background: conic-gradient(from -45deg, var(--text-primary), var(--accent), var(--brand-red), var(--text-primary)) border-box;
+            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
             display: flex; align-items: center; justify-content: center;
             font-size: 2.2rem; color: var(--accent); flex-shrink: 0;
         }
         .proc-step.center .stop-avatar {
-            width: 90px; height: 90px; font-size: 2.8rem;
-            box-shadow: 0 0 15px rgba(203, 160, 82, 0.4);
+            width: 95px; height: 95px; font-size: 2.8rem;
+            background:
+                linear-gradient(var(--bg-secondary), var(--bg-secondary)) padding-box,
+                conic-gradient(from -45deg, var(--text-primary), var(--accent), var(--brand-red), var(--text-primary)) border-box;
         }
-        
+
+        /* Modified 3D title (scaled-down version of the homepage event-card
+           title) used for the "First Stop / Second Stop / Last Stop" labels. */
+        .stop-label-3d {
+            display: inline-block;
+            font-family: var(--font-hero);
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            transform: rotate(-2deg) skewX(-5deg);
+            text-shadow:
+                1px 1px 0px #0F1626,
+                2px 2px 0px var(--accent),
+                3px 3px 0px var(--accent),
+                4px 4px 0px var(--brand-red),
+                5px 5px 8px rgba(0,0,0,0.4);
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .stop-host-link {
+            display: block;
+            margin-top: 14px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .stop-host-link:hover { text-decoration: underline; }
+
         .proc-instructions {
             background: rgba(0,0,0,0.4);
             border-radius: 12px;
@@ -232,6 +283,10 @@ function proceedingsPathSvg() {
         </svg>`;
 }
 
+// Ordinal flavor labels for the 3 nightcrawl stops (replaces the plain
+// "STOP 01/02/03" caption with the homepage's 3D title treatment).
+const STOP_ORDINAL_LABELS = ['First Stop', 'Second Stop', 'Last Stop'];
+
 // A single teaser stop card (used for the influencer & council stops in the
 // default, pre-run-off Crawl-tinery).
 function renderHostStop(stop, index, vars) {
@@ -240,17 +295,28 @@ function renderHostStop(stop, index, vars) {
         ? `<img src="${vars.influencerImg}" class="stop-avatar" alt="${vars.influencerName}">`
         : `<img src="${vars.councilImg}" class="stop-avatar" alt="${vars.councilName}">`;
 
+    // Stop 1 links out to the influencer's social account; Stop 2 links to the
+    // councilmember's official bio page. Omitted entirely if a district hasn't
+    // set the corresponding URL yet.
+    let hostLinkHtml = '';
+    if (index === 0 && vars.influencerSocialUrl) {
+        hostLinkHtml = `<a href="${vars.influencerSocialUrl}" target="_blank" rel="noopener noreferrer" class="stop-host-link">Follow ${vars.influencerName} ${socialHandleFromUrl(vars.influencerSocialUrl)}</a>`;
+    } else if (index === 1 && vars.councilBioUrl) {
+        hostLinkHtml = `<a href="${vars.councilBioUrl}" target="_blank" rel="noopener noreferrer" class="stop-host-link">View ${vars.councilName}'s Official Bio</a>`;
+    }
+
     return `
             <div class="proc-step ${alignClass} stop-${index + 1}">
                 <div class="proc-card">
                     <div class="stop-avatar-container">
                         ${avatarHtml}
                         <div style="text-align: left;">
-                            <div class="stop-number" style="font-size: 1.2rem; margin-bottom: 4px; color: var(--accent); font-weight: bold; letter-spacing: 1px;">STOP ${stop.number}</div>
-                            <h3 style="margin: 0; font-size: 1.7rem; font-family: var(--font-header); text-transform: uppercase;">${interpolate(stop.title, vars)}</h3>
+                            <div class="stop-label-3d">${STOP_ORDINAL_LABELS[index]}</div>
+                            <h3 style="margin: 0; font-size: 1.7rem; line-height: 36px; font-family: var(--font-header); text-transform: uppercase;">${interpolate(stop.title, vars)}</h3>
                         </div>
                     </div>
                     <p style="margin: 0; font-size: 1.1rem; line-height: 1.6; color: var(--text-secondary);">${interpolate(stop.body, vars)}</p>
+                    ${hostLinkHtml}
                 </div>
             </div>`;
 }
@@ -264,8 +330,8 @@ function renderElectionStop() {
                     <div class="stop-avatar-container">
                         <div class="stop-avatar">🗳️</div>
                         <div style="text-align: center;">
-                            <div class="stop-number" style="font-size: 1.2rem; margin-bottom: 4px; color: var(--accent); font-weight: bold; letter-spacing: 1px;">STOP 03</div>
-                            <h3 style="margin: 0; font-size: 1.7rem; font-family: var(--font-header); text-transform: uppercase;">The Election: Stop 3</h3>
+                            <div class="stop-label-3d">${STOP_ORDINAL_LABELS[2]}</div>
+                            <h3 style="margin: 0; font-size: 1.7rem; line-height: 36px; font-family: var(--font-header); text-transform: uppercase;">The Election: Stop 3</h3>
                         </div>
                     </div>
                     <p style="margin: 0; font-size: 1.15rem; line-height: 1.6; color: var(--text-secondary);">Where are we ending the night? The polls open 14 days before the event.</p>
