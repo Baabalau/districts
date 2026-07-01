@@ -2,6 +2,7 @@ import './leaderboard.js';
 import { auth, db } from "./firebase-config.js";
 import { doc, updateDoc, increment, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+import { isAdminUser } from "./admin-auth.js";
 
 function interpolate(text, vars) {
     if (!text) return '';
@@ -788,6 +789,8 @@ class EventLayout extends HTMLElement {
             this.initVotingPortal();
             // Non-blocking: resolve the live election state after the page is on screen.
             this.applyElectionSchedule(districtId);
+            // Admin-only: in-page toolbar to preview each election phase locally.
+            this.initAdminPreview();
         } catch (error) {
             console.error('CRITICAL ERROR loading event page:', error);
             this.innerHTML = `<p style="padding: 2rem; margin-top: 100px; text-align: center; color: red; font-size: 2rem; z-index: 9999; position: relative;">Unable to load event content: ${error.message}</p>`;
@@ -881,6 +884,105 @@ class EventLayout extends HTMLElement {
                 console.warn(`Unable to load run-off pick for ${pick.role}:`, err);
             }
         }
+    }
+
+    // Admin-only floating toolbar for previewing each election phase. It only
+    // renders for the admin account, is never shown to the public, and only
+    // changes the LOCAL view (via setVotingState) — it writes nothing to
+    // Firestore, so the live schedule and public site are never affected.
+    initAdminPreview() {
+        onAuthStateChanged(auth, async (user) => {
+            const existing = document.getElementById('admin-preview-bar');
+
+            if (!(await isAdminUser(user))) {
+                if (existing) existing.remove();
+                return;
+            }
+            if (existing) return; // already rendered for this session
+
+            const phases = [
+                { id: 'round-1', label: 'Round 1' },
+                { id: 'run-off', label: 'Run-Off' },
+                { id: 'post-election', label: 'Winner' },
+                { id: 'post-event', label: 'Post-Event' }
+            ];
+
+            const bar = document.createElement('div');
+            bar.id = 'admin-preview-bar';
+            bar.innerHTML = `
+                <style>
+                    #admin-preview-bar {
+                        position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+                        z-index: 99999; display: flex; align-items: center; gap: 12px;
+                        flex-wrap: wrap; justify-content: center;
+                        background: #0F1626; border: 1px solid var(--accent, #8A2F25);
+                        border-bottom: none; border-radius: 10px 10px 0 0;
+                        padding: 10px 16px; box-shadow: 0 -6px 20px rgba(0,0,0,0.5);
+                        font-family: var(--font-header, 'Oswald', sans-serif);
+                        max-width: 96vw;
+                    }
+                    #admin-preview-bar .apb-tag {
+                        font-size: 0.7rem; letter-spacing: 1.5px; text-transform: uppercase;
+                        color: var(--accent, #8A2F25); font-weight: 700;
+                    }
+                    #admin-preview-bar .apb-viewing {
+                        font-size: 0.8rem; color: #DEBA84; text-transform: uppercase; letter-spacing: 0.5px;
+                    }
+                    #admin-preview-bar .apb-viewing b { color: #fff; }
+                    #admin-preview-bar .apb-btn {
+                        background: transparent; color: #CBA052;
+                        border: 1px solid rgba(203,160,82,0.4); border-radius: 20px;
+                        padding: 6px 14px; font-size: 0.78rem; font-weight: 700;
+                        text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer;
+                        font-family: inherit; transition: all 0.15s ease;
+                    }
+                    #admin-preview-bar .apb-btn:hover { border-color: #CBA052; color: #fff; }
+                    #admin-preview-bar .apb-btn.active { background: var(--brand-red, #B32424); color: #fff; border-color: var(--brand-red, #B32424); }
+                    #admin-preview-bar .apb-live { border-color: rgba(69,183,209,0.6); color: #45B7D1; }
+                    #admin-preview-bar .apb-live:hover { border-color: #45B7D1; color: #fff; }
+                    #admin-preview-bar .apb-close {
+                        background: none; border: none; color: #DEBA84; font-size: 1.2rem;
+                        cursor: pointer; line-height: 1; padding: 0 4px;
+                    }
+                    #admin-preview-bar .apb-divider { width: 1px; height: 22px; background: rgba(255,255,255,0.15); }
+                </style>
+                <span class="apb-tag">Admin Preview</span>
+                <span class="apb-viewing">Viewing: <b class="apb-current">—</b></span>
+                <span class="apb-divider"></span>
+                ${phases.map(p => `<button type="button" class="apb-btn" data-phase="${p.id}">${p.label}</button>`).join('')}
+                <button type="button" class="apb-btn apb-live" data-phase="__live__">Reset to Live</button>
+                <span class="apb-divider"></span>
+                <button type="button" class="apb-close" title="Hide toolbar (reload to bring back)">×</button>
+            `;
+            document.body.appendChild(bar);
+
+            const currentLabel = bar.querySelector('.apb-current');
+            const phaseButtons = bar.querySelectorAll('[data-phase]');
+
+            const prettyPhase = (id) => (phases.find(p => p.id === id) || {}).label || id;
+
+            const markActive = (phaseId) => {
+                phaseButtons.forEach(b => b.classList.toggle('active', b.dataset.phase === phaseId));
+            };
+
+            phaseButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const target = btn.dataset.phase === '__live__'
+                        ? (window.currentElectionState || 'round-1')
+                        : btn.dataset.phase;
+                    if (window.setVotingState) window.setVotingState(target);
+                    currentLabel.textContent = btn.dataset.phase === '__live__'
+                        ? `${prettyPhase(target)} (live)`
+                        : prettyPhase(target);
+                    markActive(btn.dataset.phase === '__live__' ? null : target);
+                });
+            });
+
+            // Initialise the "Viewing" indicator with whatever is on screen now.
+            currentLabel.textContent = prettyPhase(window.currentElectionState || 'round-1');
+
+            bar.querySelector('.apb-close').addEventListener('click', () => bar.remove());
+        });
     }
 
     initScrollAnimations() {

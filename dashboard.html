@@ -386,6 +386,7 @@
         import { auth, db } from "./js/firebase-config.js";
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
         import { collection, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, increment, arrayUnion, query, where, orderBy, collectionGroup } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+        import { isAdminUser } from "./js/admin-auth.js";
 
         const loadingEl = document.getElementById("loading");
         const tableWrapper = document.getElementById("table-wrapper");
@@ -412,8 +413,9 @@
             }
 
             // Check if user is the admin
-            if (user.email !== "robhenigbell@gmail.com") {
+            if (!(await isAdminUser(user))) {
                 loadingEl.innerHTML = `<span style="color:#ff6b6b">Access Denied: You do not have permission to view this page.</span>`;
+                loadingEl.style.display = "block";
                 return;
             }
 
