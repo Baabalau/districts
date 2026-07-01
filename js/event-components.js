@@ -14,6 +14,14 @@ function interpolate(text, vars) {
     return text.replace(/\{(\w+)\}/g, (_, key) => vars[key] ?? `{${key}}`);
 }
 
+// Escapes text for safe insertion into innerHTML (captions can include
+// user-provided display names).
+function escapeHtml(str) {
+    return String(str ?? '').replace(/[&<>"']/g, (c) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+}
+
 function renderHeroIntro(intro, vars) {
     const paragraphs = Array.isArray(intro) ? intro : [intro];
     return paragraphs
@@ -927,10 +935,21 @@ class EventLayout extends HTMLElement {
                     box-shadow: 0 8px 25px rgba(0,0,0,0.5);
                     z-index: 2;
                 }
+
+                .bento-photo {
+                    position: absolute;
+                    inset: 0;
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    z-index: 0;
+                    display: block;
+                }
                 
                 .bento-overlay {
                     position: absolute;
                     inset: 0;
+                    z-index: 1;
                     background: linear-gradient(to top, rgba(15,22,38,0.9) 0%, rgba(15,22,38,0.2) 50%, rgba(15,22,38,0) 100%);
                     display: flex;
                     align-items: flex-end;
@@ -1164,7 +1183,19 @@ class EventLayout extends HTMLElement {
         }
     }
 
+    // Empty-state markup shown when a district has no usable check-in photos yet
+    // (none submitted, or none that successfully load).
+    legendsEmptyHtml(isLegendsMode) {
+        return isLegendsMode
+            ? `<div class="legends-empty"><strong>Legends Incoming</strong>No one has reached Legend status in District ${this.getAttribute('district') || ''} yet. Keep checking in &mdash; the first Local Legend could be you!</div>`
+            : `<div class="legends-empty"><strong>Be the First Legend</strong>No check-in photos yet. Check in at a participating business and share your photo to claim your spot on the wall.</div>`;
+    }
+
     // Renders the bento wall for the given mode from the cached photo data.
+    // Behavior when there are no check-in photos yet (or an image fails to load):
+    //   - No qualifying photos  -> a friendly empty-state call to action.
+    //   - A photo URL 404s/blocks -> that tile is dropped (never a blank box);
+    //     if every tile fails, we fall back to the empty state.
     renderLocalLegends(mode) {
         const wall = this.querySelector('#local-legends-wall');
         if (!wall) return;
@@ -1180,9 +1211,7 @@ class EventLayout extends HTMLElement {
         items = items.slice(0, 9);
 
         if (items.length === 0) {
-            wall.innerHTML = isLegendsMode
-                ? `<div class="legends-empty"><strong>Legends Incoming</strong>No one has reached Legend status in this district yet. Keep checking in to be the first!</div>`
-                : `<div class="legends-empty"><strong>Be the First Legend</strong>Check in at a participating business and share your photo to appear on the wall.</div>`;
+            wall.innerHTML = this.legendsEmptyHtml(isLegendsMode);
             return;
         }
 
@@ -1192,14 +1221,26 @@ class EventLayout extends HTMLElement {
         wall.innerHTML = items.map((p, i) => {
             const sizeClass = sizePattern[i % sizePattern.length];
             const badge = isLegendsMode ? `<div class="bento-legend-badge">★ Legend</div>` : '';
-            const caption = isLegendsMode ? p.displayName : p.venueName;
-            const safeUrl = String(p.photoUrl).replace(/'/g, "%27");
+            const caption = escapeHtml(isLegendsMode ? p.displayName : p.venueName);
             return `
-                <div class="bento-item ${sizeClass}" style="background-image: url('${safeUrl}');">
+                <div class="bento-item ${sizeClass}">
+                    <img class="bento-photo" src="${encodeURI(p.photoUrl)}" alt="${caption}" loading="lazy">
                     ${badge}
                     <div class="bento-overlay"><span>${caption}</span></div>
                 </div>`;
         }).join('');
+
+        // Drop any tile whose photo can't load so a broken/expired URL never
+        // renders as an empty dark box; if they all fail, show the empty state.
+        wall.querySelectorAll('.bento-photo').forEach((img) => {
+            img.addEventListener('error', () => {
+                const tile = img.closest('.bento-item');
+                if (tile) tile.remove();
+                if (!wall.querySelector('.bento-item')) {
+                    wall.innerHTML = this.legendsEmptyHtml(isLegendsMode);
+                }
+            });
+        });
     }
 
     // Fills the run-off Crawl-tinery "revealed pick" cards. The business identity
