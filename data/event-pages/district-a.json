@@ -4,10 +4,11 @@
   "time": "7:00 PM - 10:00 PM",
   "location": "Lakeview / Uptown",
   "councilName": "Aimee McCarron",
-  "councilImg": "assets/Aimee-McCarron_2.png",
+  "councilImg": "assets/profile-pics/Aimee-McCarron_2.png",
   "councilBioUrl": "https://council.nola.gov/councilmembers/aimee-mccarron/",
   "influencerName": "Aubrey Avocado",
-  "influencerImg": "assets/aubreyavocado_Medium.png",
+  "influencerAccountTitle": "AubreyAvocado",
+  "influencerImg": "assets/profile-pics/aubreyavocado_Medium-Small.png",
   "influencerSocialUrl": "https://instagram.com/aubreyavocado",
   "bgImg": "assets/district_a_image.jpeg",
   "heroIntro": [
