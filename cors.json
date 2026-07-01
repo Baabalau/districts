@@ -1,7 +1,12 @@
 [
   {
-    "origin": ["*"],
-    "method": ["GET", "PUT", "POST", "DELETE", "HEAD"],
+    "origin": [
+      "https://districts-after-dark.web.app",
+      "https://districts-after-dark.firebaseapp.com",
+      "https://districtsafterdark.com",
+      "https://www.districtsafterdark.com"
+    ],
+    "method": ["GET", "HEAD", "PUT", "POST"],
     "maxAgeSeconds": 3600
   }
 ]

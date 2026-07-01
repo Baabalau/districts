@@ -1,0 +1,26 @@
+/* Shared interior copy — event cards, influencer cards, etc. */
+
+.interior-neighborhoods,
+.event-info .event-neighborhoods {
+    font-size: 17px;
+    font-weight: 400;
+    color: var(--text-secondary);
+    line-height: 1.45;
+}
+
+.interior-hosts,
+.event-info .event-hosts {
+    font-size: 17px;
+    font-weight: 700;
+    color: rgba(222, 186, 132, 1);
+    line-height: 1.45;
+}
+
+.card-caption .interior-neighborhoods,
+.card-caption .interior-hosts {
+    display: block;
+}
+
+.card-caption .interior-neighborhoods {
+    margin-top: 4px;
+}

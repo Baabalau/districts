@@ -73,6 +73,35 @@ body > nav .nav-links a:hover {
     color: var(--accent);
 }
 
+@media (max-width: 768px) {
+    body > nav {
+        padding: 20px;
+        position: relative;
+    }
+
+    body > nav .nav-links {
+        display: none;
+    }
+    
+    .mobile-nav-btn {
+        position: absolute;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        display: none;
+        line-height: 0;
+    }
+
+    body > nav .logo {
+        margin-left: 45px;
+        font-size: 1.25rem;
+    }
+}
+
 /* Leaflet — matches light map */
 .leaflet-popup-content-wrapper {
     background: var(--panel-bg);

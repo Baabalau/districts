@@ -46,6 +46,25 @@ class FloatingMenu extends HTMLElement {
         menuToggle.addEventListener('click', openMenu);
         menuClose.addEventListener('click', closeMenu);
 
+        // Inject a static hamburger menu for mobile top nav on district pages
+        const staticNav = document.querySelector('body > nav');
+        if (staticNav && !staticNav.querySelector('.mobile-nav-btn')) {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'mobile-nav-btn';
+            btn.setAttribute('aria-label', 'Open menu');
+            btn.innerHTML = '<svg viewBox="0 0 24 24" width="28" height="28" stroke="var(--text-primary)" stroke-width="2.5" stroke-linecap="round" fill="none" aria-hidden="true"><path d="M4 12h16M4 6h16M4 18h16"/></svg>';
+
+            const updateBtnVisibility = () => {
+                btn.style.display = window.innerWidth <= 768 ? 'block' : 'none';
+            };
+            window.addEventListener('resize', updateBtnVisibility);
+            updateBtnVisibility();
+
+            btn.addEventListener('click', openMenu);
+            staticNav.insertBefore(btn, staticNav.firstChild);
+        }
+
         menuOverlay.addEventListener('click', (event) => {
             if (!event.target.closest('.menu-links') && !event.target.closest('.menu-close')) {
                 closeMenu();

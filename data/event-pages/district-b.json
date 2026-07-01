@@ -1,12 +1,15 @@
 {
   "district": "B",
-  "date": "March 12",
+  "date": "Wednesday, August 5th",
   "time": "7:00 PM - 10:00 PM",
   "location": "French Quarter / CBD",
   "councilName": "Lesli Harris",
-  "councilImg": "assets/Lesli-Harris-New-Headshot.png",
-  "influencerName": "10th Ward Buck",
-  "influencerImg": "assets/10thwardbuck.jpg",
+  "councilImg": "assets/profile-pics/Lesli-Harris-New-Headshot-Small.png",
+  "councilBioUrl": "https://council.nola.gov/councilmembers/lesli-harris/",
+  "influencerName": "Nicole Caridad Ralston",
+  "influencerAccountTitle": "EatenPathNola",
+  "influencerImg": "assets/profile-pics/nicole_ralston_eatenpathnola-Small.png",
+  "influencerSocialUrl": "https://instagram.com/eatenpathnola",
   "bgImg": "assets/district_b_image.jpg",
   "heroIntro": "Get your boots on the ground with council member {councilName} and popular influencer {influencerName} on a three stop tour to experience the nightlife and support local businesses while building a relationship with your council member.",
   "councilQuote": "This isn't just about nightlife; it's about connecting with the community where they are. We're breaking down the walls of City Hall.",
@@ -15,13 +18,13 @@
     "stops": [
       {
         "number": "01",
-        "title": "{influencerName}'s Quarter Debut",
-        "body": "The crawl begins in the heart of {location} at a spot {influencerName} calls essential—live energy, strong pours, and the kind of room that sets the tone for the whole night."
+        "title": "{influencerName}'s Uptown Wind Down",
+        "body": "The crawl begins at a spot {influencerName} calls essentialï¿½live energy, strong pours, and the kind of room that sets the tone for the whole night."
       },
       {
         "number": "02",
-        "title": "{councilName}'s CBD Pick",
-        "body": "Councilmember {councilName} takes the group to a trusted institution where regulars, workers, and visitors mix—perfect for talking policy without leaving the party behind."
+        "title": "{councilName}'s Mystery Pick",
+        "body": "Councilmember {councilName} takes the group to a trusted institution where regulars, workers, and visitors mixï¿½perfect for talking policy without leaving the party behind."
       },
       {
         "number": "03",

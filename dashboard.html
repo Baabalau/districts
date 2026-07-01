@@ -56,13 +56,18 @@
             margin-bottom: 20px;
             align-items: center;
         }
-        select, input {
+        select, input, textarea {
             padding: 8px;
             background: var(--bg-secondary);
             border: 1px solid rgba(203, 160, 82, 0.3);
             color: var(--text-primary);
             border-radius: 4px;
             font-family: var(--font-main);
+        }
+        textarea {
+            resize: vertical;
+            font-size: 1rem;
+            line-height: 1.4;
         }
         .table-container {
             width: 100%;
@@ -327,26 +332,59 @@
         </div>
         
         <div id="schedule-form" style="display: none; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; max-width: 600px;">
+            <p style="color: var(--text-secondary); font-size: 0.85rem; margin: 0 0 15px;">All election times snap to the top of the hour (e.g. 6:00 PM).</p>
             <div style="margin-bottom: 15px;">
                 <label style="display:block; margin-bottom:5px;">Round 1 Opens:</label>
-                <input type="datetime-local" id="sched-round-1" style="width: 100%;">
+                <input type="datetime-local" id="sched-round-1" step="3600" style="width: 100%;">
             </div>
             <div style="margin-bottom: 15px;">
                 <label style="display:block; margin-bottom:5px;">Run-Off Starts (Top 10):</label>
-                <input type="datetime-local" id="sched-run-off" style="width: 100%;">
+                <input type="datetime-local" id="sched-run-off" step="3600" style="width: 100%;">
             </div>
             <div style="margin-bottom: 15px;">
-                <label style="display:block; margin-bottom:5px;">Winner Announced:</label>
-                <input type="datetime-local" id="sched-winner" style="width: 100%;">
+                <label style="display:block; margin-bottom:5px;">Run-Off Ends:</label>
+                <input type="datetime-local" id="sched-winner" step="3600" style="width: 100%;">
             </div>
             <div style="margin-bottom: 15px;">
                 <label style="display:block; margin-bottom:5px;">Event Concludes (Post-Event State):</label>
-                <input type="datetime-local" id="sched-post" style="width: 100%;">
+                <input type="datetime-local" id="sched-post" step="3600" style="width: 100%;">
             </div>
             <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin: 20px 0;">
             <div style="margin-bottom: 15px;">
                 <label style="display:block; margin-bottom:5px; color: var(--text-primary);">Official Winner (Venue ID):</label>
                 <input type="text" id="sched-winner-id" placeholder="Paste venue document ID here" style="width: 100%;">
+            </div>
+
+            <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+            <h3 style="font-family: var(--font-header); text-transform: uppercase; font-size: 1.1rem; letter-spacing: 1px; margin: 0 0 6px;">Crawl-tinery Run-Off Reveal</h3>
+            <p style="color: var(--text-secondary); font-size: 0.85rem; margin: 0 0 15px;">Revealed on the event page once the Run-Off begins. Paste the venue document ID for each host's selected stop &mdash; the business name, photo, website, and map link are pulled automatically. The body text is the blurb shown on the card.</p>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px;">Influencer's Pick &mdash; Venue ID:</label>
+                <input type="text" id="sched-influencer-pick-id" placeholder="Paste venue document ID here" style="width: 100%;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px;">Influencer's Pick &mdash; Body Text:</label>
+                <textarea id="sched-influencer-pick-body" rows="3" placeholder="Why the influencer chose this stop..." style="width: 100%;"></textarea>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px;">Council's Pick &mdash; Venue ID:</label>
+                <input type="text" id="sched-council-pick-id" placeholder="Paste venue document ID here" style="width: 100%;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px;">Council's Pick &mdash; Body Text:</label>
+                <textarea id="sched-council-pick-body" rows="3" placeholder="Why the councilmember chose this stop..." style="width: 100%;"></textarea>
+            </div>
+
+            <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+            <h3 style="font-family: var(--font-header); text-transform: uppercase; font-size: 1.1rem; letter-spacing: 1px; margin: 0 0 6px;">Local Legends Board</h3>
+            <p style="color: var(--text-secondary); font-size: 0.85rem; margin: 0 0 15px;">Controls the photo wall at the bottom of the event page. <strong>Default</strong> shows every recent check-in photo. <strong>Legends Only</strong> shows just the crawlers who reached Legend status (100+ points / 10 check-ins).</p>
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px;">Board Mode:</label>
+                <select id="sched-legends-mode" style="width: 100%;">
+                    <option value="default">Default &mdash; Recent Check-Ins</option>
+                    <option value="legends">Legends Only &mdash; 100+ Points</option>
+                </select>
             </div>
         </div>
     </div>
@@ -360,6 +398,7 @@
         import { auth, db } from "./js/firebase-config.js";
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
         import { collection, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, increment, arrayUnion, query, where, orderBy, collectionGroup } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+        import { isAdminUser } from "./js/admin-auth.js";
 
         const loadingEl = document.getElementById("loading");
         const tableWrapper = document.getElementById("table-wrapper");
@@ -386,8 +425,9 @@
             }
 
             // Check if user is the admin
-            if (user.email !== "robhenigbell@gmail.com") {
+            if (!(await isAdminUser(user))) {
                 loadingEl.innerHTML = `<span style="color:#ff6b6b">Access Denied: You do not have permission to view this page.</span>`;
+                loadingEl.style.display = "block";
                 return;
             }
 
@@ -737,6 +777,11 @@
                     document.getElementById('sched-winner').value = formatForDateTimeLocal(parseD(data.winnerAnnounce));
                     document.getElementById('sched-post').value = formatForDateTimeLocal(parseD(data.postEvent));
                     document.getElementById('sched-winner-id').value = data.winnerId || '';
+                    document.getElementById('sched-influencer-pick-id').value = data.influencerPickId || '';
+                    document.getElementById('sched-influencer-pick-body').value = data.influencerPickBody || '';
+                    document.getElementById('sched-council-pick-id').value = data.councilPickId || '';
+                    document.getElementById('sched-council-pick-body').value = data.councilPickBody || '';
+                    document.getElementById('sched-legends-mode').value = data.localLegendsMode || 'default';
                     document.getElementById('schedule-form').style.display = 'block';
                 }
             } catch (e) {
@@ -749,13 +794,24 @@
 
         document.getElementById('schedule-save-btn').addEventListener('click', async () => {
             const dist = schedSelect.value;
+            // Force every election time to the top of the hour (minutes/seconds = 0).
+            const onTheHour = (val) => {
+                const d = new Date(val);
+                if (!isNaN(d)) d.setMinutes(0, 0, 0);
+                return d;
+            };
             const updates = {};
             updates[dist] = {
-                roundOneStart: new Date(document.getElementById('sched-round-1').value),
-                runOffStart: new Date(document.getElementById('sched-run-off').value),
-                winnerAnnounce: new Date(document.getElementById('sched-winner').value),
-                postEvent: new Date(document.getElementById('sched-post').value),
-                winnerId: document.getElementById('sched-winner-id').value || null
+                roundOneStart: onTheHour(document.getElementById('sched-round-1').value),
+                runOffStart: onTheHour(document.getElementById('sched-run-off').value),
+                winnerAnnounce: onTheHour(document.getElementById('sched-winner').value),
+                postEvent: onTheHour(document.getElementById('sched-post').value),
+                winnerId: document.getElementById('sched-winner-id').value || null,
+                influencerPickId: document.getElementById('sched-influencer-pick-id').value.trim() || null,
+                influencerPickBody: document.getElementById('sched-influencer-pick-body').value.trim() || null,
+                councilPickId: document.getElementById('sched-council-pick-id').value.trim() || null,
+                councilPickBody: document.getElementById('sched-council-pick-body').value.trim() || null,
+                localLegendsMode: document.getElementById('sched-legends-mode').value || 'default'
             };
             
             try {

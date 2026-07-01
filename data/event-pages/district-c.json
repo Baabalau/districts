@@ -1,12 +1,15 @@
 {
   "district": "C",
-  "date": "March 19",
+  "date": "Tuesday, July 28th",
   "time": "7:00 PM - 10:00 PM",
   "location": "Downtown & Algiers",
   "councilName": "Freddie King III",
-  "councilImg": "assets/freddie-king-iii-headshot.jpg",
-  "influencerName": "Casey Ferrand",
-  "influencerImg": "assets/caseyferrand.jpg",
+  "councilImg": "assets/profile-pics/freddie-king-iii-headshot.jpg",
+  "councilBioUrl": "https://council.nola.gov/councilmembers/freddie-king-iii/",
+  "influencerName": "Justin Brown",
+  "influencerAccountTitle": "EmpowerYouNola",
+  "influencerImg": "assets/profile-pics/empoweryounola_justinbrown-Small.png",
+  "influencerSocialUrl": "https://instagram.com/empoweryounola",
   "bgImg": "assets/district_c_image.png",
   "heroIntro": "Get your boots on the ground with council member {councilName} and popular influencer {influencerName} on a three stop tour to experience the nightlife and support local businesses while building a relationship with your council member.",
   "councilQuote": "This isn't just about nightlife; it's about connecting with the community where they are. We're breaking down the walls of City Hall.",
@@ -15,13 +18,13 @@
     "stops": [
       {
         "number": "01",
-        "title": "{influencerName}'s Downtown Opener",
-        "body": "{influencerName} starts us on the {location} side of the river with a stop that blends music, mood, and a crowd that knows how to show up for local business."
+        "title": "{influencerName}'s Westbank Opener",
+        "body": "{influencerName} starts us on the far side of the river with a stop that blends music, mood, and a crowd that knows how to show up for local business."
       },
       {
         "number": "02",
-        "title": "{councilName}'s Cross-River Choice",
-        "body": "Councilmember {councilName} picks a second stop that bridges Downtown and Algiers—somewhere with history, hospitality, and room for real neighborhood conversation."
+        "title": "{councilName}'s Difficult Decision",
+        "body": "Councilmember {councilName} picks a second stop hosts history, hospitality, and room for real neighborhood conversation."
       },
       {
         "number": "03",
