@@ -74,6 +74,17 @@ service cloud.firestore {
       }
     }
 
+    // --- Collection-group read for check-in docs ---
+    // The Local Legends wall (js/event-components.js) and the admin dashboard run
+    // a collectionGroup("customers") query. Collection-group queries are only
+    // authorized by a rule that matches the group via a recursive wildcard; the
+    // nested venues/{venueId}/customers rule above does NOT cover them (this is
+    // what the old `allow read: if true` catch-all used to provide). Writes stay
+    // governed by the nested rule; this only re-opens the public read.
+    match /{path=**}/customers/{uid} {
+      allow read: if true;
+    }
+
     // --- settings: schedule + global config ---
     // Public read (drives the event page states); admin-only writes.
     match /settings/{docId} {

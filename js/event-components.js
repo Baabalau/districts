@@ -701,8 +701,15 @@ function renderVotingStates(district) {
                         <p style="font-size: 1.1rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto;">Thank you to everyone who came out to District ${district} and supported our local nighttime economy. We'll see you at the next one!</p>
                     </div>
                 </div>
-            </div>
+            </div>`;
+}
 
+// Modals use position:fixed, so they must NOT live inside a .js-reveal section:
+// those sections get a transform on scroll-in, which makes fixed descendants
+// anchor to the section (below the map / off-screen) instead of the viewport.
+// Rendered at the event-layout root instead (see connectedCallback).
+function renderVoteModals(district) {
+    return `
             <div id="vote-modal" class="modal-overlay" style="display: none;">
                 <div class="modal-content vote-modal-content">
                     <div class="vote-modal-header">
@@ -868,6 +875,8 @@ class EventLayout extends HTMLElement {
                 ${renderVenueOperatorsStrip(shared)}
                 </div>
             </div>
+
+            ${renderVoteModals(districtCopy.district)}
 
             <!-- Local Legends Photo Wall Bento Grid (populated from check-in photos) -->
             <div class="local-legends-section js-reveal reveal-opacity" style="padding: 30px 0; background: var(--bg-primary); width: 100%; overflow: hidden;">
