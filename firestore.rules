@@ -54,7 +54,7 @@ service cloud.firestore {
                     || (isSignedIn()
                         && affectedKeys().hasOnly(['voteCount'])
                         && request.resource.data.voteCount ==
-                           ((resource.data.voteCount == null ? 0 : resource.data.voteCount) + 1));
+                           resource.data.get('voteCount', 0) + 1);
 
       // Check-in loyalty docs: a user owns the doc keyed to their uid.
       // Read kept public for the Local Legends photo wall (Phase 2 hardening).
