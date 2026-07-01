@@ -467,16 +467,16 @@ class EventLayout extends HTMLElement {
                     ${renderHeroIntro(districtCopy.heroIntro, vars)}
                     <button type="button" id="vote-scroll-btn" class="brand-btn" style="margin-top: 20px; font-size: 1.1rem; padding: 15px 30px;" onclick="document.getElementById('map-section').scrollIntoView({behavior: 'smooth'})">${interpolate(shared.hero.rsvpButton, vars)}</button>
                 </div>
-                <div class="hero-right" style="display: flex; justify-content: center; align-items: center; height: 100%;">
-                    <div class="flow-couple" style="transform-origin: center;">
-                        <div class="flow-card" style="animation: float 6s ease-in-out infinite;">
-                            <img src="${districtCopy.influencerImg}" alt="${districtCopy.influencerName}">
-                            <div class="card-caption">${districtCopy.influencerName}<span>${shared.roles.influencer}</span></div>
-                        </div>
-                        <div class="couple-ampersand" style="animation: float 6s ease-in-out infinite 1s;">&amp;</div>
-                        <div class="flow-card" style="animation: float 6s ease-in-out infinite 2s;">
+                <div class="hero-right">
+                    <div class="hero-cards-stack">
+                        <div class="flow-card council-card" style="animation: float 6s ease-in-out infinite 1s;">
                             <img src="${districtCopy.councilImg}" alt="${districtCopy.councilName}">
                             <div class="card-caption">${districtCopy.councilName}<span>${shared.roles.council}</span></div>
+                        </div>
+                        <div class="couple-ampersand stack-ampersand" style="animation: float 6s ease-in-out infinite 1.5s;">&amp;</div>
+                        <div class="flow-card influencer-card" style="animation: float 6s ease-in-out infinite;">
+                            <img src="${districtCopy.influencerImg}" alt="${districtCopy.influencerName}">
+                            <div class="card-caption">${districtCopy.influencerName}<span>${districtCopy.influencerAccountTitle || shared.roles.influencer}</span></div>
                         </div>
                     </div>
                 </div>
@@ -543,9 +543,9 @@ class EventLayout extends HTMLElement {
 
             <style>
                 @keyframes float {
-                    0% { transform: translateY(0px) rotate(-1.2deg) scale(1.03); }
-                    50% { transform: translateY(-10px) rotate(-1.2deg) scale(1.03); }
-                    100% { transform: translateY(0px) rotate(-1.2deg) scale(1.03); }
+                    0% { transform: translateY(0px) var(--base-transform, ); }
+                    50% { transform: translateY(-4px) var(--base-transform, ); }
+                    100% { transform: translateY(0px) var(--base-transform, ); }
                 }
                 @keyframes bounceArrow {
                     0%, 100% { transform: translateY(0) rotate(-5deg) skewX(-5deg); }
