@@ -374,6 +374,17 @@
                 <label style="display:block; margin-bottom:5px;">Council's Pick &mdash; Body Text:</label>
                 <textarea id="sched-council-pick-body" rows="3" placeholder="Why the councilmember chose this stop..." style="width: 100%;"></textarea>
             </div>
+
+            <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+            <h3 style="font-family: var(--font-header); text-transform: uppercase; font-size: 1.1rem; letter-spacing: 1px; margin: 0 0 6px;">Local Legends Board</h3>
+            <p style="color: var(--text-secondary); font-size: 0.85rem; margin: 0 0 15px;">Controls the photo wall at the bottom of the event page. <strong>Default</strong> shows every recent check-in photo. <strong>Legends Only</strong> shows just the crawlers who reached Legend status (100+ points / 10 check-ins).</p>
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px;">Board Mode:</label>
+                <select id="sched-legends-mode" style="width: 100%;">
+                    <option value="default">Default &mdash; Recent Check-Ins</option>
+                    <option value="legends">Legends Only &mdash; 100+ Points</option>
+                </select>
+            </div>
         </div>
     </div>
 <!-- Image Modal -->
@@ -769,6 +780,7 @@
                     document.getElementById('sched-influencer-pick-body').value = data.influencerPickBody || '';
                     document.getElementById('sched-council-pick-id').value = data.councilPickId || '';
                     document.getElementById('sched-council-pick-body').value = data.councilPickBody || '';
+                    document.getElementById('sched-legends-mode').value = data.localLegendsMode || 'default';
                     document.getElementById('schedule-form').style.display = 'block';
                 }
             } catch (e) {
@@ -791,7 +803,8 @@
                 influencerPickId: document.getElementById('sched-influencer-pick-id').value.trim() || null,
                 influencerPickBody: document.getElementById('sched-influencer-pick-body').value.trim() || null,
                 councilPickId: document.getElementById('sched-council-pick-id').value.trim() || null,
-                councilPickBody: document.getElementById('sched-council-pick-body').value.trim() || null
+                councilPickBody: document.getElementById('sched-council-pick-body').value.trim() || null,
+                localLegendsMode: document.getElementById('sched-legends-mode').value || 'default'
             };
             
             try {

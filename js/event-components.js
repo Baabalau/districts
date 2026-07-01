@@ -1,8 +1,13 @@
 import './leaderboard.js';
 import { auth, db } from "./firebase-config.js";
-import { doc, updateDoc, increment, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+import { doc, updateDoc, increment, getDoc, setDoc, collection, collectionGroup, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 import { isAdminUser } from "./admin-auth.js";
+
+// "Local Legend" threshold. checkin.html awards 50 points per visit, so a
+// Legend has earned LEGEND_POINTS_THRESHOLD points (== LEGEND_CHECKIN_COUNT visits).
+const LEGEND_POINTS_THRESHOLD = 500;
+const LEGEND_CHECKIN_COUNT = 10;
 
 function interpolate(text, vars) {
     if (!text) return '';
@@ -183,13 +188,13 @@ function itineraryStyles() {
         }
 
         .proc-instructions {
-            background: rgba(0,0,0,0.4);
-            border-radius: 12px;
-            padding: 30px;
+            background: none;
+            border-radius: 0;
+            padding: 24px 0 0;
             margin-top: 35px;
-            border-left: 4px solid var(--accent);
+            border: none;
+            border-top: 1px solid var(--text-primary);
             text-align: left;
-            border: 1px solid rgba(255,255,255,0.05);
         }
         .proc-instructions h4 {
             color: var(--text-primary); margin: 0 0 6px 0; font-size: 1.3rem; font-family: var(--font-header); text-transform: uppercase; letter-spacing: 1px;
@@ -341,6 +346,33 @@ function itineraryStyles() {
 
         @media (max-width: 900px) {
             .proc-step.left, .proc-step.right, .proc-step.center { justify-content: center; margin-bottom: 40px; }
+            .proc-card {
+                width: 100%;
+                max-width: none;
+                padding: 28px 20px;
+            }
+            .proc-step.center .proc-card {
+                max-width: none;
+            }
+            .stop-avatar-container {
+                gap: 12px;
+                align-items: flex-start;
+            }
+            .stop-avatar {
+                width: 68px;
+                height: 68px;
+                font-size: 1.75rem;
+                border-width: 2px;
+            }
+            .proc-step.center .stop-avatar {
+                width: 68px;
+                height: 68px;
+                font-size: 2.1rem;
+            }
+            .stop-avatar-container h3 {
+                font-size: 1.35rem !important;
+                line-height: 1.3 !important;
+            }
             .desktop-path { display: none; }
             .mobile-path { display: inline; }
         }
@@ -532,37 +564,37 @@ function renderMapLegend() {
                             <div style="text-align: center;">
                                 <div id="legend-round-subtitle" style="color: var(--text-secondary); font-size: 1.2rem; font-family: var(--font-hero); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px;">RUN-OFF BEGINS IN</div>
                             </div>
-                            <div class="countdown-clock small-clock" style="margin: 0; flex-wrap: nowrap;">
-                                <div class="time-box" style="padding: 6px 12px; min-width: 50px;"><span style="font-size: 2rem; line-height: 1;">02</span><label style="font-size: 0.7rem;">Days</label></div>
-                                <div class="time-box" style="padding: 6px 12px; min-width: 50px;"><span style="font-size: 2rem; line-height: 1;">14</span><label style="font-size: 0.7rem;">Hrs</label></div>
-                                <div class="time-box" style="padding: 6px 12px; min-width: 50px;"><span style="font-size: 2rem; line-height: 1;">20</span><label style="font-size: 0.7rem;">Mins</label></div>
+                            <div class="countdown-clock small-clock">
+                                <div class="time-box"><span>02</span><label>Days</label></div>
+                                <div class="time-box"><span>14</span><label>Hrs</label></div>
+                                <div class="time-box"><span>20</span><label>Mins</label></div>
                             </div>
                         </div>
 
-                        <div style="flex: 1; display: flex; gap: 20px; flex-wrap: wrap; align-items: center; justify-content: center;">
-                            <div style="display: flex; align-items: center; gap: 6px;">
-                                <div style="width: 12px; height: 12px; border-radius: 50%; background-color: #D2A039; box-shadow: 0 0 8px #D2A039;"></div>
-                                <span style="color: var(--text-primary); font-family: var(--font-header); font-size: 0.85rem; font-weight: 700; text-transform: uppercase;">Bar</span>
+                        <div class="map-legend-items">
+                            <div class="map-legend-item">
+                                <div class="map-legend-dot" style="background-color: #D2A039; box-shadow: 0 0 8px #D2A039;"></div>
+                                <span class="map-legend-label">Bar</span>
                             </div>
-                            <div style="display: flex; align-items: center; gap: 6px;">
-                                <div style="width: 12px; height: 12px; border-radius: 50%; background-color: #B32424; box-shadow: 0 0 8px #B32424;"></div>
-                                <span style="color: var(--text-primary); font-family: var(--font-header); font-size: 0.85rem; font-weight: 700; text-transform: uppercase;">Restaurant</span>
+                            <div class="map-legend-item">
+                                <div class="map-legend-dot" style="background-color: #B32424; box-shadow: 0 0 8px #B32424;"></div>
+                                <span class="map-legend-label">Restaurant</span>
                             </div>
-                            <div style="display: flex; align-items: center; gap: 6px;">
-                                <div style="width: 12px; height: 12px; border-radius: 50%; background-color: #D946EF; box-shadow: 0 0 8px #D946EF;"></div>
-                                <span style="color: var(--text-primary); font-family: var(--font-header); font-size: 0.85rem; font-weight: 700; text-transform: uppercase;">Live Venue</span>
+                            <div class="map-legend-item">
+                                <div class="map-legend-dot" style="background-color: #D946EF; box-shadow: 0 0 8px #D946EF;"></div>
+                                <span class="map-legend-label">Live Venue</span>
                             </div>
-                            <div style="display: flex; align-items: center; gap: 6px;">
-                                <div style="width: 12px; height: 12px; border-radius: 50%; background-color: #45B7D1; box-shadow: 0 0 8px #45B7D1;"></div>
-                                <span style="color: var(--text-primary); font-family: var(--font-header); font-size: 0.85rem; font-weight: 700; text-transform: uppercase;">Museum/Gallery</span>
+                            <div class="map-legend-item">
+                                <div class="map-legend-dot" style="background-color: #45B7D1; box-shadow: 0 0 8px #45B7D1;"></div>
+                                <span class="map-legend-label">Museum/Gallery</span>
                             </div>
-                            <div style="display: flex; align-items: center; gap: 6px;">
-                                <div style="width: 12px; height: 12px; border-radius: 50%; background-color: #A87B28; box-shadow: 0 0 8px #A87B28;"></div>
-                                <span style="color: var(--text-primary); font-family: var(--font-header); font-size: 0.85rem; font-weight: 700; text-transform: uppercase;">Other</span>
+                            <div class="map-legend-item">
+                                <div class="map-legend-dot" style="background-color: #A87B28; box-shadow: 0 0 8px #A87B28;"></div>
+                                <span class="map-legend-label">Other</span>
                             </div>
-                            <div style="display: flex; align-items: center; gap: 6px; border-left: 1px solid rgba(203, 160, 82, 0.3); padding-left: 15px;">
-                                <div style="width: 12px; height: 12px; border-radius: 50%; background-color: transparent; border: 2px solid #fff;"></div>
-                                <span style="color: var(--text-secondary); font-family: var(--font-header); font-size: 0.8rem; font-style: italic;">Currently Top 10</span>
+                            <div class="map-legend-item map-legend-item--top10">
+                                <div class="map-legend-dot map-legend-dot--outline"></div>
+                                <span class="map-legend-label map-legend-label--muted">Currently Top 10</span>
                             </div>
                         </div>
                     </div>
@@ -801,10 +833,12 @@ class EventLayout extends HTMLElement {
             </div>
 
             <!-- Night's Proceedings & Election Intro -->
-            <div class="proceedings-section js-reveal reveal-y delay-200" style="padding: 20px 0; background: transparent;">
-                <div class="page-module" style="width: 80%; max-width: 1400px; margin: 0 auto; text-align: center;">
-                    <h2 style="font-family: var(--font-hero); font-size: 3.5rem; text-transform: uppercase; color: var(--text-primary); margin-top: 20px; margin-bottom: 15px; letter-spacing: 2px;">${shared.itinerary.heading}</h2>
-                    <p style="font-size: 1.15rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto 10px;">Follow the trail and cast your vote to decide where District ${districtCopy.district} ends the night.</p>
+            <div class="proceedings-section js-reveal reveal-y delay-200">
+                <div class="page-module">
+                    <h2 class="title-3d section-title crawl-tinery-title">${shared.itinerary.heading}</h2>
+                    <div class="proceedings-intro">
+                        <p class="proceedings-intro__lede">Follow the trail and cast your vote to decide where District ${districtCopy.district} ends the night.</p>
+                    </div>
                     ${renderItinerary(districtCopy, vars, shared)}
                 </div>
             </div>
@@ -818,32 +852,19 @@ class EventLayout extends HTMLElement {
 
             <!-- Voting States Below Map -->
             <div class="voting-states-section js-reveal reveal-y delay-200" style="padding: 30px 0; background: transparent;">
-                <div class="page-module" style="width: 80%; max-width: 1400px; margin: 0 auto; text-align: center;">
+                <div class="page-module">
                 ${renderVotingStates(districtCopy.district)}
                 ${renderVenueOperatorsStrip(shared)}
                 </div>
             </div>
 
-            <!-- Local Legends Photo Wall Bento Grid -->
+            <!-- Local Legends Photo Wall Bento Grid (populated from check-in photos) -->
             <div class="local-legends-section js-reveal reveal-opacity" style="padding: 30px 0; background: var(--bg-primary); width: 100%; overflow: hidden;">
-                <h2 style="text-align: center; font-family: var(--font-hero); font-size: 3.5rem; color: var(--text-primary); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 40px; text-shadow: 2px 2px 0px var(--brand-red);">Local Legends</h2>
-                
-                <div class="bento-photo-wall">
-                    <div class="bento-item bento-large" style="background-image: url('assets/district_d_image.jpg');">
-                        <div class="bento-overlay"><span>Community First</span></div>
-                    </div>
-                    <div class="bento-item" style="background-image: url('https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=600&h=400&fit=crop');">
-                        <div class="bento-overlay"><span>Live Music</span></div>
-                    </div>
-                    <div class="bento-item bento-tall" style="background-image: url('https://images.unsplash.com/photo-1520862238258-005eec06c04b?w=600&h=800&fit=crop');">
-                        <div class="bento-overlay"><span>The Vibe</span></div>
-                    </div>
-                    <div class="bento-item bento-wide" style="background-image: url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&h=400&fit=crop');">
-                        <div class="bento-overlay"><span>Good Eats</span></div>
-                    </div>
-                    <div class="bento-item" style="background-image: url('https://images.unsplash.com/photo-1572116469696-31de0f17cc34?w=600&h=400&fit=crop');">
-                        <div class="bento-overlay"><span>Cheers</span></div>
-                    </div>
+                <h2 class="title-3d section-title" id="local-legends-title">Become a Local Legend</h2>
+                <p id="local-legends-subtitle" style="text-align: center; font-size: 1.15rem; color: var(--text-secondary); max-width: 640px; margin: 40px auto 40px; line-height: 1.5;">Earn 50 points every time you check in at a hospitality business in District ${districtCopy.district} &mdash; reach 500 to become a Local Legend.</p>
+
+                <div class="bento-photo-wall" id="local-legends-wall">
+                    <div class="legends-loading" style="grid-column: 1 / -1; text-align: center; color: var(--text-secondary); padding: 40px 0;">Loading check-ins&hellip;</div>
                 </div>
             </div>
 
@@ -935,7 +956,42 @@ class EventLayout extends HTMLElement {
                 .bento-item:hover .bento-overlay span {
                     transform: translateY(0);
                 }
-                
+
+                /* Legend badge (shown in "legends only" mode) */
+                .bento-legend-badge {
+                    position: absolute;
+                    top: 12px;
+                    left: 12px;
+                    z-index: 2;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 5px;
+                    background: linear-gradient(135deg, var(--accent), var(--brand-red));
+                    color: #fff;
+                    font-family: var(--font-hero);
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                    font-size: 0.72rem;
+                    font-weight: 700;
+                    padding: 5px 10px;
+                    border-radius: 20px;
+                    box-shadow: 0 3px 10px rgba(0,0,0,0.5);
+                }
+
+                /* Empty state when a district has no qualifying check-in photos yet */
+                .legends-empty {
+                    grid-column: 1 / -1;
+                    text-align: center;
+                    color: var(--text-secondary);
+                    padding: 50px 20px;
+                    border: 1px dashed rgba(203,160,82,0.3);
+                    border-radius: 12px;
+                    background: rgba(255,255,255,0.02);
+                    font-size: 1.05rem;
+                    line-height: 1.6;
+                }
+                .legends-empty strong { color: var(--text-primary); display: block; font-family: var(--font-hero); text-transform: uppercase; font-size: 1.3rem; margin-bottom: 8px; letter-spacing: 1px; }
+
                 @media (min-width: 768px) {
                     .bento-photo-wall {
                         grid-template-columns: repeat(4, 1fr);
@@ -961,6 +1017,8 @@ class EventLayout extends HTMLElement {
             this.applyElectionSchedule(districtId);
             // Admin-only: in-page toolbar to preview each election phase locally.
             this.initAdminPreview();
+            // Non-blocking: load the Local Legends photo wall from real check-ins.
+            this.initLocalLegends(districtId);
         } catch (error) {
             console.error('CRITICAL ERROR loading event page:', error);
             this.innerHTML = `<p style="padding: 2rem; margin-top: 100px; text-align: center; color: red; font-size: 2rem; z-index: 9999; position: relative;">Unable to load event content: ${error.message}</p>`;
@@ -996,6 +1054,9 @@ class EventLayout extends HTMLElement {
             this.populateRunoffCrawltinery(sched);
             this.updateRunoffDateDisplay(sched.runOffStart);
 
+            // Local Legends board mode is controlled from the same dashboard doc.
+            this.setLocalLegendsMode(sched.localLegendsMode || 'default');
+
             if (window.setVotingState) window.setVotingState(activeState);
         } catch (err) {
             console.warn('Election schedule unavailable; defaulting to round-1 state.', err);
@@ -1010,6 +1071,135 @@ class EventLayout extends HTMLElement {
         if (!el) return;
         const formatted = formatScheduleDateTime(runOffStart);
         if (formatted) el.textContent = formatted;
+    }
+
+    // Loads the Local Legends photo wall from real check-in photos for this
+    // district, then renders it in whatever mode is currently active. The board
+    // has two modes, switched from the dashboard (settings/schedule):
+    //   'default' — every recent check-in photo (evidence of participation)
+    //   'legends' — only photos from crawlers who reached Legend status
+    // The heavy fetch runs once; setLocalLegendsMode() just re-filters/re-renders.
+    async initLocalLegends(districtId) {
+        const wall = this.querySelector('#local-legends-wall');
+        if (!wall) return;
+
+        // Expose for the admin preview toolbar / console testing.
+        window.setLocalLegendsMode = (m) => this.setLocalLegendsMode(m);
+
+        try {
+            const districtUpper = districtId.toUpperCase();
+
+            // 1) District venues -> id set + id->name map (one indexed query).
+            const venuesSnap = await getDocs(
+                query(collection(db, "venues"), where("district", "==", districtUpper))
+            );
+            const venueNames = {};
+            venuesSnap.forEach((d) => { venueNames[d.id] = (d.data().name || 'A Local Business'); });
+            const districtVenueIds = new Set(Object.keys(venueNames));
+
+            // 2) All check-in photos, filtered client-side to this district.
+            // collectionGroup mirrors the dashboard's proven read pattern; we keep
+            // only docs with a usable uploaded photo.
+            const photos = [];
+            const customersSnap = await getDocs(collectionGroup(db, "customers"));
+            customersSnap.forEach((docSnap) => {
+                const venueId = docSnap.ref.parent.parent.id;
+                if (!districtVenueIds.has(venueId)) return;
+                const data = docSnap.data();
+                const url = data.photoUrl;
+                if (!url || url === 'pending_upload' || url === 'Pending Upload') return;
+                photos.push({
+                    uid: docSnap.id,
+                    venueId,
+                    venueName: venueNames[venueId] || 'A Local Business',
+                    photoUrl: url,
+                    displayName: data.displayName || 'A Local Legend',
+                    lastVisit: data.lastVisit && data.lastVisit.toDate ? data.lastVisit.toDate() : new Date(0)
+                });
+            });
+
+            // 3) Set of "Legend" users (>= LEGEND_POINTS_THRESHOLD points) for the
+            // legends-only mode. One indexed range query, scoped to actual legends.
+            const legendUids = new Set();
+            try {
+                const legendsSnap = await getDocs(
+                    query(collection(db, "users"), where("totalPoints", ">=", LEGEND_POINTS_THRESHOLD))
+                );
+                legendsSnap.forEach((d) => legendUids.add(d.id));
+            } catch (e) {
+                console.warn('Could not load Legend users; legends-only mode may be empty.', e);
+            }
+
+            // Newest check-ins first.
+            photos.sort((a, b) => b.lastVisit - a.lastVisit);
+
+            this._legendsData = { photos, legendUids };
+            this.renderLocalLegends(window.localLegendsMode || 'default');
+        } catch (err) {
+            console.warn('Unable to load Local Legends photos:', err);
+            this.renderLocalLegends(window.localLegendsMode || 'default');
+        }
+    }
+
+    // Switches the board mode (called by the dashboard-driven schedule and
+    // exposed globally for admin preview). Safe to call before data loads.
+    setLocalLegendsMode(mode) {
+        window.localLegendsMode = mode;
+        if (this._legendsData) this.renderLocalLegends(mode);
+        else this.updateLocalLegendsCopy(mode); // keep header in sync pre-load
+    }
+
+    // Updates just the title + subtitle for the active mode.
+    updateLocalLegendsCopy(mode) {
+        const title = this.querySelector('#local-legends-title');
+        const subtitle = this.querySelector('#local-legends-subtitle');
+        if (!title || !subtitle) return;
+        const district = this.getAttribute('district') || '';
+        if (mode === 'legends') {
+            title.textContent = 'Our Local Legends';
+            subtitle.textContent = `Meet the District ${district} crawlers who earned ${LEGEND_POINTS_THRESHOLD}+ points (${LEGEND_CHECKIN_COUNT} check-ins) to reach Legend status.`;
+        } else {
+            title.textContent = 'Become a Local Legend';
+            subtitle.textContent = `Earn 50 points every time you check in at a hospitality business in District ${district} — reach 500 to become a Local Legend.`;
+        }
+    }
+
+    // Renders the bento wall for the given mode from the cached photo data.
+    renderLocalLegends(mode) {
+        const wall = this.querySelector('#local-legends-wall');
+        if (!wall) return;
+
+        this.updateLocalLegendsCopy(mode);
+
+        const data = this._legendsData || { photos: [], legendUids: new Set() };
+        const isLegendsMode = mode === 'legends';
+        let items = data.photos;
+        if (isLegendsMode) items = items.filter((p) => data.legendUids.has(p.uid));
+
+        // Cap the wall so it stays a tidy bento (most recent win).
+        items = items.slice(0, 9);
+
+        if (items.length === 0) {
+            wall.innerHTML = isLegendsMode
+                ? `<div class="legends-empty"><strong>Legends Incoming</strong>No one has reached Legend status in this district yet. Keep checking in to be the first!</div>`
+                : `<div class="legends-empty"><strong>Be the First Legend</strong>Check in at a participating business and share your photo to appear on the wall.</div>`;
+            return;
+        }
+
+        // Repeating size pattern gives the grid its bento rhythm.
+        const sizePattern = ['bento-large', '', 'bento-tall', 'bento-wide', '', '', 'bento-tall', '', 'bento-wide'];
+
+        wall.innerHTML = items.map((p, i) => {
+            const sizeClass = sizePattern[i % sizePattern.length];
+            const badge = isLegendsMode ? `<div class="bento-legend-badge">★ Legend</div>` : '';
+            const caption = isLegendsMode ? p.displayName : p.venueName;
+            const safeUrl = String(p.photoUrl).replace(/'/g, "%27");
+            return `
+                <div class="bento-item ${sizeClass}" style="background-image: url('${safeUrl}');">
+                    ${badge}
+                    <div class="bento-overlay"><span>${caption}</span></div>
+                </div>`;
+        }).join('');
     }
 
     // Fills the run-off Crawl-tinery "revealed pick" cards. The business identity
@@ -1133,12 +1323,17 @@ class EventLayout extends HTMLElement {
                 ${phases.map(p => `<button type="button" class="apb-btn" data-phase="${p.id}">${p.label}</button>`).join('')}
                 <button type="button" class="apb-btn apb-live" data-phase="__live__">Reset to Live</button>
                 <span class="apb-divider"></span>
+                <span class="apb-tag">Legends</span>
+                <button type="button" class="apb-btn" data-legends-mode="default">Default</button>
+                <button type="button" class="apb-btn" data-legends-mode="legends">Legends Only</button>
+                <span class="apb-divider"></span>
                 <button type="button" class="apb-close" title="Hide toolbar (reload to bring back)">×</button>
             `;
             document.body.appendChild(bar);
 
             const currentLabel = bar.querySelector('.apb-current');
             const phaseButtons = bar.querySelectorAll('[data-phase]');
+            const legendsButtons = bar.querySelectorAll('[data-legends-mode]');
 
             const prettyPhase = (id) => (phases.find(p => p.id === id) || {}).label || id;
 
@@ -1156,6 +1351,15 @@ class EventLayout extends HTMLElement {
                         ? `${prettyPhase(target)} (live)`
                         : prettyPhase(target);
                     markActive(btn.dataset.phase === '__live__' ? null : target);
+                });
+            });
+
+            // Local Legends board-mode preview (local only; never writes).
+            legendsButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const mode = btn.dataset.legendsMode;
+                    if (window.setLocalLegendsMode) window.setLocalLegendsMode(mode);
+                    legendsButtons.forEach(b => b.classList.toggle('active', b === btn));
                 });
             });
 
