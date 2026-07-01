@@ -63,7 +63,10 @@ function formatScheduleDateTime(dateVal) {
     const d = dateVal.toDate ? dateVal.toDate() : new Date(dateVal);
     if (isNaN(d)) return null;
     const dateStr = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-    const timeStr = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    // On-the-hour display, e.g. "6 PM" (omit ":00" minutes). If a non-hour time
+    // ever slips through, fall back to showing minutes so we never mislead.
+    const timeOpts = d.getMinutes() === 0 ? { hour: 'numeric' } : { hour: 'numeric', minute: '2-digit' };
+    const timeStr = d.toLocaleTimeString('en-US', timeOpts);
     return `${dateStr} at ${timeStr}`;
 }
 
