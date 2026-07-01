@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Business | Districts After Dark</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Montserrat:wght@700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Montserrat:wght@700;900&family=Oswald:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/district-page.css">
+    <link rel="stylesheet" href="css/floating-menu.css">
     <link rel="stylesheet" href="css/event-styles.css">
     <link rel="stylesheet" href="css/site-footer.css">
+    <script type="module" src="js/components/floating-menu.js"></script>
     
     <!-- html2canvas for flattening composite images -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -17,7 +19,7 @@
             --promo-gutter: clamp(32px, 6vw, 80px);
         }
 
-        nav {
+        body > nav {
             padding-left: var(--promo-gutter);
             padding-right: var(--promo-gutter);
         }
@@ -448,11 +450,100 @@
             cursor: pointer;
             margin: 0;
         }
+
+        /* Integrated form — compact sizing */
+        #integrated-form-container {
+            padding: 20px clamp(20px, 3vw, 40px) 28px;
+            scroll-margin-top: 88px;
+        }
+
+        #integrated-form-container > h2 {
+            font-family: var(--font-header);
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin-top: 0;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        #integrated-form-container #step-intro p {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        #integrated-form-container .generator-form {
+            margin-top: 20px;
+        }
+
+        #integrated-form-container .form-step h3 {
+            font-size: 1.1rem;
+            padding: 8px 14px;
+            margin-bottom: 16px;
+        }
+
+        #integrated-form-container .generator-form input:not([type="checkbox"]):not([type="file"]),
+        #integrated-form-container .generator-form select,
+        #integrated-form-container textarea {
+            padding: 10px 12px;
+            font-size: 0.95rem;
+            margin-bottom: 14px;
+            border-radius: 6px;
+        }
+
+        #integrated-form-container .generator-form input[type="file"] {
+            padding: 8px;
+            font-size: 0.9rem;
+            margin-bottom: 14px;
+        }
+
+        #integrated-form-container .custom-google-form label {
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
+
+        #integrated-form-container .custom-google-form label span {
+            font-size: 0.8rem;
+        }
+
+        #integrated-form-container .custom-google-form .checkbox-group {
+            padding: 10px 12px;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        #integrated-form-container .custom-google-form .checkbox-group label {
+            font-size: 0.9rem;
+            gap: 8px;
+        }
+
+        #integrated-form-container .custom-google-form .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+        }
+
+        #integrated-form-container .brand-btn {
+            font-size: 0.95rem;
+            padding: 10px 20px;
+            border-radius: 6px;
+        }
+
+        #integrated-form-container #form-success h2 {
+            font-size: 1.4rem;
+        }
+
+        #integrated-form-container #form-success > p {
+            font-size: 0.95rem;
+        }
+
+        #integrated-form-container #form-success h3 {
+            font-size: 1.1rem;
+        }
     </style>
 </head>
 <body>
     <nav>
-        <div class="logo">District <span>After Dark</span></div>
+        <div class="logo">Districts <span class="logo-accent">After</span> <span class="logo-brand">Dark</span></div>
         <div class="nav-links">
             <a href="index.html">Home</a>
             <a href="index.html#events">Events</a>
@@ -460,6 +551,8 @@
             <a href="login.html" id="authLink">Log In / Sign Up</a>
         </div>
     </nav>
+
+    <floating-menu scroll-trigger></floating-menu>
 
     <div class="promo-hero">
         <div class="promo-hero-inner">
@@ -478,12 +571,12 @@
             <div class="promo-hero-visual">
                 <div class="cards-container">
                     <div class="hero-image-wrapper wrapper-1">
-                        <img src="assets/District%20Parings/BIZ%20Promo_D.png" class="hero-image" alt="Social Media Graphic Preview">
+                        <img src="assets/BIZ%20Promo_E_preview.png" class="hero-image" alt="Social Media Graphic Preview" loading="lazy">
                         <div class="image-caption">Customized Social Media Story</div>
                     </div>
                     
                     <div class="hero-image-wrapper wrapper-2">
-                            <img src="assets/Districts_Standup_Flyer/Districts_Standup_D.png" class="hero-image" alt="Printable Flyer Preview">
+                            <img src="assets/Districts_Standup_preview.png" class="hero-image" alt="Printable Flyer Preview" loading="lazy">
                         <div class="image-caption">Customized Printable Flyer</div>
                     </div>
                 </div>
@@ -492,60 +585,22 @@
     </div>
 
     <div class="content-container">
-        
-        <!-- Simplified Instructional Guide -->
-        <div class="guide-section" id="social-guide" style="margin-top: 40px; background: transparent; border: none; box-shadow: none; padding: 0;">
-            <h2 style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px;">Share Customized Social Graphics Promoting Your Business</h2>
-            
-            <div class="instruction-row">
-                <div class="instruction-steps">
-                    <div class="simple-step" style="background: transparent; border-left: none; padding: 10px 0; box-shadow: none;">
-                        <div class="step-text">
-                            <h4>Download & Import</h4>
-                            <p>Save the blank graphic to your phone and open it as a background in Instagram Stories or TikTok.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="simple-step" style="background: transparent; border-left: none; padding: 10px 0; box-shadow: none;">
-                        <div class="step-text">
-                            <h4>Add Your Logo</h4>
-                            <p>You can also use the app's native tools to place your logo over the designated center box.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="simple-step" style="background: transparent; border-left: none; padding: 10px 0; box-shadow: none;">
-                        <div class="step-text">
-                            <h4>Add The Link & Share</h4>
-                            <p>Generate your link below, place a "Link Sticker" over the bottom arrow, and post it to your followers!</p>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="instruction-visual">
-                    <img src="assets/District%20Parings/BIZ%20Promo_D.png" alt="Customization Visual">
-                    <div class="visual-pointer">
-                        PLACE LOGO HERE
-                        <span>(Using the native sticker tool)</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
         <!-- Multi-Step Integrated Form -->
-        <div class="generator-tool" id="integrated-form-container" style="margin-top: 60px; margin-bottom: 60px;">
-            <h2 style="font-family: var(--font-header); font-size: 2rem; color: var(--text-primary); margin-top: 0; margin-bottom: 15px; text-transform: uppercase;">Join the Map & Generate Promo Graphics</h2>
+        <div class="generator-tool" id="integrated-form-container" style="margin-top: 40px; margin-bottom: 60px;">
+            <h2>Join the Map & Generate Promo Graphics</h2>
             <div id="step-intro" style="text-align: left;">
-                <p style="color: var(--text-secondary); font-size: 1.1rem; line-height: 1.6; max-width: 800px; margin: 0 0 20px 0;">
+                <p style="color: var(--text-secondary); max-width: 800px; margin: 0 0 20px 0;">
                     Complete this form to request your business be added to the official Districts After Dark map. 
                     Once completed, you'll instantly receive your customized social media graphic and printable check-in flyer.
                 </p>
-                <button type="button" id="start-form-btn" class="brand-btn" style="background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); font-size: 1.2rem; padding: 15px 30px; border: none; cursor: pointer; color: white; border-radius: 8px;">Get Started</button>
+                <button type="button" id="start-form-btn" class="brand-btn" style="background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); border: none; cursor: pointer; color: white;">Get Started</button>
             </div>
             
             <form id="multi-step-form" class="generator-form custom-google-form" style="display: none;">
                 
                 <!-- Step 1 -->
-                <div class="form-step" id="step-1">
+                <div class="form-step" id="intake-step-1">
                     <h3>Step 1 of 4: Business Details</h3>
                     
                     <label for="biz-name">Business Name</label>
@@ -562,7 +617,7 @@
                     <label for="biz-address">Street Address</label>
                     <input type="text" id="biz-address" placeholder="e.g., 123 Main St, New Orleans, LA 70112" required>
                     
-                    <label for="biz-url">Business Website URL <span style="font-size: 0.9rem; font-weight: normal; color: var(--text-secondary); text-transform: none;">(Optional)</span></label>
+                    <label for="biz-url">Business Website URL <span style="font-weight: normal; color: var(--text-secondary); text-transform: none;">(Optional)</span></label>
                     <input type="url" id="biz-url" placeholder="https://yourbusiness.com">
                     
                     <label for="op-relationship">Your Relationship to the Business</label>
@@ -576,12 +631,12 @@
                     </select>
                     
                     <div style="margin-top: 20px;">
-                        <button type="button" class="brand-btn next-btn" style="background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); font-size: 1.2rem; padding: 15px 30px; border: none; cursor: pointer; color: white; border-radius: 8px;">Next</button>
+                        <button type="button" class="brand-btn next-btn" style="background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); border: none; cursor: pointer; color: white;">Next</button>
                     </div>
                 </div>
                 
                 <!-- Step 2 -->
-                <div class="form-step" id="step-2" style="display: none;">
+                <div class="form-step" id="intake-step-2" style="display: none;">
                     <h3>Step 2 of 4: Contact Information</h3>
                     
                     <label for="op-name">Your Name</label>
@@ -594,13 +649,13 @@
                     <input type="tel" id="op-phone" placeholder="e.g., (504) 555-0199" required>
                     
                     <div style="margin-top: 20px; display: flex; gap: 15px;">
-                        <button type="button" class="brand-btn prev-btn" style="background: transparent; border: 2px solid var(--text-secondary); color: var(--text-secondary); font-size: 1.2rem; padding: 15px 30px; cursor: pointer; border-radius: 8px;">Back</button>
-                        <button type="button" class="brand-btn next-btn" style="background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); font-size: 1.2rem; padding: 15px 30px; border: none; cursor: pointer; color: white; border-radius: 8px;">Next</button>
+                        <button type="button" class="brand-btn prev-btn" style="background: transparent; border: 2px solid var(--text-secondary); color: var(--text-secondary); cursor: pointer;">Back</button>
+                        <button type="button" class="brand-btn next-btn" style="background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); border: none; cursor: pointer; color: white;">Next</button>
                     </div>
                 </div>
                 
                 <!-- Step 3 -->
-                <div class="form-step" id="step-3" style="display: none;">
+                <div class="form-step" id="intake-step-3" style="display: none;">
                     <h3>Step 3 of 4: Map & Branding</h3>
                     
                     <label for="biz-district">Council District</label>
@@ -614,17 +669,17 @@
                         <option value="Not Sure">I'm not sure</option>
                     </select>
                     
-                    <label for="biz-logo" style="margin-top: 15px;">Upload Your Logo <span style="font-size: 0.9rem; font-weight: normal; color: var(--text-secondary); text-transform: none;">(Optional - Used on your promo graphics instead of text)</span></label>
+                    <label for="biz-logo" style="margin-top: 15px;">Upload Your Logo <span style="font-weight: normal; color: var(--text-secondary); text-transform: none;">(Optional - Used on your promo graphics instead of text)</span></label>
                     <input type="file" id="biz-logo" accept="image/*" style="background: rgba(255,255,255,0.05); color: white;">
                     
                     <div style="margin-top: 20px; display: flex; gap: 15px;">
-                        <button type="button" class="brand-btn prev-btn" style="background: transparent; border: 2px solid var(--text-secondary); color: var(--text-secondary); font-size: 1.2rem; padding: 15px 30px; cursor: pointer; border-radius: 8px;">Back</button>
-                        <button type="button" class="brand-btn next-btn" style="background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); font-size: 1.2rem; padding: 15px 30px; border: none; cursor: pointer; color: white; border-radius: 8px;">Next</button>
+                        <button type="button" class="brand-btn prev-btn" style="background: transparent; border: 2px solid var(--text-secondary); color: var(--text-secondary); cursor: pointer;">Back</button>
+                        <button type="button" class="brand-btn next-btn" style="background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); border: none; cursor: pointer; color: white;">Next</button>
                     </div>
                 </div>
                 
                 <!-- Step 4 -->
-                <div class="form-step" id="step-4" style="display: none;">
+                <div class="form-step" id="intake-step-4" style="display: none;">
                     <h3>Step 4 of 4: Confirmations</h3>
                     
                     <div class="checkbox-group">
@@ -637,7 +692,7 @@
                     <div class="checkbox-group">
                         <label>
                             <input type="checkbox" id="chk-host">
-                            Yes, our business would like to host District [B]'s final stop of the night on [Tuesday, July 28th]
+                            <span>Yes, our business would like to host <span id="dynamic-district-name">District [B]</span>'s final stop of the night on <span id="dynamic-district-date">[Tuesday, July 28th]</span></span>
                         </label>
                     </div>
 
@@ -648,29 +703,29 @@
                         </label>
                     </div>
                     
-                    <label for="op-comments" style="margin-top: 15px;">Additional Comments or Questions <span style="font-size: 0.9rem; font-weight: normal; color: var(--text-secondary); text-transform: none;">(Optional)</span></label>
-                    <textarea id="op-comments" rows="4" placeholder="Anything else we should know?" style="width: 100%; padding: 16px; margin-bottom: 20px; border-radius: 8px; border: 2px solid var(--text-secondary); background: rgba(255,255,255,0.05); color: white; font-family: inherit; resize: vertical;"></textarea>
+                    <label for="op-comments" style="margin-top: 15px;">Additional Comments or Questions <span style="font-weight: normal; color: var(--text-secondary); text-transform: none;">(Optional)</span></label>
+                    <textarea id="op-comments" rows="3" placeholder="Anything else we should know?" style="width: 100%; border: 2px solid var(--text-secondary); background: rgba(255,255,255,0.05); color: white; font-family: inherit; resize: vertical;"></textarea>
                     
                     <div style="margin-top: 20px; display: flex; gap: 15px;">
-                        <button type="button" class="brand-btn prev-btn" style="background: transparent; border: 2px solid var(--text-secondary); color: var(--text-secondary); font-size: 1.2rem; padding: 15px 30px; cursor: pointer; border-radius: 8px;">Back</button>
-                        <button type="submit" id="submit-form-btn" class="brand-btn" style="background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); font-size: 1.2rem; padding: 15px 30px; border: none; cursor: pointer; color: white; border-radius: 8px;">Submit & Generate Graphics</button>
+                        <button type="button" class="brand-btn prev-btn" style="background: transparent; border: 2px solid var(--text-secondary); color: var(--text-secondary); cursor: pointer;">Back</button>
+                        <button type="submit" id="submit-form-btn" class="brand-btn" style="background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); border: none; cursor: pointer; color: white;">Submit & Generate Graphics</button>
                     </div>
                 </div>
             </form>
             
             <div id="form-success" style="display:none; text-align: left; margin-top: 20px;">
                 <h2 style="color: var(--neon-cyan); margin-bottom: 10px;">Success! Request Submitted.</h2>
-                <p style="color: var(--text-secondary); font-size: 1.1rem; line-height: 1.6; margin-bottom: 30px;">
+                <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 30px;">
                     Thank you! We've automatically generated your custom promotional graphics below. 
                     <br><strong>Right-click (or long-press on mobile) to save these images.</strong>
                 </p>
 
                 <div style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 25px; margin-bottom: 40px; max-width: 600px;">
-                    <h3 style="font-family: var(--font-header); color: var(--text-primary); font-size: 1.3rem; margin-top: 0; margin-bottom: 15px; text-transform: uppercase;">Your Unique Voting Link</h3>
-                    <p style="color: white; font-size: 1rem; margin-bottom: 15px;">Share this link directly with your followers so they can vote for you!</p>
+                    <h3 style="font-family: var(--font-header); color: var(--text-primary); margin-top: 0; margin-bottom: 15px; text-transform: uppercase;">Your Unique Voting Link</h3>
+                    <p style="color: white; margin-bottom: 15px;">Share this link directly with your followers so they can vote for you!</p>
                     <div style="display: flex; gap: 10px;">
-                        <input type="text" id="generated-voting-url" readonly style="flex: 1; padding: 12px 15px; border-radius: 8px; border: 2px solid var(--text-secondary); background: rgba(255,255,255,0.9); font-size: 1rem; color: #333;">
-                        <button type="button" id="copy-link-btn" class="brand-btn" style="background: var(--brand-red); color: white; border: none; padding: 0 20px; border-radius: 8px; cursor: pointer; font-weight: bold; white-space: nowrap;">Copy Link</button>
+                        <input type="text" id="generated-voting-url" readonly style="flex: 1; padding: 10px 12px; border-radius: 6px; border: 2px solid var(--text-secondary); background: rgba(255,255,255,0.9); font-size: 0.95rem; color: #333;">
+                        <button type="button" id="copy-link-btn" class="brand-btn" style="background: var(--brand-red); color: white; border: none; padding: 0 16px; border-radius: 6px; cursor: pointer; font-weight: bold; white-space: nowrap;">Copy Link</button>
                     </div>
                 </div>
                 
@@ -703,24 +758,65 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Simplified Instructional Guide -->
+        <div class="guide-section" id="social-guide" style="margin-top: 40px; background: transparent; border: none; box-shadow: none; padding: 0;">
+            <h2 style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px;">Share Customized Social Graphics Promoting Your Business</h2>
+            
+            <div class="instruction-row">
+                <div class="instruction-steps">
+                    <div class="simple-step" style="background: transparent; border-left: none; padding: 10px 0; box-shadow: none;">
+                        <div class="step-text">
+                            <h4>Download & Import</h4>
+                            <p>Save the blank graphic to your phone and open it as a background in Instagram Stories or TikTok.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="simple-step" style="background: transparent; border-left: none; padding: 10px 0; box-shadow: none;">
+                        <div class="step-text">
+                            <h4>Add Your Logo</h4>
+                            <p>You can also use the app's native tools to place your logo over the designated center box.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="simple-step" style="background: transparent; border-left: none; padding: 10px 0; box-shadow: none;">
+                        <div class="step-text">
+                            <h4>Add The Link & Share</h4>
+                            <p>Generate your link below, place a "Link Sticker" over the bottom arrow, and post it to your followers!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="instruction-visual">
+                    <img src="assets/District%20Parings/BIZ%20Promo_D.png" alt="Customization Visual" loading="lazy">
+                    <div class="visual-pointer">
+                        PLACE LOGO HERE
+                        <span>(Using the native sticker tool)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        </div>
 
     </div>
 
     <site-footer></site-footer>
 
     <script type="module" src="js/components/site-footer.js"></script>
+    <script type="module" src="js/auth.js"></script>
 <script src="council_districts.js"></script>
     <script type="module">
         // Configuration for graphic overlays
         const graphicConfig = {
             social: {
-                logo: { top: '70%', left: '30%', maxWidth: '40%', maxHeight: '12%', transform: 'translate(0, -50%)', objectFit: 'contain' },
-                text: { top: '70%', left: '30%', width: '40%', fontSize: '1.2rem', color: '#8a2d24', transform: 'translate(0, -50%)', textAlign: 'center', whiteSpace: 'normal', wordWrap: 'break-word', lineHeight: '1.2', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '12%', textShadow: 'none' }
+                logo: { top: '74%', left: '39%', maxWidth: '40%', maxHeight: '12%', transform: 'translate(-50%, -50%)', objectFit: 'contain' },
+                text: { top: '74%', left: '39%', width: '40%', fontSize: '1.2rem', color: '#8a2d24', transform: 'translate(-50%, -50%)', textAlign: 'center', whiteSpace: 'normal', wordWrap: 'break-word', lineHeight: '1.2', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '12%', textShadow: 'none' }
             },
             flyer: {
-                logo: { top: '71%', left: '12%', maxWidth: '35%', maxHeight: '12%', transform: 'translate(0, -50%)', objectFit: 'contain' },
+                logo: { top: '77%', left: '30%', maxWidth: '35%', maxHeight: '12%', transform: 'translate(-50%, -50%)', objectFit: 'contain' },
                 qr: { bottom: '27%', left: '78%', width: '18%', transform: 'translate(-50%, 50%)' },
-                text: { top: '71%', left: '12%', width: '35%', fontSize: '1.1rem', color: '#8a2d24', transform: 'translate(0, -50%)', textAlign: 'center', whiteSpace: 'normal', wordWrap: 'break-word', lineHeight: '1.2', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '12%' }
+                text: { top: '77%', left: '30%', width: '35%', fontSize: '1.1rem', color: '#8a2d24', transform: 'translate(-50%, -50%)', textAlign: 'center', whiteSpace: 'normal', wordWrap: 'break-word', lineHeight: '1.2', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '12%' }
             },
             qrColors: {
                 foreground: 'eecd7e', // Gold
@@ -733,10 +829,10 @@
             const introSection = document.getElementById('step-intro');
             const form = document.getElementById('multi-step-form');
             const steps = [
-                document.getElementById('step-1'),
-                document.getElementById('step-2'),
-                document.getElementById('step-3'),
-                document.getElementById('step-4')
+                document.getElementById('intake-step-1'),
+                document.getElementById('intake-step-2'),
+                document.getElementById('intake-step-3'),
+                document.getElementById('intake-step-4')
             ];
             
             let currentStep = 0;
@@ -800,12 +896,21 @@
                 }
             });
 
-            // Start button logic
-            startBtn.addEventListener('click', () => {
+            function showStep(index) {
+                steps.forEach((step, i) => {
+                    step.style.display = (i === index) ? 'block' : 'none';
+                });
+                currentStep = index;
+            }
+
+            function openFormAtStep(stepIndex) {
                 introSection.style.display = 'none';
                 form.style.display = 'flex';
-                showStep(0);
-            });
+                showStep(stepIndex);
+            }
+
+            // Start button logic
+            startBtn.addEventListener('click', () => openFormAtStep(0));
 
             // Next / Prev button logic
             const nextBtns = document.querySelectorAll('.next-btn');
@@ -824,6 +929,24 @@
                     });
 
                     if (isValid && currentStep < steps.length - 1) {
+                        // Update dynamic text before showing Step 4
+                        if (currentStep + 1 === 3) {
+                            const bizDistrict = document.getElementById('biz-district').value;
+                            if (bizDistrict && bizDistrict.startsWith('District')) {
+                                const districtLetter = bizDistrict.split(' ')[1].toUpperCase();
+                                document.getElementById('dynamic-district-name').textContent = `District ${districtLetter}`;
+                                
+                                let districtEventDate = '[Tuesday, July 28th]';
+                                switch(districtLetter) {
+                                    case 'A': districtEventDate = 'Tuesday, August 25th'; break;
+                                    case 'B': districtEventDate = 'Tuesday, August 18th'; break;
+                                    case 'C': districtEventDate = 'Tuesday, August 4th'; break;
+                                    case 'D': districtEventDate = 'Tuesday, August 11th'; break;
+                                    case 'E': districtEventDate = 'Tuesday, July 21st'; break;
+                                }
+                                document.getElementById('dynamic-district-date').textContent = districtEventDate;
+                            }
+                        }
                         showStep(currentStep + 1);
                     }
                 });
@@ -837,11 +960,16 @@
                 });
             });
 
-            function showStep(index) {
-                steps.forEach((step, i) => {
-                    step.style.display = (i === index) ? 'block' : 'none';
+            const stepHash = window.location.hash.match(/^#step-(\d+)$/);
+            if (stepHash) {
+                const stepIndex = Math.min(Math.max(parseInt(stepHash[1], 10) - 1, 0), steps.length - 1);
+                openFormAtStep(stepIndex);
+                const formContainer = document.getElementById('integrated-form-container');
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        formContainer?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    });
                 });
-                currentStep = index;
             }
 
             // Logo file preview reader
@@ -969,12 +1097,22 @@
                 const bizName = rawBizName.replace(/\s*\(.*\)$/, '').trim();
                 
                 // Construct pseudo-unique venue id and district page URL
-                const venueId = bizName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                const venueId = matchedVenueId || bizName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
                 let districtPage = 'index.html';
                 let districtLetter = 'A';
+                let districtEventDate = '[Tuesday, July 28th]';
                 if (bizDistrict.startsWith('District')) {
                     districtLetter = bizDistrict.split(' ')[1].toUpperCase();
                     districtPage = `district-${districtLetter.toLowerCase()}.html`;
+                    
+                    // Set event date based on district
+                    switch(districtLetter) {
+                        case 'A': districtEventDate = 'Tuesday, August 25th'; break;
+                        case 'B': districtEventDate = 'Tuesday, August 18th'; break;
+                        case 'C': districtEventDate = 'Tuesday, August 4th'; break;
+                        case 'D': districtEventDate = 'Tuesday, August 11th'; break;
+                        case 'E': districtEventDate = 'Tuesday, July 21st'; break;
+                    }
                 }
                 const votingUrl = `${window.location.origin}/${districtPage}?vote=${venueId}`;
                 
@@ -998,13 +1136,15 @@
 
                 // Send data to Google Sheets via Web App
                 // NOTE: Replace YOUR_WEB_APP_URL with the actual URL after deploying the Apps Script
-                const scriptUrl = 'https://script.google.com/macros/s/AKfycbyiZ-stBQhmx-vq4KYt8ACGq8ahKJieh8lbelzxafCT5ICSiVuMTR0YXgof14MMhCP9/exec';
+                const scriptUrl = 'https://script.google.com/macros/s/AKfycbyvPA-iw7mTb4-89H0B-zE-cbSHXygpc0xkcL1Z34Ucc_Ud-97o08MfQcN74U-gomzfwg/exec';
                 
                 // We will send the fetch request AFTER the images are flattened and uploaded
                 // so we can include the image URLs in the payload.
                 
                 // Fetch QR code
-                const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(votingUrl)}&color=${graphicConfig.qrColors.foreground}&bgcolor=${graphicConfig.qrColors.background}`;
+                // Use the full URL (including scheme and host) so the QR code is scannable
+                const fullVotingUrl = votingUrl.startsWith('http') ? votingUrl : `${window.location.origin}${votingUrl.startsWith('/') ? '' : '/'}${votingUrl}`;
+                const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(fullVotingUrl)}&color=${graphicConfig.qrColors.foreground}&bgcolor=${graphicConfig.qrColors.background}`;
 
                 // Set Graphic Previews
                 const formSuccess = document.getElementById('form-success');
@@ -1019,6 +1159,10 @@
                 // Update base images based on district
                 socialBaseImg.src = `assets/District Parings/BIZ Promo_${districtLetter}.png`;
                 flyerBaseImg.src = `assets/Districts_Standup_Flyer/Districts_Standup_${districtLetter}.png`;
+
+                // Update confirmation text dynamically
+                document.getElementById('dynamic-district-name').textContent = `District ${districtLetter}`;
+                document.getElementById('dynamic-district-date').textContent = districtEventDate;
 
                 // Apply Config Styles
                 Object.assign(socialLogo.style, graphicConfig.social.logo);
@@ -1047,11 +1191,11 @@
                 
                 // Set Voting URL UI
                 const urlInput = document.getElementById('generated-voting-url');
-                urlInput.value = votingUrl;
+                urlInput.value = fullVotingUrl;
                 
                 const copyBtn = document.getElementById('copy-link-btn');
                 copyBtn.addEventListener('click', () => {
-                    navigator.clipboard.writeText(votingUrl).then(() => {
+                    navigator.clipboard.writeText(fullVotingUrl).then(() => {
                         const originalText = copyBtn.textContent;
                         copyBtn.textContent = 'Copied!';
                         copyBtn.style.background = '#2f533a'; // Darker green
@@ -1068,30 +1212,56 @@
 
                 // Flatten images with html2canvas and upload to Firebase Storage
                 setTimeout(async () => {
+                    const socialFilename = `${venueId}-social.png`;
+                    const flyerFilename = `${venueId}-flyer.png`;
+
+                    // Guard so a stalled html2canvas / upload can never block the claim submission
+                    const withTimeout = (promise, ms, label) => Promise.race([
+                        promise,
+                        new Promise((_, reject) => setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms))
+                    ]);
+
+                    const flattenImage = async (elementId) => {
+                        const element = document.getElementById(elementId);
+                        const canvas = await html2canvas(element, {
+                            useCORS: true, // Crucial for loading external images like the QR code
+                            scale: 2, // Higher resolution
+                            backgroundColor: null,
+                            imageTimeout: 8000,
+                            logging: false
+                        });
+                        return canvas.toDataURL('image/png');
+                    };
+
+                    let claimSent = false;
+                    const sendClaim = () => {
+                        if (claimSent || scriptUrl === 'YOUR_WEB_APP_URL') return;
+                        claimSent = true;
+                        fetch(scriptUrl, {
+                            method: 'POST',
+                            mode: 'no-cors',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(formData)
+                        }).then(() => console.log("Form data sent to Google Sheets"))
+                          .catch(error => console.error("Error sending form data:", error));
+                    };
+
                     try {
+                        // Ensure custom fonts are fully loaded so html2canvas doesn't drop overlay text
+                        if (document.fonts && document.fonts.ready) {
+                            try { await withTimeout(document.fonts.ready, 4000, 'Font loading'); } catch (e) { /* proceed anyway */ }
+                        }
+
                         // 1. Flatten the images locally first (Fast for the user)
-                        const flattenImage = async (elementId) => {
-                            const element = document.getElementById(elementId);
-                            const canvas = await html2canvas(element, { 
-                                useCORS: true, // Crucial for loading external images like the QR code
-                                scale: 2 // Higher resolution
-                            });
-                            return canvas.toDataURL('image/png');
-                        };
-
-                        const timestamp = Date.now();
-                        const socialFilename = `${venueId}-social-${timestamp}.png`;
-                        const flyerFilename = `${venueId}-flyer-${timestamp}.png`;
-
-                        const [socialDataUrl, flyerDataUrl] = await Promise.all([
+                        const [socialDataUrl, flyerDataUrl] = await withTimeout(Promise.all([
                             flattenImage('social-composite'),
                             flattenImage('flyer-composite')
-                        ]);
+                        ]), 15000, 'Image flattening');
 
                         // 2. Update UI instantly with local data URLs (No CORS issues, works offline/locally)
                         const socialContainer = document.getElementById('social-composite').parentElement;
                         const flyerContainer = document.getElementById('flyer-composite').parentElement;
-                        
+
                         // Create the download button for Social Story
                         const downloadSocialBtn = document.createElement('a');
                         downloadSocialBtn.href = socialDataUrl;
@@ -1099,7 +1269,7 @@
                         downloadSocialBtn.className = 'brand-btn';
                         downloadSocialBtn.style.cssText = 'display: inline-block; background: var(--brand-red); color: white; text-decoration: none; padding: 10px 20px; border-radius: 8px; margin-top: 15px; font-weight: bold; text-align: center; width: 100%; box-sizing: border-box; cursor: pointer;';
                         downloadSocialBtn.textContent = 'Download Social Story';
-                        
+
                         const socialHint = socialContainer.querySelector('p');
                         if (socialHint) {
                             socialHint.replaceWith(downloadSocialBtn);
@@ -1122,7 +1292,7 @@
                             flyerContainer.appendChild(downloadFlyerBtn);
                         }
 
-                        // Replace HTML composites with flat images. 
+                        // Replace HTML composites with flat images.
                         // This allows mobile users to "Long Press -> Save Image" natively and ensures perfect printing.
                         const replaceWithFlatImage = (elementId, dataUrl) => {
                             const composite = document.getElementById(elementId);
@@ -1136,37 +1306,34 @@
                         replaceWithFlatImage('social-composite', socialDataUrl);
                         replaceWithFlatImage('flyer-composite', flyerDataUrl);
 
-                        // 3. Upload to Firebase & Google Sheets in the background
-                        const { ref, uploadString, getDownloadURL } = await import('https://www.gstatic.com/firebasejs/10.9.0/firebase-storage.js');
-                        const { storage } = await import('./js/firebase-config.js');
+                        // 3. Upload to Firebase Storage (guarded so it can't hang the claim)
+                        try {
+                            const { ref, uploadString, getDownloadURL } = await import('https://www.gstatic.com/firebasejs/10.9.0/firebase-storage.js');
+                            const { storage } = await import('./js/firebase-config.js');
 
-                        const uploadToFirebase = async (dataUrl, filename) => {
-                            const storageRef = ref(storage, `promo_graphics/${filename}`);
-                            await uploadString(storageRef, dataUrl, 'data_url');
-                            return await getDownloadURL(storageRef);
-                        };
+                            const uploadToFirebase = async (dataUrl, filename) => {
+                                const storageRef = ref(storage, `promo_graphics/${filename}`);
+                                await uploadString(storageRef, dataUrl, 'data_url');
+                                return await getDownloadURL(storageRef);
+                            };
 
-                        const [socialUrl, flyerUrl] = await Promise.all([
-                            uploadToFirebase(socialDataUrl, socialFilename),
-                            uploadToFirebase(flyerDataUrl, flyerFilename)
-                        ]);
+                            const [sUrl, fUrl] = await withTimeout(Promise.all([
+                                uploadToFirebase(socialDataUrl, socialFilename),
+                                uploadToFirebase(flyerDataUrl, flyerFilename)
+                            ]), 15000, 'Firebase upload');
 
-                        formData.socialGraphicUrl = socialUrl;
-                        formData.flyerGraphicUrl = flyerUrl;
-
-                        if (scriptUrl !== 'YOUR_WEB_APP_URL') {
-                            fetch(scriptUrl, {
-                                method: 'POST',
-                                mode: 'no-cors',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify(formData)
-                            }).then(() => console.log("Form data with image URLs sent to Google Sheets"))
-                              .catch(error => console.error("Error sending form data:", error));
+                            formData.socialGraphicUrl = sUrl;
+                            formData.flyerGraphicUrl = fUrl;
+                            console.log("Firebase upload succeeded:", sUrl, fUrl);
+                        } catch (uploadError) {
+                            console.error("FIREBASE UPLOAD FAILED — code:", uploadError && uploadError.code, "| message:", uploadError && uploadError.message, uploadError);
                         }
-
                     } catch (error) {
-                        console.error("Error flattening or uploading graphics:", error);
+                        console.error("Error flattening graphics:", error);
                         alert("There was an issue generating the downloadable image. Please right-click the image to save it.");
+                    } finally {
+                        // Always record the claim in Google Sheets, with image URLs if we got them
+                        sendClaim();
                     }
                 }, 1500); // Wait 1.5s for QR code to load
             });

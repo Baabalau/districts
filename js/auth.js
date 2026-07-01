@@ -4,15 +4,17 @@ import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.9.0/f
 
 // Listen to auth state changes to update the UI globally
 document.addEventListener("DOMContentLoaded", () => {
-    const authLink = document.getElementById("authLink");
+    function setAuthLinks(href, text) {
+        document.querySelectorAll('#authLink, #floatingAuthLink').forEach((link) => {
+            link.href = href;
+            link.textContent = text;
+        });
+    }
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             // User is signed in.
-            if (authLink) {
-                authLink.href = "profile.html";
-                authLink.textContent = "Profile";
-            }
+            setAuthLinks("profile.html", "Profile");
             
             // Check if user document exists in Firestore, if not, create it
             const userRef = doc(db, "users", user.uid);
@@ -43,10 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
             
         } else {
             // No user is signed in.
-            if (authLink) {
-                authLink.href = "login.html";
-                authLink.textContent = "Log In / Sign Up";
-            }
+            setAuthLinks("login.html", "Log In / Sign Up");
         }
     });
 });

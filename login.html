@@ -25,9 +25,16 @@
             color: var(--text-primary);
             font-family: var(--font-main);
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        site-footer {
+            width: 100%;
+            margin-top: auto;
         }
 
         .auth-container {
@@ -225,6 +232,26 @@
         const authFormContainer = document.getElementById("auth-form-container");
         const authInstructions = document.getElementById("auth-instructions");
 
+        // Decide where to send the user after a successful sign-in.
+        // Priority: explicit ?redirect= param -> the page they came from -> home.
+        // We never send them back to an auth page (avoids the login/profile bounce).
+        function getRedirectUrl() {
+            const param = new URLSearchParams(window.location.search).get('redirect');
+            if (param && !param.includes('login.html')) {
+                return param;
+            }
+            try {
+                if (document.referrer) {
+                    const ref = new URL(document.referrer);
+                    if (ref.origin === window.location.origin
+                        && !ref.pathname.endsWith('login.html')) {
+                        return ref.pathname.split('/').pop() + ref.search + ref.hash || 'index.html';
+                    }
+                }
+            } catch (e) { /* fall through */ }
+            return 'index.html';
+        }
+
         // Ensure user document exists (used after auth completes)
         async function ensureUserDocument(user) {
             const userRef = doc(db, "users", user.uid);
@@ -251,8 +278,7 @@
             submitBtn.disabled = true;
             submitBtn.textContent = "Sending...";
 
-            const urlParams = new URLSearchParams(window.location.search);
-            const redirectUrl = urlParams.get('redirect') || 'profile.html';
+            const redirectUrl = getRedirectUrl();
 
             const actionCodeSettings = {
                 // URL you want to redirect back to. The domain must be in the authorized domains list in the Firebase Console.
@@ -285,9 +311,7 @@
             try {
                 const result = await signInWithPopup(auth, provider);
                 await ensureUserDocument(result.user);
-                const urlParams = new URLSearchParams(window.location.search);
-                const redirectUrl = urlParams.get('redirect') || 'profile.html';
-                window.location.href = redirectUrl;
+                window.location.href = getRedirectUrl();
             } catch (error) {
                 console.error("Google Auth Error:", error);
                 if (error.code === 'auth/popup-blocked') {
@@ -318,10 +342,7 @@
                         const result = await signInWithEmailLink(auth, email, window.location.href);
                         window.localStorage.removeItem('emailForSignIn');
                         await ensureUserDocument(result.user);
-                        
-                        const urlParams = new URLSearchParams(window.location.search);
-                        const redirectUrl = urlParams.get('redirect') || 'profile.html';
-                        window.location.href = redirectUrl;
+                        window.location.href = getRedirectUrl();
                     } catch (error) {
                         console.error(error);
                         errorMsg.textContent = "Error signing in with link. The link may have expired or already been used.";
@@ -352,9 +373,7 @@
         // Check if user is already logged in, redirect them (unless they are currently processing a sign in link)
         auth.onAuthStateChanged((user) => {
             if (user && !isSignInWithEmailLink(auth, window.location.href)) {
-                const urlParams = new URLSearchParams(window.location.search);
-                const redirectUrl = urlParams.get('redirect') || 'profile.html';
-                window.location.href = redirectUrl;
+                window.location.href = getRedirectUrl();
             }
         });
     </script>
