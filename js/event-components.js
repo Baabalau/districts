@@ -2,6 +2,7 @@ import './leaderboard.js';
 import { auth, db } from "./firebase-config.js";
 import { doc, updateDoc, increment, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+import { isAdminUser } from "./admin-auth.js";
 
 function interpolate(text, vars) {
     if (!text) return '';
@@ -25,8 +26,32 @@ function buildTemplateVars(districtCopy) {
         councilName: districtCopy.councilName,
         influencerName: districtCopy.influencerName,
         councilImg: districtCopy.councilImg,
-        influencerImg: districtCopy.influencerImg
+        influencerImg: districtCopy.influencerImg,
+        influencerSocialUrl: districtCopy.influencerSocialUrl,
+        councilBioUrl: districtCopy.councilBioUrl
     };
+}
+
+// Pulls a readable @handle out of a social profile URL (falls back to a
+// generic label if the URL shape is unexpected).
+function socialHandleFromUrl(url) {
+    try {
+        const path = new URL(url).pathname.replace(/\/+$/, '').split('/').pop();
+        return path ? `@${path}` : 'Profile';
+    } catch {
+        return 'Profile';
+    }
+}
+
+// Formats a schedule date (Firestore Timestamp or ISO string) into copy like
+// "Monday, August 4 at 3:00 PM" for the run-off teaser on the Election card.
+function formatScheduleDateTime(dateVal) {
+    if (!dateVal) return null;
+    const d = dateVal.toDate ? dateVal.toDate() : new Date(dateVal);
+    if (isNaN(d)) return null;
+    const dateStr = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+    const timeStr = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    return `${dateStr} at ${timeStr}`;
 }
 
 // Matches homepage event cards (index.html #events)
@@ -42,7 +67,7 @@ function getDistrictHeroImage(districtId, fallback) {
     return DISTRICT_HERO_IMAGES[districtId] || fallback;
 }
 
-function renderItineraryStops(stops, vars) {
+function itineraryStyles() {
     return `
     <style>
         .proceedings-container {
@@ -88,30 +113,75 @@ function renderItineraryStops(stops, vars) {
             border-color: var(--brand-red);
             border-width: 2px;
             box-shadow: 0 0 25px rgba(138, 47, 37, 0.25);
-            text-align: center;
+            text-align: left;
         }
 
         .stop-avatar-container {
             display: flex; align-items: center; gap: 18px; margin-bottom: 20px;
         }
-        .proc-step.center .stop-avatar-container {
-            justify-content: center;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 25px;
-        }
 
         .stop-avatar {
-            width: 80px; height: 80px; border-radius: 50%; object-fit: cover;
-            border: 2px solid var(--accent); background: var(--bg-secondary);
+            width: 95px; height: 95px; border-radius: 50%; object-fit: cover;
+            box-sizing: border-box;
+            border: 3px solid transparent;
+            background: conic-gradient(from -45deg, var(--text-primary), var(--accent), var(--brand-red), var(--text-primary)) border-box;
+            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
             display: flex; align-items: center; justify-content: center;
             font-size: 2.2rem; color: var(--accent); flex-shrink: 0;
         }
         .proc-step.center .stop-avatar {
-            width: 90px; height: 90px; font-size: 2.8rem;
-            box-shadow: 0 0 15px rgba(203, 160, 82, 0.4);
+            width: 95px; height: 95px; font-size: 2.8rem;
+            background:
+                linear-gradient(var(--bg-secondary), var(--bg-secondary)) padding-box,
+                conic-gradient(from -45deg, var(--text-primary), var(--accent), var(--brand-red), var(--text-primary)) border-box;
         }
-        
+
+        /* Modified 3D title (scaled-down version of the homepage event-card
+           title) used for the "First Stop / Second Stop / Last Stop" labels. */
+        .stop-label-3d {
+            display: inline-block;
+            font-family: var(--font-hero);
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            transform: rotate(-2deg) skewX(-5deg);
+            text-shadow:
+                1px 1px 0px #0F1626,
+                2px 2px 0px var(--accent),
+                3px 3px 0px var(--accent),
+                4px 4px 0px var(--brand-red),
+                5px 5px 8px rgba(0,0,0,0.4);
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .stop-host-link {
+            display: block;
+            margin-top: 14px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .stop-host-link:hover { text-decoration: underline; }
+
+        .election-runoff-date {
+            margin: 6px 0 0 0;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        .election-runoff-date .runoff-date-value {
+            color: var(--text-primary);
+            font-weight: 800;
+            text-decoration: underline;
+        }
+
         .proc-instructions {
             background: rgba(0,0,0,0.4);
             border-radius: 12px;
@@ -122,13 +192,149 @@ function renderItineraryStops(stops, vars) {
             border: 1px solid rgba(255,255,255,0.05);
         }
         .proc-instructions h4 {
-            color: var(--text-primary); margin: 0 0 15px 0; font-size: 1.3rem; font-family: var(--font-header); text-transform: uppercase; letter-spacing: 1px;
+            color: var(--text-primary); margin: 0 0 6px 0; font-size: 1.3rem; font-family: var(--font-header); text-transform: uppercase; letter-spacing: 1px;
+        }
+        .proc-instructions > p.hiw-intro {
+            margin: 0 0 20px 0; color: var(--text-secondary); font-size: 1rem; line-height: 1.5; max-width: 620px;
         }
         .proc-instructions ul {
             margin: 0; padding-left: 20px; color: var(--text-main); font-size: 1.05rem; line-height: 1.6;
         }
         .proc-instructions li { margin-bottom: 12px; }
         .proc-instructions li:last-child { margin-bottom: 0; }
+
+        /* Redesigned "How It Works" — focuses on the map/leaderboard below and
+           on recruiting votes via social shares, styled as engaging icon cards. */
+        .how-it-works-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 4px;
+        }
+        .hiw-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 22px 20px;
+            text-align: left;
+            transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+        }
+        .hiw-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(203,160,82,0.4);
+            background: rgba(255,255,255,0.05);
+        }
+        .hiw-icon {
+            width: 52px; height: 52px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.6rem;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+            border: 3px solid transparent;
+            background:
+                linear-gradient(var(--bg-secondary), var(--bg-secondary)) padding-box,
+                conic-gradient(from -45deg, var(--text-primary), var(--accent), var(--brand-red), var(--text-primary)) border-box;
+            filter: drop-shadow(0 3px 8px rgba(0,0,0,0.4));
+        }
+        .hiw-card h5 {
+            margin: 0 0 8px 0;
+            font-family: var(--font-hero);
+            text-transform: uppercase;
+            font-size: 1.05rem;
+            color: var(--text-primary);
+            letter-spacing: 0.5px;
+        }
+        .hiw-card p {
+            margin: 0;
+            font-size: 0.92rem;
+            line-height: 1.55;
+            color: var(--text-secondary);
+        }
+        .hiw-scroll-cue {
+            margin-top: 22px;
+            text-align: center;
+            font-family: var(--font-hero);
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1.5px;
+            color: var(--accent);
+            animation: hiwBounce 1.8s ease-in-out infinite;
+        }
+        @keyframes hiwBounce {
+            0%, 100% { transform: translateY(0); opacity: 0.85; }
+            50% { transform: translateY(4px); opacity: 1; }
+        }
+        @media (max-width: 900px) {
+            .how-it-works-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Run-off "revealed pick" cards */
+        .reveal-card { padding-top: 0; overflow: hidden; }
+        .reveal-card-media {
+            display: block;
+            width: calc(100% + 70px);
+            margin: -35px -35px 22px -35px;
+            height: 210px;
+            object-fit: cover;
+            background: var(--bg-secondary);
+        }
+        .reveal-card-media[hidden] { display: none; }
+        .reveal-role-label {
+            display: inline-block;
+            font-family: var(--font-header);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-size: 0.8rem;
+            color: var(--accent);
+            margin-bottom: 6px;
+        }
+        .reveal-stop-number {
+            font-size: 1.1rem; margin-bottom: 4px; color: var(--text-secondary);
+            font-weight: bold; letter-spacing: 1px;
+        }
+        .reveal-business-name {
+            margin: 0 0 16px 0;
+            font-size: 1.9rem;
+            font-family: var(--font-header);
+            text-transform: uppercase;
+            color: var(--text-primary);
+            line-height: 1.05;
+        }
+        .reveal-body {
+            margin: 0 0 22px 0;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+        .reveal-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+        .reveal-actions .reveal-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-family: var(--font-header);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            padding: 11px 18px;
+            border-radius: 24px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        .reveal-btn.reveal-map-link {
+            background: var(--brand-red);
+            color: #fff;
+            border: 1px solid var(--brand-red);
+        }
+        .reveal-btn.reveal-map-link:hover { filter: brightness(1.12); }
+        .reveal-btn.reveal-web-link {
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid rgba(203,160,82,0.5);
+        }
+        .reveal-btn.reveal-web-link:hover { border-color: var(--text-primary); }
+        .reveal-btn.reveal-web-link[hidden] { display: none; }
 
         .desktop-path { display: inline; }
         .mobile-path { display: none; }
@@ -138,9 +344,11 @@ function renderItineraryStops(stops, vars) {
             .desktop-path { display: none; }
             .mobile-path { display: inline; }
         }
-    </style>
-    
-    <div class="proceedings-container">
+    </style>`;
+}
+
+function proceedingsPathSvg() {
+    return `
         <!-- 3D Winding SVG Path (responsive) -->
         <svg class="proceedings-path" viewBox="0 0 100 100" preserveAspectRatio="none">
             <!-- DESKTOP Layers ('S' shape) -->
@@ -158,53 +366,151 @@ function renderItineraryStops(stops, vars) {
                 <path d="M 50,5 C 80,35 20,65 50,95" fill="none" stroke="var(--accent)" stroke-width="10" vector-effect="non-scaling-stroke" transform="translate(2, 2)" />
                 <path d="M 50,5 C 80,35 20,65 50,95" fill="none" stroke="var(--brand-red)" stroke-width="4" vector-effect="non-scaling-stroke" />
             </g>
-        </svg>
+        </svg>`;
+}
 
-        ${stops.map((stop, index) => {
-            const alignClass = index === 0 ? 'left' : (index === 1 ? 'right' : 'center');
-            
-            let avatarHtml = '';
-            if (index === 0) {
-                avatarHtml = `<img src="${vars.influencerImg}" class="stop-avatar" alt="${vars.influencerName}">`;
-            } else if (index === 1) {
-                avatarHtml = `<img src="${vars.councilImg}" class="stop-avatar" alt="${vars.councilName}">`;
-            } else {
-                avatarHtml = `<div class="stop-avatar">🗳️</div>`;
-            }
+// Ordinal flavor labels for the 3 nightcrawl stops (replaces the plain
+// "STOP 01/02/03" caption with the homepage's 3D title treatment).
+const STOP_ORDINAL_LABELS = ['First Stop', 'Second Stop', 'Last Stop'];
 
-            let extraHtml = '';
-            let subtitleHtml = `<p style="margin: 0; font-size: 1.1rem; line-height: 1.6; color: var(--text-secondary);">${interpolate(stop.body, vars)}</p>`;
-            
-            if (index === 2) {
-                // Combine the "How it works" instructions into the third stop to unify the narrative
-                subtitleHtml = `<p style="margin: 0; font-size: 1.15rem; line-height: 1.6; color: var(--text-secondary);">Where are we ending the night? The polls open 14 days before the event.</p>`;
-                extraHtml = `
-                    <div class="proc-instructions">
-                        <h4>How it works</h4>
-                        <ul>
-                            <li><strong>Round 1:</strong> Voting opens for all districts when the press release drops. Vote for your favorite neighborhood spots. The top 10 advance.</li>
-                            <li><strong>The Run-Off:</strong> Starts the Monday before the event at 3:00 PM. A final sprint to decide the winner among the top 10.</li>
-                            <li><strong>The Prize:</strong> The winning venue hosts the final stop. Every vote is an entry into the Golden Ticket Raffle!</li>
-                        </ul>
-                    </div>
-                `;
-            }
+// A single teaser stop card (used for the influencer & council stops in the
+// default, pre-run-off Crawl-tinery).
+function renderHostStop(stop, index, vars) {
+    const alignClass = index === 0 ? 'left' : 'right';
+    const avatarHtml = index === 0
+        ? `<img src="${vars.influencerImg}" class="stop-avatar" alt="${vars.influencerName}">`
+        : `<img src="${vars.councilImg}" class="stop-avatar" alt="${vars.councilName}">`;
 
-            return `
+    // Stop 1 links out to the influencer's social account; Stop 2 links to the
+    // councilmember's official bio page. Omitted entirely if a district hasn't
+    // set the corresponding URL yet.
+    let hostLinkHtml = '';
+    if (index === 0 && vars.influencerSocialUrl) {
+        hostLinkHtml = `<a href="${vars.influencerSocialUrl}" target="_blank" rel="noopener noreferrer" class="stop-host-link">Follow ${vars.influencerName} ${socialHandleFromUrl(vars.influencerSocialUrl)}</a>`;
+    } else if (index === 1 && vars.councilBioUrl) {
+        hostLinkHtml = `<a href="${vars.councilBioUrl}" target="_blank" rel="noopener noreferrer" class="stop-host-link">View ${vars.councilName}'s Official Bio</a>`;
+    }
+
+    return `
             <div class="proc-step ${alignClass} stop-${index + 1}">
                 <div class="proc-card">
                     <div class="stop-avatar-container">
                         ${avatarHtml}
-                        <div style="text-align: ${index === 2 ? 'center' : 'left'};">
-                            <div class="stop-number" style="font-size: 1.2rem; margin-bottom: 4px; color: var(--accent); font-weight: bold; letter-spacing: 1px;">STOP ${stop.number}</div>
-                            <h3 style="margin: 0; font-size: 1.7rem; font-family: var(--font-header); text-transform: uppercase;">${index === 2 ? 'The Election: Stop 3' : interpolate(stop.title, vars)}</h3>
+                        <div style="text-align: left;">
+                            <div class="stop-label-3d">${STOP_ORDINAL_LABELS[index]}</div>
+                            <h3 style="margin: 0; font-size: 1.7rem; line-height: 36px; font-family: var(--font-header); text-transform: uppercase;">${interpolate(stop.title, vars)}</h3>
                         </div>
                     </div>
-                    ${subtitleHtml}
-                    ${extraHtml}
+                    <p style="margin: 0; font-size: 1.1rem; line-height: 1.6; color: var(--text-secondary);">${interpolate(stop.body, vars)}</p>
+                    ${hostLinkHtml}
                 </div>
             </div>`;
-        }).join('')}
+}
+
+// The final "Stop 3 / The Election" card. Shared by both Crawl-tinery variants
+// since the third stop is decided by the public vote in every phase. The
+// run-off start date/time (#election-runoff-date-value) is filled in from the
+// live schedule by updateRunoffDateDisplay() once it's fetched.
+function renderElectionStop() {
+    return `
+            <div class="proc-step center stop-3">
+                <div class="proc-card">
+                    <div class="stop-avatar-container">
+                        <div class="stop-avatar">🗳️</div>
+                        <div style="text-align: left;">
+                            <div class="stop-label-3d">${STOP_ORDINAL_LABELS[2]}</div>
+                            <h3 style="margin: 0; font-size: 1.7rem; line-height: 36px; font-family: var(--font-header); text-transform: uppercase;">Tell Us Where to End the Night</h3>
+                        </div>
+                    </div>
+                    <p style="margin: 0; font-size: 1.15rem; line-height: 1.6; color: var(--text-secondary);">Your favorite neighborhood restaurant? A dive bar? A great spot for live music? It's up to you!</p>
+                    <p class="election-runoff-date" id="election-runoff-date">A run-off of your top ten choices starts <span class="runoff-date-value">soon</span>.</p>
+
+                    <div class="proc-instructions">
+                        <h4>How It Works</h4>
+                        <p class="hiw-intro">Every vote below is a real vote for the crawl's final stop. Here's how to make yours count.</p>
+                        <div class="how-it-works-grid">
+                            <div class="hiw-card">
+                                <div class="hiw-icon">🗺️</div>
+                                <h5>Explore &amp; Vote on the Map</h5>
+                                <p>Scroll down to browse every bar, restaurant, live venue, and museum/gallery in the district &mdash; each one color-coded and pinned to the map below.</p>
+                            </div>
+                            <div class="hiw-card">
+                                <div class="hiw-icon">🏆</div>
+                                <h5>Browse Businesses on the Leaderboard</h5>
+                                <p>Tap any pin, or use the leaderboard and browse list below, to vote for your favorite spots. Vote for as many businesses as you like &mdash; the top 10 advance to the run-off.</p>
+                            </div>
+                            <div class="hiw-card">
+                                <div class="hiw-icon">📲</div>
+                                <h5>Recruit More Votes</h5>
+                                <p>Copy a venue's direct link from its map popup or leaderboard card and drop it into an Instagram or TikTok story to rally your friends and followers.</p>
+                            </div>
+                        </div>
+                        <div class="hiw-scroll-cue">↓ Scroll down to explore the map &amp; leaderboard ↓</div>
+                    </div>
+                </div>
+            </div>`;
+}
+
+// A single "revealed pick" card for the run-off Crawl-tinery. Content is
+// populated at runtime from the venue doc + schedule (see populateRunoffCrawltinery).
+function renderRevealCard({ role, roleLabel, stopNumber, alignClass }) {
+    return `
+            <div class="proc-step ${alignClass}" data-pick-role="${role}">
+                <div class="proc-card reveal-card">
+                    <img class="reveal-card-media" data-field="image" src="" alt="" hidden>
+                    <div class="reveal-role-label">${roleLabel}'s Pick</div>
+                    <div class="reveal-stop-number">STOP ${stopNumber}</div>
+                    <h3 class="reveal-business-name" data-field="name">To Be Revealed</h3>
+                    <p class="reveal-body" data-field="body"></p>
+                    <div class="reveal-actions">
+                        <button type="button" class="reveal-btn reveal-map-link" data-field="map">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            Find on Map
+                        </button>
+                        <a class="reveal-btn reveal-web-link" data-field="website" href="#" target="_blank" rel="noopener noreferrer" hidden>
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                            Visit Website
+                        </a>
+                    </div>
+                </div>
+            </div>`;
+}
+
+// Default (pre-run-off) Crawl-tinery: teases the two host stops + the election.
+function renderDefaultCrawltinery(stops, vars) {
+    return `
+    <div class="proceedings-container">
+        ${proceedingsPathSvg()}
+        ${renderHostStop(stops[0], 0, vars)}
+        ${renderHostStop(stops[1], 1, vars)}
+        ${renderElectionStop()}
+    </div>`;
+}
+
+// Run-off Crawl-tinery: reveals the two businesses the hosts selected, then the
+// still-live election for the third stop.
+function renderRunoffCrawltinery(vars, influencerRole, councilRole) {
+    return `
+    <div class="proceedings-container">
+        ${proceedingsPathSvg()}
+        ${renderRevealCard({ role: 'influencer', roleLabel: influencerRole, stopNumber: '01', alignClass: 'left' })}
+        ${renderRevealCard({ role: 'council', roleLabel: councilRole, stopNumber: '02', alignClass: 'right' })}
+        ${renderElectionStop()}
+    </div>`;
+}
+
+// Renders both Crawl-tinery variants. The run-off variant is hidden until the
+// run-off begins; setVotingState() toggles between them based on the schedule.
+function renderItinerary(districtCopy, vars, shared) {
+    const influencerRole = districtCopy.influencerAccountTitle || shared.roles.influencer;
+    const councilRole = shared.roles.council;
+    return `
+    ${itineraryStyles()}
+    <div id="crawltinery-default">
+        ${renderDefaultCrawltinery(districtCopy.itinerary.stops, vars)}
+    </div>
+    <div id="crawltinery-runoff" style="display: none;">
+        ${renderRunoffCrawltinery(vars, influencerRole, councilRole)}
     </div>`;
 }
 
@@ -499,7 +805,7 @@ class EventLayout extends HTMLElement {
                 <div class="page-module" style="width: 80%; max-width: 1400px; margin: 0 auto; text-align: center;">
                     <h2 style="font-family: var(--font-hero); font-size: 3.5rem; text-transform: uppercase; color: var(--text-primary); margin-top: 20px; margin-bottom: 15px; letter-spacing: 2px;">${shared.itinerary.heading}</h2>
                     <p style="font-size: 1.15rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto 10px;">Follow the trail and cast your vote to decide where District ${districtCopy.district} ends the night.</p>
-                    ${renderItineraryStops(districtCopy.itinerary.stops, vars)}
+                    ${renderItinerary(districtCopy, vars, shared)}
                 </div>
             </div>
 
@@ -653,6 +959,8 @@ class EventLayout extends HTMLElement {
             this.initVotingPortal();
             // Non-blocking: resolve the live election state after the page is on screen.
             this.applyElectionSchedule(districtId);
+            // Admin-only: in-page toolbar to preview each election phase locally.
+            this.initAdminPreview();
         } catch (error) {
             console.error('CRITICAL ERROR loading event page:', error);
             this.innerHTML = `<p style="padding: 2rem; margin-top: 100px; text-align: center; color: red; font-size: 2rem; z-index: 9999; position: relative;">Unable to load event content: ${error.message}</p>`;
@@ -682,10 +990,180 @@ class EventLayout extends HTMLElement {
 
             window.currentElectionState = activeState;
             window.electionWinnerId = winnerId;
+
+            // Populate the run-off Crawl-tinery cards from the schedule's picks so
+            // they are ready before we toggle them into view.
+            this.populateRunoffCrawltinery(sched);
+            this.updateRunoffDateDisplay(sched.runOffStart);
+
             if (window.setVotingState) window.setVotingState(activeState);
         } catch (err) {
             console.warn('Election schedule unavailable; defaulting to round-1 state.', err);
         }
+    }
+
+    // Fills in the run-off start date/time on the Election card (Stop 3) so
+    // visitors know exactly when voting narrows to the top 10. Leaves the
+    // "soon" placeholder if the schedule hasn't been set yet.
+    updateRunoffDateDisplay(runOffStart) {
+        const el = this.querySelector('#election-runoff-date .runoff-date-value');
+        if (!el) return;
+        const formatted = formatScheduleDateTime(runOffStart);
+        if (formatted) el.textContent = formatted;
+    }
+
+    // Fills the run-off Crawl-tinery "revealed pick" cards. The business identity
+    // (name, photo, website, map location) is pulled from each venue doc so the
+    // admin only has to paste a venue ID + write the blurb in the dashboard.
+    async populateRunoffCrawltinery(sched) {
+        if (!sched) return;
+        const picks = [
+            { role: 'influencer', id: sched.influencerPickId, body: sched.influencerPickBody },
+            { role: 'council', id: sched.councilPickId, body: sched.councilPickBody }
+        ];
+
+        for (const pick of picks) {
+            const card = this.querySelector(`[data-pick-role="${pick.role}"]`);
+            if (!card) continue;
+
+            const bodyEl = card.querySelector('[data-field="body"]');
+            if (bodyEl && pick.body) bodyEl.textContent = pick.body;
+
+            if (!pick.id) continue;
+
+            try {
+                const venueSnap = await getDoc(doc(db, "venues", pick.id));
+                if (!venueSnap.exists()) continue;
+                const venue = venueSnap.data();
+
+                const nameEl = card.querySelector('[data-field="name"]');
+                if (nameEl && venue.name) nameEl.textContent = venue.name;
+
+                const imgEl = card.querySelector('[data-field="image"]');
+                if (imgEl && venue.image) {
+                    imgEl.src = venue.image;
+                    imgEl.alt = venue.name || '';
+                    imgEl.hidden = false;
+                }
+
+                const webEl = card.querySelector('[data-field="website"]');
+                const websiteUrl = venue.website || venue.facebook;
+                if (webEl && websiteUrl) {
+                    webEl.href = websiteUrl;
+                    webEl.hidden = false;
+                }
+
+                const mapBtn = card.querySelector('[data-field="map"]');
+                if (mapBtn) {
+                    mapBtn.addEventListener('click', () => {
+                        if (window.openMapPopupForVenue) window.openMapPopupForVenue(pick.id);
+                        const mapSection = document.getElementById('map-section');
+                        if (mapSection) mapSection.scrollIntoView({ behavior: 'smooth' });
+                    });
+                }
+            } catch (err) {
+                console.warn(`Unable to load run-off pick for ${pick.role}:`, err);
+            }
+        }
+    }
+
+    // Admin-only floating toolbar for previewing each election phase. It only
+    // renders for the admin account, is never shown to the public, and only
+    // changes the LOCAL view (via setVotingState) — it writes nothing to
+    // Firestore, so the live schedule and public site are never affected.
+    initAdminPreview() {
+        onAuthStateChanged(auth, async (user) => {
+            const existing = document.getElementById('admin-preview-bar');
+
+            if (!(await isAdminUser(user))) {
+                if (existing) existing.remove();
+                return;
+            }
+            if (existing) return; // already rendered for this session
+
+            const phases = [
+                { id: 'round-1', label: 'Round 1' },
+                { id: 'run-off', label: 'Run-Off' },
+                { id: 'post-election', label: 'Winner' },
+                { id: 'post-event', label: 'Post-Event' }
+            ];
+
+            const bar = document.createElement('div');
+            bar.id = 'admin-preview-bar';
+            bar.innerHTML = `
+                <style>
+                    #admin-preview-bar {
+                        position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+                        z-index: 99999; display: flex; align-items: center; gap: 12px;
+                        flex-wrap: wrap; justify-content: center;
+                        background: #0F1626; border: 1px solid var(--accent, #8A2F25);
+                        border-bottom: none; border-radius: 10px 10px 0 0;
+                        padding: 10px 16px; box-shadow: 0 -6px 20px rgba(0,0,0,0.5);
+                        font-family: var(--font-header, 'Oswald', sans-serif);
+                        max-width: 96vw;
+                    }
+                    #admin-preview-bar .apb-tag {
+                        font-size: 0.7rem; letter-spacing: 1.5px; text-transform: uppercase;
+                        color: var(--accent, #8A2F25); font-weight: 700;
+                    }
+                    #admin-preview-bar .apb-viewing {
+                        font-size: 0.8rem; color: #DEBA84; text-transform: uppercase; letter-spacing: 0.5px;
+                    }
+                    #admin-preview-bar .apb-viewing b { color: #fff; }
+                    #admin-preview-bar .apb-btn {
+                        background: transparent; color: #CBA052;
+                        border: 1px solid rgba(203,160,82,0.4); border-radius: 20px;
+                        padding: 6px 14px; font-size: 0.78rem; font-weight: 700;
+                        text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer;
+                        font-family: inherit; transition: all 0.15s ease;
+                    }
+                    #admin-preview-bar .apb-btn:hover { border-color: #CBA052; color: #fff; }
+                    #admin-preview-bar .apb-btn.active { background: var(--brand-red, #B32424); color: #fff; border-color: var(--brand-red, #B32424); }
+                    #admin-preview-bar .apb-live { border-color: rgba(69,183,209,0.6); color: #45B7D1; }
+                    #admin-preview-bar .apb-live:hover { border-color: #45B7D1; color: #fff; }
+                    #admin-preview-bar .apb-close {
+                        background: none; border: none; color: #DEBA84; font-size: 1.2rem;
+                        cursor: pointer; line-height: 1; padding: 0 4px;
+                    }
+                    #admin-preview-bar .apb-divider { width: 1px; height: 22px; background: rgba(255,255,255,0.15); }
+                </style>
+                <span class="apb-tag">Admin Preview</span>
+                <span class="apb-viewing">Viewing: <b class="apb-current">—</b></span>
+                <span class="apb-divider"></span>
+                ${phases.map(p => `<button type="button" class="apb-btn" data-phase="${p.id}">${p.label}</button>`).join('')}
+                <button type="button" class="apb-btn apb-live" data-phase="__live__">Reset to Live</button>
+                <span class="apb-divider"></span>
+                <button type="button" class="apb-close" title="Hide toolbar (reload to bring back)">×</button>
+            `;
+            document.body.appendChild(bar);
+
+            const currentLabel = bar.querySelector('.apb-current');
+            const phaseButtons = bar.querySelectorAll('[data-phase]');
+
+            const prettyPhase = (id) => (phases.find(p => p.id === id) || {}).label || id;
+
+            const markActive = (phaseId) => {
+                phaseButtons.forEach(b => b.classList.toggle('active', b.dataset.phase === phaseId));
+            };
+
+            phaseButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const target = btn.dataset.phase === '__live__'
+                        ? (window.currentElectionState || 'round-1')
+                        : btn.dataset.phase;
+                    if (window.setVotingState) window.setVotingState(target);
+                    currentLabel.textContent = btn.dataset.phase === '__live__'
+                        ? `${prettyPhase(target)} (live)`
+                        : prettyPhase(target);
+                    markActive(btn.dataset.phase === '__live__' ? null : target);
+                });
+            });
+
+            // Initialise the "Viewing" indicator with whatever is on screen now.
+            currentLabel.textContent = prettyPhase(window.currentElectionState || 'round-1');
+
+            bar.querySelector('.apb-close').addEventListener('click', () => bar.remove());
+        });
     }
 
     initScrollAnimations() {
@@ -926,6 +1404,15 @@ class EventLayout extends HTMLElement {
         
         window.setVotingState = (stateId) => {
             const states = ['round-1', 'run-off', 'post-election', 'post-event'];
+
+            // Toggle the Crawl-tinery variant: the default teaser shows only in
+            // round-1 (and pre-launch); once the run-off begins the host picks stay
+            // revealed for every later phase.
+            const defaultCrawl = this.querySelector('#crawltinery-default');
+            const runoffCrawl = this.querySelector('#crawltinery-runoff');
+            const picksRevealed = stateId !== 'round-1';
+            if (defaultCrawl) defaultCrawl.style.display = picksRevealed ? 'none' : 'block';
+            if (runoffCrawl) runoffCrawl.style.display = picksRevealed ? 'block' : 'none';
             
             // Update map legend subtitle based on state
             const legendSubtitle = document.querySelector('#legend-round-subtitle');
