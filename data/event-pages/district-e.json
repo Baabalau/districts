@@ -17,13 +17,13 @@
     "stops": [
       {
         "number": "01",
-        "title": "{influencerName}' East Side Opener",
-        "body": "{influencerName} opens the crawl in {location} with a stop that puts New Orleans East and the Lower 9 on the mapùmusic, food, and a room full of neighborhood pride."
+        "title": "{councilName}' Lower 9 Opener",
+        "body": "{councilName} opens the crawl in the lower ninth ward with a stop that puts New Orleans East and the Lower 9 on the mapÔøΩmusic, food, and a room full of neighborhood pride."
       },
       {
         "number": "02",
-        "title": "{councilName}' Ward Favorite",
-        "body": "Councilmember {councilName} chooses a second stop rooted in the community: a place where locals gather, support each other, and keep the culture alive after dark."
+        "title": "{influencerName}' NO East Favorite",
+        "body": "Councilmember {influencerName} chooses a second stop rooted in the community: a place where locals gather, support each other, and keep the culture alive after dark."
       },
       {
         "number": "03",

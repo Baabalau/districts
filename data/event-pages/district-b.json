@@ -18,13 +18,13 @@
     "stops": [
       {
         "number": "01",
-        "title": "{influencerName}'s Quarter Debut",
-        "body": "The crawl begins in the heart of {location} at a spot {influencerName} calls essentialùlive energy, strong pours, and the kind of room that sets the tone for the whole night."
+        "title": "{influencerName}'s Downtown Debut",
+        "body": "The crawl begins in the heart of the CBD at a spot {influencerName} calls essentialÔøΩlive energy, strong pours, and the kind of room that sets the tone for the whole night."
       },
       {
         "number": "02",
-        "title": "{councilName}'s CBD Pick",
-        "body": "Councilmember {councilName} takes the group to a trusted institution where regulars, workers, and visitors mixùperfect for talking policy without leaving the party behind."
+        "title": "{councilName}'s Mystery Pick",
+        "body": "Councilmember {councilName} takes the group to a trusted institution where regulars, workers, and visitors mixÔøΩperfect for talking policy without leaving the party behind."
       },
       {
         "number": "03",
