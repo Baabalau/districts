@@ -567,23 +567,30 @@
 
         /* --- INTERSECTING HORIZONTAL CARD FLOWS --- */
         .flow-section {
-            padding: 48px 0 56px;
+            padding: 48px 0;
             background: var(--bg-secondary);
             overflow: hidden;
             position: relative;
+            display: flex;
+            flex-direction: column;
+            row-gap: 25px;
         }
 
         .flow-row {
             overflow: hidden;
             width: 100%;
-            padding: 10px 0;
+            padding: 0 0 10px;
         }
 
         .flow-row--people {
-            transform: rotate(-1.2deg) scale(1.03);
             z-index: 2;
             margin-bottom: 20px;
+            padding-top: 25px;
             padding-bottom: 40px;
+        }
+
+        .flow-row--people .flow-couple {
+            transform: rotate(-1.2deg) scale(1.03);
         }
 
         .flow-track {
@@ -678,7 +685,7 @@
             text-transform: uppercase;
             letter-spacing: 0.15em;
             color: var(--text-secondary);
-            margin-bottom: 12px;
+            margin: 0;
             padding: 0 16px;
         }
 
