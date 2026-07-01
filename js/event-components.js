@@ -43,6 +43,17 @@ function socialHandleFromUrl(url) {
     }
 }
 
+// Formats a schedule date (Firestore Timestamp or ISO string) into copy like
+// "Monday, August 4 at 3:00 PM" for the run-off teaser on the Election card.
+function formatScheduleDateTime(dateVal) {
+    if (!dateVal) return null;
+    const d = dateVal.toDate ? dateVal.toDate() : new Date(dateVal);
+    if (isNaN(d)) return null;
+    const dateStr = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+    const timeStr = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    return `${dateStr} at ${timeStr}`;
+}
+
 // Matches homepage event cards (index.html #events)
 const DISTRICT_HERO_IMAGES = {
     a: 'assets/district_a_image.jpeg',
@@ -102,17 +113,11 @@ function itineraryStyles() {
             border-color: var(--brand-red);
             border-width: 2px;
             box-shadow: 0 0 25px rgba(138, 47, 37, 0.25);
-            text-align: center;
+            text-align: left;
         }
 
         .stop-avatar-container {
             display: flex; align-items: center; gap: 18px; margin-bottom: 20px;
-        }
-        .proc-step.center .stop-avatar-container {
-            justify-content: center;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 25px;
         }
 
         .stop-avatar {
@@ -164,6 +169,19 @@ function itineraryStyles() {
         }
         .stop-host-link:hover { text-decoration: underline; }
 
+        .election-runoff-date {
+            margin: 6px 0 0 0;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        .election-runoff-date .runoff-date-value {
+            color: var(--text-primary);
+            font-weight: 800;
+            text-decoration: underline;
+        }
+
         .proc-instructions {
             background: rgba(0,0,0,0.4);
             border-radius: 12px;
@@ -174,13 +192,81 @@ function itineraryStyles() {
             border: 1px solid rgba(255,255,255,0.05);
         }
         .proc-instructions h4 {
-            color: var(--text-primary); margin: 0 0 15px 0; font-size: 1.3rem; font-family: var(--font-header); text-transform: uppercase; letter-spacing: 1px;
+            color: var(--text-primary); margin: 0 0 6px 0; font-size: 1.3rem; font-family: var(--font-header); text-transform: uppercase; letter-spacing: 1px;
+        }
+        .proc-instructions > p.hiw-intro {
+            margin: 0 0 20px 0; color: var(--text-secondary); font-size: 1rem; line-height: 1.5; max-width: 620px;
         }
         .proc-instructions ul {
             margin: 0; padding-left: 20px; color: var(--text-main); font-size: 1.05rem; line-height: 1.6;
         }
         .proc-instructions li { margin-bottom: 12px; }
         .proc-instructions li:last-child { margin-bottom: 0; }
+
+        /* Redesigned "How It Works" — focuses on the map/leaderboard below and
+           on recruiting votes via social shares, styled as engaging icon cards. */
+        .how-it-works-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 4px;
+        }
+        .hiw-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 22px 20px;
+            text-align: left;
+            transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+        }
+        .hiw-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(203,160,82,0.4);
+            background: rgba(255,255,255,0.05);
+        }
+        .hiw-icon {
+            width: 52px; height: 52px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.6rem;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+            border: 3px solid transparent;
+            background:
+                linear-gradient(var(--bg-secondary), var(--bg-secondary)) padding-box,
+                conic-gradient(from -45deg, var(--text-primary), var(--accent), var(--brand-red), var(--text-primary)) border-box;
+            filter: drop-shadow(0 3px 8px rgba(0,0,0,0.4));
+        }
+        .hiw-card h5 {
+            margin: 0 0 8px 0;
+            font-family: var(--font-hero);
+            text-transform: uppercase;
+            font-size: 1.05rem;
+            color: var(--text-primary);
+            letter-spacing: 0.5px;
+        }
+        .hiw-card p {
+            margin: 0;
+            font-size: 0.92rem;
+            line-height: 1.55;
+            color: var(--text-secondary);
+        }
+        .hiw-scroll-cue {
+            margin-top: 22px;
+            text-align: center;
+            font-family: var(--font-hero);
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1.5px;
+            color: var(--accent);
+            animation: hiwBounce 1.8s ease-in-out infinite;
+        }
+        @keyframes hiwBounce {
+            0%, 100% { transform: translateY(0); opacity: 0.85; }
+            50% { transform: translateY(4px); opacity: 1; }
+        }
+        @media (max-width: 900px) {
+            .how-it-works-grid { grid-template-columns: 1fr; }
+        }
 
         /* Run-off "revealed pick" cards */
         .reveal-card { padding-top: 0; overflow: hidden; }
@@ -322,26 +408,44 @@ function renderHostStop(stop, index, vars) {
 }
 
 // The final "Stop 3 / The Election" card. Shared by both Crawl-tinery variants
-// since the third stop is decided by the public vote in every phase.
+// since the third stop is decided by the public vote in every phase. The
+// run-off start date/time (#election-runoff-date-value) is filled in from the
+// live schedule by updateRunoffDateDisplay() once it's fetched.
 function renderElectionStop() {
     return `
             <div class="proc-step center stop-3">
                 <div class="proc-card">
                     <div class="stop-avatar-container">
                         <div class="stop-avatar">🗳️</div>
-                        <div style="text-align: center;">
+                        <div style="text-align: left;">
                             <div class="stop-label-3d">${STOP_ORDINAL_LABELS[2]}</div>
-                            <h3 style="margin: 0; font-size: 1.7rem; line-height: 36px; font-family: var(--font-header); text-transform: uppercase;">The Election: Stop 3</h3>
+                            <h3 style="margin: 0; font-size: 1.7rem; line-height: 36px; font-family: var(--font-header); text-transform: uppercase;">Tell Us Where to End the Night</h3>
                         </div>
                     </div>
-                    <p style="margin: 0; font-size: 1.15rem; line-height: 1.6; color: var(--text-secondary);">Where are we ending the night? The polls open 14 days before the event.</p>
+                    <p style="margin: 0; font-size: 1.15rem; line-height: 1.6; color: var(--text-secondary);">Your favorite neighborhood restaurant? A dive bar? A great spot for live music? It's up to you!</p>
+                    <p class="election-runoff-date" id="election-runoff-date">A run-off of your top ten choices starts <span class="runoff-date-value">soon</span>.</p>
+
                     <div class="proc-instructions">
-                        <h4>How it works</h4>
-                        <ul>
-                            <li><strong>Round 1:</strong> Voting opens for all districts when the press release drops. Vote for your favorite neighborhood spots. The top 10 advance.</li>
-                            <li><strong>The Run-Off:</strong> Starts the Monday before the event at 3:00 PM. A final sprint to decide the winner among the top 10.</li>
-                            <li><strong>The Prize:</strong> The winning venue hosts the final stop. Every vote is an entry into the Golden Ticket Raffle!</li>
-                        </ul>
+                        <h4>How It Works</h4>
+                        <p class="hiw-intro">Every vote below is a real vote for the crawl's final stop. Here's how to make yours count.</p>
+                        <div class="how-it-works-grid">
+                            <div class="hiw-card">
+                                <div class="hiw-icon">🗺️</div>
+                                <h5>Explore &amp; Vote on the Map</h5>
+                                <p>Scroll down to browse every bar, restaurant, live venue, and museum/gallery in the district &mdash; each one color-coded and pinned to the map below.</p>
+                            </div>
+                            <div class="hiw-card">
+                                <div class="hiw-icon">🏆</div>
+                                <h5>Browse Businesses on the Leaderboard</h5>
+                                <p>Tap any pin, or use the leaderboard and browse list below, to vote for your favorite spots. Vote for as many businesses as you like &mdash; the top 10 advance to the run-off.</p>
+                            </div>
+                            <div class="hiw-card">
+                                <div class="hiw-icon">📲</div>
+                                <h5>Recruit More Votes</h5>
+                                <p>Copy a venue's direct link from its map popup or leaderboard card and drop it into an Instagram or TikTok story to rally your friends and followers.</p>
+                            </div>
+                        </div>
+                        <div class="hiw-scroll-cue">↓ Scroll down to explore the map &amp; leaderboard ↓</div>
                     </div>
                 </div>
             </div>`;
@@ -890,11 +994,22 @@ class EventLayout extends HTMLElement {
             // Populate the run-off Crawl-tinery cards from the schedule's picks so
             // they are ready before we toggle them into view.
             this.populateRunoffCrawltinery(sched);
+            this.updateRunoffDateDisplay(sched.runOffStart);
 
             if (window.setVotingState) window.setVotingState(activeState);
         } catch (err) {
             console.warn('Election schedule unavailable; defaulting to round-1 state.', err);
         }
+    }
+
+    // Fills in the run-off start date/time on the Election card (Stop 3) so
+    // visitors know exactly when voting narrows to the top 10. Leaves the
+    // "soon" placeholder if the schedule hasn't been set yet.
+    updateRunoffDateDisplay(runOffStart) {
+        const el = this.querySelector('#election-runoff-date .runoff-date-value');
+        if (!el) return;
+        const formatted = formatScheduleDateTime(runOffStart);
+        if (formatted) el.textContent = formatted;
     }
 
     // Fills the run-off Crawl-tinery "revealed pick" cards. The business identity
