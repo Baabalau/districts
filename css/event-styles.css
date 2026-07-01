@@ -96,7 +96,7 @@
 
 .hero-left h1.title-3d {
     font-family: var(--font-hero);
-    font-size: clamp(3.8rem, 7vw, 92px);
+    font-size: 50px;
     font-weight: 700;
     text-transform: uppercase;
     line-height: 1.1;
@@ -255,19 +255,20 @@
         text-align: left;
         align-items: center;
         gap: 40px;
+        width: 90%;
+        padding-bottom: 30px;
     }
 
     .hero-left {
         width: 100%;
         flex: 1 1 auto;
-        padding-left: 20px;
-        padding-right: 20px;
+        padding-left: 10px;
+        padding-right: 10px;
     }
 
-    /* Scale purely with viewport so the longest word ("NIGHTCRAWL") never
-       has to break, while staying as large as possible. */
+    /* User-tuned cap (50px) with viewport scaling for narrow screens. */
     .hero-left h1.title-3d {
-        font-size: clamp(2.25rem, 10.5vw, 3.75rem);
+        font-size: clamp(2rem, 12.8vw, 50px);
         overflow-wrap: normal;
         word-break: normal;
         hyphens: none;
@@ -315,6 +316,63 @@
         top: 44%;
         left: 40%;
         margin-top: 0;
+    }
+}
+
+/* Crawl-tinery / proceedings intro */
+.proceedings-section {
+    padding: 20px 0;
+    background: transparent;
+}
+
+.page-module {
+    width: 80%;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+@media (max-width: 900px) {
+    .page-module {
+        width: 92%;
+        padding: 0 10px;
+        box-sizing: border-box;
+    }
+}
+
+.voting-states-section .page-module {
+    text-align: center;
+}
+
+.proceedings-intro {
+    max-width: 640px;
+    margin: 0 auto 10px;
+    text-align: left;
+}
+
+.section-title.title-3d {
+    display: block;
+    text-align: center;
+    font-size: clamp(2.8rem, 6vw, 4.5rem);
+    margin: 0 auto 12px;
+    letter-spacing: 2px;
+}
+
+.proceedings-intro__lede {
+    font-size: 1.15rem;
+    color: var(--text-primary);
+    font-weight: 800;
+    margin-top: 40px;
+    margin-bottom: 10px;
+    text-align: left;
+}
+
+@media (max-width: 768px) {
+    .proceedings-section {
+        padding-bottom: 30px;
+    }
+
+    .section-title.title-3d {
+        font-size: clamp(2rem, 7.5vw, 2.8rem);
     }
 }
 
@@ -432,18 +490,23 @@
         padding: 0 10px !important;
     }
     .map-filters-inner > div:first-child {
-        padding-right: 15px !important;
+        padding: 5px !important;
         gap: 10px !important;
     }
     #legend-round-name {
         font-size: 1.2rem !important;
     }
     .map-filters-inner .countdown-clock.small-clock .time-box {
-        padding: 4px 8px !important;
-        min-width: 40px !important;
+        flex: 1 1 0 !important;
+        min-width: 0 !important;
+        padding: 4px 6px !important;
     }
     .map-filters-inner .countdown-clock.small-clock .time-box span {
-        font-size: 1.5rem !important;
+        font-size: 2rem !important;
+        font-weight: 900 !important;
+    }
+    .map-filters-inner .countdown-clock.small-clock .time-box label {
+        font-size: calc(0.65rem + 2pt) !important;
     }
     .map-filters-inner > div:last-child {
         gap: 10px !important;
@@ -455,30 +518,35 @@
         gap: 10px !important;
     }
     .map-filters-inner > div:first-child {
-        padding-right: 10px !important;
+        padding: 5px !important;
         gap: 8px !important;
     }
     #legend-round-name {
         font-size: 1rem !important;
     }
     .map-filters-inner .countdown-clock.small-clock {
-        gap: 5px !important;
+        gap: 4px !important;
     }
     .map-filters-inner .countdown-clock.small-clock .time-box {
+        flex: 1 1 0 !important;
+        min-width: 0 !important;
         padding: 2px 4px !important;
-        min-width: 30px !important;
     }
     .map-filters-inner .countdown-clock.small-clock .time-box span {
-        font-size: 1.2rem !important;
+        font-size: 1.6rem !important;
+        font-weight: 900 !important;
     }
     .map-filters-inner .countdown-clock.small-clock .time-box label {
-        font-size: 0.5rem !important;
+        font-size: calc(0.5rem + 2pt) !important;
     }
     .map-filters-inner > div:last-child {
         gap: 8px !important;
     }
     .map-filters-inner > div:last-child span {
-        font-size: 0.7rem !important;
+        font-size: 0.8rem !important;
+    }
+    .map-legend-label--muted {
+        font-size: 0.75rem !important;
     }
 }
 
@@ -667,18 +735,29 @@
 
 @media (max-width: 768px) {
     .venue-operators-strip {
+        flex-direction: column;
+        align-items: center;
         gap: 10px;
-        justify-content: center;
+        text-align: center;
+        padding: 16px 12px 0;
     }
     .venue-operators-label {
-        font-size: 0.75rem;
+        font-size: 0.8rem;
+        white-space: normal;
     }
     .venue-operators-text {
-        font-size: 0.75rem;
+        font-size: 0.85rem;
+        white-space: normal;
+        line-height: 1.45;
+        flex-shrink: 1;
     }
     .venue-operators-btn {
-        padding: 6px 12px;
-        font-size: 0.75rem;
+        padding: 10px 20px;
+        font-size: 0.85rem;
+        margin-top: 4px;
+        width: 100%;
+        max-width: 280px;
+        text-align: center;
     }
 }
 
@@ -735,7 +814,7 @@
     background: var(--panel-bg);
     border: 2px solid rgba(45, 27, 21, 0.15);
     border-radius: 12px;
-    padding: 4px 20px 15px;
+    padding: 4px 10px 15px;
     margin-bottom: 30px;
     box-shadow: 0 12px 32px rgba(45, 27, 21, 0.1);
 }
@@ -749,7 +828,10 @@
     text-transform: uppercase;
 }
 .leaderboard-list .venue-card {
+    position: relative;
     margin-bottom: 5px;
+    overflow: hidden;
+    align-items: center;
 }
 .leaderboard-list .venue-card:last-child {
     margin-bottom: 0;
@@ -820,6 +902,12 @@
     50%, 95% { transform: translateY(-1.2em); }
     100% { transform: translateY(0); }
 }
+@keyframes flipTextTriple {
+    0%, 28% { transform: translateY(0); }
+    33%, 61% { transform: translateY(-1.2em); }
+    66%, 94% { transform: translateY(-2.4em); }
+    100% { transform: translateY(0); }
+}
 
 /* State controls (Dev only) */
 .state-controls button {
@@ -844,6 +932,79 @@
 }
 .small-clock .time-box { padding: 10px 15px; min-width: 70px; }
 .small-clock .time-box span { font-size: 1.8rem; }
+
+/* Map filters bar: full-width countdown + left-aligned legend */
+.map-filters-inner > div:first-child {
+    padding: 5px;
+}
+.map-filters-inner .countdown-clock.small-clock {
+    width: 100%;
+    gap: 6px;
+    margin: 0;
+    flex-wrap: nowrap;
+}
+.map-filters-inner .countdown-clock.small-clock .time-box {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 6px 8px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+.map-filters-inner .countdown-clock.small-clock .time-box span {
+    font-size: 2.4rem;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 0;
+}
+.map-filters-inner .countdown-clock.small-clock .time-box label {
+    font-size: calc(0.7rem + 2pt);
+}
+.map-filters-inner > div:last-child {
+    justify-content: flex-start;
+}
+
+.map-legend-items {
+    flex: 1;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+.map-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.map-legend-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.map-legend-label {
+    color: var(--text-primary);
+    font-family: var(--font-header);
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+.map-legend-item--top10 {
+    border-left: 1px solid rgba(203, 160, 82, 0.3);
+    padding-left: 15px;
+}
+.map-legend-dot--outline {
+    background-color: transparent;
+    border: 2px solid #fff;
+    box-shadow: none;
+}
+.map-legend-label--muted {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-style: italic;
+    text-transform: none;
+    font-weight: 400;
+}
+
 .critical .time-box { border-color: #ff3333; animation: pulse-border 2s infinite; }
 
 @keyframes pulse-border {
@@ -900,6 +1061,30 @@
     padding: 0 15px;
     min-width: 0;
 }
+
+/* Leaderboard cards: corner rank badge + details fill remaining width */
+.venue-list.leaderboard-list .venue-card {
+    position: relative;
+    padding: 10px;
+}
+.venue-list.leaderboard-list .venue-card .rank-badge {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+    margin-right: 0;
+    z-index: 1;
+    border-radius: 7px 0 5px 0;
+}
+.venue-list.leaderboard-list .venue-card .v-details {
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+    padding: 0 6px 0 26px;
+}
+
 .venue-list .venue-name {
     font-family: 'EB Garamond', Georgia, serif;
     font-size: 1.5rem;
@@ -926,12 +1111,29 @@
     font-size: 0.85rem;
     font-style: italic;
 }
+.venue-subtitle-flip--leaderboard {
+    font-size: 15px;
+}
 .venue-subtitle-flip .flipper-container {
     animation: flipText 8s infinite;
+}
+.venue-subtitle-flip .flipper-container--double {
+    animation: flipText 8s infinite;
+}
+.venue-subtitle-flip .flipper-container--triple {
+    animation: flipTextTriple 9s infinite;
 }
 .venue-subtitle-flip .flipper-container div {
     height: 1.2em;
     line-height: 1.2em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.venue-subtitle-flip .flip-vote-count {
+    color: var(--accent);
+    font-weight: 800;
+    font-style: normal;
 }
 .venue-subtitle {
     color: var(--text-secondary);
@@ -1006,7 +1208,7 @@
 }
 .rank-badge {
     width: 35px; height: 35px; background: #333; color: #fff; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center; font-weight: 900; font-family: var(--font-header);
+    display: flex; align-items: center; justify-content: center; font-weight: 900; font-family: var(--font-hero);
     margin-right: 15px; flex-shrink: 0; border: 2px solid var(--bg-primary);
 }
 .rank-badge.gold { background: #CBA052; color: #0F1626; }
@@ -1027,6 +1229,48 @@
 .venue-explorer {
     margin-bottom: 20px;
 }
+
+@media (max-width: 900px) {
+    .voting-states-section .page-module {
+        width: 100%;
+        max-width: none;
+        padding: 0;
+    }
+
+    .venue-explorer {
+        width: 100%;
+        max-width: none;
+        margin-left: 0;
+        margin-right: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .venue-explorer .explorer-tabs {
+        padding-inline: 16px;
+    }
+
+    .venue-explorer .leaderboard {
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+    }
+
+    .venue-explorer .explorer-controls,
+    .venue-explorer .venue-list-container {
+        padding-inline: 16px;
+        box-sizing: border-box;
+    }
+
+    .venue-explorer .venue-list-container {
+        border-radius: 0;
+    }
+
+    .voting-states-section .venue-operators-strip {
+        padding-inline: 16px;
+    }
+}
+
 .explorer-tabs {
     display: flex;
     gap: 8px;
