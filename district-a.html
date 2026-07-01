@@ -7,15 +7,17 @@
     <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Oswald:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <link rel="stylesheet" href="css/district-page.css">
-    <link rel="stylesheet" href="css/event-styles.css?v=11">
+    <link rel="stylesheet" href="css/district-page.css?v=2">
+    <link rel="stylesheet" href="css/floating-menu.css?v=2">
+    <link rel="stylesheet" href="css/event-styles.css?v=22">
     <link rel="stylesheet" href="css/site-footer.css">
+    <script type="module" src="js/components/floating-menu.js?v=2"></script>
     <script type="module" src="js/components/site-footer.js"></script>
-<script type="module" src="js/event-components.js?v=14"></script>
+<script type="module" src="js/event-components.js?v=23"></script>
 </head>
 <body>
     <nav>
-        <div class="logo">District <span>After Dark</span></div>
+        <div class="logo">Districts <span class="logo-accent">After</span> <span class="logo-brand">Dark</span></div>
         <div class="nav-links">
             <a href="index.html">Home</a>
             <a href="index.html#events">Events</a>
@@ -23,6 +25,8 @@
             <a href="login.html" id="authLink">Log In / Sign Up</a>
         </div>
     </nav>
+
+    <floating-menu scroll-trigger></floating-menu>
 
     <event-layout district="A"></event-layout>
 
@@ -37,7 +41,7 @@
         }
     </script>
     <script src="council_districts.js"></script>
-    <script type="module" src="js/district-map.js?v=14"></script>
+    <script type="module" src="js/district-map.js?v=15"></script>
     <script type="module" src="js/auth.js"></script>
 </body>
 </html>

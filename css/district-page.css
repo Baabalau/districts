@@ -31,16 +31,13 @@ body {
     text-align: left;
 }
 
-nav {
+body > nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 20px 50px;
     background: rgba(15, 22, 38, 0.95);
     backdrop-filter: blur(8px);
-    position: sticky;
-    top: 0;
-    z-index: 100;
     border-bottom: 1px solid rgba(203, 160, 82, 0.25);
 }
 
@@ -53,11 +50,15 @@ nav {
     letter-spacing: 0.04em;
 }
 
-.logo span {
+.logo-accent {
     color: var(--brand-red);
 }
 
-.nav-links a {
+.logo-brand {
+    color: var(--brand-red);
+}
+
+body > nav .nav-links a {
     color: var(--text-primary);
     text-decoration: none;
     margin-left: 30px;
@@ -68,8 +69,37 @@ nav {
     transition: color 0.2s ease;
 }
 
-.nav-links a:hover {
+body > nav .nav-links a:hover {
     color: var(--accent);
+}
+
+@media (max-width: 768px) {
+    body > nav {
+        padding: 20px;
+        position: relative;
+    }
+
+    body > nav .nav-links {
+        display: none;
+    }
+    
+    .mobile-nav-btn {
+        position: absolute;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        display: none;
+        line-height: 0;
+    }
+
+    body > nav .logo {
+        margin-left: 45px;
+        font-size: 1.25rem;
+    }
 }
 
 /* Leaflet — matches light map */

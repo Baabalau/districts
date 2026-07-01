@@ -14,16 +14,34 @@ document.addEventListener("DOMContentLoaded", async () => {
         clearInterval(mapContainerInterval);
 
         const districtConfigs = {
-        'a': { center: [29.985, -90.10], zoom: 14 },
-        'b': { center: [29.9546, -90.0673], zoom: 15 },
+        'a': { center: [29.970, -90.107], zoom: 13 },
+        'b': { center: [29.942, -90.090], zoom: 14 },
         'c': { center: [29.958, -90.04], zoom: 12 },
-        'd': { center: [30.01, -90.05], zoom: 14 },
-        'e': { center: [30.00, -89.99], zoom: 13 }
+        'd': { center: [30.000, -90.064], zoom: 13 },
+        'e': { center: [30.060, -89.831], zoom: 11 },
     };
 
     // Initial map framing per district (full district remains pannable via maxBounds below).
     // sw/ne = south-west and north-east corners as [lat, lng].
     const districtInitialView = {
+        // Lakeview / Uptown — explicit framing so load matches designed viewport (see district-a map)
+        'a': {
+            center: [29.970, -90.107],
+            zoom: 13,
+            mobile: {
+                center: [29.970, -90.107],
+                zoom: 12
+            }
+        },
+        // French Quarter / CBD — explicit framing so load matches designed viewport (see district-b map)
+        'b': {
+            center: [29.942, -90.090],
+            zoom: 14,
+            mobile: {
+                center: [29.942, -90.090],
+                zoom: 13
+            }
+        },
         // Marigny / French Quarter — mobile uses explicit center+zoom (fitBounds is unreliable on narrow viewports)
         'c': {
             sw: [29.954, -90.068],
@@ -34,11 +52,23 @@ document.addEventListener("DOMContentLoaded", async () => {
                 zoom: 14
             }
         },
-        // Western half of District E — New Orleans East off-screen until user pans east
+        // Gentilly / St. Roch — explicit framing so load matches designed viewport (see district-d map)
+        'd': {
+            center: [30.000, -90.064],
+            zoom: 13,
+            mobile: {
+                center: [30.000, -90.064],
+                zoom: 12
+            }
+        },
+        // New Orleans East / Lower 9th — explicit framing so full district loads centered (see district-e map)
         'e': {
-            sw: [29.962, -90.032],
-            ne: [30.105, -89.945],
-            padding: [6, 6]
+            center: [30.060, -89.831],
+            zoom: 11,
+            mobile: {
+                center: [30.060, -89.831],
+                zoom: 10
+            }
         }
     };
 
@@ -127,6 +157,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 if (initialView?.mobile && isMobile) {
                     map.setView(initialView.mobile.center, initialView.mobile.zoom);
+                } else if (initialView?.center && initialView?.zoom != null && !initialView.sw) {
+                    map.setView(initialView.center, initialView.zoom);
                 } else if (initialView) {
                     const initialBounds = L.latLngBounds(initialView.sw, initialView.ne);
                     map.fitBounds(initialBounds, { padding: initialView.padding || [20, 20] });
@@ -382,20 +414,43 @@ document.addEventListener("DOMContentLoaded", async () => {
             // Render a single venue list item (Browse view). The Browse list is
             // alphabetical, not a ranking, so it shows a type-colored dot (matching
             // the map legend) instead of a gold/silver/bronze medal badge.
-            const buildVenueSubtitle = (v, extraHtml = '') => {
+            const buildVenueSubtitle = (v) => {
                 const typeStr = (v.type && typeof v.type === 'string') ? v.type.replace('_', ' ') : 'Venue';
                 let addressSnippet = '';
                 if (v.address) addressSnippet = v.address.split(',')[0].trim();
 
-                const rotation = addressSnippet ? `
+                if (addressSnippet) {
+                    return `
                     <div class="venue-subtitle-flip">
-                        <div class="flipper-container">
+                        <div class="flipper-container flipper-container--double">
                             <div>${typeStr}</div>
                             <div>${addressSnippet}</div>
                         </div>
-                    </div>` : `<em class="venue-subtitle">${typeStr}</em>`;
+                    </div>`;
+                }
+                return `<em class="venue-subtitle">${typeStr}</em>`;
+            };
 
-                return extraHtml ? `${rotation}${extraHtml}` : rotation;
+            const buildLeaderboardSubtitle = (v) => {
+                const typeStr = (v.type && typeof v.type === 'string') ? v.type.replace('_', ' ') : 'Venue';
+                let addressSnippet = '';
+                if (v.address) addressSnippet = v.address.split(',')[0].trim();
+                const voteCount = v.voteCount || 0;
+                const voteLabel = `${voteCount} vote${voteCount === 1 ? '' : 's'}`;
+
+                const lines = [
+                    `<div class="flip-vote-count">${voteLabel}</div>`,
+                    ...(addressSnippet ? [`<div>${addressSnippet}</div>`] : []),
+                    `<div>${typeStr}</div>`
+                ];
+                const modifier = lines.length === 3 ? 'triple' : 'double';
+
+                return `
+                    <div class="venue-subtitle-flip venue-subtitle-flip--leaderboard">
+                        <div class="flipper-container flipper-container--${modifier}">
+                            ${lines.join('')}
+                        </div>
+                    </div>`;
             };
 
             const renderVenueActions = (v) => {
@@ -492,11 +547,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                     const leftIndicator = `<span class="rank-badge ${badgeClass}">${i + 1}</span>`;
 
                     if (v) {
-                        const voteMeta = `<span class="vote-count-label">${v.voteCount} vote${v.voteCount === 1 ? '' : 's'}</span>`;
                         htmlString += renderVenueCard({
                             leftIndicatorHtml: leftIndicator,
                             nameHtml: `<strong class="venue-name">${v.name || 'Unknown'}</strong>`,
-                            subtitleHtml: buildVenueSubtitle(v, voteMeta),
+                            subtitleHtml: buildLeaderboardSubtitle(v),
                             actionsHtml: renderVenueActions(v)
                         });
                     } else {
