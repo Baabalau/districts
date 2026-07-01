@@ -212,7 +212,7 @@ floating-menu[scroll-trigger].is-visible .menu-toggle {
     pointer-events: auto;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
     .menu-toggle {
         top: 20px;
         left: 20px;
