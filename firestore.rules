@@ -1,9 +1,89 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
+
+    // --- Helpers ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Admin is identified by email (rules files are not shipped to the browser,
+    // so this does not undo the client-side email-hashing done in admin-auth.js).
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.email == 'robhenigbell@gmail.com';
+    }
+
+    // Set of field keys that differ between the incoming write and the stored doc.
+    function affectedKeys() {
+      return request.resource.data.diff(resource.data).affectedKeys();
+    }
+
+    // --- users: profile docs (contain email/PII) ---
+    // Public read is intentionally kept for now because the district-leaderboard
+    // (js/leaderboard.js) reads across all users. Phase 2 will split public
+    // fields from PII so this can be locked down.
+    match /users/{uid} {
       allow read: if true;
-      allow write: if true;
+
+      // A user may only create their own doc, keyed to their uid.
+      allow create: if isSignedIn()
+                    && request.auth.uid == uid
+                    && request.resource.data.uid == uid;
+
+      // A user may update only their own doc, and may never flip their own ban
+      // flag. Admins may update anything.
+      allow update: if isAdmin()
+                    || (isSignedIn()
+                        && request.auth.uid == uid
+                        && !('isBanned' in affectedKeys()));
+
+      allow delete: if isAdmin();
+    }
+
+    // --- venues: nominee businesses ---
+    // Public read (map + leaderboard). Venue documents are seeded/managed by the
+    // admin; the only write open to visitors is a single-vote increment.
+    match /venues/{venueId} {
+      allow read: if true;
+      allow create, delete: if isAdmin();
+
+      // Signed-in users may change ONLY voteCount, and only by exactly +1
+      // (guarding venues where voteCount was never set). All other venue fields
+      // (visitCount, optOutRunoff, name, etc.) are admin-only.
+      allow update: if isAdmin()
+                    || (isSignedIn()
+                        && affectedKeys().hasOnly(['voteCount'])
+                        && request.resource.data.voteCount ==
+                           ((resource.data.voteCount == null ? 0 : resource.data.voteCount) + 1));
+
+      // Check-in loyalty docs: a user owns the doc keyed to their uid.
+      // Read kept public for the Local Legends photo wall (Phase 2 hardening).
+      match /customers/{uid} {
+        allow read: if true;
+        allow create, update: if isSignedIn() && request.auth.uid == uid;
+        allow delete: if isAdmin();
+      }
+
+      // Vote audit records: a user may create their own; only admins can read
+      // (for the dashboard audit) or remove them.
+      match /votes/{uid} {
+        allow read: if isAdmin();
+        allow create: if isSignedIn() && request.auth.uid == uid;
+        allow update: if false;
+        allow delete: if isAdmin();
+      }
+    }
+
+    // --- settings: schedule + global config ---
+    // Public read (drives the event page states); admin-only writes.
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // --- Default deny: anything not matched above is denied. ---
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }
