@@ -414,20 +414,43 @@ document.addEventListener("DOMContentLoaded", async () => {
             // Render a single venue list item (Browse view). The Browse list is
             // alphabetical, not a ranking, so it shows a type-colored dot (matching
             // the map legend) instead of a gold/silver/bronze medal badge.
-            const buildVenueSubtitle = (v, extraHtml = '') => {
+            const buildVenueSubtitle = (v) => {
                 const typeStr = (v.type && typeof v.type === 'string') ? v.type.replace('_', ' ') : 'Venue';
                 let addressSnippet = '';
                 if (v.address) addressSnippet = v.address.split(',')[0].trim();
 
-                const rotation = addressSnippet ? `
+                if (addressSnippet) {
+                    return `
                     <div class="venue-subtitle-flip">
-                        <div class="flipper-container">
+                        <div class="flipper-container flipper-container--double">
                             <div>${typeStr}</div>
                             <div>${addressSnippet}</div>
                         </div>
-                    </div>` : `<em class="venue-subtitle">${typeStr}</em>`;
+                    </div>`;
+                }
+                return `<em class="venue-subtitle">${typeStr}</em>`;
+            };
 
-                return extraHtml ? `${rotation}${extraHtml}` : rotation;
+            const buildLeaderboardSubtitle = (v) => {
+                const typeStr = (v.type && typeof v.type === 'string') ? v.type.replace('_', ' ') : 'Venue';
+                let addressSnippet = '';
+                if (v.address) addressSnippet = v.address.split(',')[0].trim();
+                const voteCount = v.voteCount || 0;
+                const voteLabel = `${voteCount} vote${voteCount === 1 ? '' : 's'}`;
+
+                const lines = [
+                    `<div class="flip-vote-count">${voteLabel}</div>`,
+                    ...(addressSnippet ? [`<div>${addressSnippet}</div>`] : []),
+                    `<div>${typeStr}</div>`
+                ];
+                const modifier = lines.length === 3 ? 'triple' : 'double';
+
+                return `
+                    <div class="venue-subtitle-flip venue-subtitle-flip--leaderboard">
+                        <div class="flipper-container flipper-container--${modifier}">
+                            ${lines.join('')}
+                        </div>
+                    </div>`;
             };
 
             const renderVenueActions = (v) => {
@@ -524,11 +547,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                     const leftIndicator = `<span class="rank-badge ${badgeClass}">${i + 1}</span>`;
 
                     if (v) {
-                        const voteMeta = `<span class="vote-count-label">${v.voteCount} vote${v.voteCount === 1 ? '' : 's'}</span>`;
                         htmlString += renderVenueCard({
                             leftIndicatorHtml: leftIndicator,
                             nameHtml: `<strong class="venue-name">${v.name || 'Unknown'}</strong>`,
-                            subtitleHtml: buildVenueSubtitle(v, voteMeta),
+                            subtitleHtml: buildLeaderboardSubtitle(v),
                             actionsHtml: renderVenueActions(v)
                         });
                     } else {
