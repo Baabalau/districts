@@ -89,7 +89,6 @@
             font-family: var(--font-header);
             color: var(--brand-red);
             font-size: 1.1rem;
-            text-transform: uppercase;
             text-shadow: 1px 1px 0px rgba(0,0,0,0.8);
             text-align: center;
             margin-top: 10px;
@@ -126,7 +125,7 @@
         @media (min-width: 992px) {
             .promo-hero-inner {
                 flex-direction: row;
-                align-items: flex-start;
+                align-items: center;
                 justify-content: center;
                 gap: clamp(40px, 6vw, 80px);
             }
@@ -140,26 +139,26 @@
                 margin-top: 0;
                 margin-bottom: 12px;
                 justify-content: center;
-                transform: translateY(48px);
+                transform: translateY(8px);
             }
 
             .cards-container {
-                width: 360px;
-                height: 420px;
+                width: 363px;
+                height: 423px;
             }
             
             .cards-container .hero-image-wrapper img.hero-image {
-                width: 280px;
+                width: 275px;
             }
             
             .cards-container .hero-image-wrapper.wrapper-1 {
-                top: 10px;
+                top: -15px;
                 left: 0;
             }
 
             .cards-container .hero-image-wrapper.wrapper-2 {
-                top: 55px;
-                left: 50px;
+                top: 60px;
+                left: 55px;
             }
         }
         
@@ -180,13 +179,16 @@
                 text-align: left;
             }
             .promo-hero-visual {
-                justify-content: flex-start;
+                justify-content: center;
+                align-self: stretch;
+                width: 100%;
                 margin-top: 40px;
                 margin-bottom: 16px;
             }
             .cards-container {
                 width: 300px;
                 height: 400px;
+                margin: 0 auto;
             }
             .cards-container .hero-image-wrapper img.hero-image {
                 width: 240px;
@@ -259,6 +261,66 @@
             padding-bottom: 15px;
         }
 
+        #social-guide > h2 {
+            text-transform: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 20px;
+        }
+
+        #social-guide .guide-highlight {
+            text-decoration: underline;
+            text-decoration-color: var(--text-primary);
+            text-underline-offset: 0.18em;
+            text-decoration-thickness: 2px;
+        }
+
+        #social-guide .district-rotate {
+            display: inline-flex;
+            flex-direction: column;
+            position: relative;
+            height: 1.1em;
+            overflow: hidden;
+            vertical-align: text-bottom;
+            font-family: var(--font-header);
+            color: var(--brand-red);
+            text-shadow: 1px 1px 0px rgba(0,0,0,0.8), -1px -1px 0px rgba(255,255,255,0.2);
+            padding: 0 4px;
+            margin: 0 2px;
+            border-radius: 4px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.2) 100%);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.1);
+            border: 1px solid rgba(0,0,0,0.8);
+        }
+
+        #social-guide .district-rotate-inner {
+            display: flex;
+            flex-direction: column;
+            animation: slotMachine 10s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+        }
+
+        #social-guide .district-rotate-inner span {
+            height: 1.1em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        @keyframes slotMachine {
+            0%, 15% { transform: translateY(0); }
+            20%, 35% { transform: translateY(-1.1em); }
+            40%, 55% { transform: translateY(-2.2em); }
+            60%, 75% { transform: translateY(-3.3em); }
+            80%, 95% { transform: translateY(-4.4em); }
+            100% { transform: translateY(-5.5em); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            #social-guide .district-rotate-inner {
+                animation: none;
+            }
+        }
+
         .instruction-row {
             display: flex;
             align-items: flex-start;
@@ -275,95 +337,116 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 2.25rem;
+            list-style: none;
+            margin: 0 0 2rem;
+            padding: 0;
         }
 
         .simple-step {
             display: flex;
+            gap: 16px;
             align-items: flex-start;
-            gap: 15px;
-            background: var(--bg-primary);
-            padding: 20px 25px;
-            border-radius: 12px;
-            border-left: 5px solid var(--accent);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
         .simple-step .icon {
-            font-size: 1.5rem;
-            line-height: 1.2;
+            flex-shrink: 0;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.45rem;
+            box-sizing: border-box;
+            border: 3px solid transparent;
+            background:
+                linear-gradient(var(--bg-primary), var(--bg-primary)) padding-box,
+                conic-gradient(from -45deg, var(--text-primary), var(--accent), var(--brand-red), var(--text-primary)) border-box;
+            filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.4));
+            color: var(--text-primary);
+            font-family: var(--font-header);
         }
 
         .step-text h4 {
-            color: var(--brand-red);
+            margin: 2px 0 5px;
             font-family: var(--font-header);
-            font-size: 1.2rem;
-            margin-bottom: 5px;
             text-transform: uppercase;
+            font-size: 1.12rem;
+            letter-spacing: 0.03em;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
         }
 
         .step-text p {
-            color: white;
-            font-size: 1rem;
-            line-height: 1.5;
             margin: 0;
+            font-size: 1.15rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
         }
 
         .instruction-visual {
             flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+            gap: 15px;
+        }
+
+        .instruction-visual-graphic {
             position: relative;
-            max-width: 450px;
-            margin: 0 auto;
-        }
-
-        .instruction-visual img {
             width: 100%;
-            border-radius: 16px;
-            border: 4px solid rgba(255,255,255,0.1);
-            opacity: 0.8;
-            filter: brightness(0.8);
+            max-width: 330px;
+            flex-shrink: 0;
         }
 
-        /* The Pointer Overlay */
-        .visual-pointer {
-            position: absolute;
-            top: 55%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: var(--accent);
-            color: white;
-            font-family: var(--font-header);
-            font-size: 1.2rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            padding: 15px 30px;
-            border-radius: 8px;
-            border: 3px solid white;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.8);
-            text-align: left;
-            z-index: 10;
-            width: 80%;
-        }
-
-        .visual-pointer::after {
-            content: '';
-            position: absolute;
-            top: -20px;
-            left: 50%;
-            transform: translateX(-50%);
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-bottom: 20px solid var(--accent);
-        }
-
-        .visual-pointer span {
+        .instruction-visual-graphic img {
+            width: 100%;
+            height: auto;
             display: block;
-            font-size: 0.85rem;
-            font-weight: 600;
+            border: 2px solid var(--text-primary);
+            border-radius: 12px;
+            box-sizing: border-box;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+        }
+
+        .instruction-visual-pointers {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            max-width: 225px;
+        }
+
+        .instruction-visual-pointers p {
+            position: absolute;
+            color: var(--text-primary);
             font-family: var(--font-main);
-            color: rgba(255,255,255,0.8);
-            margin-top: 5px;
-            text-transform: none;
+            font-size: 0.9rem;
+            font-weight: bold;
+            line-height: 1.3;
+            margin: 0;
+        }
+
+        .instruction-visual-pointers .pointer-story {
+            top: 0;
+        }
+
+        .instruction-visual-pointers .pointer-bottom-stack {
+            position: absolute;
+            bottom: 12%;
+            left: 0;
+            right: 0;
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 20px;
+        }
+
+        .instruction-visual-pointers .pointer-bottom-stack p {
+            position: static;
         }
 
         /* Flyer Generator */
@@ -463,12 +546,12 @@
             color: var(--text-primary);
             margin-top: 0;
             margin-bottom: 12px;
-            text-transform: uppercase;
+            text-transform: none;
         }
 
         #integrated-form-container #step-intro p {
-            font-size: 0.95rem;
-            line-height: 1.5;
+            font-size: 1.15rem;
+            line-height: 1.6;
             margin-bottom: 16px;
         }
 
@@ -564,7 +647,6 @@
                     <span class="subtitle-follow">Use our custom tools to generate stunning social media and printable graphics in seconds.</span>
                 </span>
                 
-                <button class="brand-btn" onclick="document.querySelector('.generator-tool').scrollIntoView({behavior: 'smooth'})" style="background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); font-size: 1.2rem; padding: 15px 30px; text-decoration: none; border: none; cursor: pointer; color: white;">Generate Your Graphics</button>
             </div>
 
             <!-- Elevated Previews layout overlapping cards -->
@@ -572,7 +654,7 @@
                 <div class="cards-container">
                     <div class="hero-image-wrapper wrapper-1">
                         <img src="assets/BIZ%20Promo_E_preview.png" class="hero-image" alt="Social Media Graphic Preview" loading="lazy">
-                        <div class="image-caption">Customized Social Media Story</div>
+                        <div class="image-caption">Customizable for Social Media</div>
                     </div>
                     
                     <div class="hero-image-wrapper wrapper-2">
@@ -588,11 +670,11 @@
 
         <!-- Multi-Step Integrated Form -->
         <div class="generator-tool" id="integrated-form-container" style="margin-top: 40px; margin-bottom: 60px;">
-            <h2>Join the Map & Generate Promo Graphics</h2>
+            <h2>Represent Your Business + Generate Custom Promotions</h2>
             <div id="step-intro" style="text-align: left;">
                 <p style="color: var(--text-secondary); max-width: 800px; margin: 0 0 20px 0;">
-                    Complete this form to request your business be added to the official Districts After Dark map. 
-                    Once completed, you'll instantly receive your customized social media graphic and printable check-in flyer.
+                    Complete form for your business to be added to the Districts After Dark map.
+                    You'll instantly receive a customized social graphic and printable flyer.
                 </p>
                 <button type="button" id="start-form-btn" class="brand-btn" style="background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); border: none; cursor: pointer; color: white;">Get Started</button>
             </div>
@@ -761,25 +843,28 @@
         
         <!-- Simplified Instructional Guide -->
         <div class="guide-section" id="social-guide" style="margin-top: 40px; background: transparent; border: none; box-shadow: none; padding: 0;">
-            <h2 style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px;">Share Customized Social Graphics Promoting Your Business</h2>
+            <h2>Share an <span class="guide-highlight">Instantly Customized Graphic</span> &amp; earn votes for your business to host the last stop of District <span class="district-rotate" aria-label="District letter rotates through A, B, C, D, and E"><span class="district-rotate-inner"><span>A</span><span>B</span><span>C</span><span>D</span><span>E</span><span>A</span></span></span> After Dark:</h2>
             
             <div class="instruction-row">
                 <div class="instruction-steps">
-                    <div class="simple-step" style="background: transparent; border-left: none; padding: 10px 0; box-shadow: none;">
+                    <div class="simple-step">
+                        <div class="icon">1</div>
                         <div class="step-text">
                             <h4>Download & Import</h4>
                             <p>Save the blank graphic to your phone and open it as a background in Instagram Stories or TikTok.</p>
                         </div>
                     </div>
                     
-                    <div class="simple-step" style="background: transparent; border-left: none; padding: 10px 0; box-shadow: none;">
+                    <div class="simple-step">
+                        <div class="icon">2</div>
                         <div class="step-text">
                             <h4>Add Your Logo</h4>
                             <p>You can also use the app's native tools to place your logo over the designated center box.</p>
                         </div>
                     </div>
                     
-                    <div class="simple-step" style="background: transparent; border-left: none; padding: 10px 0; box-shadow: none;">
+                    <div class="simple-step">
+                        <div class="icon">3</div>
                         <div class="step-text">
                             <h4>Add The Link & Share</h4>
                             <p>Generate your link below, place a "Link Sticker" over the bottom arrow, and post it to your followers!</p>
@@ -788,10 +873,15 @@
                 </div>
 
                 <div class="instruction-visual">
-                    <img src="assets/District%20Parings/BIZ%20Promo_D.png" alt="Customization Visual" loading="lazy">
-                    <div class="visual-pointer">
-                        PLACE LOGO HERE
-                        <span>(Using the native sticker tool)</span>
+                    <div class="instruction-visual-graphic">
+                        <img src="assets/District%20Parings/BIZ%20Promo_D.png" alt="Customization Visual" loading="lazy">
+                    </div>
+                    <div class="instruction-visual-pointers">
+                        <p class="pointer-story">&lt;&lt; Open image in Instagram as a Story</p>
+                        <div class="pointer-bottom-stack">
+                            <p class="pointer-link">&lt;&lt; Use sticker to copy/paste link here</p>
+                            <p class="pointer-name">&lt;&lt; Use Text Tool to place business name here</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -845,25 +935,39 @@
             import('./js/firebase-config.js').then(async (module) => {
                 const { db } = module;
                 const { collection, getDocs } = await import('https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js');
+                // An address is considered complete only if it contains an actual
+                // street name (two or more consecutive letters), not just a bare
+                // street number like "330" or "1200".
+                const hasCompleteAddress = (addr) => {
+                    if (!addr || typeof addr !== 'string') return false;
+                    return /[a-zA-Z]{2,}/.test(addr);
+                };
+
                 try {
                     const querySnapshot = await getDocs(collection(db, "venues"));
                     querySnapshot.forEach((doc) => {
                         const data = doc.data();
                         const venueName = data.name;
                         const venueAddress = data.address;
-                        
-                        // Append address in parentheses if it exists to differentiate franchises
-                        let dropdownLabel = venueName;
-                        if (venueAddress) {
-                            dropdownLabel = `${venueName} (${venueAddress})`;
+
+                        // Skip businesses without a complete street address.
+                        // These can't be reliably deep-linked to their map popup,
+                        // so they shouldn't appear in the dropdown at all.
+                        if (!hasCompleteAddress(venueAddress)) {
+                            return;
                         }
+
+                        // Append address in parentheses to differentiate franchises
+                        const dropdownLabel = `${venueName} (${venueAddress})`;
 
                         const option = document.createElement('option');
                         option.value = dropdownLabel;
                         datalist.appendChild(option);
                         
-                        // Store the mapping using the full label so it's unique
-                        venueMap.set(dropdownLabel, doc.id);
+                        // Store the mapping using the full label so it's unique.
+                        // Keep the venue's real district so the vote link points to
+                        // the correct district page where its map marker lives.
+                        venueMap.set(dropdownLabel, { id: doc.id, district: data.district || null });
                     });
                 } catch (error) {
                     console.error("Error loading venues for autocomplete:", error);
@@ -1088,10 +1192,21 @@
                 
                 // Get form values
                 const rawBizName = document.getElementById('biz-name').value || 'Your Business';
-                const bizDistrict = document.getElementById('biz-district').value || 'District A';
-                
-                // Check if this business matches an existing Firebase ID using the raw input
-                const matchedVenueId = venueMap.get(rawBizName) || null;
+                let bizDistrict = document.getElementById('biz-district').value || 'District A';
+
+                // Check if this business matches an existing Firebase venue using the raw input
+                const matchedVenue = venueMap.get(rawBizName) || null;
+                const matchedVenueId = matchedVenue ? matchedVenue.id : null;
+
+                // For an existing venue, its stored district is authoritative. Using it
+                // guarantees the QR/vote link points to the district page that actually
+                // hosts this venue's map marker (so the popup can open).
+                if (matchedVenue && matchedVenue.district) {
+                    const dbLetter = String(matchedVenue.district).trim().toUpperCase();
+                    if (/^[A-E]$/.test(dbLetter)) {
+                        bizDistrict = `District ${dbLetter}`;
+                    }
+                }
 
                 // Clean the business name for graphics (remove the address in parentheses if it exists)
                 const bizName = rawBizName.replace(/\s*\(.*\)$/, '').trim();
@@ -1114,7 +1229,10 @@
                         case 'E': districtEventDate = 'Tuesday, July 21st'; break;
                     }
                 }
-                const votingUrl = `${window.location.origin}/${districtPage}?vote=${venueId}`;
+                // Build the link relative to the current directory so it also works
+                // when the site is served from a subfolder (e.g. GitHub Pages project sites).
+                const basePath = window.location.pathname.replace(/[^/]*$/, '');
+                const votingUrl = `${window.location.origin}${basePath}${districtPage}?vote=${venueId}`;
                 
                 // Prepare data for Google Apps Script Web App
                 const formData = {
@@ -1171,17 +1289,18 @@
                 Object.assign(flyerQr.style, graphicConfig.flyer.qr);
                 Object.assign(flyerName.style, graphicConfig.flyer.text);
 
+                // Social graphic: never auto-insert the business name or logo.
+                // Leave the story blank so users can add their own branding
+                // with Instagram/TikTok's native sticker and text tools.
+                socialName.style.display = 'none';
+                socialLogo.style.display = 'none';
+
+                // Printable flyer: keep inserting the logo if provided, otherwise the name.
                 if (logoDataUrl) {
-                    socialLogo.src = logoDataUrl;
-                    socialLogo.style.display = 'block';
-                    socialName.style.display = 'none'; // Hide text if logo exists
                     flyerLogo.src = logoDataUrl;
                     flyerLogo.style.display = 'block';
                     flyerName.style.display = 'none'; // Hide text if logo exists
                 } else {
-                    socialLogo.style.display = 'none';
-                    socialName.textContent = bizName;
-                    socialName.style.display = 'block';
                     flyerLogo.style.display = 'none';
                     flyerName.textContent = bizName;
                     flyerName.style.display = 'block';
