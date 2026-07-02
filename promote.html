@@ -163,17 +163,22 @@
         }
         
         @media (max-width: 991px) {
+            .promo-hero {
+                padding-bottom: 100px;
+            }
+
             .promo-hero-inner {
                 flex-direction: column;
                 align-items: flex-start;
+                gap: 12px;
             }
             .promo-hero-content {
                 text-align: left;
-                margin-bottom: 20px;
+                margin-bottom: 0;
             }
             .subtitle {
                 text-align: left;
-                margin: 20px 0 40px;
+                margin: 20px 0 12px;
             }
             .subtitle-follow {
                 text-align: left;
@@ -182,8 +187,8 @@
                 justify-content: center;
                 align-self: stretch;
                 width: 100%;
-                margin-top: 40px;
-                margin-bottom: 16px;
+                margin-top: 0;
+                margin-bottom: 48px;
             }
             .cards-container {
                 width: 300px;
@@ -261,27 +266,51 @@
             padding-bottom: 15px;
         }
 
-        #social-guide > h2 {
+        .promo-section-heading {
+            font-family: var(--font-header);
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin-top: 0;
+            margin-bottom: 12px;
             text-transform: none;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding-bottom: 20px;
+            line-height: 1.35;
         }
 
-        #social-guide .guide-highlight {
+        #social-guide-container {
+            padding: 20px clamp(20px, 3vw, 40px) 28px;
+            margin-top: 40px;
+            margin-bottom: 60px;
+        }
+
+        #social-guide-container > .promo-section-heading {
+            margin-bottom: 39px;
+        }
+
+        #social-guide-container #social-guide {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+        }
+
+        #social-guide-container .guide-highlight {
             text-decoration: underline;
             text-decoration-color: var(--text-primary);
             text-underline-offset: 0.18em;
             text-decoration-thickness: 2px;
         }
 
-        #social-guide .district-rotate {
+        #social-guide-container .district-rotate {
             display: inline-flex;
             flex-direction: column;
             position: relative;
             height: 1.1em;
             overflow: hidden;
             vertical-align: text-bottom;
-            font-family: var(--font-header);
+            font-family: inherit;
+            font-size: inherit;
+            line-height: 1;
             color: var(--brand-red);
             text-shadow: 1px 1px 0px rgba(0,0,0,0.8), -1px -1px 0px rgba(255,255,255,0.2);
             padding: 0 4px;
@@ -292,13 +321,13 @@
             border: 1px solid rgba(0,0,0,0.8);
         }
 
-        #social-guide .district-rotate-inner {
+        #social-guide-container .district-rotate-inner {
             display: flex;
             flex-direction: column;
             animation: slotMachine 10s cubic-bezier(0.25, 1, 0.5, 1) infinite;
         }
 
-        #social-guide .district-rotate-inner span {
+        #social-guide-container .district-rotate-inner span {
             height: 1.1em;
             display: flex;
             align-items: center;
@@ -316,7 +345,7 @@
         }
 
         @media (prefers-reduced-motion: reduce) {
-            #social-guide .district-rotate-inner {
+            #social-guide-container .district-rotate-inner {
                 animation: none;
             }
         }
@@ -324,13 +353,8 @@
         .instruction-row {
             display: flex;
             align-items: flex-start;
-            gap: 60px;
-        }
-
-        @media (max-width: 900px) {
-            .instruction-row {
-                flex-direction: column;
-            }
+            gap: 50px;
+            margin-top: 0;
         }
 
         .instruction-steps {
@@ -339,7 +363,7 @@
             flex-direction: column;
             gap: 2.25rem;
             list-style: none;
-            margin: 0 0 2rem;
+            margin: 0;
             padding: 0;
         }
 
@@ -449,6 +473,72 @@
             position: static;
         }
 
+        @media (max-width: 900px) {
+            .instruction-row {
+                flex-direction: column;
+                gap: 32px;
+            }
+
+            .instruction-visual {
+                width: 100%;
+                max-width: 100%;
+                justify-content: center;
+                align-items: stretch;
+                gap: 15px;
+                margin: 0;
+                padding: 0 20px;
+            }
+
+            .instruction-visual-graphic {
+                width: 40vw;
+                max-width: 40vw;
+                flex-shrink: 0;
+            }
+
+            .instruction-visual-pointers {
+                position: static;
+                flex: 1 1 0;
+                min-width: 0;
+                width: calc(100% - 40vw - 10px);
+                max-width: none;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                align-self: stretch;
+                padding: 30px 0;
+            }
+
+            .instruction-visual-pointers p {
+                position: static;
+                font-size: 0.82rem;
+                line-height: 1.4;
+            }
+
+            .instruction-visual-pointers .pointer-story {
+                max-width: none;
+                margin-bottom: 8px;
+            }
+
+            .instruction-visual-pointers .pointer-bottom-stack {
+                position: static;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                margin-top: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .instruction-visual-pointers p {
+                font-size: 0.78rem;
+                line-height: 1.35;
+            }
+
+            .instruction-visual-pointers .pointer-bottom-stack {
+                gap: 8px;
+            }
+        }
+
         /* Flyer Generator */
         .generator-tool {
             background: linear-gradient(135deg, var(--bg-primary), #1a2336);
@@ -540,15 +630,6 @@
             scroll-margin-top: 88px;
         }
 
-        #integrated-form-container > h2 {
-            font-family: var(--font-header);
-            font-size: 1.5rem;
-            color: var(--text-primary);
-            margin-top: 0;
-            margin-bottom: 12px;
-            text-transform: none;
-        }
-
         #integrated-form-container #step-intro p {
             font-size: 1.15rem;
             line-height: 1.6;
@@ -622,6 +703,23 @@
         #integrated-form-container #form-success h3 {
             font-size: 1.1rem;
         }
+
+        @media (max-width: 991px) {
+            .content-container {
+                padding: 0;
+                max-width: none;
+            }
+
+            #integrated-form-container,
+            #social-guide-container {
+                width: 100%;
+                border-radius: 0;
+                border-left: none;
+                border-right: none;
+                padding-left: clamp(20px, 5vw, 32px);
+                padding-right: clamp(20px, 5vw, 32px);
+            }
+        }
     </style>
 </head>
 <body>
@@ -670,7 +768,7 @@
 
         <!-- Multi-Step Integrated Form -->
         <div class="generator-tool" id="integrated-form-container" style="margin-top: 40px; margin-bottom: 60px;">
-            <h2>Represent Your Business + Generate Custom Promotions</h2>
+            <h2 class="promo-section-heading">Represent Your Business + Generate Custom Promotions</h2>
             <div id="step-intro" style="text-align: left;">
                 <p style="color: var(--text-secondary); max-width: 800px; margin: 0 0 20px 0;">
                     Complete form for your business to be added to the Districts After Dark map.
@@ -842,10 +940,10 @@
         </div>
         
         <!-- Simplified Instructional Guide -->
-        <div class="guide-section" id="social-guide" style="margin-top: 40px; background: transparent; border: none; box-shadow: none; padding: 0;">
-            <h2>Share an <span class="guide-highlight">Instantly Customized Graphic</span> &amp; earn votes for your business to host the last stop of District <span class="district-rotate" aria-label="District letter rotates through A, B, C, D, and E"><span class="district-rotate-inner"><span>A</span><span>B</span><span>C</span><span>D</span><span>E</span><span>A</span></span></span> After Dark:</h2>
-            
-            <div class="instruction-row">
+        <div class="generator-tool" id="social-guide-container">
+            <h2 class="promo-section-heading">Share an <span class="guide-highlight">Instantly Customized Graphic</span> &amp; earn votes for your business to host the last stop of District <span class="district-rotate" aria-label="District letter rotates through A, B, C, D, and E"><span class="district-rotate-inner"><span>A</span><span>B</span><span>C</span><span>D</span><span>E</span><span>A</span></span></span> After Dark:</h2>
+            <div class="guide-section" id="social-guide">
+                <div class="instruction-row">
                 <div class="instruction-steps">
                     <div class="simple-step">
                         <div class="icon">1</div>
