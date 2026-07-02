@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Batch Flyer Generator | Districts After Dark</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Montserrat:wght@700;900&family=Oswald:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;700&family=Inter:wght@400;600;800&family=Montserrat:wght@700;900&family=Oswald:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/district-page.css">
+    <link rel="stylesheet" href="css/event-styles.css">
     
     <!-- html2canvas for flattening composite images -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -130,66 +132,52 @@
             transition: width 0.3s;
         }
 
-        .venue-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
+        .batch-venue-explorer {
             margin-top: 20px;
         }
 
-        .venue-card {
-            background: rgba(255,255,255,0.05);
-            border-radius: 12px;
-            padding: 20px;
-            border: 2px solid transparent;
-            transition: all 0.2s;
+        .batch-venue-explorer .venue-list .venue-card {
+            gap: 12px;
         }
 
-        .venue-card.selected {
+        .batch-venue-explorer .venue-list .venue-card.selected {
             border-color: var(--brand-gold);
         }
 
-        .venue-card.completed {
+        .batch-venue-explorer .venue-list .venue-card.completed {
             border-color: #4ade80;
         }
 
-        .venue-card.error {
+        .batch-venue-explorer .venue-list .venue-card.error {
             border-color: #ef4444;
         }
 
-        .venue-card-header {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            margin-bottom: 10px;
-        }
-
-        .venue-card input[type="checkbox"] {
+        .batch-venue-explorer .venue-select {
             width: 20px;
             height: 20px;
             accent-color: var(--brand-gold);
             flex-shrink: 0;
-            margin-top: 3px;
+            cursor: pointer;
         }
 
-        .venue-name {
-            font-weight: 600;
-            font-size: 1.1rem;
-            line-height: 1.3;
-        }
-
-        .venue-address {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-top: 5px;
+        .batch-venue-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+            flex-shrink: 0;
+            min-width: 120px;
         }
 
         .venue-status {
-            font-size: 0.85rem;
-            margin-top: 10px;
-            padding: 5px 10px;
+            font-size: 0.8rem;
+            padding: 4px 10px;
             border-radius: 4px;
             display: inline-block;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
         }
 
         .venue-status.pending {
@@ -213,11 +201,11 @@
         }
 
         .download-link {
-            display: inline-block;
-            margin-top: 10px;
             color: var(--brand-gold);
             text-decoration: none;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            white-space: nowrap;
         }
 
         .download-link:hover {
@@ -275,9 +263,18 @@
         }
 
         .empty-state {
+            display: block;
             text-align: center;
             padding: 60px 20px;
             color: var(--text-secondary);
+            background: transparent;
+            border: none;
+            transform: none;
+        }
+
+        .empty-state:hover {
+            transform: none;
+            border-color: transparent;
         }
 
         .empty-state h3 {
@@ -313,15 +310,19 @@
             <div class="progress-bar-fill" id="progress-fill"></div>
         </div>
 
-        <div class="select-all-row" id="select-all-row" style="display: none;">
-            <input type="checkbox" id="select-all" checked>
-            <label for="select-all">Select All (<span id="venue-count">0</span> venues)</label>
-        </div>
+        <div class="venue-explorer batch-venue-explorer">
+            <div class="select-all-row" id="select-all-row" style="display: none;">
+                <input type="checkbox" id="select-all" checked>
+                <label for="select-all">Select All (<span id="venue-count">0</span> venues)</label>
+            </div>
 
-        <div id="venue-list" class="venue-grid">
-            <div class="empty-state">
-                <h3>No venues loaded</h3>
-                <p>Select a district and click "Load Venues" to get started.</p>
+            <div class="venue-list-container">
+                <ul id="venue-list" class="venue-list">
+                    <li class="empty-state">
+                        <h3>No venues loaded</h3>
+                        <p>Select a district and click "Load Venues" to get started.</p>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
@@ -453,48 +454,48 @@
         function renderVenueList() {
             if (venues.length === 0) {
                 venueList.innerHTML = `
-                    <div class="empty-state">
+                    <li class="empty-state">
                         <h3>No venues found</h3>
                         <p>No venues found for this district.</p>
-                    </div>
+                    </li>
                 `;
                 return;
             }
 
             venueList.innerHTML = venues.map((venue, index) => `
-                <div class="venue-card" data-venue-id="${venue.id}" id="venue-card-${index}">
-                    <div class="venue-card-header">
-                        <input type="checkbox" id="venue-${index}" data-index="${index}" checked>
-                        <div>
-                            <div class="venue-name">${venue.name}</div>
-                            ${venue.address ? `<div class="venue-address">${venue.address}</div>` : ''}
-                        </div>
+                <li class="venue-card" data-venue-id="${venue.id}" id="venue-card-${index}">
+                    <input type="checkbox" class="venue-select" id="venue-${index}" data-index="${index}" checked>
+                    <div class="v-details">
+                        <strong class="venue-name">${venue.name}</strong>
+                        ${venue.address ? `<span class="venue-subtitle">${venue.address}</span>` : ''}
                     </div>
-                    <span class="venue-status pending">Pending</span>
-                </div>
+                    <div class="batch-venue-actions">
+                        <span class="venue-status pending">Pending</span>
+                    </div>
+                </li>
             `).join('');
 
-            // Add checkbox listeners
-            venueList.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+            venueList.querySelectorAll('.venue-select').forEach(cb => {
                 cb.addEventListener('change', updateSelectAllState);
             });
         }
 
         function updateSelectAllState() {
-            const checkboxes = venueList.querySelectorAll('input[type="checkbox"]');
+            const checkboxes = venueList.querySelectorAll('.venue-select');
             const allChecked = Array.from(checkboxes).every(cb => cb.checked);
             selectAllCheckbox.checked = allChecked;
         }
 
         selectAllCheckbox.addEventListener('change', () => {
-            const checkboxes = venueList.querySelectorAll('input[type="checkbox"]');
-            checkboxes.forEach(cb => cb.checked = selectAllCheckbox.checked);
+            venueList.querySelectorAll('.venue-select').forEach(cb => {
+                cb.checked = selectAllCheckbox.checked;
+            });
         });
 
         // Generate flyers
         generateBtn.addEventListener('click', async () => {
             const selectedIndices = [];
-            venueList.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
+            venueList.querySelectorAll('.venue-select:checked').forEach(cb => {
                 selectedIndices.push(parseInt(cb.dataset.index));
             });
 
@@ -578,16 +579,16 @@
                     card.classList.remove('selected');
                     card.classList.add('completed');
 
-                    // Add individual download link
-                    let downloadLink = card.querySelector('.download-link');
+                    const actionsEl = card.querySelector('.batch-venue-actions');
+                    let downloadLink = actionsEl.querySelector('.download-link');
                     if (!downloadLink) {
                         downloadLink = document.createElement('a');
                         downloadLink.className = 'download-link';
-                        card.appendChild(downloadLink);
+                        actionsEl.appendChild(downloadLink);
                     }
                     downloadLink.href = dataUrl;
                     downloadLink.download = filename;
-                    downloadLink.textContent = '⬇ Download Flyer';
+                    downloadLink.textContent = 'Download Flyer';
 
                 } catch (error) {
                     console.error(`Error generating flyer for ${venue.name}:`, error);
