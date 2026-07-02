@@ -221,8 +221,10 @@
 
         .flyer-composite {
             position: relative;
-            width: 816px;  /* 8.5 inches at 96 DPI */
-            height: 1056px; /* 11 inches at 96 DPI */
+            width: 450px;
+            aspect-ratio: 8.5 / 11;
+            background: white;
+            overflow: hidden;
         }
 
         .flyer-composite img.base-img {
@@ -233,6 +235,11 @@
 
         .flyer-composite .overlay {
             position: absolute;
+        }
+
+        #flyer-name-text {
+            font-family: var(--font-header);
+            font-weight: bold;
         }
 
         .select-all-row {
@@ -403,6 +410,27 @@
             progressFill.style.width = `${percent}%`;
         }
 
+        function slugifyBusinessName(name) {
+            return name
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '') || 'business';
+        }
+
+        function buildFlyerFilename(venue, usedNames = new Set()) {
+            let base = `${slugifyBusinessName(venue.name)}-flyer`;
+            let filename = `${base}.png`;
+            let counter = 2;
+
+            while (usedNames.has(filename)) {
+                filename = `${base}-${counter}.png`;
+                counter++;
+            }
+
+            usedNames.add(filename);
+            return filename;
+        }
+
         // Load venues from Firebase
         loadBtn.addEventListener('click', async () => {
             const district = districtSelect.value;
@@ -508,6 +536,7 @@
             loadBtn.disabled = true;
             progressBar.style.display = 'block';
             generatedFlyers.clear();
+            const usedFilenames = new Set();
 
             const districtLetter = districtSelect.value;
             const basePath = window.location.pathname.replace(/[^/]*$/, '');
@@ -560,6 +589,15 @@
                     // Small delay for rendering
                     await new Promise(r => setTimeout(r, 200));
 
+                    if (document.fonts && document.fonts.ready) {
+                        try {
+                            await Promise.race([
+                                document.fonts.ready,
+                                new Promise((_, reject) => setTimeout(() => reject(new Error('Font loading timed out')), 4000))
+                            ]);
+                        } catch (e) { /* proceed anyway */ }
+                    }
+
                     // Flatten with html2canvas
                     const canvas = await html2canvas(flyerComposite, {
                         useCORS: true,
@@ -570,7 +608,7 @@
                     });
 
                     const dataUrl = canvas.toDataURL('image/png');
-                    const filename = `${venueId}-flyer.png`;
+                    const filename = buildFlyerFilename(venue, usedFilenames);
                     generatedFlyers.set(filename, dataUrl);
 
                     // Update card with success
