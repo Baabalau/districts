@@ -370,14 +370,19 @@ document.addEventListener("DOMContentLoaded", async () => {
             window.venueMarkers[place.id] = marker;
         });
 
-        // Global function to open a specific venue's popup
+        // Global function to open a specific venue's popup. Centers the map on the
+        // marker first so the popup is actually in view, then opens it once the
+        // pan/zoom settles (with a fallback in case the view doesn't move).
         window.openMapPopupForVenue = (venueId) => {
             const marker = window.venueMarkers[venueId];
-            if (marker) {
-                marker.openPopup();
-                // Optionally center map on marker
-                // map.setView(marker.getLatLng(), map.getZoom());
-            }
+            if (!marker) return;
+
+            const targetZoom = Math.max(map.getZoom(), 15);
+            map.once('moveend', () => marker.openPopup());
+            map.setView(marker.getLatLng(), targetZoom, { animate: true });
+
+            // Fallback: if the view was already at the target, moveend won't fire.
+            setTimeout(() => marker.openPopup(), 500);
         };
 
         // Populate the voting lists dynamically
