@@ -292,11 +292,11 @@
         .hero-inner {
             width: 100%;
             max-width: 1280px;
-            margin: 0 auto;
+            margin: 0 0 0 10px;
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            gap: 36px;
+            gap: 40px;
         }
 
         .hero-content {
@@ -454,10 +454,11 @@
 
         .title-3d-line {
             display: block;
+            margin-left: 0;
         }
 
         .title-3d-line + .title-3d-line {
-            margin-top: 0.08em;
+            margin-top: 5px;
         }
 
         /* Complementary Subtitle */
@@ -933,7 +934,7 @@
             font-family: var(--font-header);
             font-weight: 800;
             text-transform: uppercase;
-            font-size: clamp(0.7rem, 2vw, 0.85rem);
+            font-size: clamp(0.875rem, 3.5vw, 1.1rem);
             letter-spacing: 0.05em;
             border: none;
             background: var(--bg-primary);
@@ -1439,17 +1440,7 @@
             cursor: pointer;
         }
 
-        @media (min-width: 768px) {
-            .event-card:nth-child(even) {
-                transform: translateY(32px);
-            }
-            .event-card:nth-child(even):hover {
-                transform: translateY(24px) scale(1.02);
-            }
-        }
-
         .event-card:hover {
-            transform: translateY(-8px) scale(1.02);
             border-color: var(--accent);
             box-shadow: 0 12px 32px rgba(210, 160, 57, 0.25);
         }
@@ -1567,7 +1558,7 @@
             }
 
             .event-card:hover {
-                transform: translateY(-7px) scale(1.02);
+                border-color: var(--accent);
                 box-shadow: 0 11px 28px rgba(210, 160, 57, 0.25);
             }
         }
@@ -1597,6 +1588,20 @@
         .js-reveal.is-visible {
             opacity: 1;
             transform: translate(0, 0);
+        }
+
+        /* Event cards: hover lift after scroll reveal (beats .js-reveal.is-visible) */
+        .event-grid .event-card.js-reveal.reveal-y.is-visible:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: var(--accent);
+            box-shadow: 0 12px 32px rgba(210, 160, 57, 0.25);
+        }
+
+        @media (max-width: 767px) {
+            .event-grid .event-card.js-reveal.reveal-y.is-visible:hover {
+                transform: translateY(-7px) scale(1.02);
+                box-shadow: 0 11px 28px rgba(210, 160, 57, 0.25);
+            }
         }
         
         .delay-200 { transition-delay: 0.2s; }
