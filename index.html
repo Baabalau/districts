@@ -587,6 +587,13 @@
             margin-bottom: 20px;
             padding-top: 25px;
             padding-bottom: 40px;
+            cursor: grab;
+            touch-action: pan-y;
+            user-select: none;
+        }
+
+        .flow-row--people.is-dragging {
+            cursor: grabbing;
         }
 
         .flow-row--people .flow-couple {
@@ -600,19 +607,10 @@
             will-change: transform;
         }
 
-        .flow-track--left {
-            animation: flow-left 55s linear infinite;
-        }
-
-        @keyframes flow-left {
-            from { transform: translateX(0); }
-            to { transform: translateX(-50%); }
-        }
-
         .flow-card {
-            width: 215px;
-            height: 280px;
-            border-radius: 14px;
+            width: 194px;
+            height: 252px;
+            border-radius: 13px;
             overflow: hidden;
             flex-shrink: 0;
             border: 2px solid var(--text-primary);
@@ -659,24 +657,33 @@
             width: 100%;
             background: rgba(15, 22, 38, 0.92);
             text-align: center;
-            padding: 12px 10px;
+            padding: 10px 8px;
             text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+        }
+
+        .flow-card .card-caption .interior-hosts,
+        .flow-card .card-caption .interior-neighborhoods {
+            font-size: 15px;
+            line-height: 1.3;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .flow-couple {
             display: flex;
             gap: 10px;
-            padding: 0 56px;
+            padding: 0 50px;
             align-items: flex-start;
         }
 
         .flow-couple .flow-card:nth-child(3) {
-            margin-top: 39px;
+            margin-top: 35px;
         }
 
         .couple-ampersand {
             font-family: var(--font-header);
-            font-size: 2.2rem;
+            font-size: 2rem;
             font-weight: 900;
             color: var(--brand-red);
             align-self: center;
@@ -708,8 +715,7 @@
         }
 
         @media (prefers-reduced-motion: reduce) {
-            .flow-track--left {
-                animation: none;
+            .flow-track {
                 justify-content: center;
                 flex-wrap: wrap;
                 max-width: 100%;
@@ -1655,7 +1661,7 @@
     <section class="flow-section" aria-label="Featured councilmembers and influencers">
         <p class="flow-label">Councilmembers &amp; influencers</p>
         <div class="flow-row flow-row--people">
-            <div class="flow-track flow-track--left" id="flow-track">
+            <div class="flow-track" id="flow-track">
                 <!-- Skeleton placeholders shown until JS loads real content -->
                 <div class="flow-couple skeleton-couple"><div class="flow-card"></div><div class="couple-ampersand">&amp;</div><div class="flow-card"></div></div>
                 <div class="flow-couple skeleton-couple"><div class="flow-card"></div><div class="couple-ampersand">&amp;</div><div class="flow-card"></div></div>
@@ -1892,12 +1898,12 @@
             return `
                 <div class="flow-couple">
                     <div class="flow-card">
-                        <img src="${data.influencerImg}" alt="${data.influencerName}" width="215" height="280" loading="lazy" decoding="async" data-loading="true" onload="this.removeAttribute('data-loading')">
+                        <img src="${data.influencerImg}" alt="${data.influencerName}" width="194" height="252" loading="lazy" decoding="async" data-loading="true" onload="this.removeAttribute('data-loading')">
                         <div class="card-caption"><span class="interior-hosts">${data.influencerName}</span><span class="interior-neighborhoods">${influencerSubtitle}</span></div>
                     </div>
                     <div class="couple-ampersand">&amp;</div>
                     <div class="flow-card">
-                        <img src="${data.councilImg}" alt="${data.councilName}" width="215" height="280" loading="lazy" decoding="async" data-loading="true" onload="this.removeAttribute('data-loading')">
+                        <img src="${data.councilImg}" alt="${data.councilName}" width="194" height="252" loading="lazy" decoding="async" data-loading="true" onload="this.removeAttribute('data-loading')">
                         <div class="card-caption"><span class="interior-hosts">${data.councilName}</span><span class="interior-neighborhoods">${councilSubtitle}</span></div>
                     </div>
                 </div>`;
@@ -1920,8 +1926,116 @@
 
                 const couplesHtml = districts.map(renderFlowCouple).join('');
                 track.innerHTML = couplesHtml + couplesHtml;
+                initFlowCarousel();
             } catch (error) {
                 console.error('Error loading flow couples:', error);
+            }
+        }
+
+        function initFlowCarousel() {
+            const row = document.querySelector('.flow-row--people');
+            const track = document.getElementById('flow-track');
+            if (!row || !track || row.dataset.carouselInit === 'true') return;
+            row.dataset.carouselInit = 'true';
+
+            const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            let offset = 0;
+            let isDragging = false;
+            let isPaused = prefersReducedMotion;
+            let dragStartX = 0;
+            let dragStartOffset = 0;
+            let lastTime = performance.now();
+            let resumeTimer = null;
+            let speed = 54;
+
+            function getLoopWidth() {
+                return track.scrollWidth / 2;
+            }
+
+            function updateSpeed() {
+                const loopWidth = getLoopWidth();
+                if (loopWidth > 0) speed = loopWidth / 55;
+            }
+
+            function normalizeOffset() {
+                const loopWidth = getLoopWidth();
+                if (loopWidth <= 0) return;
+                while (offset <= -loopWidth) offset += loopWidth;
+                while (offset > 0) offset -= loopWidth;
+            }
+
+            function applyTransform() {
+                track.style.transform = `translateX(${offset}px)`;
+            }
+
+            function pauseAutoScroll() {
+                isPaused = true;
+                clearTimeout(resumeTimer);
+            }
+
+            function resumeAutoScroll(delay = 0) {
+                clearTimeout(resumeTimer);
+                if (prefersReducedMotion) return;
+                resumeTimer = setTimeout(() => {
+                    isPaused = false;
+                }, delay);
+            }
+
+            function tick(now) {
+                const dt = (now - lastTime) / 1000;
+                lastTime = now;
+                if (!isPaused && !isDragging) {
+                    offset -= speed * dt;
+                    normalizeOffset();
+                    applyTransform();
+                }
+                requestAnimationFrame(tick);
+            }
+
+            row.addEventListener('pointerdown', (event) => {
+                if (event.pointerType === 'mouse' && event.button !== 0) return;
+                isDragging = true;
+                pauseAutoScroll();
+                dragStartX = event.clientX;
+                dragStartOffset = offset;
+                row.setPointerCapture(event.pointerId);
+                row.classList.add('is-dragging');
+            });
+
+            row.addEventListener('pointermove', (event) => {
+                if (!isDragging) return;
+                offset = dragStartOffset + (event.clientX - dragStartX);
+                normalizeOffset();
+                applyTransform();
+            });
+
+            function endDrag() {
+                if (!isDragging) return;
+                isDragging = false;
+                row.classList.remove('is-dragging');
+                resumeAutoScroll(500);
+            }
+
+            row.addEventListener('pointerup', endDrag);
+            row.addEventListener('pointercancel', endDrag);
+
+            row.addEventListener('wheel', (event) => {
+                const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+                if (delta === 0) return;
+                event.preventDefault();
+                pauseAutoScroll();
+                offset -= delta;
+                normalizeOffset();
+                applyTransform();
+                resumeAutoScroll(500);
+            }, { passive: false });
+
+            updateSpeed();
+            applyTransform();
+            requestAnimationFrame(tick);
+
+            if (typeof ResizeObserver !== 'undefined') {
+                new ResizeObserver(updateSpeed).observe(track);
             }
         }
         

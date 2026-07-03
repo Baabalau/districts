@@ -16,11 +16,14 @@ class SiteFooter extends HTMLElement {
                                 <span>New Orleans City Council</span>
                             </a>
                         </li>
-                        <li>
-                            <span style="margin-right: 8px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-secondary, #DEBA84);">Questions / Comments:</span>
-                            <a href="mailto:nighttime@nola.gov">
-                                <span>nighttime@nola.gov</span>
-                            </a>
+                        <li class="site-footer-contact">
+                            <span class="site-footer-contact-spacer" aria-hidden="true"></span>
+                            <div class="site-footer-contact-content">
+                                <span class="site-footer-contact-label">Questions / Comments:</span>
+                                <a href="mailto:nighttime@nola.gov">
+                                    <span>nighttime@nola.gov</span>
+                                </a>
+                            </div>
                         </li>
                     </ul>
                 </div>
