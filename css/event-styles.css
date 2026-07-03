@@ -1081,8 +1081,7 @@
     text-transform: uppercase;
 }
 .map-legend-item--top10 {
-    border-left: 1px solid rgba(203, 160, 82, 0.3);
-    padding-left: 15px;
+    padding-left: 0;
 }
 .map-legend-dot--outline {
     background-color: transparent;
