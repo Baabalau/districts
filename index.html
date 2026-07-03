@@ -281,9 +281,9 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-            align-items: flex-start;
+            align-items: center;
             text-align: left;
-            padding: 120px 24px 48px;
+            padding: 120px clamp(24px, 5vw, 60px) 48px;
             /* Lightened overlay for inverted theme */
             background: linear-gradient(rgba(15, 22, 38, 0.85), rgba(15, 22, 38, 0.95)), url('https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover;
             background-attachment: fixed;
@@ -292,7 +292,7 @@
         .hero-inner {
             width: 100%;
             max-width: 1280px;
-            margin: 0 0 0 10px;
+            margin: 0 auto;
             display: flex;
             flex-direction: column;
             align-items: flex-start;
@@ -323,7 +323,8 @@
                 max-width: none;
                 display: flex;
                 flex-direction: column;
-                justify-content: center;
+                justify-content: flex-start;
+                align-items: flex-start;
                 text-align: left;
             }
             .hero-map {
@@ -882,8 +883,9 @@
 
         /* --- ABOUT / WAYS TO PARTICIPATE (full section) --- */
         .about-section {
-            padding: 100px 24px 120px;
-            max-width: 920px;
+            padding: 100px clamp(24px, 5vw, 60px) 120px;
+            width: 100%;
+            max-width: 1280px;
             margin: 0 auto;
             overflow: hidden;
         }
@@ -1414,9 +1416,15 @@
 
         /* --- EVENTS SECTION --- */
         .events-section {
-            padding: 100px 50px;
+            padding: 100px clamp(24px, 5vw, 60px);
             background: var(--bg-secondary);
             border-top: 5px solid var(--text-primary);
+        }
+
+        .events-section .section-title {
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .event-grid {
