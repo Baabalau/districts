@@ -2,7 +2,7 @@
   "district": "B",
   "date": "Wednesday, August 5th",
   "time": "7:00 PM - 10:00 PM",
-  "location": "French Quarter / CBD",
+  "location": "Uptown, Central City, Broadmoor & the CBD",
   "councilName": "Lesli Harris",
   "councilImg": "assets/profile-pics/Lesli-Harris-New-Headshot-Small.png",
   "councilBioUrl": "https://council.nola.gov/councilmembers/lesli-harris/",
@@ -18,7 +18,7 @@
     "stops": [
       {
         "number": "01",
-        "title": "{influencerName}'s Uptown Wind Down",
+        "title": "{influencerName}'s Sundown Wind Down",
         "body": "The crawl begins at a spot {influencerName} calls essential�live energy, strong pours, and the kind of room that sets the tone for the whole night."
       },
       {

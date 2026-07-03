@@ -30,6 +30,15 @@ function renderHeroIntro(intro, vars) {
         .join('');
 }
 
+function renderHeroTitle(title, vars) {
+    const text = interpolate(title, vars);
+    const match = text.match(/^District\s+(\S+)\s+(.+)$/i);
+    if (match) {
+        return `<span class="title-3d-line">District ${escapeHtml(match[1])}</span><span class="title-3d-line">${escapeHtml(match[2])}</span>`;
+    }
+    return escapeHtml(text);
+}
+
 function buildTemplateVars(districtCopy) {
     return {
         district: districtCopy.district,
@@ -818,10 +827,10 @@ class EventLayout extends HTMLElement {
             <div class="event-hero-wrap" style="background-image: linear-gradient(rgba(15, 22, 38, 0.85), rgba(15, 22, 38, 0.95)), url('${heroBg}'); background-position: center; background-size: cover; background-attachment: fixed;">
                 <div class="event-hero">
                 <div class="hero-left">
-                    <h1 class="title-3d">${interpolate(shared.hero.title, vars)}</h1>
+                    <h1 class="title-3d">${renderHeroTitle(shared.hero.title, vars)}</h1>
                     <h2>${districtCopy.date}</h2>
                     ${renderHeroIntro(districtCopy.heroIntro, vars)}
-                    <button type="button" id="vote-scroll-btn" class="brand-btn" style="margin-top: 20px; font-size: 1.1rem; padding: 15px 30px;" onclick="document.getElementById('map-section').scrollIntoView({behavior: 'smooth'})">${interpolate(shared.hero.rsvpButton, vars)}</button>
+                    <button type="button" id="vote-scroll-btn" class="brand-btn" onclick="document.getElementById('map-section').scrollIntoView({behavior: 'smooth'})">${interpolate(shared.hero.rsvpButton, vars)}</button>
                 </div>
                 <div class="hero-right">
                     <div class="hero-cards-stack">
