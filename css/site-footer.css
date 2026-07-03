@@ -2,7 +2,7 @@
 
 .site-footer {
     margin-top: 0;
-    padding: 2rem 1.25rem 2.5rem;
+    padding: 2rem clamp(24px, 5vw, 60px) 2.5rem;
     border-top-width: 3px;
     border-top-style: solid;
     /* Use the map blue background */
@@ -12,20 +12,22 @@
 }
 
 .site-footer-inner {
-    width: 80%;
+    width: 100%;
     max-width: 1400px;
-    margin: 0 auto;
-    text-align: center;
+    margin: 0;
+    text-align: left;
 }
 
 .site-footer-links {
     list-style: none;
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
+    justify-content: flex-start;
+    align-items: flex-start;
     gap: 1.5rem 3rem;
     font-size: 0.95rem;
+    padding: 0;
+    margin: 0;
 }
 
 .site-footer-links li {
@@ -63,5 +65,12 @@
 .footer-seal-nighttime {
     border: 1px solid #ffffff;
     border-radius: 50%;
+}
+
+@media (max-width: 640px) {
+    .site-footer-links {
+        flex-direction: column;
+        gap: 1.25rem;
+    }
 }
 

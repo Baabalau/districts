@@ -632,6 +632,24 @@
             height: 100%;
             object-fit: cover;
             display: block;
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .flow-card img[data-loading="true"] {
+            background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--bg-primary) 50%, var(--bg-secondary) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        .skeleton-couple .flow-card {
+            background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--bg-primary) 50%, var(--bg-secondary) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
         }
 
         .card-caption {
@@ -1638,7 +1656,10 @@
         <p class="flow-label">Councilmembers &amp; influencers</p>
         <div class="flow-row flow-row--people">
             <div class="flow-track flow-track--left" id="flow-track">
-                <!-- Populated from data/event-pages/district-*.json -->
+                <!-- Skeleton placeholders shown until JS loads real content -->
+                <div class="flow-couple skeleton-couple"><div class="flow-card"></div><div class="couple-ampersand">&amp;</div><div class="flow-card"></div></div>
+                <div class="flow-couple skeleton-couple"><div class="flow-card"></div><div class="couple-ampersand">&amp;</div><div class="flow-card"></div></div>
+                <div class="flow-couple skeleton-couple"><div class="flow-card"></div><div class="couple-ampersand">&amp;</div><div class="flow-card"></div></div>
             </div>
         </div>
     </section>
@@ -1871,12 +1892,12 @@
             return `
                 <div class="flow-couple">
                     <div class="flow-card">
-                        <img src="${data.influencerImg}" alt="${data.influencerName}">
+                        <img src="${data.influencerImg}" alt="${data.influencerName}" width="215" height="280" loading="lazy" decoding="async" data-loading="true" onload="this.removeAttribute('data-loading')">
                         <div class="card-caption"><span class="interior-hosts">${data.influencerName}</span><span class="interior-neighborhoods">${influencerSubtitle}</span></div>
                     </div>
                     <div class="couple-ampersand">&amp;</div>
                     <div class="flow-card">
-                        <img src="${data.councilImg}" alt="${data.councilName}">
+                        <img src="${data.councilImg}" alt="${data.councilName}" width="215" height="280" loading="lazy" decoding="async" data-loading="true" onload="this.removeAttribute('data-loading')">
                         <div class="card-caption"><span class="interior-hosts">${data.councilName}</span><span class="interior-neighborhoods">${councilSubtitle}</span></div>
                     </div>
                 </div>`;

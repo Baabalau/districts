@@ -1701,24 +1701,31 @@ class EventLayout extends HTMLElement {
         setTimeout(() => {
             const urlParams = new URLSearchParams(window.location.search);
             const voteTarget = urlParams.get('vote');
-            
+
             if (voteTarget) {
                 // We want to open the map popup for this venue, not just the vote modal directly.
-                // The map rendering is asynchronous, so we wait for the markers to be populated.
+                // The map + Firestore markers load asynchronously, so wait for THIS venue's
+                // marker specifically (not just the helper) before scrolling and opening it.
+                let attempts = 0;
                 const checkMapInterval = setInterval(() => {
-                    if (window.openMapPopupForVenue) {
+                    attempts++;
+                    const markerReady = window.openMapPopupForVenue &&
+                        window.venueMarkers && window.venueMarkers[voteTarget];
+
+                    if (markerReady) {
                         clearInterval(checkMapInterval);
-                        window.openMapPopupForVenue(voteTarget);
-                        // Also scroll to the map
+                        // Anchor to the map first, then open the popup once the smooth
+                        // scroll and the map's initial framing have settled.
                         const mapSection = document.getElementById('map-section');
                         if (mapSection) {
                             mapSection.scrollIntoView({ behavior: 'smooth' });
                         }
+                        setTimeout(() => window.openMapPopupForVenue(voteTarget), 700);
+                    } else if (attempts >= 50) {
+                        // Give up after ~10s (marker may not exist for this district).
+                        clearInterval(checkMapInterval);
                     }
                 }, 200);
-                
-                // Fallback: clear interval after 5 seconds if map fails to load
-                setTimeout(() => clearInterval(checkMapInterval), 5000);
             }
         }, 150);
     }
