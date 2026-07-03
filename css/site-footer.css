@@ -15,14 +15,14 @@
     width: 100%;
     max-width: 1400px;
     margin: 0 auto;
-    text-align: left;
+    text-align: center;
 }
 
 .site-footer-links {
     list-style: none;
     display: flex;
     flex-wrap: wrap;
-    justify-content: flex-start;
+    justify-content: center;
     align-items: center;
     gap: 1.5rem 3rem;
     font-size: 0.95rem;
@@ -99,8 +99,9 @@
     }
 
     .site-footer-inner {
-        max-width: 22rem;
-        margin-inline: auto;
+        max-width: none;
+        margin-inline: 0;
+        text-align: left;
     }
 
     .site-footer-links {
