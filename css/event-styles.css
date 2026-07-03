@@ -153,10 +153,11 @@
 /* Hero Cards Stack Layout */
 .hero-cards-stack {
     position: relative;
-    width: 100%;
+    width: min(100%, 340px);
     max-width: 340px;
     height: clamp(400px, 45vw, 480px);
     margin: 0 auto;
+    flex-shrink: 0;
 }
 
 .hero-cards-stack .council-card {
@@ -259,6 +260,63 @@
         10px 10px 14px rgba(0,0,0,0.45);
     z-index: 3;
     line-height: 1;
+}
+
+/* Large screens: centered hero pair, constrained copy, smaller cards */
+@media (min-width: 1101px) {
+    .event-hero {
+        justify-content: center;
+        flex-wrap: nowrap;
+        align-items: center;
+        width: 100%;
+        max-width: none;
+        gap: clamp(48px, 6vw, 96px);
+    }
+
+    .hero-left {
+        flex: 0 0 540px;
+        width: 540px;
+        max-width: 540px;
+        padding-right: 0;
+    }
+
+    .hero-left h1.title-3d,
+    .hero-left h2,
+    .hero-left p,
+    .hero-left .brand-btn {
+        max-width: 540px;
+    }
+
+    .hero-left .brand-btn {
+        white-space: normal;
+        width: 100%;
+        box-sizing: border-box;
+        text-align: center;
+        line-height: 1.35;
+    }
+
+    .hero-right {
+        flex: 0 0 306px;
+        width: 306px;
+        min-width: 306px;
+        min-height: 432px;
+    }
+
+    .hero-cards-stack {
+        width: 306px;
+        max-width: 306px;
+        height: clamp(360px, 40.5vw, 432px);
+        margin: 0;
+    }
+
+    .hero-cards-stack .flow-card {
+        width: clamp(144px, 22.5vw, 180px);
+        height: clamp(187px, 29.25vw, 234px);
+    }
+
+    .hero-cards-stack .stack-ampersand {
+        font-size: clamp(1.8rem, 3.6vw, 3.15rem);
+    }
 }
 
 /* Narrow / tablet: stack hero (cards below text + CTA) */
