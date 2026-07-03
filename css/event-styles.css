@@ -69,6 +69,14 @@
     letter-spacing: 2px;
 }
 
+.title-3d-line {
+    display: block;
+}
+
+.title-3d-line + .title-3d-line {
+    margin-top: 0.08em;
+}
+
 /* Hero Section */
 .event-hero-wrap {
     width: 100%;
@@ -95,14 +103,18 @@
 }
 
 .hero-left h1.title-3d {
+    display: block;
+    max-width: 100%;
     font-family: var(--font-hero);
-    font-size: 50px;
+    font-size: clamp(2.8rem, 6vw, 4.5rem);
     font-weight: 700;
     text-transform: uppercase;
     line-height: 1.1;
     margin-top: 30px;
     margin-bottom: 30px;
     color: var(--text-primary);
+    text-align: left;
+    overflow-wrap: break-word;
 }
 
 .hero-left h2 {
@@ -113,9 +125,10 @@
 }
 
 .hero-left p {
-    font-size: clamp(1rem, 1.5vw, 1.1rem);
-    color: var(--text-secondary);
-    line-height: 1.65;
+    font-family: var(--font-main);
+    font-size: clamp(1rem, 1.8vw, 1.15rem);
+    color: var(--text-primary);
+    line-height: 1.75;
     font-weight: 500;
 }
 
@@ -248,54 +261,133 @@
     line-height: 1;
 }
 
-/* Mobile hero — overrides placed AFTER base rules so they take effect */
-@media (max-width: 768px) {
+/* Narrow / tablet: stack hero (cards below text + CTA) */
+@media (max-width: 1100px) {
     .event-hero {
         flex-direction: column;
         text-align: left;
-        align-items: center;
-        gap: 40px;
-        width: 90%;
-        padding-bottom: 30px;
+        align-items: flex-start;
+        gap: 36px;
+        width: 100%;
+        max-width: none;
+        padding: 20px 10vw 36px;
+        box-sizing: border-box;
     }
 
     .hero-left {
         width: 100%;
         flex: 1 1 auto;
-        padding-left: 10px;
-        padding-right: 10px;
+        padding-left: 0;
+        padding-right: 0;
     }
 
-    /* User-tuned cap (50px) with viewport scaling for narrow screens. */
-    .hero-left h1.title-3d {
-        font-size: clamp(2rem, 12.8vw, 50px);
-        overflow-wrap: normal;
-        word-break: normal;
-        hyphens: none;
+    /* Stacked hero copy block = 80vw (10vw padding on .event-hero each side) */
+    .hero-left h1.title-3d,
+    .hero-left h2,
+    .hero-left p,
+    .hero-left .brand-btn {
+        width: 100%;
         max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .hero-left h1.title-3d {
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        overflow: visible;
+        transform-origin: left bottom;
+        font-size: clamp(2.25rem, calc(65vw / 5.5), 5.25rem);
+        letter-spacing: 0.04em;
+        line-height: 1.05;
+        text-shadow:
+            1px 1px 0px #0F1626,
+            2px 2px 0px var(--accent),
+            3px 3px 0px var(--accent),
+            5px 5px 0px var(--accent),
+            7px 7px 0px var(--brand-red),
+            9px 9px 0px var(--brand-red),
+            12px 14px 16px rgba(0,0,0,0.45);
+    }
+
+    .hero-left h1.title-3d .title-3d-line {
+        display: block;
+        white-space: nowrap;
     }
 
     .hero-left .brand-btn {
         white-space: normal;
-        width: 100%;
         padding: 14px 18px;
+        font-size: 1.1rem;
         text-align: center;
         line-height: 1.35;
+    }
+
+    #vote-scroll-btn {
+        margin-top: 20px;
+    }
+
+    .hero-left p {
+        font-size: clamp(1rem, 3.33vw, 19px);
     }
 
     .hero-right {
         width: 100%;
         min-height: auto;
-        padding-top: 10px;
+        padding-top: 8px;
+        align-self: center;
     }
 
-    /* Keep cards absolutely positioned so the ampersand can be placed precisely.
-       Bring the two cards onto a closer horizontal plane than desktop. */
+    /* Enlarged card pair for stacked tablet/narrow layouts */
     .hero-cards-stack {
-        position: relative;
-        height: clamp(250px, 74vw, 320px);
-        max-width: 360px;
-        margin: 0 auto 20px;
+        height: clamp(320px, 48vw, 430px);
+        max-width: min(480px, 90vw);
+        margin: 0 auto 12px;
+    }
+
+    .hero-cards-stack .flow-card {
+        width: clamp(190px, 36vw, 250px);
+        height: clamp(247px, 47vw, 325px);
+    }
+
+    .hero-cards-stack .stack-ampersand {
+        font-size: clamp(2.25rem, 5vw, 3.75rem);
+    }
+}
+
+/* Stacked hero: cap title, date, body, and CTA at ~570px snapshot size */
+@media (min-width: 571px) and (max-width: 1100px) {
+    .hero-left h1.title-3d {
+        font-size: calc(570px * 0.65 / 5.5);
+    }
+
+    .hero-left h2 {
+        font-size: 1.1rem;
+    }
+
+    .hero-left p {
+        font-size: 19px;
+    }
+
+    .hero-left .brand-btn,
+    #vote-scroll-btn {
+        font-size: 1.1rem;
+        padding: 14px 18px;
+    }
+}
+
+/* Mobile hero refinements */
+@media (max-width: 768px) {
+    /* Spread cards apart when stack caps at ~400×360 so both names stay readable */
+    .hero-cards-stack {
+        height: clamp(280px, 72vw, 360px);
+        max-width: min(400px, 92vw);
+        padding: 0 clamp(14px, 5vw, 22px);
+    }
+
+    .hero-cards-stack .flow-card {
+        width: clamp(150px, 36vw, 172px);
+        height: clamp(195px, 47vw, 224px);
     }
 
     .hero-cards-stack .council-card {
@@ -306,15 +398,15 @@
     }
 
     .hero-cards-stack .influencer-card {
-        top: 12%;
+        top: 10%;
         right: 0;
         left: auto;
         bottom: auto;
     }
 
     .hero-cards-stack .stack-ampersand {
-        top: 44%;
-        left: 40%;
+        top: 42%;
+        left: 46%;
         margin-top: 0;
     }
 }
