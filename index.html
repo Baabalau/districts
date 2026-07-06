@@ -1838,58 +1838,56 @@
 
     <section id="events" class="events-section">
         <h2 class="section-title js-reveal reveal-opacity">Upcoming <span>Crawls</span></h2>
-        <div class="event-grid">
-            
-            <div class="event-card js-reveal reveal-y" style="transition-delay: 0.1s;" onclick="window.location.href='district-e.html'">
-                <div class="event-img" style="background-image: url('assets/district_e_image.jpg');"></div>
+        <div class="event-grid" id="event-grid">
+            <div class="event-card js-reveal reveal-y" data-district="e" style="transition-delay: 0.1s;">
+                <div class="event-img"></div>
                 <div class="event-info">
                     <h3 class="event-district">District E</h3>
-                    <p class="event-neighborhoods">New Orleans East and the Lower 9</p>
-                    <p class="event-hosts">with Jason Hughes &amp; Ron Orleans</p>
-                    <p class="event-datetime" data-district="e"><strong>Loading...</strong></p>
+                    <p class="event-neighborhoods">&nbsp;</p>
+                    <p class="event-hosts">&nbsp;</p>
+                    <p class="event-datetime"><strong>Loading...</strong></p>
                 </div>
             </div>
 
-            <div class="event-card js-reveal reveal-y" style="transition-delay: 0.2s;" onclick="window.location.href='district-c.html'">
-                <div class="event-img" style="background-image: url('assets/district_c_image.png');"></div>
+            <div class="event-card js-reveal reveal-y" data-district="c" style="transition-delay: 0.2s;">
+                <div class="event-img"></div>
                 <div class="event-info">
                     <h3 class="event-district">District C</h3>
-                    <p class="event-neighborhoods">Algiers, the French Quarter, Tremé, Marigny and Bywater</p>
-                    <p class="event-hosts">with Freddie King III &amp; Justin Brown</p>
-                    <p class="event-datetime" data-district="c"><strong>Loading...</strong></p>
+                    <p class="event-neighborhoods">&nbsp;</p>
+                    <p class="event-hosts">&nbsp;</p>
+                    <p class="event-datetime"><strong>Loading...</strong></p>
                 </div>
             </div>
 
-            <div class="event-card js-reveal reveal-y" style="transition-delay: 0.3s;" onclick="window.location.href='district-b.html'">
-                <div class="event-img" style="background-image: url('assets/district_b_image.jpg');"></div>
+            <div class="event-card js-reveal reveal-y" data-district="b" style="transition-delay: 0.3s;">
+                <div class="event-img"></div>
                 <div class="event-info">
                     <h3 class="event-district">District B</h3>
-                    <p class="event-neighborhoods">Uptown, Central City, the CBD and Broadmoor</p>
-                    <p class="event-hosts">with Lesli Harris &amp; Nicole Ralston</p>
-                    <p class="event-datetime" data-district="b"><strong>Loading...</strong></p>
+                    <p class="event-neighborhoods">&nbsp;</p>
+                    <p class="event-hosts">&nbsp;</p>
+                    <p class="event-datetime"><strong>Loading...</strong></p>
                 </div>
             </div>
 
-            <div class="event-card js-reveal reveal-y" style="transition-delay: 0.4s;" onclick="window.location.href='district-d.html'">
-                <div class="event-img" style="background-image: url('assets/district_d_image.jpg');"></div>
+            <div class="event-card js-reveal reveal-y" data-district="d" style="transition-delay: 0.4s;">
+                <div class="event-img"></div>
                 <div class="event-info">
                     <h3 class="event-district">District D</h3>
-                    <p class="event-neighborhoods">Gentilly, the historic 7th Ward and the Lakefront</p>
-                    <p class="event-hosts">with Eugene Green &amp; Casey Ferrand McGee</p>
-                    <p class="event-datetime" data-district="d"><strong>Loading...</strong></p>
+                    <p class="event-neighborhoods">&nbsp;</p>
+                    <p class="event-hosts">&nbsp;</p>
+                    <p class="event-datetime"><strong>Loading...</strong></p>
                 </div>
             </div>
 
-            <div class="event-card js-reveal reveal-y" style="transition-delay: 0.5s;" onclick="window.location.href='district-a.html'">
-                <div class="event-img" style="background-image: url('assets/district_a_image.jpeg');"></div>
+            <div class="event-card js-reveal reveal-y" data-district="a" style="transition-delay: 0.5s;">
+                <div class="event-img"></div>
                 <div class="event-info">
                     <h3 class="event-district">District A</h3>
-                    <p class="event-neighborhoods">Carrollton, Mid-City, Bayou Saint John and Lakeview</p>
-                    <p class="event-hosts">with Aimee McCarron &amp; Aubrey Avocado</p>
-                    <p class="event-datetime" data-district="a"><strong>Loading...</strong></p>
+                    <p class="event-neighborhoods">&nbsp;</p>
+                    <p class="event-hosts">&nbsp;</p>
+                    <p class="event-datetime"><strong>Loading...</strong></p>
                 </div>
             </div>
-
         </div>
     </section>
 
@@ -1902,24 +1900,46 @@
         import { db } from "./js/firebase-config.js";
         import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
-        // --- LOAD EVENT DATES FROM JSON ---
-        async function loadEventDates() {
-            const districtIds = ['a', 'b', 'c', 'd', 'e'];
-            
-            for (const id of districtIds) {
+        // --- LOAD EVENT CARDS FROM JSON ---
+        async function loadEventCards() {
+            const cards = document.querySelectorAll('.event-card[data-district]');
+
+            await Promise.all([...cards].map(async (card) => {
+                const id = card.dataset.district;
                 try {
                     const response = await fetch(`data/event-pages/district-${id}.json`);
-                    if (response.ok) {
-                        const data = await response.json();
-                        const dateEl = document.querySelector(`.event-datetime[data-district="${id}"]`);
-                        if (dateEl && data.date) {
-                            dateEl.innerHTML = `<strong>${data.date}</strong>`;
-                        }
+                    if (!response.ok) return;
+                    const data = await response.json();
+
+                    const imgEl = card.querySelector('.event-img');
+                    const districtEl = card.querySelector('.event-district');
+                    const neighborhoodsEl = card.querySelector('.event-neighborhoods');
+                    const hostsEl = card.querySelector('.event-hosts');
+                    const dateEl = card.querySelector('.event-datetime strong');
+
+                    if (imgEl && data.bgImg) {
+                        imgEl.style.backgroundImage = `url('${data.bgImg}')`;
                     }
+                    if (districtEl && data.district) {
+                        districtEl.textContent = `District ${data.district}`;
+                    }
+                    if (neighborhoodsEl && data.location) {
+                        neighborhoodsEl.textContent = data.location;
+                    }
+                    if (hostsEl && data.councilName && data.influencerName) {
+                        hostsEl.textContent = `with ${data.councilName} & ${data.influencerName}`;
+                    }
+                    if (dateEl && data.date) {
+                        dateEl.textContent = data.date;
+                    }
+
+                    card.onclick = () => {
+                        window.location.href = `district-${id}.html`;
+                    };
                 } catch (error) {
-                    console.error(`Error loading date for district ${id}:`, error);
+                    console.error(`Error loading event card for district ${id}:`, error);
                 }
-            }
+            }));
         }
 
         function renderFlowCouple(data) {
@@ -2070,7 +2090,7 @@
             }
         }
         
-        loadEventDates();
+        loadEventCards();
         loadFlowCouples();
 
         // --- MENU LOGIC ---

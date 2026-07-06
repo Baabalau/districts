@@ -596,8 +596,9 @@
 
         .custom-google-form .checkbox-group {
             display: flex;
-            align-items: center;
-            gap: 15px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
             background: rgba(0,0,0,0.2);
             padding: 15px;
             border-radius: 8px;
@@ -792,6 +793,10 @@
                             <input type="checkbox" id="chk-new-business">
                             This is a new business not currently on the map
                         </label>
+                        <label>
+                            <input type="checkbox" id="chk-opt-out">
+                            Please remove our business from this website and affiliated promotions.
+                        </label>
                     </div>
                     
                     <label for="biz-address">Street Address</label>
@@ -873,13 +878,6 @@
                         <label>
                             <input type="checkbox" id="chk-host">
                             <span>Yes, our business would like to host <span id="dynamic-district-name">District [B]</span>'s final stop of the night on <span id="dynamic-district-date">[Tuesday, July 28th]</span></span>
-                        </label>
-                    </div>
-
-                    <div class="checkbox-group">
-                        <label>
-                            <input type="checkbox" id="chk-opt-out">
-                            Please remove our business from this website and affiliated promotions.
                         </label>
                     </div>
                     
