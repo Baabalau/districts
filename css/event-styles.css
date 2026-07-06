@@ -1743,10 +1743,11 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 12px;
 }
 
 #vote-modal .vote-modal-arrow {
-    margin: 0 0 10px;
+    margin: 0;
 }
 
 #vote-modal .vote-modal-venue-name {
@@ -1754,12 +1755,16 @@
     color: var(--text-primary);
     font-family: var(--font-hero);
     text-transform: uppercase;
-    margin-bottom: 12px;
+    margin-bottom: 0;
     line-height: 1.1;
     letter-spacing: 1px;
     text-shadow: 2px 2px 0px var(--accent);
     text-align: center;
     width: 100%;
+}
+
+#vote-modal .modal-vote-tally-wrap {
+    margin-bottom: 0;
 }
 
 .modal-vote-tally-wrap {
@@ -1774,7 +1779,7 @@
     flex-direction: row;
     align-items: baseline;
     justify-content: center;
-    gap: 0.4em;
+    gap: 0.35em;
     padding: 0;
     min-width: 0;
     line-height: 1;
@@ -1787,7 +1792,7 @@
 .modal-vote-tally-wrap .tally-number {
     grid-column: unset;
     grid-row: unset;
-    font-size: 40px;
+    font-size: 56px;
     line-height: 1;
     margin-bottom: 0;
 }
@@ -1795,16 +1800,32 @@
 .modal-vote-tally-wrap .tally-label {
     grid-column: unset;
     grid-row: unset;
-    font-size: 18px;
+    font-size: 24px;
     line-height: 1;
     letter-spacing: 1px;
-    margin-top: 0.15em;
+    margin-top: 0.12em;
+}
+
+/* Slot reels inherit the modal tally number size so em-based rolls stay in sync */
+.modal-vote-tally-wrap .tally-digit-reel,
+.modal-vote-tally-wrap .tally-digit-static {
+    font-size: inherit;
+    line-height: 1;
+}
+
+.modal-vote-tally-wrap .tally-digit-reel {
+    vertical-align: baseline;
+}
+
+.modal-vote-tally-wrap .tally-digit-cell {
+    font-size: inherit;
 }
 
 #vote-modal .auth-buttons {
     align-items: center;
     width: 100%;
     max-width: 360px;
+    margin-top: 0;
 }
 
 #vote-modal .auth-buttons .auth-btn {
