@@ -1053,6 +1053,10 @@ class EventLayout extends HTMLElement {
         `;
             this.initScrollAnimations();
             this.initVotingPortal();
+            const footer = document.querySelector('site-footer');
+            if (footer?.setPhotoCredit && districtCopy.photoCredit) {
+                footer.setPhotoCredit(districtCopy.photoCredit);
+            }
             // Non-blocking: resolve the live election state after the page is on screen.
             this.applyElectionSchedule(districtId);
             // Admin-only: in-page toolbar to preview each election phase locally.
