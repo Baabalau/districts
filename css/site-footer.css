@@ -89,7 +89,7 @@
 .site-footer-links a:hover {
     opacity: 0.9;
     transform: translateY(-2px);
-    color: var(--bg-secondary, #E8D5AD);
+    color: var(--gold-muted-faint, #8A7348);
 }
 
 .site-footer-links a span {
