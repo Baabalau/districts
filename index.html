@@ -1532,23 +1532,6 @@
             letter-spacing: 0.03em;
         }
 
-        .event-photo-credit {
-            margin: 14px 0 0;
-            font-size: 0.72rem;
-            color: var(--text-secondary);
-            line-height: 1.4;
-        }
-
-        .event-photo-credit a {
-            color: var(--text-primary);
-            text-decoration: underline;
-            text-underline-offset: 2px;
-        }
-
-        .event-photo-credit a:hover {
-            color: var(--bg-secondary);
-        }
-
         .event-info .brand-btn {
             display: none;
         }
@@ -1864,7 +1847,6 @@
                     <p class="event-neighborhoods">New Orleans East and the Lower 9</p>
                     <p class="event-hosts">with Jason Hughes &amp; Ron Orleans</p>
                     <p class="event-datetime" data-district="e"><strong>Loading...</strong></p>
-                    <p class="event-photo-credit" data-district="e" hidden></p>
                 </div>
             </div>
 
@@ -1875,7 +1857,6 @@
                     <p class="event-neighborhoods">Algiers, the French Quarter, Tremé, Marigny and Bywater</p>
                     <p class="event-hosts">with Freddie King III &amp; Justin Brown</p>
                     <p class="event-datetime" data-district="c"><strong>Loading...</strong></p>
-                    <p class="event-photo-credit" data-district="c" hidden></p>
                 </div>
             </div>
 
@@ -1886,7 +1867,6 @@
                     <p class="event-neighborhoods">Uptown, Central City, the CBD and Broadmoor</p>
                     <p class="event-hosts">with Lesli Harris &amp; Nicole Ralston</p>
                     <p class="event-datetime" data-district="b"><strong>Loading...</strong></p>
-                    <p class="event-photo-credit" data-district="b" hidden></p>
                 </div>
             </div>
 
@@ -1897,7 +1877,6 @@
                     <p class="event-neighborhoods">Gentilly, the historic 7th Ward and the Lakefront</p>
                     <p class="event-hosts">with Eugene Green &amp; Casey Ferrand McGee</p>
                     <p class="event-datetime" data-district="d"><strong>Loading...</strong></p>
-                    <p class="event-photo-credit" data-district="d" hidden></p>
                 </div>
             </div>
 
@@ -1908,7 +1887,6 @@
                     <p class="event-neighborhoods">Carrollton, Mid-City, Bayou Saint John and Lakeview</p>
                     <p class="event-hosts">with Aimee McCarron &amp; Aubrey Avocado</p>
                     <p class="event-datetime" data-district="a"><strong>Loading...</strong></p>
-                    <p class="event-photo-credit" data-district="a" hidden></p>
                 </div>
             </div>
 
@@ -1936,12 +1914,6 @@
                         const dateEl = document.querySelector(`.event-datetime[data-district="${id}"]`);
                         if (dateEl && data.date) {
                             dateEl.innerHTML = `<strong>${data.date}</strong>`;
-                        }
-
-                        const creditEl = document.querySelector(`.event-photo-credit[data-district="${id}"]`);
-                        if (creditEl && data.photoCredit?.name && data.photoCredit?.url) {
-                            creditEl.innerHTML = `Photo Credit: <a href="${data.photoCredit.url}" target="_blank" rel="noopener noreferrer">${data.photoCredit.name}</a>`;
-                            creditEl.hidden = false;
                         }
                     }
                 } catch (error) {
