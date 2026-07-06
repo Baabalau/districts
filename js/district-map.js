@@ -208,13 +208,22 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         const isTop10 = rank && rank <= 10;
-        const borderStyle = isTop10 ? 'border: 2px solid #fff;' : 'border: 2px solid transparent;';
-        // Add neon glow effect matching the marker's color
         const glowStyle = `box-shadow: 0 0 8px ${color}, 0 0 12px ${color};`;
+
+        // Top 10: white ring around the category-colored core (matches map legend).
+        // Uses a nested wrapper so the ring isn't clipped by Leaflet's iconSize box.
+        if (isTop10) {
+            return L.divIcon({
+                className: 'custom-venue-marker custom-venue-marker--top10',
+                html: `<div class="venue-marker-ring"><div class="venue-marker-core venue-marker-core--top10" style="background-color: ${color}; ${glowStyle}"></div></div>`,
+                iconSize: [24, 24],
+                iconAnchor: [12, 12]
+            });
+        }
 
         return L.divIcon({
             className: 'custom-venue-marker',
-            html: `<div style="background-color: ${color}; width: 16px; height: 16px; border-radius: 50%; ${glowStyle} ${borderStyle}"></div>`,
+            html: `<div class="venue-marker-core" style="background-color: ${color}; ${glowStyle}"></div>`,
             iconSize: [16, 16],
             iconAnchor: [8, 8]
         });
@@ -287,10 +296,15 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (place.inBounds) inDistrictVenues.push(place);
         });
 
-        // Mock ranks if none have rank (to allow previewing the rankings UI)
-        if (!inDistrictVenues.some(v => v.rank)) {
-            inDistrictVenues.slice(0, 10).forEach((v, index) => v.rank = index + 1);
-        }
+        // Live vote rankings for map Top 10 highlighting (must match leaderboard).
+        const sortedByVotes = [...inDistrictVenues].sort((a, b) => {
+            const diff = (b.voteCount || 0) - (a.voteCount || 0);
+            if (diff !== 0) return diff;
+            return (a.name || '').localeCompare(b.name || '');
+        });
+        sortedByVotes.forEach((v, index) => {
+            v.rank = (v.voteCount || 0) > 0 ? index + 1 : null;
+        });
 
         let allMarkers = [];
         window.venueMarkers = {}; // Store markers by venue ID for easy access
