@@ -16,8 +16,8 @@
     "url": "https://www.flickr.com/photos/infrogmation/4946844705/in/photostream/"
   },
   "heroIntro": [
-    "This summer, Councilmember Aimee McCarron and Aubrey Avocado are supporting local hospitality businesses with a visit to three local favorites across Uptown, Carrollton, Holly Grove, Mid-City, Bayou Saint John and Lakeview!",
-    "Join in by earning points to support your neighborhood businesses and voting to decide Aimee & Aubrey?s last stop of the night!"
+    "Councilmember {councilDisplayName} and {influencerIntro} are supporting District {district}'s hospitality businesses this summer with a special night out to three local favorites across Uptown, Carrollton, Holly Grove, Mid-City, Bayou Saint John and Lakeview!",
+    "Vote to decide {councilFirstName} & {influencerFirstName}'s last stop of the night, and make sure to support your neighborhood restaurants, bars, music venues and more all summer long!"
   ],
   "councilQuote": "This isn't just about nightlife; it's about connecting with the community where they are. We're breaking down the walls of City Hall.",
   "influencerQuote": "District {district} has some of the most vibrant, unsung spots in the city. I can't wait to show everyone what makes this neighborhood tick.",
