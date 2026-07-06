@@ -3,6 +3,39 @@ import { collection, query, where, getDocs, doc, updateDoc, arrayUnion, incremen
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 import { renderVoteTally } from "./vote-tally.js";
 
+/** Best display address when Firestore `address` was overwritten by a bare street number. */
+export function formatVenueAddress(venue) {
+    if (!venue) return '';
+
+    const pick = (key) => {
+        const val = venue[key];
+        return typeof val === 'string' ? val.trim() : '';
+    };
+
+    const full = pick('address');
+    const street = pick('addressstreet') || pick('addressStreet');
+    const number = pick('addressnumber') || pick('addressNumber');
+    const hasStreetName = (value) => /[a-zA-Z]{2,}/.test(value);
+
+    if (hasStreetName(full)) {
+        return full.split(',')[0].trim();
+    }
+
+    if (hasStreetName(street)) {
+        if (/^\d+\s*[a-zA-Z]/.test(street)) {
+            return street.split(',')[0].trim();
+        }
+        if (number || (/^\d/.test(full) && !hasStreetName(full))) {
+            const streetNumber = number || full;
+            return `${streetNumber} ${street}`.replace(/\s+/g, ' ').trim().split(',')[0].trim();
+        }
+        return street.split(',')[0].trim();
+    }
+
+    if (full) return full.split(',')[0].trim();
+    return [number, street].filter(Boolean).join(' ').trim();
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
     // Determine district from URL
     const path = window.location.pathname;
@@ -359,6 +392,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const venueNameStr = place.name || 'Unnamed Venue';
             const venueShareUrl = window.location.origin + window.location.pathname + '?vote=' + encodeURIComponent(place.id) + '&name=' + encodeURIComponent(venueNameStr);
             const safeVenueShareUrl = venueShareUrl.replace(/'/g, "\\'");
+            const displayAddress = formatVenueAddress(place);
 
                     // Use website URL if available, otherwise hide the placeholder
                     const websiteUrl = place.website ? place.website : (place.facebook ? place.facebook : null);
@@ -379,7 +413,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                                 <h4 class="venue-map-popup__title">${place.name || 'Unnamed Venue'}</h4>
                                 ${renderVoteTally(place.voteCount)}
                             </div>
-                            ${place.address ? `<p class="venue-map-popup__address">${place.address}</p>` : ''}
+                            ${displayAddress ? `<p class="venue-map-popup__address">${displayAddress}</p>` : ''}
                             
                             <div class="venue-map-popup__meta">
                                 <p class="venue-map-popup__type">${(place.type && typeof place.type === 'string') ? place.type.replace('_', ' ') : 'Venue'}</p>
@@ -472,8 +506,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             // the map legend) instead of a gold/silver/bronze medal badge.
             const buildVenueSubtitle = (v) => {
                 const typeStr = (v.type && typeof v.type === 'string') ? v.type.replace('_', ' ') : 'Venue';
-                let addressSnippet = '';
-                if (v.address) addressSnippet = v.address.split(',')[0].trim();
+                const addressSnippet = formatVenueAddress(v);
 
                 if (addressSnippet) {
                     return `
@@ -489,8 +522,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             const buildLeaderboardSubtitle = (v) => {
                 const typeStr = (v.type && typeof v.type === 'string') ? v.type.replace('_', ' ') : 'Venue';
-                let addressSnippet = '';
-                if (v.address) addressSnippet = v.address.split(',')[0].trim();
+                const addressSnippet = formatVenueAddress(v);
 
                 let subtitleFlipHtml = '';
                 if (addressSnippet) {

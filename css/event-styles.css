@@ -8,6 +8,8 @@
     --bg-secondary: #182238; /* Lighter Dark Blue */
     --text-primary: #CBA052; /* Gold */
     --text-secondary: #DEBA84; /* Tan */
+    --gold-muted: #B89962; /* Muted gold — brand button hover text */
+    --gold-muted-faint: #8A7348; /* Very muted gold — footer link hover */
     
     /* Accent + brand color */
     --accent: #8A2F25; /* Red */
@@ -41,6 +43,7 @@
 
 .brand-btn:hover {
     background: linear-gradient(180deg, var(--accent-dark) 0%, #1E2545 100%);
+    color: var(--gold-muted);
     transform: translateY(-3px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
 }
