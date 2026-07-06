@@ -434,6 +434,45 @@
     }
 }
 
+/* Tablet / intermediate: 10% smaller cards, ≤5% horizontal overlap */
+@media (min-width: 769px) and (max-width: 1100px) {
+    .hero-cards-stack {
+        --hero-card-w: clamp(171px, 32.4vw, 225px);
+        --hero-card-h: clamp(222px, 42.3vw, 293px);
+        width: min(90vw, max(400px, calc(var(--hero-card-w) * 1.95)));
+        max-width: min(480px, 90vw);
+        height: clamp(288px, 43.2vw, 387px);
+        margin: 0 auto 12px;
+        padding: 0 clamp(10px, 2.5vw, 18px);
+    }
+
+    .hero-cards-stack .flow-card {
+        width: var(--hero-card-w);
+        height: var(--hero-card-h);
+    }
+
+    .hero-cards-stack .council-card {
+        top: 0;
+        left: 0;
+        bottom: auto;
+        right: auto;
+    }
+
+    .hero-cards-stack .influencer-card {
+        top: 14%;
+        right: 0;
+        left: auto;
+        bottom: auto;
+    }
+
+    .hero-cards-stack .stack-ampersand {
+        top: 44%;
+        left: 46%;
+        margin-top: 0;
+        font-size: clamp(2rem, 4.5vw, 3.4rem);
+    }
+}
+
 /* Mobile hero refinements */
 @media (max-width: 768px) {
     /* Spread cards apart when stack caps at ~400×360 so both names stay readable */
