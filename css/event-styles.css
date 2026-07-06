@@ -1462,6 +1462,13 @@
     gap: 8px;
     flex-shrink: 0;
 }
+
+/* Wrappers are layout-neutral on tablet/desktop; stack on small phones only */
+.venue-actions-stack,
+.venue-actions-buttons {
+    display: contents;
+}
+
 .venue-vote-btn {
     padding: 0 20px;
     height: 42px;
@@ -1514,6 +1521,68 @@
     opacity: 1;
     border-color: var(--text-secondary);
 }
+
+/* Small phones: stack vote tally above action buttons; gold line spans full stack */
+@media (max-width: 570px) {
+    .venue-list .venue-actions {
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .venue-list .venue-actions::before {
+        content: '';
+        width: 2px;
+        flex-shrink: 0;
+        align-self: stretch;
+        background: var(--text-primary);
+        opacity: 0.21;
+        border-radius: 1px;
+    }
+
+    .venue-list .venue-actions-stack {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        gap: 6px;
+    }
+
+    .venue-list .venue-actions-buttons {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .venue-list .venue-actions .prominent-vote-tally::before {
+        display: none;
+    }
+
+    .venue-list .venue-actions .prominent-vote-tally {
+        grid-template-columns: auto;
+        padding: 0;
+        min-width: 0;
+        justify-items: start;
+        text-align: left;
+    }
+
+    .venue-list .venue-actions .prominent-vote-tally span.tally-number {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    .venue-list .venue-actions .prominent-vote-tally span.tally-label {
+        grid-column: 1;
+        grid-row: 2;
+    }
+
+    .venue-list .venue-name {
+        font-size: 1.125rem;
+    }
+}
+
 .rank-badge {
     width: 35px; height: 35px; background: #333; color: #fff; border-radius: 50%;
     display: flex; align-items: center; justify-content: center; font-weight: 900; font-family: var(--font-hero);

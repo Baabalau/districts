@@ -512,12 +512,16 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const safeName = v.name ? v.name.replace(/'/g, "\\'") : '';
                 
                 return `<div class="venue-actions">
-                        ${renderVoteTally(v.voteCount)}
-                        <button class="brand-btn venue-vote-btn" onclick="window.openVoteModal('${v.id}', '${safeName}', ${Number(v.voteCount) || 0})" title="Vote for Business">
-                            <span class="desktop-text">VOTE FOR BUSINESS</span>
-                            <span class="mobile-text">🗳️</span>
-                        </button>
-                        <a href="checkin.html?venue=${v.id}" class="brand-btn venue-checkin-btn" title="Check In to Location">📍</a>
+                        <div class="venue-actions-stack">
+                            ${renderVoteTally(v.voteCount)}
+                            <div class="venue-actions-buttons">
+                                <button class="brand-btn venue-vote-btn" onclick="window.openVoteModal('${v.id}', '${safeName}', ${Number(v.voteCount) || 0})" title="Vote for Business">
+                                    <span class="desktop-text">VOTE FOR BUSINESS</span>
+                                    <span class="mobile-text">🗳️</span>
+                                </button>
+                                <a href="checkin.html?venue=${v.id}" class="brand-btn venue-checkin-btn" title="Check In to Location">📍</a>
+                            </div>
+                        </div>
                     </div>`;
             };
 
