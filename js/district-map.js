@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         'b': { center: [29.942, -90.090], zoom: 14 },
         'c': { center: [29.958, -90.04], zoom: 12 },
         'd': { center: [30.000, -90.064], zoom: 13 },
-        'e': { center: [30.060, -89.831], zoom: 11 },
+        'e': { center: [30.010, -89.997], zoom: 13 },
     };
 
     // Initial map framing per district (full district remains pannable via maxBounds below).
@@ -61,13 +61,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                 zoom: 12
             }
         },
-        // New Orleans East / Lower 9th — explicit framing so full district loads centered (see district-e map)
+        // New Orleans East / Lower 9th — frame the urban core (venues cluster west),
+        // not the full district polygon which stretches far east toward the lake.
         'e': {
-            center: [30.060, -89.831],
-            zoom: 11,
+            center: [30.010, -89.997],
+            zoom: 13,
             mobile: {
-                center: [30.060, -89.831],
-                zoom: 10
+                center: [30.010, -89.997],
+                zoom: 12
             }
         }
     };
