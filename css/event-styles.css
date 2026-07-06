@@ -1003,7 +1003,7 @@
     background: var(--panel-bg);
     border: 2px solid rgba(45, 27, 21, 0.15);
     border-radius: 12px;
-    padding: 4px 10px 15px;
+    padding: 10px 10px 15px;
     margin-bottom: 30px;
     box-shadow: 0 12px 32px rgba(45, 27, 21, 0.1);
 }
@@ -1013,7 +1013,8 @@
     font-size: 1.2rem;
     margin-bottom: 10px;
     margin-top: 0;
-    padding-top: 4px;
+    padding-top: 5px;
+    padding-bottom: 5px;
     text-transform: uppercase;
 }
 .leaderboard-list .venue-card {
@@ -1306,9 +1307,6 @@
     text-transform: uppercase;
     line-height: 1.1;
     display: block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
     color: var(--text-primary);
     margin-bottom: 4px;
 }
@@ -1345,11 +1343,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
-.venue-subtitle-flip .flip-vote-count {
-    color: var(--accent);
-    font-weight: 800;
-    font-style: normal;
-}
 .venue-subtitle {
     color: var(--text-secondary);
     font-size: 0.85rem;
@@ -1362,6 +1355,55 @@
     font-weight: 700;
     color: var(--accent);
     font-style: normal;
+}
+.prominent-vote-tally {
+    display: grid;
+    grid-template-columns: 2px 18px auto;
+    grid-template-rows: auto auto;
+    gap: 0px;
+    align-items: center;
+    justify-content: start;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    padding: 3px 10px 3px 0;
+    min-width: 60px;
+    line-height: 23px;
+    text-align: left;
+}
+
+.prominent-vote-tally::before {
+    content: '';
+    grid-column: 1;
+    grid-row: 1 / -1;
+    align-self: center;
+    width: 2px;
+    height: 28px;
+    background: var(--text-primary);
+    opacity: 0.21;
+    border-radius: 1px;
+}
+
+.prominent-vote-tally span.tally-number {
+    grid-column: 3;
+    grid-row: 1;
+    font-size: 20px;
+    font-family: var(--font-header);
+    color: var(--text-primary);
+    font-weight: 900;
+    line-height: 23px;
+    margin-bottom: 0;
+}
+
+.prominent-vote-tally span.tally-label {
+    grid-column: 3;
+    grid-row: 2;
+    font-size: 11px;
+    line-height: 13px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    font-weight: 500;
+    letter-spacing: 1px;
 }
 .venue-actions {
     display: flex;
@@ -1489,7 +1531,8 @@
 .explorer-tabs {
     display: flex;
     gap: 8px;
-    margin-bottom: 18px;
+    margin-top: 20px;
+    margin-bottom: 20px;
     border-bottom: 1px solid rgba(255,255,255,0.12);
 }
 .explorer-tab {

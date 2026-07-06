@@ -119,6 +119,26 @@ body > nav .nav-links a:hover {
     color: var(--text-primary) !important;
 }
 
+#map .venue-map-popup-pane .leaflet-popup-close-button {
+    top: 10px;
+    left: 10px;
+    right: auto;
+    opacity: 0.45;
+    transition: opacity 0.2s ease;
+}
+
+#map .venue-map-popup-pane .leaflet-popup-close-button:hover {
+    opacity: 0.75;
+}
+
+#map .venue-map-popup-pane .leaflet-popup-content {
+    margin: 6px 12px 8px 26px;
+}
+
+#map .venue-map-popup-pane .leaflet-popup-content-wrapper {
+    padding: 10px;
+}
+
 /* Map zoom — lower-left, horizontal, subdued */
 #map .leaflet-bottom.leaflet-left .leaflet-control-zoom {
     margin-bottom: 14px;
@@ -171,19 +191,62 @@ body > nav .nav-links a:hover {
     overflow: hidden;
     font-family: 'EB Garamond', Georgia, serif;
     text-align: left;
-    padding: 12px 12px 16px;
+    padding: 0;
     box-sizing: border-box;
 }
 
+/* Override Leaflet's default paragraph margins inside venue popups */
+#map .venue-map-popup-pane .leaflet-popup-content .venue-map-popup p {
+    margin: 0;
+}
+
+.venue-map-popup__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 4px;
+}
+
+.venue-map-popup__header .prominent-vote-tally {
+    flex-shrink: 0;
+    align-self: center;
+    padding-top: 0;
+    padding-bottom: 0;
+    line-height: 1;
+}
+
+.venue-map-popup__header .prominent-vote-tally::before {
+    height: 100%;
+    min-height: 24px;
+    max-height: 32px;
+}
+
+.venue-map-popup__header .prominent-vote-tally span.tally-number {
+    line-height: 1.1;
+}
+
+.venue-map-popup__header .prominent-vote-tally span.tally-label {
+    line-height: 1;
+}
+
 .venue-map-popup__title {
-    margin: 0 0 6px;
+    flex: 1;
+    min-width: 0;
+    margin: 0;
     color: var(--text-primary);
     font-family: 'EB Garamond', Georgia, serif;
     font-size: 1.5rem;
     text-transform: uppercase;
-    line-height: 1.1;
-    padding-right: 20px;
+    line-height: 1.05;
     overflow-wrap: anywhere;
+}
+
+.venue-map-popup__address {
+    margin: 0 0 4px;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.2;
 }
 
 .venue-map-popup__meta {
@@ -192,7 +255,8 @@ body > nav .nav-links a:hover {
     align-items: center;
     gap: 8px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding-bottom: 12px;
+    padding-bottom: 8px;
+    margin-bottom: 8px;
     min-width: 0;
 }
 
@@ -211,12 +275,29 @@ body > nav .nav-links a:hover {
     flex-shrink: 0;
 }
 
+.venue-map-popup__body {
+    margin-bottom: 8px;
+}
+
+.venue-map-popup__description {
+    margin: 0 0 8px;
+    font-size: 0.95rem;
+    color: var(--text-main);
+    line-height: 1.4;
+}
+
+.venue-map-popup__website {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0;
+}
+
 .venue-map-popup__actions {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    margin-top: 5px;
-    padding-bottom: 4px;
+    gap: 8px;
+    margin-top: 0;
+    padding-bottom: 0;
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
@@ -232,7 +313,7 @@ body > nav .nav-links a:hover {
     letter-spacing: 1px;
     font-weight: 700;
     text-transform: uppercase;
-    padding: 14px 12px;
+    padding: 12px 12px;
     font-size: 1.05rem;
     background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%);
     color: white;
@@ -282,13 +363,12 @@ body > nav .nav-links a:hover {
         overflow: hidden;
     }
 
-    .venue-map-popup {
-        padding: 4px 2px 8px;
-    }
-
     .venue-map-popup__title {
         font-size: 1.15rem;
-        padding-right: 12px;
+    }
+
+    #map .venue-map-popup-pane .leaflet-popup-content {
+        margin: 6px 10px 8px 24px !important;
     }
 
     .venue-map-popup .brand-btn.venue-map-popup__btn {

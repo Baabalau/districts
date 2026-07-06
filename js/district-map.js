@@ -2,6 +2,15 @@ import { auth, db } from "./firebase-config.js";
 import { collection, query, where, getDocs, doc, updateDoc, arrayUnion, increment } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 
+function renderVoteTally(voteCount) {
+    const count = Number(voteCount) || 0;
+    const label = count === 1 ? 'vote' : 'votes';
+    return `<div class="prominent-vote-tally" aria-label="${count} ${label}">
+        <span class="tally-number">${count}</span>
+        <span class="tally-label">${label}</span>
+    </div>`;
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
     // Determine district from URL
     const path = window.location.pathname;
@@ -364,7 +373,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     let websiteHtml = '';
                     if (websiteUrl) {
                         websiteHtml = `
-                        <div style="margin-bottom: 12px; display: flex; align-items: center;">
+                        <div class="venue-map-popup__website">
                             <a href="${websiteUrl}" target="_blank" rel="noopener noreferrer" style="font-size: 0.95rem; color: var(--neon-cyan); text-decoration: none; font-family: var(--font-main); display: inline-flex; align-items: center; gap: 6px; transition: opacity 0.2s ease; border: 1px solid rgba(0, 255, 255, 0.4); padding: 6px 14px; border-radius: 20px; background: rgba(0, 255, 255, 0.05);" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg> 
                                 Visit Website
@@ -374,13 +383,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                     
                     const popupContent = `
                         <div class="venue-map-popup">
-                            
-                            <div style="margin-bottom: 10px;">
+                            <div class="venue-map-popup__header">
                                 <h4 class="venue-map-popup__title">${place.name || 'Unnamed Venue'}</h4>
-                                ${place.address ? `<p style="margin: 0 0 8px 0; font-size: 0.95rem; color: var(--text-secondary); line-height: 1.3;">${place.address}</p>` : ''}
+                                ${renderVoteTally(place.voteCount)}
                             </div>
+                            ${place.address ? `<p class="venue-map-popup__address">${place.address}</p>` : ''}
                             
-                            <div class="venue-map-popup__meta" style="margin-bottom: ${hasRealDescription ? '10px' : '15px'};">
+                            <div class="venue-map-popup__meta">
                                 <p class="venue-map-popup__type">${(place.type && typeof place.type === 'string') ? place.type.replace('_', ' ') : 'Venue'}</p>
                                 
                                 <div class="venue-map-popup__share">
@@ -391,13 +400,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                                 </div>
                             </div>
                     
-                            <div style="margin-bottom: 12px;">
-                                ${hasRealDescription ? `<p style="margin: 0 0 16px 0; font-size: 0.95rem; color: var(--text-main); line-height: 1.5;">${place.description}</p>` : ''}
-                                ${websiteHtml}
-                            </div>
+                            ${(hasRealDescription || websiteHtml) ? `<div class="venue-map-popup__body">${hasRealDescription ? `<p class="venue-map-popup__description">${place.description}</p>` : ''}${websiteHtml}</div>` : ''}
                             
                             <div class="venue-map-popup__actions">
-                                <button class="brand-btn venue-map-popup__btn" onclick="window.openVoteModal('${place.id}', '${venueNameStr.replace(/'/g, "\\'")}')">Vote For This Business</button>
+                                <button class="brand-btn venue-map-popup__btn" onclick="window.openVoteModal('${place.id}', '${venueNameStr.replace(/'/g, "\\'")}')">Vote For Business</button>
                                 
                                 <a href="checkin.html?venue=${place.id}" class="brand-btn venue-map-popup__btn venue-map-popup__btn--checkin">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> Check In to Location
@@ -493,29 +499,30 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const typeStr = (v.type && typeof v.type === 'string') ? v.type.replace('_', ' ') : 'Venue';
                 let addressSnippet = '';
                 if (v.address) addressSnippet = v.address.split(',')[0].trim();
-                const voteCount = v.voteCount || 0;
-                const voteLabel = `${voteCount} vote${voteCount === 1 ? '' : 's'}`;
 
-                const lines = [
-                    `<div class="flip-vote-count">${voteLabel}</div>`,
-                    ...(addressSnippet ? [`<div>${addressSnippet}</div>`] : []),
-                    `<div>${typeStr}</div>`
-                ];
-                const modifier = lines.length === 3 ? 'triple' : 'double';
-
-                return `
+                let subtitleFlipHtml = '';
+                if (addressSnippet) {
+                    subtitleFlipHtml = `
                     <div class="venue-subtitle-flip venue-subtitle-flip--leaderboard">
-                        <div class="flipper-container flipper-container--${modifier}">
-                            ${lines.join('')}
+                        <div class="flipper-container flipper-container--double">
+                            <div>${typeStr}</div>
+                            <div>${addressSnippet}</div>
                         </div>
                     </div>`;
+                } else {
+                    subtitleFlipHtml = `<em class="venue-subtitle">${typeStr}</em>`;
+                }
+
+                return subtitleFlipHtml;
             };
 
             const renderVenueActions = (v) => {
                 const safeName = v.name ? v.name.replace(/'/g, "\\'") : '';
+                
                 return `<div class="venue-actions">
-                        <button class="brand-btn venue-vote-btn" onclick="window.openVoteModal('${v.id}', '${safeName}')" title="Vote for this Business">
-                            <span class="desktop-text">VOTE FOR THIS BUSINESS</span>
+                        ${renderVoteTally(v.voteCount)}
+                        <button class="brand-btn venue-vote-btn" onclick="window.openVoteModal('${v.id}', '${safeName}')" title="Vote for Business">
+                            <span class="desktop-text">VOTE FOR BUSINESS</span>
                             <span class="mobile-text">🗳️</span>
                         </button>
                         <a href="checkin.html?venue=${v.id}" class="brand-btn venue-checkin-btn" title="Check In to Location">📍</a>
