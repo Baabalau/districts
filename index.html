@@ -923,7 +923,7 @@
             display: flex;
             gap: 0;
             max-width: 520px;
-            margin: 0 0 2rem;
+            margin: 0 0 1rem;
             border-radius: 10px;
             overflow: hidden;
             border: 2px solid var(--text-primary);
@@ -979,7 +979,7 @@
 
         .pv-split {
             display: flex;
-            gap: clamp(28px, 5vw, 56px);
+            gap: 100px;
             align-items: center;
         }
 
@@ -989,14 +989,6 @@
             text-align: left;
         }
 
-        .pv-intro {
-            font-size: 1.15rem;
-            line-height: 1.6;
-            color: var(--text-secondary);
-            margin: 0 0 1.75rem;
-            max-width: 46ch;
-        }
-
         .pv-features {
             list-style: none;
             margin: 0 0 2rem;
@@ -1004,6 +996,7 @@
             display: flex;
             flex-direction: column;
             gap: 1.15rem;
+            max-width: 50vw;
         }
 
         .pv-feature {
@@ -1044,8 +1037,9 @@
 
         .pv-feature p {
             margin: 0;
-            font-size: 0.98rem;
-            line-height: 1.55;
+            font-size: clamp(1rem, 1.8vw, 1.15rem);
+            line-height: 1.75;
+            font-weight: 500;
             color: var(--text-secondary);
         }
 
@@ -1080,8 +1074,8 @@
 
         /* Residents: shareable "I Voted" graphic in a phone frame */
         .pv-phone {
-            width: 240px;
-            max-width: 60vw;
+            width: 216px;
+            max-width: 54vw;
             border-radius: 30px;
             padding: 10px;
             background: linear-gradient(160deg, #2a3350, #0b1120);
@@ -1098,9 +1092,9 @@
         /* Businesses: overlapping flyer + map popup previews (promote.html pattern) */
         .pv-biz-stack {
             position: relative;
-            width: 320px;
-            height: 380px;
-            max-width: 74vw;
+            width: 352px;
+            height: 418px;
+            max-width: 81.4vw;
         }
 
         .pv-biz-card {
@@ -1358,6 +1352,10 @@
                 align-items: stretch;
             }
 
+            .pv-features {
+                max-width: none;
+            }
+
             .pv-media {
                 align-self: center;
                 order: -1;
@@ -1365,7 +1363,25 @@
 
             .pv-biz-stack {
                 margin: 0 auto;
-                height: 340px;
+                height: 374px;
+            }
+        }
+
+        @media (min-width: 821px) {
+            .pv-media {
+                flex: 1 1 42%;
+                min-width: 280px;
+            }
+
+            .pv-phone {
+                width: clamp(270px, 30.6vw, 378px);
+                max-width: none;
+            }
+
+            .pv-biz-stack {
+                width: clamp(374px, 41.8vw, 506px);
+                height: clamp(440px, 48.4vw, 594px);
+                max-width: none;
             }
         }
 
@@ -1740,7 +1756,6 @@
             <div class="participate-panel pv-panel" role="tabpanel" id="panel-participate-residents" aria-labelledby="tab-participate-residents">
                 <div class="pv-split">
                     <div class="pv-copy">
-                        <p class="pv-intro">Your neighborhood, your call. Here's how to shape summer nights in your district.</p>
                         <ul class="pv-features">
                             <li class="pv-feature">
                                 <span class="pv-icon" aria-hidden="true">🗳️</span>
@@ -1777,7 +1792,6 @@
             <div class="participate-panel pv-panel" role="tabpanel" id="panel-participate-venues" aria-labelledby="tab-participate-venues" hidden>
                 <div class="pv-split">
                     <div class="pv-copy">
-                        <p class="pv-intro">Turn your regulars into a voting bloc and land the final stop of the crawl.</p>
                         <ul class="pv-features">
                             <li class="pv-feature">
                                 <span class="pv-icon" aria-hidden="true">📣</span>
