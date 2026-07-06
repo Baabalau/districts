@@ -739,7 +739,7 @@ function renderVoteModals(district) {
                 <div class="modal-content vote-modal-content">
                     <button type="button" class="close-modal vote-modal-close" onclick="window.closeVoteModal()" aria-label="Close">×</button>
                     <div class="vote-modal-header">
-                        <h2>VOTE for the District ${district} nightcrawl's last stop to be ...</h2>
+                        <h2>Vote for the last stop of the nightcrawl in District ${district} to be ...</h2>
                     </div>
                     <div class="vote-modal-body">
                         <div class="animated-arrow arrow-3d vote-modal-arrow">↓</div>
@@ -891,7 +891,7 @@ class EventLayout extends HTMLElement {
 
             <!-- Map Section -->
             <div class="map-section-wrapper js-reveal reveal-opacity" id="map-section" style="margin-bottom: 0;">
-                <h2 class="title-3d map-title"><u>District ${districtCopy.district}</u><br><span style="font-size: 0.8em; color: var(--accent);">${districtCopy.location}</span></h2>
+                <h2 class="title-3d map-title"><u>District ${districtCopy.district}</u><span class="map-title-neighborhoods">${districtCopy.location}</span></h2>
                 <div id="map"></div>
                 ${renderMapLegend()}
             </div>

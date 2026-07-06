@@ -787,6 +787,13 @@
     text-underline-offset: 8px;
 }
 
+.map-title-neighborhoods {
+    display: block;
+    margin-top: 15px;
+    font-size: 0.8em;
+    color: var(--accent);
+}
+
 #map {
     width: 100%;
     height: 600px;
@@ -1695,7 +1702,7 @@
 #vote-modal .vote-modal-content {
     position: relative;
     text-align: center;
-    padding: 44px 20px 40px;
+    padding: 10px 20px 40px;
 }
 
 #vote-modal .vote-modal-close {
