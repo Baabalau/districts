@@ -3,6 +3,7 @@ import { auth, db } from "./firebase-config.js";
 import { doc, updateDoc, increment, getDoc, setDoc, collection, collectionGroup, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 import { isAdminUser } from "./admin-auth.js";
+import { renderVoteTally, animateVoteTallySlotMachine } from "./vote-tally.js";
 
 // "Local Legend" threshold. checkin.html awards 50 points per visit, so a
 // Legend has earned LEGEND_POINTS_THRESHOLD points (== LEGEND_CHECKIN_COUNT visits).
@@ -67,10 +68,25 @@ function socialHandleFromUrl(url) {
 
 // Formats a schedule date (Firestore Timestamp or ISO string) into copy like
 // "Monday, August 4 at 3:00 PM" for the run-off teaser on the Election card.
-function formatScheduleDateTime(dateVal) {
+function parseScheduleDate(dateVal) {
     if (!dateVal) return null;
     const d = dateVal.toDate ? dateVal.toDate() : new Date(dateVal);
-    if (isNaN(d)) return null;
+    return isNaN(d) ? null : d;
+}
+
+function getCountdownParts(targetDate, now = new Date()) {
+    const diff = targetDate.getTime() - now.getTime();
+    if (diff <= 0) return { days: 0, hours: 0, mins: 0 };
+    return {
+        days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+        mins: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+    };
+}
+
+function formatScheduleDateTime(dateVal) {
+    const d = parseScheduleDate(dateVal);
+    if (!d) return null;
     const dateStr = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
     // On-the-hour display, e.g. "6 PM" (omit ":00" minutes). If a non-hour time
     // ever slips through, fall back to showing minutes so we never mislead.
@@ -585,9 +601,9 @@ function renderMapLegend() {
                                 <div id="legend-round-subtitle" style="color: var(--text-secondary); font-size: 1.2rem; font-family: var(--font-hero); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px;">RUN-OFF BEGINS IN</div>
                             </div>
                             <div class="countdown-clock small-clock">
-                                <div class="time-box"><span>02</span><label>Days</label></div>
-                                <div class="time-box"><span>14</span><label>Hrs</label></div>
-                                <div class="time-box"><span>20</span><label>Mins</label></div>
+                                <div class="time-box"><span>--</span><label>Days</label></div>
+                                <div class="time-box"><span>--</span><label>Hrs</label></div>
+                                <div class="time-box"><span>--</span><label>Mins</label></div>
                             </div>
                         </div>
 
@@ -674,9 +690,9 @@ function renderVotingStates(district) {
                         <h2>Round 1: Choose Your Final Stop</h2>
                         <p>The top 10 venues will advance to the run-off in:</p>
                         <div class="countdown-clock small-clock">
-                            <div class="time-box"><span>02</span><label>Days</label></div>
-                            <div class="time-box"><span>14</span><label>Hrs</label></div>
-                            <div class="time-box"><span>20</span><label>Mins</label></div>
+                            <div class="time-box"><span>--</span><label>Days</label></div>
+                            <div class="time-box"><span>--</span><label>Hrs</label></div>
+                            <div class="time-box"><span>--</span><label>Mins</label></div>
                         </div>
                     </div>
                     ${renderVenueExplorer()}
@@ -726,7 +742,8 @@ function renderVoteModals(district) {
                         <button class="close-modal" onclick="window.closeVoteModal()">×</button>
                     </div>
                     <div class="animated-arrow arrow-3d" style="margin: 0 0 10px 0;">↓</div>
-                    <div id="modal-venue-name" style="font-size: 3.2rem; color: var(--text-primary); font-family: var(--font-hero); text-transform: uppercase; margin-bottom: 35px; line-height: 1.1; letter-spacing: 1px; text-shadow: 2px 2px 0px var(--accent);"></div>
+                    <div id="modal-venue-name" style="font-size: 3.2rem; color: var(--text-primary); font-family: var(--font-hero); text-transform: uppercase; margin-bottom: 12px; line-height: 1.1; letter-spacing: 1px; text-shadow: 2px 2px 0px var(--accent);"></div>
+                    <div id="modal-vote-tally" class="modal-vote-tally-wrap"></div>
                     <div class="auth-buttons" id="vote-auth-section">
                         <!-- Populated dynamically based on auth state -->
                     </div>
@@ -1077,21 +1094,21 @@ class EventLayout extends HTMLElement {
 
             const sched = schedSnap.data()[districtId.toUpperCase()];
             const now = new Date();
-            const parseDate = (d) => (d && d.toDate ? d.toDate() : new Date(d));
 
             let activeState = 'round-1';
             let winnerId = null;
-            if (sched.postEvent && now >= parseDate(sched.postEvent)) {
+            if (sched.postEvent && now >= parseScheduleDate(sched.postEvent)) {
                 activeState = 'post-event';
-            } else if (sched.winnerAnnounce && now >= parseDate(sched.winnerAnnounce)) {
+            } else if (sched.winnerAnnounce && now >= parseScheduleDate(sched.winnerAnnounce)) {
                 activeState = 'post-election';
                 winnerId = sched.winnerId;
-            } else if (sched.runOffStart && now >= parseDate(sched.runOffStart)) {
+            } else if (sched.runOffStart && now >= parseScheduleDate(sched.runOffStart)) {
                 activeState = 'run-off';
             }
 
             window.currentElectionState = activeState;
             window.electionWinnerId = winnerId;
+            this._electionSchedule = sched;
 
             // Populate the run-off Crawl-tinery cards from the schedule's picks so
             // they are ready before we toggle them into view.
@@ -1102,6 +1119,7 @@ class EventLayout extends HTMLElement {
             this.setLocalLegendsMode(sched.localLegendsMode || 'default');
 
             if (window.setVotingState) window.setVotingState(activeState);
+            this.startCountdownTimer(activeState);
         } catch (err) {
             console.warn('Election schedule unavailable; defaulting to round-1 state.', err);
         }
@@ -1115,6 +1133,47 @@ class EventLayout extends HTMLElement {
         if (!el) return;
         const formatted = formatScheduleDateTime(runOffStart);
         if (formatted) el.textContent = formatted;
+    }
+
+    getCountdownTarget(stateId, sched = this._electionSchedule) {
+        if (!sched) return null;
+        if (stateId === 'round-1') return parseScheduleDate(sched.runOffStart);
+        if (stateId === 'run-off') return parseScheduleDate(sched.winnerAnnounce);
+        return null;
+    }
+
+    updateCountdownClocks(stateId) {
+        const sched = this._electionSchedule;
+        const target = this.getCountdownTarget(stateId, sched);
+        let display;
+        if (!sched) {
+            display = ['--', '--', '--'];
+        } else if (!target) {
+            display = ['00', '00', '00'];
+        } else {
+            const parts = getCountdownParts(target);
+            const pad = (n) => String(n).padStart(2, '0');
+            display = [pad(parts.days), pad(parts.hours), pad(parts.mins)];
+        }
+
+        this.querySelectorAll('.countdown-clock').forEach((clock) => {
+            const spans = clock.querySelectorAll('.time-box span');
+            if (spans.length >= 3) {
+                spans[0].textContent = display[0];
+                spans[1].textContent = display[1];
+                spans[2].textContent = display[2];
+            }
+        });
+    }
+
+    startCountdownTimer(initialState) {
+        if (this._countdownInterval) clearInterval(this._countdownInterval);
+        this._displayedElectionState = initialState;
+        this.updateCountdownClocks(initialState);
+        this._countdownInterval = setInterval(() => {
+            const state = this._displayedElectionState || window.currentElectionState || 'round-1';
+            this.updateCountdownClocks(state);
+        }, 60000);
     }
 
     // Loads the Local Legends photo wall from real check-in photos for this
@@ -1481,7 +1540,7 @@ class EventLayout extends HTMLElement {
             }
         });
 
-        window.openVoteModal = (venueId, venueName) => {
+        window.openVoteModal = (venueId, venueName, voteCount) => {
             const modal = this.querySelector('#vote-modal');
             const nameEl = this.querySelector('#modal-venue-name');
             nameEl.innerText = venueName;
@@ -1493,7 +1552,24 @@ class EventLayout extends HTMLElement {
             
             modal.dataset.venueId = venueId;
             modal.dataset.venueName = venueName;
-            
+            modal.dataset.voteCount = Number(voteCount) || 0;
+
+            // Render the current tally fresh each time so it never carries over a
+            // spinning/landed state (or a stale count) from a previous vote.
+            const tallyContainer = this.querySelector('#modal-vote-tally');
+            if (tallyContainer) {
+                tallyContainer.innerHTML = renderVoteTally(modal.dataset.voteCount);
+            }
+
+            // Reset the submit button back to its default label in case a previous
+            // vote left it reading "Vote Tallied".
+            const submitBtn = this.querySelector('#submit-vote-btn');
+            if (submitBtn) {
+                submitBtn.innerText = 'Submit Vote';
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('vote-tallied');
+            }
+
             // Reset error message if it exists
             const errorMsg = this.querySelector('#vote-error-msg');
             if (errorMsg) errorMsg.style.display = 'none';
@@ -1574,8 +1650,23 @@ class EventLayout extends HTMLElement {
                     email: currentUser.email || userData.email || "",
                     timestamp: new Date()
                 });
-                
-                window.showShareScreen();
+
+                // Celebrate the vote landing: roll the tally up by one with a
+                // slot-machine animation, confirm on the button, then hand off to
+                // the share screen after the user has had a moment to see it land.
+                const priorVoteCount = parseInt(modal.dataset.voteCount, 10) || 0;
+                const newVoteCount = priorVoteCount + 1;
+                modal.dataset.voteCount = newVoteCount;
+
+                btn.innerText = 'Vote Tallied ✓';
+                btn.classList.add('vote-tallied');
+
+                const tallyEl = this.querySelector('#modal-vote-tally .prominent-vote-tally');
+                await animateVoteTallySlotMachine(tallyEl, priorVoteCount, newVoteCount);
+
+                setTimeout(() => {
+                    window.showShareScreen();
+                }, 1100);
             } catch (error) {
                 console.error("Error submitting vote:", error);
                 errorMsg.textContent = "Error: " + error.message.replace("Firebase: ", "");
@@ -1590,6 +1681,7 @@ class EventLayout extends HTMLElement {
             if (btn) {
                 btn.innerText = 'Submit Vote';
                 btn.disabled = false;
+                btn.classList.remove('vote-tallied');
             }
             this.querySelector('#vote-modal').style.display = 'none';
             
@@ -1674,6 +1766,7 @@ class EventLayout extends HTMLElement {
         
         window.setVotingState = (stateId) => {
             const states = ['round-1', 'run-off', 'post-election', 'post-event'];
+            this._displayedElectionState = stateId;
 
             // Toggle the Crawl-tinery variant: the default teaser shows only in
             // round-1 (and pre-launch); once the run-off begins the host picks stay
@@ -1702,6 +1795,8 @@ class EventLayout extends HTMLElement {
                 const el = this.querySelector('#state-' + s);
                 if (el) el.style.display = s === stateId ? 'block' : 'none';
             });
+
+            this.updateCountdownClocks(stateId);
         };
         
         if (window.currentElectionState) {

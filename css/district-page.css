@@ -119,6 +119,265 @@ body > nav .nav-links a:hover {
     color: var(--text-primary) !important;
 }
 
+#map .venue-map-popup-pane .leaflet-popup-close-button {
+    top: 10px;
+    left: 10px;
+    right: auto;
+    opacity: 0.45;
+    transition: opacity 0.2s ease;
+}
+
+#map .venue-map-popup-pane .leaflet-popup-close-button:hover {
+    opacity: 0.75;
+}
+
+#map .venue-map-popup-pane .leaflet-popup-content {
+    margin: 6px 12px 8px 26px;
+}
+
+#map .venue-map-popup-pane .leaflet-popup-content-wrapper {
+    padding: 10px;
+}
+
+/* Map zoom — lower-left, horizontal, subdued */
+#map .leaflet-bottom.leaflet-left .leaflet-control-zoom {
+    margin-bottom: 14px;
+    margin-left: 14px;
+    opacity: 0.45;
+    transition: opacity 0.2s ease;
+    border: none;
+    box-shadow: none;
+}
+
+#map .leaflet-bottom.leaflet-left .leaflet-control-zoom:hover {
+    opacity: 0.8;
+}
+
+#map .leaflet-control-zoom.leaflet-bar {
+    display: flex;
+    flex-direction: row;
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    border-radius: 6px;
+    overflow: hidden;
+    background: rgba(15, 22, 38, 0.6);
+}
+
+#map .leaflet-control-zoom.leaflet-bar a {
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
+    font-size: 18px;
+    color: var(--text-primary);
+    background: transparent;
+    border: none;
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+    border-bottom: none;
+}
+
+#map .leaflet-control-zoom.leaflet-bar a:last-child {
+    border-right: none;
+}
+
+#map .leaflet-control-zoom.leaflet-bar a:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+}
+
+/* Venue map popups — comfortable width on mobile, unchanged on desktop */
+.venue-map-popup {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    font-family: 'EB Garamond', Georgia, serif;
+    text-align: left;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Override Leaflet's default paragraph margins inside venue popups */
+#map .venue-map-popup-pane .leaflet-popup-content .venue-map-popup p {
+    margin: 0;
+}
+
+.venue-map-popup__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 4px;
+}
+
+.venue-map-popup__header .prominent-vote-tally {
+    flex-shrink: 0;
+    align-self: center;
+    padding-top: 0;
+    padding-bottom: 0;
+    line-height: 1;
+}
+
+.venue-map-popup__header .prominent-vote-tally::before {
+    height: 100%;
+    min-height: 24px;
+    max-height: 32px;
+}
+
+.venue-map-popup__header .prominent-vote-tally span.tally-number {
+    line-height: 1.1;
+}
+
+.venue-map-popup__header .prominent-vote-tally span.tally-label {
+    line-height: 1;
+}
+
+.venue-map-popup__title {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    color: var(--text-primary);
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    line-height: 1.05;
+    overflow-wrap: anywhere;
+}
+
+.venue-map-popup__address {
+    margin: 0 0 4px;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.2;
+}
+
+.venue-map-popup__meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+    min-width: 0;
+}
+
+.venue-map-popup__type {
+    margin: 0;
+    font-size: 1.05rem;
+    color: var(--text-secondary);
+    text-transform: capitalize;
+    font-style: italic;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.venue-map-popup__share {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.venue-map-popup__body {
+    margin-bottom: 8px;
+}
+
+.venue-map-popup__description {
+    margin: 0 0 8px;
+    font-size: 0.95rem;
+    color: var(--text-main);
+    line-height: 1.4;
+}
+
+.venue-map-popup__website {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0;
+}
+
+.venue-map-popup__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 0;
+    padding-bottom: 0;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.venue-map-popup .brand-btn.venue-map-popup__btn {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    white-space: normal;
+    text-align: center;
+    letter-spacing: 1px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 12px 12px;
+    font-size: 1.05rem;
+    background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    transform: none;
+}
+
+.venue-map-popup .brand-btn.venue-map-popup__btn--checkin {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: transparent;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+    opacity: 0.7;
+    box-shadow: none;
+}
+
+.venue-map-popup .brand-btn.venue-map-popup__btn--checkin:hover {
+    opacity: 1;
+    border-color: var(--text-secondary);
+    transform: none;
+}
+
+@media (min-width: 769px) {
+    .venue-map-popup {
+        min-width: 310px;
+    }
+}
+
+@media (max-width: 768px) {
+    #map .leaflet-popup-content {
+        min-width: 0 !important;
+        margin: 10px 12px !important;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+
+    #map .leaflet-popup-content-wrapper {
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+
+    .venue-map-popup__title {
+        font-size: 1.15rem;
+    }
+
+    #map .venue-map-popup-pane .leaflet-popup-content {
+        margin: 6px 10px 8px 24px !important;
+    }
+
+    .venue-map-popup .brand-btn.venue-map-popup__btn {
+        font-size: 0.88rem;
+        padding: 12px 8px;
+        letter-spacing: 0.5px;
+    }
+}
+
 /* Dialogue Den */
 .upvote-btn {
     background: transparent;

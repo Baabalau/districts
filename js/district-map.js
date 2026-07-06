@@ -1,6 +1,7 @@
 import { auth, db } from "./firebase-config.js";
 import { collection, query, where, getDocs, doc, updateDoc, arrayUnion, increment } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+import { renderVoteTally } from "./vote-tally.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
     // Determine district from URL
@@ -18,7 +19,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         'b': { center: [29.942, -90.090], zoom: 14 },
         'c': { center: [29.958, -90.04], zoom: 12 },
         'd': { center: [30.000, -90.064], zoom: 13 },
-        'e': { center: [30.060, -89.831], zoom: 11 },
+        'e': { center: [30.010, -89.997], zoom: 13 },
     };
 
     // Initial map framing per district (full district remains pannable via maxBounds below).
@@ -61,13 +62,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                 zoom: 12
             }
         },
-        // New Orleans East / Lower 9th — explicit framing so full district loads centered (see district-e map)
+        // New Orleans East / Lower 9th — frame the urban core (venues cluster west),
+        // not the full district polygon which stretches far east toward the lake.
         'e': {
-            center: [30.060, -89.831],
-            zoom: 11,
+            center: [30.010, -89.997],
+            zoom: 13,
             mobile: {
-                center: [30.060, -89.831],
-                zoom: 10
+                center: [30.010, -89.997],
+                zoom: 12
             }
         }
     };
@@ -79,10 +81,48 @@ document.addEventListener("DOMContentLoaded", async () => {
         zoomControl: false
     }).setView(config.center, config.zoom);
     
-    // Move zoom control to top right to avoid overlapping with the title
+    // Zoom control — lower-left, styled in district-page.css
     L.control.zoom({
-        position: 'topright'
+        position: 'bottomleft'
     }).addTo(map);
+
+    // On mobile, Leaflet sizes popups from content min-widths — clamp to the map
+    // container so cards don't run edge-to-edge. Desktop keeps bindPopup defaults.
+    function fitMapPopupForMobile(popup) {
+        if (!window.matchMedia('(max-width: 768px)').matches) return;
+        const el = popup.getElement();
+        if (!el) return;
+        map.invalidateSize();
+        const maxW = Math.max(220, map.getSize().x - 56);
+        const wrapper = el.querySelector('.leaflet-popup-content-wrapper');
+        const content = el.querySelector('.leaflet-popup-content');
+        if (wrapper) {
+            wrapper.style.width = `${maxW}px`;
+            wrapper.style.maxWidth = `${maxW}px`;
+            wrapper.style.overflow = 'hidden';
+            wrapper.style.boxSizing = 'border-box';
+        }
+        if (content) {
+            content.style.width = 'auto';
+            content.style.maxWidth = '100%';
+            content.style.minWidth = '0';
+            content.style.margin = '10px 12px';
+            content.style.boxSizing = 'border-box';
+            content.style.overflow = 'hidden';
+        }
+    }
+
+    map.on('popupopen', (e) => fitMapPopupForMobile(e.popup));
+
+    function getPopupOptions() {
+        const base = { autoPanPaddingTopLeft: [0, 60], className: 'venue-map-popup-pane' };
+        if (!window.matchMedia('(max-width: 768px)').matches) {
+            return { ...base, minWidth: 340, maxWidth: 380 };
+        }
+        map.invalidateSize();
+        const maxW = Math.max(220, map.getSize().x - 56);
+        return { ...base, minWidth: 0, maxWidth: maxW };
+    }
 
     // Dark basemap
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
@@ -208,13 +248,22 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         const isTop10 = rank && rank <= 10;
-        const borderStyle = isTop10 ? 'border: 2px solid #fff;' : 'border: 2px solid transparent;';
-        // Add neon glow effect matching the marker's color
         const glowStyle = `box-shadow: 0 0 8px ${color}, 0 0 12px ${color};`;
+
+        // Top 10: white ring around the category-colored core (matches map legend).
+        // Uses a nested wrapper so the ring isn't clipped by Leaflet's iconSize box.
+        if (isTop10) {
+            return L.divIcon({
+                className: 'custom-venue-marker custom-venue-marker--top10',
+                html: `<div class="venue-marker-ring"><div class="venue-marker-core venue-marker-core--top10" style="background-color: ${color}; ${glowStyle}"></div></div>`,
+                iconSize: [24, 24],
+                iconAnchor: [12, 12]
+            });
+        }
 
         return L.divIcon({
             className: 'custom-venue-marker',
-            html: `<div style="background-color: ${color}; width: 16px; height: 16px; border-radius: 50%; ${glowStyle} ${borderStyle}"></div>`,
+            html: `<div class="venue-marker-core" style="background-color: ${color}; ${glowStyle}"></div>`,
             iconSize: [16, 16],
             iconAnchor: [8, 8]
         });
@@ -287,10 +336,15 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (place.inBounds) inDistrictVenues.push(place);
         });
 
-        // Mock ranks if none have rank (to allow previewing the rankings UI)
-        if (!inDistrictVenues.some(v => v.rank)) {
-            inDistrictVenues.slice(0, 10).forEach((v, index) => v.rank = index + 1);
-        }
+        // Live vote rankings for map Top 10 highlighting (must match leaderboard).
+        const sortedByVotes = [...inDistrictVenues].sort((a, b) => {
+            const diff = (b.voteCount || 0) - (a.voteCount || 0);
+            if (diff !== 0) return diff;
+            return (a.name || '').localeCompare(b.name || '');
+        });
+        sortedByVotes.forEach((v, index) => {
+            v.rank = (v.voteCount || 0) > 0 ? index + 1 : null;
+        });
 
         let allMarkers = [];
         window.venueMarkers = {}; // Store markers by venue ID for easy access
@@ -311,7 +365,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     let websiteHtml = '';
                     if (websiteUrl) {
                         websiteHtml = `
-                        <div style="margin-bottom: 12px; display: flex; align-items: center;">
+                        <div class="venue-map-popup__website">
                             <a href="${websiteUrl}" target="_blank" rel="noopener noreferrer" style="font-size: 0.95rem; color: var(--neon-cyan); text-decoration: none; font-family: var(--font-main); display: inline-flex; align-items: center; gap: 6px; transition: opacity 0.2s ease; border: 1px solid rgba(0, 255, 255, 0.4); padding: 6px 14px; border-radius: 20px; background: rgba(0, 255, 255, 0.05);" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg> 
                                 Visit Website
@@ -320,17 +374,17 @@ document.addEventListener("DOMContentLoaded", async () => {
                     }
                     
                     const popupContent = `
-                        <div style="width: 100%; min-width: 310px; font-family: 'EB Garamond', Georgia, serif; text-align: left; padding: 12px 12px 16px 12px; box-sizing: border-box;">
-                            
-                            <div style="margin-bottom: 10px;">
-                                <h4 style="margin: 0 0 6px 0; color: var(--text-primary); font-family: 'EB Garamond', Georgia, serif; font-size: 1.5rem; text-transform: uppercase; line-height: 1.1; padding-right: 20px;">${place.name || 'Unnamed Venue'}</h4>
-                                ${place.address ? `<p style="margin: 0 0 8px 0; font-size: 0.95rem; color: var(--text-secondary); line-height: 1.3;">${place.address}</p>` : ''}
+                        <div class="venue-map-popup">
+                            <div class="venue-map-popup__header">
+                                <h4 class="venue-map-popup__title">${place.name || 'Unnamed Venue'}</h4>
+                                ${renderVoteTally(place.voteCount)}
                             </div>
+                            ${place.address ? `<p class="venue-map-popup__address">${place.address}</p>` : ''}
                             
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: ${hasRealDescription ? '10px' : '15px'}; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px;">
-                                <p style="margin: 0; font-size: 1.05rem; color: var(--text-secondary); text-transform: capitalize; font-style: italic;">${(place.type && typeof place.type === 'string') ? place.type.replace('_', ' ') : 'Venue'}</p>
+                            <div class="venue-map-popup__meta">
+                                <p class="venue-map-popup__type">${(place.type && typeof place.type === 'string') ? place.type.replace('_', ' ') : 'Venue'}</p>
                                 
-                                <div style="position: relative; flex-shrink: 0;">
+                                <div class="venue-map-popup__share">
                                     <button onclick="const btn = this; navigator.clipboard.writeText('${safeVenueShareUrl}').then(() => { const msg = btn.nextElementSibling; const icon = btn.querySelector('.link-icon'); btn.style.background = '#618A62'; btn.style.borderColor = '#618A62'; if(icon){ icon.style.filter = 'brightness(0) saturate(100%) invert(100%)'; icon.style.opacity = '1'; } msg.style.display='block'; setTimeout(() => { msg.style.display='none'; btn.style.background = 'rgba(255,255,255,0.05)'; btn.style.borderColor = 'rgba(255,255,255,0.2)'; if(icon){ icon.style.filter = 'brightness(0) saturate(100%) invert(72%) sepia(21%) saturate(942%) hue-rotate(354deg) brightness(91%) contrast(88%)'; icon.style.opacity = '0.8'; } }, 2000); }).catch(e => console.error(e));" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; width: 34px; height: 34px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;" title="Copy direct link to this venue">
                                         <img class="link-icon" src="assets/link.png" alt="Copy Link" style="width: 13px; height: 13px; object-fit: contain; filter: brightness(0) saturate(100%) invert(72%) sepia(21%) saturate(942%) hue-rotate(354deg) brightness(91%) contrast(88%); opacity: 0.8; transition: all 0.2s ease;">
                                     </button>
@@ -338,16 +392,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                                 </div>
                             </div>
                     
-                            <div style="margin-bottom: 12px;">
-                                ${hasRealDescription ? `<p style="margin: 0 0 16px 0; font-size: 0.95rem; color: var(--text-main); line-height: 1.5;">${place.description}</p>` : ''}
-                                ${websiteHtml}
-                            </div>
+                            ${(hasRealDescription || websiteHtml) ? `<div class="venue-map-popup__body">${hasRealDescription ? `<p class="venue-map-popup__description">${place.description}</p>` : ''}${websiteHtml}</div>` : ''}
                             
-                            <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 5px; padding-bottom: 4px;">
-                                <button class="brand-btn" style="width: 100%; padding: 14px 12px; font-size: 1.05rem; text-align: center; letter-spacing: 1px; font-weight: 700; text-transform: uppercase; background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); color: white; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.4);" onclick="window.openVoteModal('${place.id}', '${venueNameStr.replace(/'/g, "\\'")}')">Vote For This Business</button>
+                            <div class="venue-map-popup__actions">
+                                <button class="brand-btn venue-map-popup__btn" onclick="window.openVoteModal('${place.id}', '${venueNameStr.replace(/'/g, "\\'")}', ${Number(place.voteCount) || 0})">Vote For Business</button>
                                 
-                                <a href="checkin.html?venue=${place.id}" class="brand-btn" style="width: 100%; background: transparent; border: 2px solid rgba(255,255,255,0.2); color: var(--text-secondary); text-decoration: none; padding: 10px 12px; font-size: 0.95rem; text-align: center; letter-spacing: 0.5px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-weight: 500; opacity: 0.7; transition: all 0.2s ease;" onmouseover="this.style.opacity='1'; this.style.borderColor='var(--text-secondary)';" onmouseout="this.style.opacity='0.7'; this.style.borderColor='rgba(255,255,255,0.2)';">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> Check In to Location
+                                <a href="checkin.html?venue=${place.id}" class="brand-btn venue-map-popup__btn venue-map-popup__btn--checkin">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> Check In to Location
                                 </a>
                             </div>
                         </div>
@@ -360,7 +411,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             };
             
             const marker = L.marker([place.lat, place.lng], markerOptions).addTo(map)
-                .bindPopup(popupContent, { autoPanPaddingTopLeft: [0, 60], minWidth: 340, maxWidth: 380 });
+                .bindPopup(popupContent, getPopupOptions());
 
             allMarkers.push({
                 marker: marker,
@@ -440,29 +491,30 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const typeStr = (v.type && typeof v.type === 'string') ? v.type.replace('_', ' ') : 'Venue';
                 let addressSnippet = '';
                 if (v.address) addressSnippet = v.address.split(',')[0].trim();
-                const voteCount = v.voteCount || 0;
-                const voteLabel = `${voteCount} vote${voteCount === 1 ? '' : 's'}`;
 
-                const lines = [
-                    `<div class="flip-vote-count">${voteLabel}</div>`,
-                    ...(addressSnippet ? [`<div>${addressSnippet}</div>`] : []),
-                    `<div>${typeStr}</div>`
-                ];
-                const modifier = lines.length === 3 ? 'triple' : 'double';
-
-                return `
+                let subtitleFlipHtml = '';
+                if (addressSnippet) {
+                    subtitleFlipHtml = `
                     <div class="venue-subtitle-flip venue-subtitle-flip--leaderboard">
-                        <div class="flipper-container flipper-container--${modifier}">
-                            ${lines.join('')}
+                        <div class="flipper-container flipper-container--double">
+                            <div>${typeStr}</div>
+                            <div>${addressSnippet}</div>
                         </div>
                     </div>`;
+                } else {
+                    subtitleFlipHtml = `<em class="venue-subtitle">${typeStr}</em>`;
+                }
+
+                return subtitleFlipHtml;
             };
 
             const renderVenueActions = (v) => {
                 const safeName = v.name ? v.name.replace(/'/g, "\\'") : '';
+                
                 return `<div class="venue-actions">
-                        <button class="brand-btn venue-vote-btn" onclick="window.openVoteModal('${v.id}', '${safeName}')" title="Vote for this Business">
-                            <span class="desktop-text">VOTE FOR THIS BUSINESS</span>
+                        ${renderVoteTally(v.voteCount)}
+                        <button class="brand-btn venue-vote-btn" onclick="window.openVoteModal('${v.id}', '${safeName}', ${Number(v.voteCount) || 0})" title="Vote for Business">
+                            <span class="desktop-text">VOTE FOR BUSINESS</span>
                             <span class="mobile-text">🗳️</span>
                         </button>
                         <a href="checkin.html?venue=${v.id}" class="brand-btn venue-checkin-btn" title="Check In to Location">📍</a>
