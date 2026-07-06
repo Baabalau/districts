@@ -30,6 +30,15 @@ function renderHeroIntro(intro, vars) {
         .join('');
 }
 
+function renderHeroTitle(title, vars) {
+    const text = interpolate(title, vars);
+    const match = text.match(/^District\s+(\S+)\s+(.+)$/i);
+    if (match) {
+        return `<span class="title-3d-line">District ${escapeHtml(match[1])}</span><span class="title-3d-line">${escapeHtml(match[2])}</span>`;
+    }
+    return escapeHtml(text);
+}
+
 function buildTemplateVars(districtCopy) {
     return {
         district: districtCopy.district,
@@ -818,10 +827,10 @@ class EventLayout extends HTMLElement {
             <div class="event-hero-wrap" style="background-image: linear-gradient(rgba(15, 22, 38, 0.85), rgba(15, 22, 38, 0.95)), url('${heroBg}'); background-position: center; background-size: cover; background-attachment: fixed;">
                 <div class="event-hero">
                 <div class="hero-left">
-                    <h1 class="title-3d">${interpolate(shared.hero.title, vars)}</h1>
+                    <h1 class="title-3d">${renderHeroTitle(shared.hero.title, vars)}</h1>
                     <h2>${districtCopy.date}</h2>
                     ${renderHeroIntro(districtCopy.heroIntro, vars)}
-                    <button type="button" id="vote-scroll-btn" class="brand-btn" style="margin-top: 20px; font-size: 1.1rem; padding: 15px 30px;" onclick="document.getElementById('map-section').scrollIntoView({behavior: 'smooth'})">${interpolate(shared.hero.rsvpButton, vars)}</button>
+                    <button type="button" id="vote-scroll-btn" class="brand-btn" onclick="document.getElementById('map-section').scrollIntoView({behavior: 'smooth'})">${interpolate(shared.hero.rsvpButton, vars)}</button>
                 </div>
                 <div class="hero-right">
                     <div class="hero-cards-stack">
@@ -1044,6 +1053,10 @@ class EventLayout extends HTMLElement {
         `;
             this.initScrollAnimations();
             this.initVotingPortal();
+            const footer = document.querySelector('site-footer');
+            if (footer?.setPhotoCredit && districtCopy.photoCredit) {
+                footer.setPhotoCredit(districtCopy.photoCredit);
+            }
             // Non-blocking: resolve the live election state after the page is on screen.
             this.applyElectionSchedule(districtId);
             // Admin-only: in-page toolbar to preview each election phase locally.
@@ -1701,24 +1714,31 @@ class EventLayout extends HTMLElement {
         setTimeout(() => {
             const urlParams = new URLSearchParams(window.location.search);
             const voteTarget = urlParams.get('vote');
-            
+
             if (voteTarget) {
                 // We want to open the map popup for this venue, not just the vote modal directly.
-                // The map rendering is asynchronous, so we wait for the markers to be populated.
+                // The map + Firestore markers load asynchronously, so wait for THIS venue's
+                // marker specifically (not just the helper) before scrolling and opening it.
+                let attempts = 0;
                 const checkMapInterval = setInterval(() => {
-                    if (window.openMapPopupForVenue) {
+                    attempts++;
+                    const markerReady = window.openMapPopupForVenue &&
+                        window.venueMarkers && window.venueMarkers[voteTarget];
+
+                    if (markerReady) {
                         clearInterval(checkMapInterval);
-                        window.openMapPopupForVenue(voteTarget);
-                        // Also scroll to the map
+                        // Anchor to the map first, then open the popup once the smooth
+                        // scroll and the map's initial framing have settled.
                         const mapSection = document.getElementById('map-section');
                         if (mapSection) {
                             mapSection.scrollIntoView({ behavior: 'smooth' });
                         }
+                        setTimeout(() => window.openMapPopupForVenue(voteTarget), 700);
+                    } else if (attempts >= 50) {
+                        // Give up after ~10s (marker may not exist for this district).
+                        clearInterval(checkMapInterval);
                     }
                 }, 200);
-                
-                // Fallback: clear interval after 5 seconds if map fails to load
-                setTimeout(() => clearInterval(checkMapInterval), 5000);
             }
         }, 150);
     }

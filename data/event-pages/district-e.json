@@ -2,14 +2,19 @@
   "district": "E",
   "date": "Tuesday, July 21st",
   "time": "7:00 PM - 10:00 PM",
-  "location": "New Orleans East / Lower 9th",
+  "location": "New Orleans East & the Lower 9",
   "councilName": "Jason Hughes",
-  "councilImg": "assets/jason-hughes_1.png",
+  "councilImg": "assets/profile-pics/jason-hughes_1.png",
   "councilBioUrl": "https://council.nola.gov/councilmembers/jason-hughes/",
   "influencerName": "Ron Orleans",
-  "influencerImg": "assets/ronorleans.png",
+  "influencerAccountTitle": "Creator / Influencer",
+  "influencerImg": "assets/profile-pics/ronorleans.png",
   "influencerSocialUrl": "https://instagram.com/ronorleans",
   "bgImg": "assets/district_e_image.jpg",
+  "photoCredit": {
+    "name": "Jo Naylor",
+    "url": "https://commons.wikimedia.org/wiki/File:New_orleans_east_sign.jpg"
+  },
   "heroIntro": "Get your boots on the ground with council member {councilName} and popular influencer {influencerName} on a three stop tour to experience the nightlife and support local businesses while building a relationship with your council member.",
   "councilQuote": "This isn't just about nightlife; it's about connecting with the community where they are. We're breaking down the walls of City Hall.",
   "influencerQuote": "District {district} has some of the most vibrant, unsung spots in the city. I can't wait to show everyone what makes this neighborhood tick.",
@@ -17,13 +22,13 @@
     "stops": [
       {
         "number": "01",
-        "title": "{influencerName}' East Side Opener",
-        "body": "{influencerName} opens the crawl in {location} with a stop that puts New Orleans East and the Lower 9 on the mapùmusic, food, and a room full of neighborhood pride."
+        "title": "{councilName}' Lower 9 Opener",
+        "body": "{councilName} opens the crawl in the lower ninth ward with a stop that puts New Orleans East and the Lower 9 on the mapùmusic, food, and a room full of neighborhood pride."
       },
       {
         "number": "02",
-        "title": "{councilName}' Ward Favorite",
-        "body": "Councilmember {councilName} chooses a second stop rooted in the community: a place where locals gather, support each other, and keep the culture alive after dark."
+        "title": "{influencerName}' NO East Favorite",
+        "body": "Councilmember {influencerName} chooses a second stop rooted in the community: a place where locals gather, support each other, and keep the culture alive after dark."
       },
       {
         "number": "03",

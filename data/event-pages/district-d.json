@@ -2,14 +2,19 @@
   "district": "D",
   "date": "Tuesday, August 11th",
   "time": "7:00 PM - 10:00 PM",
-  "location": "Gentilly / St. Roch",
+  "location": "Gentilly, 7th Ward, Desire, & the Lakefront",
   "councilName": "Eugene Green",
-  "councilImg": "assets/EugeneGreen_Large Medium.png",
+  "councilImg": "assets/profile-pics/EugeneGreen.png",
   "councilBioUrl": "https://council.nola.gov/councilmembers/eugene-green/",
   "influencerName": "Casey Ferrand McGee",
-  "influencerImg": "assets/caseyferrand Medium.png",
+  "influencerAccountTitle": "Author",
+  "influencerImg": "assets/profile-pics/caseyferrand-Medium.png",
   "influencerSocialUrl": "https://instagram.com/caseyferrandmcgee",
   "bgImg": "assets/district_d_image.jpg",
+  "photoCredit": {
+    "name": "Infrogmation of New Orleans",
+    "url": "https://commons.wikimedia.org/wiki/File:DillardFrontJan06.jpg"
+  },
   "heroIntro": "Get your boots on the ground with council member {councilName} and {influencerName} on a three stop tour to experience the nightlife and support local businesses while building a relationship with your council member.",
   "councilQuote": "This isn't just about nightlife; it's about connecting with the community where they are. We're breaking down the walls of City Hall.",
   "influencerQuote": "District {district} has some of the most vibrant, unsung spots in the city. I can't wait to show everyone what makes this neighborhood tick.",
@@ -17,13 +22,13 @@
     "stops": [
       {
         "number": "01",
-        "title": "{influencerName}'s St. Roch Start",
+        "title": "{influencerName}'s 7th Ward Roots",
         "body": "The night kicks off in {location} at a spot {influencerName} wants more people to know�local flavor, strong community ties, and the energy that keeps this corridor moving."
       },
       {
         "number": "02",
-        "title": "{councilName}'s Gentilly Classic",
-        "body": "Stop two is Councilmember {councilName}'s pick: a Gentilly institution where longtime residents and newcomers can share a table and talk about what the ward needs next."
+        "title": "{councilName}'s Lakeside Classic",
+        "body": "Stop two is Councilmember {councilName}'s pick: a lakefront institution where longtime residents and newcomers can share a table and talk about what the ward needs next."
       },
       {
         "number": "03",
