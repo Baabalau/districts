@@ -79,10 +79,48 @@ document.addEventListener("DOMContentLoaded", async () => {
         zoomControl: false
     }).setView(config.center, config.zoom);
     
-    // Move zoom control to top right to avoid overlapping with the title
+    // Zoom control — lower-left, styled in district-page.css
     L.control.zoom({
-        position: 'topright'
+        position: 'bottomleft'
     }).addTo(map);
+
+    // On mobile, Leaflet sizes popups from content min-widths — clamp to the map
+    // container so cards don't run edge-to-edge. Desktop keeps bindPopup defaults.
+    function fitMapPopupForMobile(popup) {
+        if (!window.matchMedia('(max-width: 768px)').matches) return;
+        const el = popup.getElement();
+        if (!el) return;
+        map.invalidateSize();
+        const maxW = Math.max(220, map.getSize().x - 56);
+        const wrapper = el.querySelector('.leaflet-popup-content-wrapper');
+        const content = el.querySelector('.leaflet-popup-content');
+        if (wrapper) {
+            wrapper.style.width = `${maxW}px`;
+            wrapper.style.maxWidth = `${maxW}px`;
+            wrapper.style.overflow = 'hidden';
+            wrapper.style.boxSizing = 'border-box';
+        }
+        if (content) {
+            content.style.width = 'auto';
+            content.style.maxWidth = '100%';
+            content.style.minWidth = '0';
+            content.style.margin = '10px 12px';
+            content.style.boxSizing = 'border-box';
+            content.style.overflow = 'hidden';
+        }
+    }
+
+    map.on('popupopen', (e) => fitMapPopupForMobile(e.popup));
+
+    function getPopupOptions() {
+        const base = { autoPanPaddingTopLeft: [0, 60], className: 'venue-map-popup-pane' };
+        if (!window.matchMedia('(max-width: 768px)').matches) {
+            return { ...base, minWidth: 340, maxWidth: 380 };
+        }
+        map.invalidateSize();
+        const maxW = Math.max(220, map.getSize().x - 56);
+        return { ...base, minWidth: 0, maxWidth: maxW };
+    }
 
     // Dark basemap
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
@@ -334,17 +372,17 @@ document.addEventListener("DOMContentLoaded", async () => {
                     }
                     
                     const popupContent = `
-                        <div style="width: 100%; min-width: 310px; font-family: 'EB Garamond', Georgia, serif; text-align: left; padding: 12px 12px 16px 12px; box-sizing: border-box;">
+                        <div class="venue-map-popup">
                             
                             <div style="margin-bottom: 10px;">
-                                <h4 style="margin: 0 0 6px 0; color: var(--text-primary); font-family: 'EB Garamond', Georgia, serif; font-size: 1.5rem; text-transform: uppercase; line-height: 1.1; padding-right: 20px;">${place.name || 'Unnamed Venue'}</h4>
+                                <h4 class="venue-map-popup__title">${place.name || 'Unnamed Venue'}</h4>
                                 ${place.address ? `<p style="margin: 0 0 8px 0; font-size: 0.95rem; color: var(--text-secondary); line-height: 1.3;">${place.address}</p>` : ''}
                             </div>
                             
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: ${hasRealDescription ? '10px' : '15px'}; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px;">
-                                <p style="margin: 0; font-size: 1.05rem; color: var(--text-secondary); text-transform: capitalize; font-style: italic;">${(place.type && typeof place.type === 'string') ? place.type.replace('_', ' ') : 'Venue'}</p>
+                            <div class="venue-map-popup__meta" style="margin-bottom: ${hasRealDescription ? '10px' : '15px'};">
+                                <p class="venue-map-popup__type">${(place.type && typeof place.type === 'string') ? place.type.replace('_', ' ') : 'Venue'}</p>
                                 
-                                <div style="position: relative; flex-shrink: 0;">
+                                <div class="venue-map-popup__share">
                                     <button onclick="const btn = this; navigator.clipboard.writeText('${safeVenueShareUrl}').then(() => { const msg = btn.nextElementSibling; const icon = btn.querySelector('.link-icon'); btn.style.background = '#618A62'; btn.style.borderColor = '#618A62'; if(icon){ icon.style.filter = 'brightness(0) saturate(100%) invert(100%)'; icon.style.opacity = '1'; } msg.style.display='block'; setTimeout(() => { msg.style.display='none'; btn.style.background = 'rgba(255,255,255,0.05)'; btn.style.borderColor = 'rgba(255,255,255,0.2)'; if(icon){ icon.style.filter = 'brightness(0) saturate(100%) invert(72%) sepia(21%) saturate(942%) hue-rotate(354deg) brightness(91%) contrast(88%)'; icon.style.opacity = '0.8'; } }, 2000); }).catch(e => console.error(e));" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; width: 34px; height: 34px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;" title="Copy direct link to this venue">
                                         <img class="link-icon" src="assets/link.png" alt="Copy Link" style="width: 13px; height: 13px; object-fit: contain; filter: brightness(0) saturate(100%) invert(72%) sepia(21%) saturate(942%) hue-rotate(354deg) brightness(91%) contrast(88%); opacity: 0.8; transition: all 0.2s ease;">
                                     </button>
@@ -357,11 +395,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                                 ${websiteHtml}
                             </div>
                             
-                            <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 5px; padding-bottom: 4px;">
-                                <button class="brand-btn" style="width: 100%; padding: 14px 12px; font-size: 1.05rem; text-align: center; letter-spacing: 1px; font-weight: 700; text-transform: uppercase; background: linear-gradient(180deg, var(--brand-red) 0%, #2f533a 100%); color: white; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.4);" onclick="window.openVoteModal('${place.id}', '${venueNameStr.replace(/'/g, "\\'")}')">Vote For This Business</button>
+                            <div class="venue-map-popup__actions">
+                                <button class="brand-btn venue-map-popup__btn" onclick="window.openVoteModal('${place.id}', '${venueNameStr.replace(/'/g, "\\'")}')">Vote For This Business</button>
                                 
-                                <a href="checkin.html?venue=${place.id}" class="brand-btn" style="width: 100%; background: transparent; border: 2px solid rgba(255,255,255,0.2); color: var(--text-secondary); text-decoration: none; padding: 10px 12px; font-size: 0.95rem; text-align: center; letter-spacing: 0.5px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-weight: 500; opacity: 0.7; transition: all 0.2s ease;" onmouseover="this.style.opacity='1'; this.style.borderColor='var(--text-secondary)';" onmouseout="this.style.opacity='0.7'; this.style.borderColor='rgba(255,255,255,0.2)';">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> Check In to Location
+                                <a href="checkin.html?venue=${place.id}" class="brand-btn venue-map-popup__btn venue-map-popup__btn--checkin">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> Check In to Location
                                 </a>
                             </div>
                         </div>
@@ -374,7 +412,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             };
             
             const marker = L.marker([place.lat, place.lng], markerOptions).addTo(map)
-                .bindPopup(popupContent, { autoPanPaddingTopLeft: [0, 60], minWidth: 340, maxWidth: 380 });
+                .bindPopup(popupContent, getPopupOptions());
 
             allMarkers.push({
                 marker: marker,
