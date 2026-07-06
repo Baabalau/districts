@@ -41,13 +41,25 @@ function renderHeroTitle(title, vars) {
 }
 
 function buildTemplateVars(districtCopy) {
+    const councilFirstName = districtCopy.councilName?.split(' ')[0] ?? '';
+    const influencerFirstName = districtCopy.influencerName?.split(' ')[0] ?? '';
+    const brandedAccounts = ['EatenPathNola', 'EmpowerYouNola'];
+    const influencerIntro = brandedAccounts.includes(districtCopy.influencerAccountTitle)
+        ? `${districtCopy.influencerName} of ${districtCopy.influencerAccountTitle}`
+        : districtCopy.influencerName;
+
     return {
         district: districtCopy.district,
         date: districtCopy.date,
         time: districtCopy.time,
         location: districtCopy.location,
         councilName: districtCopy.councilName,
+        councilDisplayName: districtCopy.councilDisplayName || districtCopy.councilName,
+        councilFirstName,
         influencerName: districtCopy.influencerName,
+        influencerFirstName,
+        influencerIntro,
+        influencerAccountTitle: districtCopy.influencerAccountTitle ?? '',
         councilImg: districtCopy.councilImg,
         influencerImg: districtCopy.influencerImg,
         influencerSocialUrl: districtCopy.influencerSocialUrl,
@@ -445,17 +457,16 @@ const STOP_ORDINAL_LABELS = ['First Stop', 'Second Stop', 'Last Stop'];
 // default, pre-run-off Crawl-tinery).
 function renderHostStop(stop, index, vars) {
     const alignClass = index === 0 ? 'left' : 'right';
-    const avatarHtml = index === 0
+    const hostRole = stop.hostRole ?? (index === 0 ? 'influencer' : 'council');
+    const avatarHtml = hostRole === 'influencer'
         ? `<img src="${vars.influencerImg}" class="stop-avatar" alt="${vars.influencerName}">`
         : `<img src="${vars.councilImg}" class="stop-avatar" alt="${vars.councilName}">`;
 
-    // Stop 1 links out to the influencer's social account; Stop 2 links to the
-    // councilmember's official bio page. Omitted entirely if a district hasn't
-    // set the corresponding URL yet.
+    // Stop links out to the host's social account or official bio page.
     let hostLinkHtml = '';
-    if (index === 0 && vars.influencerSocialUrl) {
+    if (hostRole === 'influencer' && vars.influencerSocialUrl) {
         hostLinkHtml = `<a href="${vars.influencerSocialUrl}" target="_blank" rel="noopener noreferrer" class="stop-host-link">Follow ${vars.influencerName} ${socialHandleFromUrl(vars.influencerSocialUrl)}</a>`;
-    } else if (index === 1 && vars.councilBioUrl) {
+    } else if (hostRole === 'council' && vars.councilBioUrl) {
         hostLinkHtml = `<a href="${vars.councilBioUrl}" target="_blank" rel="noopener noreferrer" class="stop-host-link">View ${vars.councilName}'s Official Bio</a>`;
     }
 
@@ -848,7 +859,7 @@ class EventLayout extends HTMLElement {
                 <div class="hero-left">
                     <h1 class="title-3d">${renderHeroTitle(shared.hero.title, vars)}</h1>
                     <h2>${districtCopy.date}</h2>
-                    ${renderHeroIntro(districtCopy.heroIntro, vars)}
+                    ${renderHeroIntro(districtCopy.heroIntro || shared.heroIntro, vars)}
                     <button type="button" id="vote-scroll-btn" class="brand-btn" onclick="document.getElementById('map-section').scrollIntoView({behavior: 'smooth'})">${interpolate(shared.hero.rsvpButton, vars)}</button>
                 </div>
                 <div class="hero-right">
