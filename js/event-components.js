@@ -737,15 +737,17 @@ function renderVoteModals(district) {
     return `
             <div id="vote-modal" class="modal-overlay" style="display: none;">
                 <div class="modal-content vote-modal-content">
+                    <button type="button" class="close-modal vote-modal-close" onclick="window.closeVoteModal()" aria-label="Close">×</button>
                     <div class="vote-modal-header">
-                        <h2 style="font-size: 22px; font-family: var(--font-main); color: var(--text-secondary); font-weight: 500; text-transform: none;">VOTE for the District ${district} nightcrawl to end the night at...</h2>
-                        <button class="close-modal" onclick="window.closeVoteModal()">×</button>
+                        <h2>VOTE for the District ${district} nightcrawl's last stop to be ...</h2>
                     </div>
-                    <div class="animated-arrow arrow-3d" style="margin: 0 0 10px 0;">↓</div>
-                    <div id="modal-venue-name" style="font-size: 3.2rem; color: var(--text-primary); font-family: var(--font-hero); text-transform: uppercase; margin-bottom: 12px; line-height: 1.1; letter-spacing: 1px; text-shadow: 2px 2px 0px var(--accent);"></div>
-                    <div id="modal-vote-tally" class="modal-vote-tally-wrap"></div>
-                    <div class="auth-buttons" id="vote-auth-section">
-                        <!-- Populated dynamically based on auth state -->
+                    <div class="vote-modal-body">
+                        <div class="animated-arrow arrow-3d vote-modal-arrow">↓</div>
+                        <div id="modal-venue-name" class="vote-modal-venue-name"></div>
+                        <div id="modal-vote-tally" class="modal-vote-tally-wrap"></div>
+                        <div class="auth-buttons" id="vote-auth-section">
+                            <!-- Populated dynamically based on auth state -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1666,7 +1668,7 @@ class EventLayout extends HTMLElement {
 
                 setTimeout(() => {
                     window.showShareScreen();
-                }, 1100);
+                }, 3000);
             } catch (error) {
                 console.error("Error submitting vote:", error);
                 errorMsg.textContent = "Error: " + error.message.replace("Firebase: ", "");
