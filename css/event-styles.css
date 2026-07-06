@@ -1393,6 +1393,10 @@
     font-weight: 900;
     line-height: 23px;
     margin-bottom: 0;
+    display: inline-flex;
+    align-items: baseline;
+    font-variant-numeric: tabular-nums;
+    transition: color 0.2s ease, transform 0.2s ease;
 }
 
 .prominent-vote-tally span.tally-label {
@@ -1404,6 +1408,46 @@
     text-transform: uppercase;
     font-weight: 500;
     letter-spacing: 1px;
+}
+
+/* Slot-machine / odometer roll for the vote tally number (see js/vote-tally.js) */
+.tally-digit-reel {
+    display: inline-block;
+    height: 1em;
+    overflow: hidden;
+    vertical-align: top;
+    line-height: 1;
+}
+
+.tally-digit-track {
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.tally-digit-cell {
+    display: block;
+    height: 1em;
+    line-height: 1;
+    text-align: center;
+}
+
+.tally-digit-static {
+    display: inline-block;
+}
+
+.prominent-vote-tally.tally-spinning span.tally-number {
+    color: var(--brand-red);
+}
+
+.prominent-vote-tally.tally-landed span.tally-number {
+    animation: tally-pop 0.35s ease;
+}
+
+@keyframes tally-pop {
+    0% { transform: scale(1); }
+    45% { transform: scale(1.3); }
+    100% { transform: scale(1); }
 }
 .venue-actions {
     display: flex;
@@ -1678,6 +1722,37 @@
     height: 100%;
     font-weight: 800;
     font-size: 28px;
+}
+
+.modal-vote-tally-wrap {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 30px;
+}
+
+.modal-vote-tally-wrap .prominent-vote-tally {
+    padding: 4px 18px 4px 0;
+    min-width: 0;
+}
+
+.modal-vote-tally-wrap .prominent-vote-tally::before {
+    height: 34px;
+}
+
+.modal-vote-tally-wrap .tally-number {
+    font-size: 26px;
+    line-height: 28px;
+}
+
+.modal-vote-tally-wrap .tally-label {
+    font-size: 12px;
+}
+
+#submit-vote-btn.vote-tallied {
+    background: var(--brand-red);
+    opacity: 0.9;
+    cursor: default;
+    transform: none !important;
 }
 
 .auth-buttons {

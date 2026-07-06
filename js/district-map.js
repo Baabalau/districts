@@ -1,15 +1,7 @@
 import { auth, db } from "./firebase-config.js";
 import { collection, query, where, getDocs, doc, updateDoc, arrayUnion, increment } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
-
-function renderVoteTally(voteCount) {
-    const count = Number(voteCount) || 0;
-    const label = count === 1 ? 'vote' : 'votes';
-    return `<div class="prominent-vote-tally" aria-label="${count} ${label}">
-        <span class="tally-number">${count}</span>
-        <span class="tally-label">${label}</span>
-    </div>`;
-}
+import { renderVoteTally } from "./vote-tally.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
     // Determine district from URL
@@ -403,7 +395,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                             ${(hasRealDescription || websiteHtml) ? `<div class="venue-map-popup__body">${hasRealDescription ? `<p class="venue-map-popup__description">${place.description}</p>` : ''}${websiteHtml}</div>` : ''}
                             
                             <div class="venue-map-popup__actions">
-                                <button class="brand-btn venue-map-popup__btn" onclick="window.openVoteModal('${place.id}', '${venueNameStr.replace(/'/g, "\\'")}')">Vote For Business</button>
+                                <button class="brand-btn venue-map-popup__btn" onclick="window.openVoteModal('${place.id}', '${venueNameStr.replace(/'/g, "\\'")}', ${Number(place.voteCount) || 0})">Vote For Business</button>
                                 
                                 <a href="checkin.html?venue=${place.id}" class="brand-btn venue-map-popup__btn venue-map-popup__btn--checkin">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> Check In to Location
@@ -521,7 +513,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 
                 return `<div class="venue-actions">
                         ${renderVoteTally(v.voteCount)}
-                        <button class="brand-btn venue-vote-btn" onclick="window.openVoteModal('${v.id}', '${safeName}')" title="Vote for Business">
+                        <button class="brand-btn venue-vote-btn" onclick="window.openVoteModal('${v.id}', '${safeName}', ${Number(v.voteCount) || 0})" title="Vote for Business">
                             <span class="desktop-text">VOTE FOR BUSINESS</span>
                             <span class="mobile-text">🗳️</span>
                         </button>

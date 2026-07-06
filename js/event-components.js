@@ -3,6 +3,7 @@ import { auth, db } from "./firebase-config.js";
 import { doc, updateDoc, increment, getDoc, setDoc, collection, collectionGroup, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 import { isAdminUser } from "./admin-auth.js";
+import { renderVoteTally, animateVoteTallySlotMachine } from "./vote-tally.js";
 
 // "Local Legend" threshold. checkin.html awards 50 points per visit, so a
 // Legend has earned LEGEND_POINTS_THRESHOLD points (== LEGEND_CHECKIN_COUNT visits).
@@ -741,7 +742,8 @@ function renderVoteModals(district) {
                         <button class="close-modal" onclick="window.closeVoteModal()">×</button>
                     </div>
                     <div class="animated-arrow arrow-3d" style="margin: 0 0 10px 0;">↓</div>
-                    <div id="modal-venue-name" style="font-size: 3.2rem; color: var(--text-primary); font-family: var(--font-hero); text-transform: uppercase; margin-bottom: 35px; line-height: 1.1; letter-spacing: 1px; text-shadow: 2px 2px 0px var(--accent);"></div>
+                    <div id="modal-venue-name" style="font-size: 3.2rem; color: var(--text-primary); font-family: var(--font-hero); text-transform: uppercase; margin-bottom: 12px; line-height: 1.1; letter-spacing: 1px; text-shadow: 2px 2px 0px var(--accent);"></div>
+                    <div id="modal-vote-tally" class="modal-vote-tally-wrap"></div>
                     <div class="auth-buttons" id="vote-auth-section">
                         <!-- Populated dynamically based on auth state -->
                     </div>
@@ -1538,7 +1540,7 @@ class EventLayout extends HTMLElement {
             }
         });
 
-        window.openVoteModal = (venueId, venueName) => {
+        window.openVoteModal = (venueId, venueName, voteCount) => {
             const modal = this.querySelector('#vote-modal');
             const nameEl = this.querySelector('#modal-venue-name');
             nameEl.innerText = venueName;
@@ -1550,7 +1552,24 @@ class EventLayout extends HTMLElement {
             
             modal.dataset.venueId = venueId;
             modal.dataset.venueName = venueName;
-            
+            modal.dataset.voteCount = Number(voteCount) || 0;
+
+            // Render the current tally fresh each time so it never carries over a
+            // spinning/landed state (or a stale count) from a previous vote.
+            const tallyContainer = this.querySelector('#modal-vote-tally');
+            if (tallyContainer) {
+                tallyContainer.innerHTML = renderVoteTally(modal.dataset.voteCount);
+            }
+
+            // Reset the submit button back to its default label in case a previous
+            // vote left it reading "Vote Tallied".
+            const submitBtn = this.querySelector('#submit-vote-btn');
+            if (submitBtn) {
+                submitBtn.innerText = 'Submit Vote';
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('vote-tallied');
+            }
+
             // Reset error message if it exists
             const errorMsg = this.querySelector('#vote-error-msg');
             if (errorMsg) errorMsg.style.display = 'none';
@@ -1631,8 +1650,23 @@ class EventLayout extends HTMLElement {
                     email: currentUser.email || userData.email || "",
                     timestamp: new Date()
                 });
-                
-                window.showShareScreen();
+
+                // Celebrate the vote landing: roll the tally up by one with a
+                // slot-machine animation, confirm on the button, then hand off to
+                // the share screen after the user has had a moment to see it land.
+                const priorVoteCount = parseInt(modal.dataset.voteCount, 10) || 0;
+                const newVoteCount = priorVoteCount + 1;
+                modal.dataset.voteCount = newVoteCount;
+
+                btn.innerText = 'Vote Tallied ✓';
+                btn.classList.add('vote-tallied');
+
+                const tallyEl = this.querySelector('#modal-vote-tally .prominent-vote-tally');
+                await animateVoteTallySlotMachine(tallyEl, priorVoteCount, newVoteCount);
+
+                setTimeout(() => {
+                    window.showShareScreen();
+                }, 1100);
             } catch (error) {
                 console.error("Error submitting vote:", error);
                 errorMsg.textContent = "Error: " + error.message.replace("Firebase: ", "");
@@ -1647,6 +1681,7 @@ class EventLayout extends HTMLElement {
             if (btn) {
                 btn.innerText = 'Submit Vote';
                 btn.disabled = false;
+                btn.classList.remove('vote-tallied');
             }
             this.querySelector('#vote-modal').style.display = 'none';
             
