@@ -787,6 +787,13 @@
     text-underline-offset: 8px;
 }
 
+.map-title-neighborhoods {
+    display: block;
+    margin-top: 15px;
+    font-size: 0.8em;
+    color: var(--accent);
+}
+
 #map {
     width: 100%;
     height: 600px;
@@ -1003,7 +1010,7 @@
     background: var(--panel-bg);
     border: 2px solid rgba(45, 27, 21, 0.15);
     border-radius: 12px;
-    padding: 4px 10px 15px;
+    padding: 10px 10px 15px;
     margin-bottom: 30px;
     box-shadow: 0 12px 32px rgba(45, 27, 21, 0.1);
 }
@@ -1013,7 +1020,8 @@
     font-size: 1.2rem;
     margin-bottom: 10px;
     margin-top: 0;
-    padding-top: 4px;
+    padding-top: 5px;
+    padding-bottom: 5px;
     text-transform: uppercase;
 }
 .leaderboard-list .venue-card {
@@ -1185,6 +1193,33 @@
     border: 2px solid #fff;
     box-shadow: none;
 }
+
+/* Map venue markers — Top 10 ring must sit outside Leaflet's icon box */
+.leaflet-div-icon.custom-venue-marker {
+    background: transparent;
+    border: none;
+}
+.venue-marker-core {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+}
+.venue-marker-core--top10 {
+    width: 12px;
+    height: 12px;
+}
+.venue-marker-ring {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.45);
+}
+
 .map-legend-label--muted {
     color: var(--text-secondary);
     font-size: 0.9rem;
@@ -1279,9 +1314,6 @@
     text-transform: uppercase;
     line-height: 1.1;
     display: block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
     color: var(--text-primary);
     margin-bottom: 4px;
 }
@@ -1318,11 +1350,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
-.venue-subtitle-flip .flip-vote-count {
-    color: var(--accent);
-    font-weight: 800;
-    font-style: normal;
-}
 .venue-subtitle {
     color: var(--text-secondary);
     font-size: 0.85rem;
@@ -1336,12 +1363,112 @@
     color: var(--accent);
     font-style: normal;
 }
+.prominent-vote-tally {
+    display: grid;
+    grid-template-columns: 2px 18px auto;
+    grid-template-rows: auto auto;
+    gap: 0px;
+    align-items: center;
+    justify-content: start;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    padding: 3px 10px 3px 0;
+    min-width: 60px;
+    line-height: 23px;
+    text-align: left;
+}
+
+.prominent-vote-tally::before {
+    content: '';
+    grid-column: 1;
+    grid-row: 1 / -1;
+    align-self: center;
+    width: 2px;
+    height: 28px;
+    background: var(--text-primary);
+    opacity: 0.21;
+    border-radius: 1px;
+}
+
+.prominent-vote-tally span.tally-number {
+    grid-column: 3;
+    grid-row: 1;
+    font-size: 20px;
+    font-family: var(--font-header);
+    color: var(--text-primary);
+    font-weight: 900;
+    line-height: 23px;
+    margin-bottom: 0;
+    display: inline-flex;
+    align-items: baseline;
+    font-variant-numeric: tabular-nums;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.prominent-vote-tally span.tally-label {
+    grid-column: 3;
+    grid-row: 2;
+    font-size: 11px;
+    line-height: 13px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    font-weight: 500;
+    letter-spacing: 1px;
+}
+
+/* Slot-machine / odometer roll for the vote tally number (see js/vote-tally.js) */
+.tally-digit-reel {
+    display: inline-block;
+    height: 1em;
+    overflow: hidden;
+    vertical-align: top;
+    line-height: 1;
+}
+
+.tally-digit-track {
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.tally-digit-cell {
+    display: block;
+    height: 1em;
+    line-height: 1;
+    text-align: center;
+}
+
+.tally-digit-static {
+    display: inline-block;
+}
+
+.prominent-vote-tally.tally-spinning span.tally-number {
+    color: var(--brand-red);
+}
+
+.prominent-vote-tally.tally-landed span.tally-number {
+    animation: tally-pop 0.35s ease;
+}
+
+@keyframes tally-pop {
+    0% { transform: scale(1); }
+    45% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
 .venue-actions {
     display: flex;
     align-items: stretch;
     gap: 8px;
     flex-shrink: 0;
 }
+
+/* Wrappers are layout-neutral on tablet/desktop; stack on small phones only */
+.venue-actions-stack,
+.venue-actions-buttons {
+    display: contents;
+}
+
 .venue-vote-btn {
     padding: 0 20px;
     height: 42px;
@@ -1394,6 +1521,68 @@
     opacity: 1;
     border-color: var(--text-secondary);
 }
+
+/* Small phones: stack vote tally above action buttons; gold line spans full stack */
+@media (max-width: 570px) {
+    .venue-list .venue-actions {
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .venue-list .venue-actions::before {
+        content: '';
+        width: 2px;
+        flex-shrink: 0;
+        align-self: stretch;
+        background: var(--text-primary);
+        opacity: 0.21;
+        border-radius: 1px;
+    }
+
+    .venue-list .venue-actions-stack {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        gap: 6px;
+    }
+
+    .venue-list .venue-actions-buttons {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .venue-list .venue-actions .prominent-vote-tally::before {
+        display: none;
+    }
+
+    .venue-list .venue-actions .prominent-vote-tally {
+        grid-template-columns: auto;
+        padding: 0;
+        min-width: 0;
+        justify-items: start;
+        text-align: left;
+    }
+
+    .venue-list .venue-actions .prominent-vote-tally span.tally-number {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    .venue-list .venue-actions .prominent-vote-tally span.tally-label {
+        grid-column: 1;
+        grid-row: 2;
+    }
+
+    .venue-list .venue-name {
+        font-size: 1.125rem;
+    }
+}
+
 .rank-badge {
     width: 35px; height: 35px; background: #333; color: #fff; border-radius: 50%;
     display: flex; align-items: center; justify-content: center; font-weight: 900; font-family: var(--font-hero);
@@ -1462,7 +1651,8 @@
 .explorer-tabs {
     display: flex;
     gap: 8px;
-    margin-bottom: 18px;
+    margin-top: 20px;
+    margin-bottom: 20px;
     border-bottom: 1px solid rgba(255,255,255,0.12);
 }
 .explorer-tab {
@@ -1579,35 +1769,143 @@
 }
 
 #vote-modal .vote-modal-content {
-    text-align: left;
-    padding: 16px 20px 40px;
+    position: relative;
+    text-align: center;
+    padding: 10px 20px 40px;
 }
 
-#vote-modal .vote-modal-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 10px;
-}
-
-#vote-modal .vote-modal-header h2 {
-    flex: 1;
-    min-width: 0;
-    margin: 0;
-    text-align: left;
-    line-height: 1.3;
-}
-
-#vote-modal .vote-modal-header .close-modal {
-    position: static;
-    flex-shrink: 0;
+#vote-modal .vote-modal-close {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: auto;
     margin: 0;
     padding: 0;
     line-height: 1;
-    height: 100%;
     font-weight: 800;
     font-size: 28px;
+    opacity: 0.45;
+    transition: opacity 0.2s ease;
+}
+
+#vote-modal .vote-modal-close:hover {
+    opacity: 0.75;
+}
+
+#vote-modal .vote-modal-header {
+    margin-bottom: 16px;
+}
+
+#vote-modal .vote-modal-header h2 {
+    margin: 0;
+    padding-left: 28px;
+    text-align: left;
+    font-size: 22px;
+    font-family: var(--font-main);
+    color: var(--text-secondary);
+    font-weight: 500;
+    text-transform: none;
+    line-height: 1.3;
+}
+
+#vote-modal .vote-modal-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+#vote-modal .vote-modal-arrow {
+    margin: 0;
+}
+
+#vote-modal .vote-modal-venue-name {
+    font-size: 3.2rem;
+    color: var(--text-primary);
+    font-family: var(--font-hero);
+    text-transform: uppercase;
+    margin-bottom: 0;
+    line-height: 1.1;
+    letter-spacing: 1px;
+    text-shadow: 2px 2px 0px var(--accent);
+    text-align: center;
+    width: 100%;
+}
+
+#vote-modal .modal-vote-tally-wrap {
+    margin-bottom: 0;
+}
+
+.modal-vote-tally-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+    width: 100%;
+}
+
+.modal-vote-tally-wrap .prominent-vote-tally {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.35em;
+    padding: 0;
+    min-width: 0;
+    line-height: 1;
+}
+
+.modal-vote-tally-wrap .prominent-vote-tally::before {
+    display: none;
+}
+
+.modal-vote-tally-wrap .tally-number {
+    grid-column: unset;
+    grid-row: unset;
+    font-size: 56px;
+    line-height: 1;
+    margin-bottom: 0;
+}
+
+.modal-vote-tally-wrap .tally-label {
+    grid-column: unset;
+    grid-row: unset;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: 1px;
+    margin-top: 0.12em;
+}
+
+/* Slot reels inherit the modal tally number size so em-based rolls stay in sync */
+.modal-vote-tally-wrap .tally-digit-reel,
+.modal-vote-tally-wrap .tally-digit-static {
+    font-size: inherit;
+    line-height: 1;
+}
+
+.modal-vote-tally-wrap .tally-digit-reel {
+    vertical-align: baseline;
+}
+
+.modal-vote-tally-wrap .tally-digit-cell {
+    font-size: inherit;
+}
+
+#vote-modal .auth-buttons {
+    align-items: center;
+    width: 100%;
+    max-width: 360px;
+    margin-top: 0;
+}
+
+#vote-modal .auth-buttons .auth-btn {
+    width: 100%;
+}
+
+#submit-vote-btn.vote-tallied {
+    background: var(--brand-red);
+    opacity: 0.9;
+    cursor: default;
+    transform: none !important;
 }
 
 .auth-buttons {
