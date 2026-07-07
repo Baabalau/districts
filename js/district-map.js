@@ -411,7 +411,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         <div class="venue-map-popup">
                             <div class="venue-map-popup__header">
                                 <h4 class="venue-map-popup__title">${place.name || 'Unnamed Venue'}</h4>
-                                ${renderVoteTally(place.voteCount)}
+                                ${renderVoteTally(place.voteCount, place.id)}
                             </div>
                             ${displayAddress ? `<p class="venue-map-popup__address">${displayAddress}</p>` : ''}
                             
@@ -545,7 +545,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 
                 return `<div class="venue-actions">
                         <div class="venue-actions-stack">
-                            ${renderVoteTally(v.voteCount)}
+                            ${renderVoteTally(v.voteCount, v.id)}
                             <div class="venue-actions-buttons">
                                 <button class="brand-btn venue-vote-btn" onclick="window.openVoteModal('${v.id}', '${safeName}', ${Number(v.voteCount) || 0})" title="Vote for Business">
                                     <span class="desktop-text">VOTE FOR BUSINESS</span>

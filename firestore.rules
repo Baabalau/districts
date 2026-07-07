@@ -64,10 +64,12 @@ service cloud.firestore {
         allow delete: if isAdmin();
       }
 
-      // Vote audit records: a user may create their own; only admins can read
-      // (for the dashboard audit) or remove them.
+      // Vote audit records: a user may create their own, and must be able to
+      // read their own (the vote transaction reads this doc as its atomic
+      // dedup guard - "have I already voted for this venue?"). Admins can
+      // read any, for the dashboard audit.
       match /votes/{uid} {
-        allow read: if isAdmin();
+        allow read: if isAdmin() || (isSignedIn() && request.auth.uid == uid);
         allow create: if isSignedIn() && request.auth.uid == uid;
         allow update: if false;
         allow delete: if isAdmin();

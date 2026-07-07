@@ -1687,7 +1687,21 @@ class EventLayout extends HTMLElement {
                 btn.classList.add('vote-tallied');
 
                 const tallyEl = this.querySelector('#modal-vote-tally .prominent-vote-tally');
-                await animateVoteTallySlotMachine(tallyEl, priorVoteCount, newVoteCount);
+
+                // The modal has its own copy of the tally, but the map popup / venue
+                // explorer card the user voted from renders its OWN separate tally
+                // element for the same venue (from a one-time page-load fetch, not a
+                // live listener). Without this, that underlying tally silently stays
+                // stale after a successful vote. Refresh every on-screen copy in step.
+                const otherTallyEls = document.querySelectorAll(
+                    `.prominent-vote-tally[data-venue-id="${CSS.escape(venueId)}"]`
+                );
+                await Promise.all([
+                    animateVoteTallySlotMachine(tallyEl, priorVoteCount, newVoteCount),
+                    ...Array.from(otherTallyEls).map((el) =>
+                        animateVoteTallySlotMachine(el, priorVoteCount, newVoteCount)
+                    )
+                ]);
 
                 setTimeout(() => {
                     window.showShareScreen();

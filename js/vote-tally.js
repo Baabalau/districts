@@ -2,10 +2,14 @@
 // Used on venue cards (browse/leaderboard), the map popup, and the vote modal
 // so the markup + slot-machine increment animation only live in one place.
 
-export function renderVoteTally(voteCount) {
+// `venueId` is optional and only needed on tallies that live OUTSIDE the vote
+// modal (map popup, venue explorer card) so a successful vote can find and
+// refresh every on-screen copy of that venue's count, not just the modal's.
+export function renderVoteTally(voteCount, venueId) {
     const count = Number(voteCount) || 0;
     const label = count === 1 ? 'vote' : 'votes';
-    return `<div class="prominent-vote-tally" aria-label="${count} ${label}">
+    const idAttr = venueId ? ` data-venue-id="${String(venueId).replace(/"/g, '&quot;')}"` : '';
+    return `<div class="prominent-vote-tally"${idAttr} aria-label="${count} ${label}">
         <span class="tally-number">${count}</span>
         <span class="tally-label">${label}</span>
     </div>`;
