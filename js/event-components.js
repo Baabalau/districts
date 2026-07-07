@@ -1232,12 +1232,29 @@ class EventLayout extends HTMLElement {
         try {
             const districtUpper = districtId.toUpperCase();
 
-            // 1) District venues -> id set + id->name map (one indexed query).
-            const venuesSnap = await getDocs(
-                query(collection(db, "venues"), where("district", "==", districtUpper))
-            );
+            // 1) District venues -> id set + id->name map. Prefer the pre-published
+            // per-district snapshot (1 read); fall back to the indexed collection
+            // query only if the snapshot has not been published yet.
             const venueNames = {};
-            venuesSnap.forEach((d) => { venueNames[d.id] = (d.data().name || 'A Local Business'); });
+            const snapDoc = await getDoc(doc(db, "settings", `venues_${districtUpper}`));
+            let usedSnapshot = false;
+            if (snapDoc.exists()) {
+                try {
+                    const points = JSON.parse(snapDoc.data().points || "[]");
+                    if (Array.isArray(points) && points.length) {
+                        points.forEach((p) => { venueNames[p.id] = p.name || 'A Local Business'; });
+                        usedSnapshot = true;
+                    }
+                } catch (e) {
+                    console.warn('Could not parse district venue snapshot for legends:', e);
+                }
+            }
+            if (!usedSnapshot) {
+                const venuesSnap = await getDocs(
+                    query(collection(db, "venues"), where("district", "==", districtUpper))
+                );
+                venuesSnap.forEach((d) => { venueNames[d.id] = (d.data().name || 'A Local Business'); });
+            }
             const districtVenueIds = new Set(Object.keys(venueNames));
 
             // 2) All check-in photos, filtered client-side to this district.
@@ -1657,6 +1674,10 @@ class EventLayout extends HTMLElement {
                 const userRef = doc(db, "users", currentUser.uid);
                 const venueRef = doc(db, "venues", venueId);
                 const voteRecordRef = doc(db, "venues", venueId, "votes", currentUser.uid);
+                // Per-district display aggregate: lets the district map read all
+                // counts in one doc. Incremented in the SAME transaction so it can
+                // never drift from the authoritative venues/{id}.voteCount.
+                const countsRef = doc(db, "settings", `voteCounts_${districtId}`);
 
                 // Atomic vote: the audit doc (create-only, rules forbid update) is
                 // the server-authoritative dedup guard. Reading it inside the
@@ -1671,6 +1692,10 @@ class EventLayout extends HTMLElement {
                     if (auditSnap.exists()) throw new Error(ALREADY_VOTED);
 
                     tx.update(venueRef, { voteCount: increment(1) });
+                    tx.set(countsRef, {
+                        counts: { [venueId]: increment(1) },
+                        updatedAt: serverTimestamp()
+                    }, { merge: true });
                     tx.set(voteRecordRef, {
                         uid: currentUser.uid,
                         displayName: currentUser.displayName || userData.displayName || "Unknown User",

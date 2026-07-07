@@ -88,10 +88,19 @@ service cloud.firestore {
     }
 
     // --- settings: schedule + global config ---
-    // Public read (drives the event page states); admin-only writes.
+    // Public read (drives the event page states); admin-only writes, EXCEPT the
+    // per-district vote-count display aggregates (voteCounts_A..E), which signed-in
+    // voters increment inside the vote transaction. Rules can't constrain a
+    // nested-map increment to exactly +1, so this aggregate is display-only and
+    // intentionally not tamper-proof; the authoritative tally lives in
+    // venues/{id}.voteCount + the venues/{id}/votes audit docs. hasOnly limits the
+    // blast radius to the counts/updatedAt fields.
     match /settings/{docId} {
       allow read: if true;
       allow write: if isAdmin();
+      allow update: if isSignedIn()
+                    && docId.matches('voteCounts_[A-E]')
+                    && affectedKeys().hasOnly(['counts', 'updatedAt']);
     }
 
     // --- Default deny: anything not matched above is denied. ---

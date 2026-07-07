@@ -329,10 +329,205 @@ function publishMapSnapshot() {
   }
 }
 
+// Publish per-district STATIC venue snapshots (settings/venues_<A-E>) plus a
+// SEED of the live vote-count aggregates (settings/voteCounts_<A-E>). This lets
+// each district page render its map/leaderboard from 2 doc reads instead of
+// ~150 collection reads. Run AFTER "2. Sync Venues to Map" so venue IDs exist.
+//
+// Static data comes from the sheet (source of truth for venue details). Vote
+// counts are seeded from the LIVE venue docs (app-owned truth), never the sheet.
+// The seed is a full overwrite, so removed venues drop out; re-running repairs
+// any drift. Because the seed overwrites, run it during a quiet moment - votes
+// landing in the read->write window would be reset in the aggregate (they remain
+// correct on the venue docs and re-appear on the venue's next vote/seed).
+function publishDistrictSnapshots() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const data = sheet.getDataRange().getValues();
+
+  if (data.length <= 1) {
+    SpreadsheetApp.getUi().alert('No data found to publish.');
+    return;
+  }
+
+  const headers = data[0];
+  const colIdx = (name) => headers.findIndex(h => String(h).trim().toLowerCase() === name);
+  const idIdx = colIdx('id');
+  const nameIdx = colIdx('name');
+  const districtIdx = colIdx('district');
+  const latIdx = colIdx('lat');
+  const lngIdx = colIdx('lng');
+  const typeIdx = colIdx('type');
+  const websiteIdx = colIdx('website');
+  const facebookIdx = colIdx('facebook');
+  const descIdx = colIdx('description');
+
+  if (idIdx === -1 || districtIdx === -1 || latIdx === -1 || lngIdx === -1) {
+    SpreadsheetApp.getUi().alert("Error: sheet needs 'id', 'district', 'lat', and 'lng' columns. Run 'Sync Venues to Map' first.");
+    return;
+  }
+
+  // Group static venue records by district.
+  const byDistrict = {};
+  for (let i = 1; i < data.length; i++) {
+    const row = data[i];
+    const id = String(row[idIdx]).trim();
+    if (!id) continue; // needs a synced id; run Sync first
+    const district = String(row[districtIdx] || '').trim().toUpperCase();
+    if (!district) continue;
+
+    let lat = Number(row[latIdx]);
+    let lng = Number(row[lngIdx]);
+    if (!lat || !lng) continue;
+
+    const name = nameIdx !== -1 ? String(row[nameIdx] || '').trim() : '';
+    if (name.toUpperCase() === 'SATURN BAR') {
+      lat = 29.9679094;
+      lng = -90.0442228;
+    }
+
+    // Canonical address, mirroring what "Sync Venues to Map" writes to the docs.
+    const rowValues = {};
+    headers.forEach((h, index) => {
+      const key = normalizeHeader(h);
+      if (key === 'id' || key === '') return;
+      rowValues[key] = row[index];
+    });
+    const address = buildCanonicalAddress(rowValues);
+
+    const point = { id: id, name: name, lat: lat, lng: lng };
+    if (typeIdx !== -1 && row[typeIdx]) point.type = String(row[typeIdx]).trim();
+    if (address) point.address = address;
+    if (websiteIdx !== -1 && row[websiteIdx]) point.website = String(row[websiteIdx]).trim();
+    if (facebookIdx !== -1 && row[facebookIdx]) point.facebook = String(row[facebookIdx]).trim();
+    if (descIdx !== -1 && row[descIdx]) point.description = String(row[descIdx]).trim();
+
+    (byDistrict[district] = byDistrict[district] || []).push(point);
+  }
+
+  const liveCounts = fetchLiveVoteCounts_();
+
+  const token = ScriptApp.getOAuthToken();
+  const authHeader = { 'Authorization': 'Bearer ' + token };
+  const base = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents/settings`;
+  const now = new Date().toISOString();
+
+  let published = 0;
+  const districts = Object.keys(byDistrict);
+  districts.forEach((d) => {
+    // 1) Static snapshot: full overwrite of the points string.
+    const staticPayload = {
+      fields: {
+        points: { stringValue: JSON.stringify(byDistrict[d]) },
+        updatedAt: { timestampValue: now }
+      }
+    };
+    const r1 = UrlFetchApp.fetch(`${base}/venues_${d}`, {
+      method: 'patch',
+      contentType: 'application/json',
+      headers: authHeader,
+      payload: JSON.stringify(staticPayload),
+      muteHttpExceptions: true
+    });
+    if (r1.getResponseCode() >= 200 && r1.getResponseCode() < 300) {
+      published++;
+    } else {
+      Logger.log(`Error publishing venues_${d}: ` + r1.getContentText());
+    }
+
+    // 2) Counts seed: full overwrite of the counts map (updateMask ensures
+    // removed venues drop out rather than lingering).
+    const countsFields = {};
+    const dc = liveCounts[d] || {};
+    Object.keys(dc).forEach((id) => { countsFields[id] = { integerValue: String(dc[id]) }; });
+    const countsPayload = {
+      fields: {
+        counts: { mapValue: { fields: countsFields } },
+        updatedAt: { timestampValue: now }
+      }
+    };
+    const r2 = UrlFetchApp.fetch(
+      `${base}/voteCounts_${d}?updateMask.fieldPaths=counts&updateMask.fieldPaths=updatedAt`, {
+      method: 'patch',
+      contentType: 'application/json',
+      headers: authHeader,
+      payload: JSON.stringify(countsPayload),
+      muteHttpExceptions: true
+    });
+    if (r2.getResponseCode() < 200 || r2.getResponseCode() >= 300) {
+      Logger.log(`Error seeding voteCounts_${d}: ` + r2.getContentText());
+    }
+  });
+
+  SpreadsheetApp.getUi().alert(`Published ${published} district snapshot(s) for: ${districts.join(', ') || '(none)'}`);
+}
+
+// Reads every venue doc's live voteCount + district straight from Firestore
+// (NOT the sheet) so the counts aggregate is seeded from app-owned truth.
+// Returns { <DISTRICT>: { <venueId>: <count> } }.
+function fetchLiveVoteCounts_() {
+  const url = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents/venues`;
+  const token = ScriptApp.getOAuthToken();
+  const authHeader = { 'Authorization': 'Bearer ' + token };
+  const result = {};
+  let nextPageToken = '';
+
+  try {
+    do {
+      let fetchUrl = `${url}?pageSize=300`;
+      if (nextPageToken) fetchUrl += `&pageToken=${encodeURIComponent(nextPageToken)}`;
+
+      const resp = UrlFetchApp.fetch(fetchUrl, {
+        method: 'get',
+        headers: authHeader,
+        muteHttpExceptions: true
+      });
+      if (resp.getResponseCode() !== 200) break;
+
+      const body = JSON.parse(resp.getContentText());
+      (body.documents || []).forEach((docItem) => {
+        const parts = docItem.name.split('/');
+        const id = parts[parts.length - 1];
+        const f = docItem.fields || {};
+        const district = (f.district && f.district.stringValue)
+          ? f.district.stringValue.trim().toUpperCase() : '';
+        if (!district) return;
+
+        let count = 0;
+        if (f.voteCount) {
+          if (f.voteCount.integerValue !== undefined) count = parseInt(f.voteCount.integerValue, 10);
+          else if (f.voteCount.doubleValue !== undefined) count = Math.round(Number(f.voteCount.doubleValue));
+        }
+        (result[district] = result[district] || {})[id] = count || 0;
+      });
+      nextPageToken = body.nextPageToken || '';
+    } while (nextPageToken !== '');
+  } catch (e) {
+    Logger.log('Error fetching live vote counts: ' + e);
+  }
+
+  return result;
+}
+
+// One-time installer: auto-refresh the STATIC district snapshots every 15 min so
+// new/edited/removed businesses propagate without opening the sheet. This also
+// re-seeds counts on each run - acceptable since re-seeding matches the live
+// venue docs; if you prefer counts to only ever move via live votes, install a
+// static-only variant instead. Run this once from the Apps Script editor.
+function installSnapshotTrigger() {
+  // Avoid stacking duplicate triggers if run more than once.
+  ScriptApp.getProjectTriggers().forEach((t) => {
+    if (t.getHandlerFunction() === 'publishDistrictSnapshots') {
+      ScriptApp.deleteTrigger(t);
+    }
+  });
+  ScriptApp.newTrigger('publishDistrictSnapshots').timeBased().everyMinutes(15).create();
+}
+
 function onOpen() {
   SpreadsheetApp.getUi().createMenu('Firebase Sync')
     .addItem('1. Geocode Addresses -> Lat/Lng', 'geocodeAddresses')
     .addItem('2. Sync Venues to Map', 'syncToFirestore')
     .addItem('3. Publish Homepage Map Snapshot', 'publishMapSnapshot')
+    .addItem('4. Publish District Map Snapshots', 'publishDistrictSnapshots')
     .addToUi();
 }

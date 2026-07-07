@@ -954,6 +954,15 @@
                 const venueSnap = await getDoc(venueRef);
                 if (venueSnap.exists() && venueSnap.data().voteCount > 0) {
                     await updateDoc(venueRef, { voteCount: increment(-1) });
+
+                    // Keep the district map's display aggregate in sync so the
+                    // nulled vote is reflected immediately (re-seeding via the
+                    // Apps Script snapshot publish is the backstop for any drift).
+                    const district = venueSnap.data().district;
+                    if (district) {
+                        const countsRef = doc(db, "settings", `voteCounts_${String(district).toUpperCase()}`);
+                        await setDoc(countsRef, { counts: { [venueId]: increment(-1) } }, { merge: true });
+                    }
                 }
                 
                 alert("Vote invalidated.");
