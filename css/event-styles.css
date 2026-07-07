@@ -745,6 +745,8 @@
 /* Map Section */
 .map-section-wrapper {
     position: relative;
+    /* Title sits 70px above the wrapper; +40px breathing room for scroll targets */
+    scroll-margin-top: 110px;
     width: 80%;
     max-width: 1400px;
     margin: 60px auto;
@@ -835,6 +837,7 @@
     }
 
     .map-section-wrapper {
+        scroll-margin-top: 40px;
         width: 100%;
         max-width: none;
         margin: 40px 0 0;
