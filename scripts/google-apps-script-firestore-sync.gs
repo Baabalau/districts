@@ -1,5 +1,19 @@
 const PROJECT_ID = 'districts-after-dark';
 
+// Convert business name + district into a stable, URL-safe ID.
+// Example: "Brittany's Restaurant & Lounge" + "E" -> "brittanys-restaurant-lounge-e"
+function slugify(name, district) {
+  const slug = String(name || '')
+    .toLowerCase()
+    .replace(/['']/g, '')           // Remove apostrophes
+    .replace(/&/g, 'and')           // & -> and
+    .replace(/[^a-z0-9]+/g, '-')    // Non-alphanumeric -> hyphen
+    .replace(/^-+|-+$/g, '')        // Trim leading/trailing hyphens
+    .substring(0, 50);              // Cap length
+  const dist = String(district || '').trim().toLowerCase();
+  return dist ? `${slug}-${dist}` : slug;
+}
+
 // Map sheet headers to distinct Firestore field names (prevents "address #" overwriting "address").
 function normalizeHeader(header) {
   const h = String(header).trim().toLowerCase();
@@ -78,9 +92,16 @@ function syncToFirestore() {
 
   const headers = data[0];
   const idIndex = headers.findIndex(h => String(h).trim().toLowerCase() === 'id');
+  const nameIndex = headers.findIndex(h => String(h).trim().toLowerCase() === 'name');
+  const districtIndex = headers.findIndex(h => String(h).trim().toLowerCase() === 'district');
 
   if (idIndex === -1) {
     SpreadsheetApp.getUi().alert("Error: Your sheet must have an 'id' column header.");
+    return;
+  }
+
+  if (nameIndex === -1) {
+    SpreadsheetApp.getUi().alert("Error: Your sheet must have a 'name' column to auto-generate IDs.");
     return;
   }
 
@@ -120,13 +141,39 @@ function syncToFirestore() {
   }
 
   let successCount = 0;
+  let generatedCount = 0;
   const sheetIds = [];
+  const usedIds = new Set(existingIds);
 
   for (let i = 1; i < data.length; i++) {
     const row = data[i];
-    const docId = String(row[idIndex]).trim();
-    if (!docId) continue;
-
+    let docId = String(row[idIndex]).trim();
+    
+    // Auto-generate ID if blank
+    if (!docId) {
+      const name = row[nameIndex];
+      const district = districtIndex !== -1 ? row[districtIndex] : '';
+      
+      if (!name || String(name).trim() === '') {
+        continue; // Skip rows with no name
+      }
+      
+      let baseId = slugify(name, district);
+      docId = baseId;
+      
+      // If this ID is already used, add a counter suffix
+      let counter = 2;
+      while (usedIds.has(docId)) {
+        docId = `${baseId}-${counter}`;
+        counter++;
+      }
+      
+      // Write the generated ID back to the sheet
+      sheet.getRange(i + 1, idIndex + 1).setValue(docId);
+      generatedCount++;
+    }
+    
+    usedIds.add(docId);
     sheetIds.push(docId);
 
     const rowValues = {};
@@ -185,7 +232,11 @@ function syncToFirestore() {
     }
   });
 
-  SpreadsheetApp.getUi().alert(`Sync Complete!\n\nAdded/Updated: ${successCount} venue(s)\nDeleted: ${deleteCount} removed venue(s)`);
+  let message = `Sync Complete!\n\nAdded/Updated: ${successCount} venue(s)\nDeleted: ${deleteCount} removed venue(s)`;
+  if (generatedCount > 0) {
+    message += `\n\nAuto-generated ${generatedCount} new ID(s) in your sheet.`;
+  }
+  SpreadsheetApp.getUi().alert(message);
 }
 
 function onOpen() {
