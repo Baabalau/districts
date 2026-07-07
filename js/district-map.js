@@ -658,7 +658,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             };
 
             // Combined Venue Explorer: one component toggling between the vote-ranked
-            // Leaderboard and a Browse view (A-Z/Z-A sort + business-type filter).
+            // Leaderboard and a Browse view (A-Z/Z-A sort + business-type filter + search).
             // Everything operates on the already-fetched in-memory array -> 0 extra reads.
             const setupVenueExplorer = (stateSelector, browseVenues) => {
                 const explorer = eventLayout.querySelector(`${stateSelector} .venue-explorer`);
@@ -667,17 +667,31 @@ document.addEventListener("DOMContentLoaded", async () => {
                 // Leaderboard pane (vote rankings)
                 updateLeaderboard(`${stateSelector} .leaderboard`, 10);
 
-                // Browse pane: alphabetical sort + type filter, applied client-side
+                // Browse pane: search + alphabetical sort + type filter, applied client-side
+                const searchInput = explorer.querySelector('.venue-search');
                 const sortSelect = explorer.querySelector('.sort-select');
                 const typeFilter = explorer.querySelector('.type-filter');
 
                 const applyBrowse = () => {
+                    const searchVal = searchInput ? searchInput.value.trim().toLowerCase() : '';
                     const sortVal = sortSelect ? sortSelect.value : 'az';
                     const typeVal = typeFilter ? typeFilter.value : 'all';
                     let list = browseVenues.slice();
+                    
+                    // Filter by search term (name or address)
+                    if (searchVal) {
+                        list = list.filter(v => {
+                            const name = (v.name || '').toLowerCase();
+                            const address = (v.address || '').toLowerCase();
+                            return name.includes(searchVal) || address.includes(searchVal);
+                        });
+                    }
+                    
+                    // Filter by business type
                     if (typeVal !== 'all') {
                         list = list.filter(v => categorizeType(v.type) === typeVal);
                     }
+                    
                     list.sort((a, b) => {
                         const an = (a.name || '').toLowerCase();
                         const bn = (b.name || '').toLowerCase();
@@ -686,6 +700,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     renderPaginatedList(stateSelector, list);
                 };
 
+                if (searchInput) searchInput.addEventListener('input', applyBrowse);
                 if (sortSelect) sortSelect.addEventListener('change', applyBrowse);
                 if (typeFilter) typeFilter.addEventListener('change', applyBrowse);
                 applyBrowse();

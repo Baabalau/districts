@@ -1696,6 +1696,26 @@
     outline: none;
     border-color: var(--accent);
 }
+.venue-search {
+    background: var(--panel-bg);
+    color: var(--text-primary);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-family: var(--font-main);
+    font-size: 0.9rem;
+    flex: 1;
+    min-width: 150px;
+    max-width: 280px;
+}
+.venue-search::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.7;
+}
+.venue-search:focus {
+    outline: none;
+    border-color: var(--accent);
+}
 .type-dot {
     width: 16px;
     height: 16px;

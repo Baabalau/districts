@@ -661,6 +661,7 @@ function renderVenueExplorer() {
                             <button type="button" class="explorer-tab" data-view="browse">Browse All</button>
                         </div>
                         <div class="explorer-controls" style="display: none;">
+                            <input type="search" class="venue-search" placeholder="Search venues..." aria-label="Search venues">
                             <select class="sort-select" aria-label="Sort venues">
                                 <option value="az">Name: A&ndash;Z</option>
                                 <option value="za">Name: Z&ndash;A</option>
