@@ -1901,7 +1901,7 @@
     <script type="module" src="js/auth.js"></script>
     <script type="module">
         import { db } from "./js/firebase-config.js";
-        import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+        import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
         // --- LOAD EVENT CARDS FROM JSON ---
         async function loadEventCards() {
@@ -2268,34 +2268,32 @@
             });
         }
 
+        // The homepage map is decorative (non-interactive dots). Instead of reading
+        // every venue per visit, it reads ONE pre-published snapshot doc
+        // (settings/mapSnapshot) written by the Google Sheet sync. 735 reads -> 1.
         async function loadAllVenues() {
             try {
-                let venues = [];
-                const querySnapshot = await getDocs(collection(db, "venues"));
-                querySnapshot.forEach((doc) => {
-                    venues.push(doc.data());
-                });
+                const snap = await getDoc(doc(db, "settings", "mapSnapshot"));
+                if (!snap.exists()) return;
 
-                // Client-side overrides
+                let points = [];
+                try {
+                    points = JSON.parse(snap.data().points || "[]");
+                } catch (e) {
+                    console.error("Could not parse map snapshot:", e);
+                    return;
+                }
 
-                // 2. Fix Saturn Bar
-                venues.forEach(place => {
-                    if (place.name && place.name.toUpperCase() === 'SATURN BAR') {
-                        place.lat = 29.9679094;
-                        place.lng = -90.0442228;
-                    }
-                });
-
-                venues.forEach((place) => {
+                points.forEach((place) => {
                     if (!place.lat || !place.lng) return;
-                    
+
                     L.marker([place.lat, place.lng], {
                         icon: getTinyVenueIcon(place.type),
                         interactive: false // non-clickable
                     }).addTo(map);
                 });
             } catch (error) {
-                console.error("Error fetching venues from Firestore:", error);
+                console.error("Error loading map snapshot from Firestore:", error);
             }
         }
         

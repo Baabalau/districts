@@ -1,6 +1,6 @@
 import './leaderboard.js';
 import { auth, db } from "./firebase-config.js";
-import { doc, updateDoc, increment, getDoc, setDoc, collection, collectionGroup, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+import { doc, updateDoc, increment, getDoc, setDoc, collection, collectionGroup, getDocs, query, where, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 import { isAdminUser } from "./admin-auth.js";
 import { renderVoteTally, animateVoteTallySlotMachine } from "./vote-tally.js";
@@ -1092,8 +1092,10 @@ class EventLayout extends HTMLElement {
             this.applyElectionSchedule(districtId);
             // Admin-only: in-page toolbar to preview each election phase locally.
             this.initAdminPreview();
-            // Non-blocking: load the Local Legends photo wall from real check-ins.
-            this.initLocalLegends(districtId);
+            // Local Legends reads every check-in citywide (collectionGroup), so
+            // defer it until the wall scrolls into view. Most visitors vote/browse
+            // the map without reaching it, avoiding that cost entirely at scale.
+            this.deferLocalLegends(districtId);
         } catch (error) {
             console.error('CRITICAL ERROR loading event page:', error);
             this.innerHTML = `<p style="padding: 2rem; margin-top: 100px; text-align: center; color: red; font-size: 2rem; z-index: 9999; position: relative;">Unable to load event content: ${error.message}</p>`;
@@ -1196,6 +1198,26 @@ class EventLayout extends HTMLElement {
     //   'default' — every recent check-in photo (evidence of participation)
     //   'legends' — only photos from crawlers who reached Legend status
     // The heavy fetch runs once; setLocalLegendsMode() just re-filters/re-renders.
+    // Fire initLocalLegends only when the photo wall is about to enter the
+    // viewport (or immediately if IntersectionObserver is unavailable). Runs once.
+    deferLocalLegends(districtId) {
+        const wall = this.querySelector('#local-legends-wall');
+        if (!wall) return;
+
+        if (!('IntersectionObserver' in window)) {
+            this.initLocalLegends(districtId);
+            return;
+        }
+
+        const observer = new IntersectionObserver((entries, obs) => {
+            if (entries.some((e) => e.isIntersecting)) {
+                obs.disconnect();
+                this.initLocalLegends(districtId);
+            }
+        }, { rootMargin: '400px 0px' });
+        observer.observe(wall);
+    }
+
     async initLocalLegends(districtId) {
         const wall = this.querySelector('#local-legends-wall');
         if (!wall) return;
@@ -1621,48 +1643,37 @@ class EventLayout extends HTMLElement {
             btn.innerText = 'Submitting...';
             btn.disabled = true;
 
+            // Sentinel thrown inside the transaction when the user has already
+            // voted for this venue, so we can show a friendly message instead of
+            // a generic error.
+            const ALREADY_VOTED = 'ALREADY_VOTED';
+            const ACCOUNT_BANNED = 'ACCOUNT_BANNED';
+
             try {
                 const userRef = doc(db, "users", currentUser.uid);
-                const userSnap = await getDoc(userRef);
-                
-                let userData = userSnap.exists() ? userSnap.data() : {};
-                
-                if (userData.isBanned) {
-                    errorMsg.textContent = `Your account is suspended.`;
-                    errorMsg.style.display = 'block';
-                    btn.innerText = 'Submit Vote';
-                    btn.disabled = false;
-                    return;
-                }
-                
-                let votes = userData.votes || {};
-                
-                // Check if user already voted for this specific venue
-                if (votes[venueId]) {
-                    errorMsg.textContent = `You have already voted for ${venueName || 'this venue'}.`;
-                    errorMsg.style.display = 'block';
-                    btn.innerText = 'Submit Vote';
-                    btn.disabled = false;
-                    return;
-                }
-                
-                // Update user's votes
-                votes[venueId] = true;
-                await setDoc(userRef, { votes: votes }, { merge: true });
-                
-                // Increment venue's voteCount
                 const venueRef = doc(db, "venues", venueId);
-                await updateDoc(venueRef, {
-                    voteCount: increment(1)
-                });
-                
-                // Add a detailed audit record
                 const voteRecordRef = doc(db, "venues", venueId, "votes", currentUser.uid);
-                await setDoc(voteRecordRef, {
-                    uid: currentUser.uid,
-                    displayName: currentUser.displayName || userData.displayName || "Unknown User",
-                    email: currentUser.email || userData.email || "",
-                    timestamp: new Date()
+
+                // Atomic vote: the audit doc (create-only, rules forbid update) is
+                // the server-authoritative dedup guard. Reading it inside the
+                // transaction guarantees no partial writes, no permanent block on a
+                // failed increment, and no double-count race across tabs/clicks.
+                await runTransaction(db, async (tx) => {
+                    const userSnap = await tx.get(userRef);
+                    const userData = userSnap.exists() ? userSnap.data() : {};
+                    if (userData.isBanned) throw new Error(ACCOUNT_BANNED);
+
+                    const auditSnap = await tx.get(voteRecordRef);
+                    if (auditSnap.exists()) throw new Error(ALREADY_VOTED);
+
+                    tx.update(venueRef, { voteCount: increment(1) });
+                    tx.set(voteRecordRef, {
+                        uid: currentUser.uid,
+                        displayName: currentUser.displayName || userData.displayName || "Unknown User",
+                        email: currentUser.email || userData.email || "",
+                        timestamp: serverTimestamp()
+                    });
+                    tx.set(userRef, { votes: { [venueId]: true } }, { merge: true });
                 });
 
                 // Celebrate the vote landing: roll the tally up by one with a
@@ -1682,8 +1693,14 @@ class EventLayout extends HTMLElement {
                     window.showShareScreen();
                 }, 3000);
             } catch (error) {
-                console.error("Error submitting vote:", error);
-                errorMsg.textContent = "Error: " + error.message.replace("Firebase: ", "");
+                if (error && error.message === ALREADY_VOTED) {
+                    errorMsg.textContent = `You have already voted for ${venueName || 'this venue'}.`;
+                } else if (error && error.message === ACCOUNT_BANNED) {
+                    errorMsg.textContent = `Your account is suspended.`;
+                } else {
+                    console.error("Error submitting vote:", error);
+                    errorMsg.textContent = "Error: " + error.message.replace("Firebase: ", "");
+                }
                 errorMsg.style.display = 'block';
                 btn.innerText = 'Submit Vote';
                 btn.disabled = false;
