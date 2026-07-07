@@ -223,16 +223,25 @@ function itineraryStyles() {
         .stop-host-link:hover { text-decoration: underline; }
 
         .election-runoff-date {
-            margin: 6px 0 0 0;
-            font-size: 1.05rem;
-            line-height: 1.6;
+            margin: 10px 0 0 0;
+            font-size: 1.3rem;
+            line-height: 1.5;
             color: var(--text-primary);
             font-weight: 600;
         }
         .election-runoff-date .runoff-date-value {
-            color: var(--text-primary);
+            color: rgba(203, 160, 82, 1);
             font-weight: 800;
             text-decoration: underline;
+        }
+        .election-runoff-disclaimer {
+            margin: 8px 0 0 0;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: var(--text-secondary);
+        }
+        .election-runoff-disclaimer em {
+            font-style: italic;
         }
 
         .proc-instructions {
@@ -503,6 +512,7 @@ function renderElectionStop() {
                     </div>
                     <p style="margin: 0; font-size: 1.15rem; line-height: 1.6; color: var(--text-secondary);">Your favorite neighborhood restaurant? A dive bar? A great spot for live music? It's up to you!</p>
                     <p class="election-runoff-date" id="election-runoff-date">A run-off of your top ten choices starts <span class="runoff-date-value">soon</span>.</p>
+                    <p class="election-runoff-disclaimer"><em>* Event hosts (Nighttime Economy, Council Office and influencer) must agree to appear at a location for it to be included in the run-off.</em></p>
 
                     <div class="proc-instructions">
                         <h4>How It Works</h4>
