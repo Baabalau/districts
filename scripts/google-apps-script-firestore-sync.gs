@@ -1,5 +1,14 @@
 const PROJECT_ID = 'districts-after-dark';
 
+// SAFETY: when false, the sync will NEVER delete venue docs that are missing from
+// the sheet (it only logs what it would have removed). Keep false during the live
+// event so an accidental sheet edit can't wipe venues (and their votes).
+const ALLOW_DELETES = false;
+
+// Live-data fields owned by the app, not the sheet. The sync must never overwrite
+// these or it would reset vote tallies / check-in counts on every run.
+const PROTECTED_FIELDS = ['votecount', 'votes', 'visitcount', 'optoutrunoff'];
+
 // Convert business name + district into a stable, URL-safe ID.
 // Example: "Brittany's Restaurant & Lounge" + "E" -> "brittanys-restaurant-lounge-e"
 function slugify(name, district) {
@@ -187,6 +196,8 @@ function syncToFirestore() {
 
     const payload = { fields: {} };
     Object.keys(rowValues).forEach((key) => {
+      // Never let the sheet clobber app-owned live data (vote counts, etc.).
+      if (PROTECTED_FIELDS.indexOf(key.toLowerCase()) !== -1) return;
       const val = rowValues[key];
       if (val === '') return;
       if (key === 'lat' || key === 'lng') {
@@ -221,27 +232,107 @@ function syncToFirestore() {
   let deleteCount = 0;
   const idsToDelete = existingIds.filter(id => !sheetIds.includes(id));
 
-  idsToDelete.forEach(idToDelete => {
-    const deleteResponse = UrlFetchApp.fetch(`${url}/${idToDelete}`, {
-      method: 'delete',
-      headers: authHeader,
-      muteHttpExceptions: true
+  if (ALLOW_DELETES) {
+    idsToDelete.forEach(idToDelete => {
+      const deleteResponse = UrlFetchApp.fetch(`${url}/${idToDelete}`, {
+        method: 'delete',
+        headers: authHeader,
+        muteHttpExceptions: true
+      });
+      if (deleteResponse.getResponseCode() >= 200 && deleteResponse.getResponseCode() < 300) {
+        deleteCount++;
+      }
     });
-    if (deleteResponse.getResponseCode() >= 200 && deleteResponse.getResponseCode() < 300) {
-      deleteCount++;
-    }
-  });
+  } else if (idsToDelete.length > 0) {
+    Logger.log('ALLOW_DELETES is false. Skipped deleting ' + idsToDelete.length +
+               ' venue(s) not present in the sheet: ' + idsToDelete.join(', '));
+  }
 
-  let message = `Sync Complete!\n\nAdded/Updated: ${successCount} venue(s)\nDeleted: ${deleteCount} removed venue(s)`;
+  let message = `Sync Complete!\n\nAdded/Updated: ${successCount} venue(s)`;
+  if (ALLOW_DELETES) {
+    message += `\nDeleted: ${deleteCount} removed venue(s)`;
+  } else if (idsToDelete.length > 0) {
+    message += `\nSkipped ${idsToDelete.length} delete(s) (ALLOW_DELETES is off).`;
+  }
   if (generatedCount > 0) {
     message += `\n\nAuto-generated ${generatedCount} new ID(s) in your sheet.`;
   }
   SpreadsheetApp.getUi().alert(message);
 }
 
+// Publish a compact {lat, lng, type} point list to settings/mapSnapshot so the
+// homepage map can render its decorative dots with a SINGLE Firestore read
+// instead of pulling every venue for every visitor.
+function publishMapSnapshot() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const data = sheet.getDataRange().getValues();
+
+  if (data.length <= 1) {
+    SpreadsheetApp.getUi().alert('No data found to publish.');
+    return;
+  }
+
+  const headers = data[0];
+  const latIdx = headers.findIndex(h => String(h).trim().toLowerCase() === 'lat');
+  const lngIdx = headers.findIndex(h => String(h).trim().toLowerCase() === 'lng');
+  const typeIdx = headers.findIndex(h => String(h).trim().toLowerCase() === 'type');
+  const nameIdx = headers.findIndex(h => String(h).trim().toLowerCase() === 'name');
+
+  if (latIdx === -1 || lngIdx === -1) {
+    SpreadsheetApp.getUi().alert("Error: Your sheet must have 'lat' and 'lng' columns.");
+    return;
+  }
+
+  const points = [];
+  for (let i = 1; i < data.length; i++) {
+    let lat = Number(data[i][latIdx]);
+    let lng = Number(data[i][lngIdx]);
+    if (!lat || !lng) continue;
+
+    // Bake in the historical Saturn Bar coordinate fix so the client no longer
+    // has to special-case it.
+    const name = nameIdx !== -1 ? String(data[i][nameIdx] || '').trim().toUpperCase() : '';
+    if (name === 'SATURN BAR') {
+      lat = 29.9679094;
+      lng = -90.0442228;
+    }
+
+    const point = { lat: lat, lng: lng };
+    if (typeIdx !== -1 && data[i][typeIdx]) {
+      point.type = String(data[i][typeIdx]).trim();
+    }
+    points.push(point);
+  }
+
+  const url = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents/settings/mapSnapshot`;
+  const token = ScriptApp.getOAuthToken();
+  const payload = {
+    fields: {
+      points: { stringValue: JSON.stringify(points) },
+      updatedAt: { timestampValue: new Date().toISOString() }
+    }
+  };
+
+  const response = UrlFetchApp.fetch(url, {
+    method: 'patch',
+    contentType: 'application/json',
+    headers: { 'Authorization': 'Bearer ' + token },
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  });
+
+  if (response.getResponseCode() >= 200 && response.getResponseCode() < 300) {
+    SpreadsheetApp.getUi().alert(`Homepage map snapshot published: ${points.length} point(s).`);
+  } else {
+    Logger.log('Error publishing snapshot: ' + response.getContentText());
+    SpreadsheetApp.getUi().alert('Error publishing snapshot. Check the logs for details.');
+  }
+}
+
 function onOpen() {
   SpreadsheetApp.getUi().createMenu('Firebase Sync')
     .addItem('1. Geocode Addresses -> Lat/Lng', 'geocodeAddresses')
     .addItem('2. Sync Venues to Map', 'syncToFirestore')
+    .addItem('3. Publish Homepage Map Snapshot', 'publishMapSnapshot')
     .addToUi();
 }
