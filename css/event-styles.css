@@ -135,6 +135,12 @@
     font-weight: 500;
 }
 
+.hero-left p strong {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+}
+
 .hero-left .brand-btn {
     white-space: nowrap;
 }

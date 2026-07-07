@@ -1,44 +1,44 @@
-{
-  "district": "C",
-  "date": "Tuesday, July 28th",
-  "time": "7:00 PM - 10:00 PM",
-  "location": "French Quarter, TremÈ, Marigny, Bywater & Algiers",
-  "councilName": "Freddie King III",
-  "councilDisplayName": "Freddie King",
-  "councilImg": "assets/profile-pics/freddie-king-iii-headshot.jpg",
-  "councilBioUrl": "https://council.nola.gov/councilmembers/freddie-king-iii/",
-  "influencerName": "Justin Brown",
-  "influencerAccountTitle": "EmpowerYouNola",
-  "influencerImg": "assets/profile-pics/empoweryounola_justinbrown-Small.png",
-  "influencerSocialUrl": "https://instagram.com/empoweryounola",
-  "bgImg": "assets/district_c_image.png",
-  "photoCredit": {
-    "name": "Moniker",
-    "url": "https://www.monikerpartners.com/retreat-locations/corporate-retreats-in-new-orleans"
-  },
-  "heroIntro": [
-    "Councilmember {councilDisplayName} and {influencerIntro} are supporting District {district}'s hospitality businesses this summer with a special night out to three local favorites across the French Quarter, TremÈ, Faubourg-Marigny, Bywater & Algiers!",
-    "Vote to decide {councilFirstName} & {influencerFirstName}'s last stop of the night, and make sure to support your neighborhood restaurants, bars, music venues and more all summer long!"
-  ],
-  "councilQuote": "This isn't just about nightlife; it's about connecting with the community where they are. We're breaking down the walls of City Hall.",
-  "influencerQuote": "District {district} has some of the most vibrant, unsung spots in the city. I can't wait to show everyone what makes this neighborhood tick.",
-  "itinerary": {
-    "stops": [
-      {
-        "number": "01",
-        "title": "{influencerName}'s Westbank Opener",
-        "body": "{influencerName} starts us on the far side of the river with a stop that blends music, mood, and a crowd that knows how to show up for local business."
-      },
-      {
-        "number": "02",
-        "title": "{councilName}'s Difficult Decision",
-        "body": "Councilmember {councilName} picks a second stop hosts history, hospitality, and room for real neighborhood conversation."
-      },
-      {
-        "number": "03",
-        "title": "The District C Vote",
-        "body": "Help choose where we land last. Your vote decides which {location} venue joins the crawl on March 19 as the community's third stop."
-      }
-    ]
-  }
-}
+{
+  "district": "C",
+  "date": "Tuesday, July 28th",
+  "time": "7:00 PM - 10:00 PM",
+  "location": "French Quarter, Tremù, Marigny, Bywater & Algiers",
+  "councilName": "Freddie King III",
+  "councilDisplayName": "Freddie King",
+  "councilImg": "assets/profile-pics/freddie-king-iii-headshot.jpg",
+  "councilBioUrl": "https://council.nola.gov/councilmembers/freddie-king-iii/",
+  "influencerName": "Justin Brown",
+  "influencerAccountTitle": "EmpowerYouNola",
+  "influencerImg": "assets/profile-pics/empoweryounola_justinbrown-Small.png",
+  "influencerSocialUrl": "https://instagram.com/empoweryounola",
+  "bgImg": "assets/district_c_image.png",
+  "photoCredit": {
+    "name": "Moniker",
+    "url": "https://www.monikerpartners.com/retreat-locations/corporate-retreats-in-new-orleans"
+  },
+  "heroIntro": [
+    "Councilmember {councilDisplayName} and {influencerIntro} are supporting District {district}'s hospitality businesses this summer with a special night out to three local favorites across the French Quarter, Tremù, Faubourg-Marigny, Bywater & Algiers!",
+    "<strong>Vote to decide</strong> {councilFirstName} & {influencerFirstName}'s last stop of the night & <strong>become a Local Legend</strong> by checking in at neighborhood restaurants, bars, music venues and more all summer long!"
+  ],
+  "councilQuote": "This isn't just about nightlife; it's about connecting with the community where they are. We're breaking down the walls of City Hall.",
+  "influencerQuote": "District {district} has some of the most vibrant, unsung spots in the city. I can't wait to show everyone what makes this neighborhood tick.",
+  "itinerary": {
+    "stops": [
+      {
+        "number": "01",
+        "title": "{influencerName}'s Westbank Opener",
+        "body": "{influencerName} starts us on the far side of the river with a stop that blends music, mood, and a crowd that knows how to show up for local business."
+      },
+      {
+        "number": "02",
+        "title": "{councilName}'s Difficult Decision",
+        "body": "Councilmember {councilName} picks a second stop hosts history, hospitality, and room for real neighborhood conversation."
+      },
+      {
+        "number": "03",
+        "title": "The District C Vote",
+        "body": "Help choose where we land last. Your vote decides which {location} venue joins the crawl on March 19 as the community's third stop."
+      }
+    ]
+  }
+}
