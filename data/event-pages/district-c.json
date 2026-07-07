@@ -2,7 +2,7 @@
   "district": "C",
   "date": "Tuesday, July 28th",
   "time": "7:00 PM - 10:00 PM",
-  "location": "French Quarter, Tremù, Marigny, Bywater & Algiers",
+  "location": "French Quarter, Trem\u00e9, Marigny, Bywater & Algiers",
   "councilName": "Freddie King III",
   "councilDisplayName": "Freddie King",
   "councilImg": "assets/profile-pics/freddie-king-iii-headshot.jpg",
@@ -17,7 +17,7 @@
     "url": "https://www.monikerpartners.com/retreat-locations/corporate-retreats-in-new-orleans"
   },
   "heroIntro": [
-    "Councilmember {councilDisplayName} and {influencerIntro} are supporting District {district}'s hospitality businesses this summer with a special night out to three local favorites across the French Quarter, Tremù, Faubourg-Marigny, Bywater & Algiers!",
+    "Councilmember {councilDisplayName} and {influencerIntro} are supporting District {district}'s hospitality businesses this summer with a special night out to three local favorites across the French Quarter, Trem\u00e9, Faubourg-Marigny, Bywater & Algiers!",
     "<strong>Vote to decide</strong> {councilFirstName} & {influencerFirstName}'s last stop of the night & <strong>become a Local Legend</strong> by checking in at neighborhood restaurants, bars, music venues and more all summer long!"
   ],
   "councilQuote": "This isn't just about nightlife; it's about connecting with the community where they are. We're breaking down the walls of City Hall.",
