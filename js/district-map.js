@@ -1,5 +1,5 @@
 import { auth, db } from "./firebase-config.js";
-import { collection, query, where, getDocs, doc, updateDoc, arrayUnion, increment } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+import { collection, query, where, getDocs, getDoc, doc, updateDoc, arrayUnion, increment } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 import { renderVoteTally } from "./vote-tally.js";
 
@@ -34,6 +34,41 @@ export function formatVenueAddress(venue) {
 
     if (full) return full.split(',')[0].trim();
     return [number, street].filter(Boolean).join(' ').trim();
+}
+
+// Reads the per-district static snapshot (settings/venues_<D>) and the live
+// vote-count aggregate (settings/voteCounts_<D>) and merges them into the venue
+// array the map/leaderboard expects. Returns null if the snapshot doc is missing
+// so the caller can fall back to a full collection read.
+export async function loadVenuesFromSnapshot(districtUpper) {
+    try {
+        const snap = await getDoc(doc(db, "settings", `venues_${districtUpper}`));
+        if (!snap.exists()) return null;
+
+        let points;
+        try {
+            points = JSON.parse(snap.data().points || "[]");
+        } catch (e) {
+            console.error("Could not parse district venue snapshot:", e);
+            return null;
+        }
+        if (!Array.isArray(points) || points.length === 0) return null;
+
+        // Live counts are best-effort: if the aggregate is missing/unreadable we
+        // still render venues with a sane default of 0 votes.
+        let counts = {};
+        try {
+            const countsSnap = await getDoc(doc(db, "settings", `voteCounts_${districtUpper}`));
+            if (countsSnap.exists()) counts = countsSnap.data().counts || {};
+        } catch (e) {
+            console.warn("Could not read vote-count aggregate; defaulting to 0.", e);
+        }
+
+        return points.map((p) => ({ ...p, voteCount: Number(counts[p.id]) || 0 }));
+    } catch (e) {
+        console.warn("Snapshot read failed; will fall back to full read.", e);
+        return null;
+    }
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -329,21 +364,30 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     try {
-        // Fetch venues from Firestore where district matches
-        const venuesRef = collection(db, "venues");
-        const q = query(venuesRef, where("district", "==", districtId.toUpperCase()));
-        const querySnapshot = await getDocs(q);
+        const districtUpper = districtId.toUpperCase();
 
-        let venues = [];
+        // Hybrid read: static venue data comes from a pre-published per-district
+        // snapshot doc (1 read), live vote counts from a single aggregate doc
+        // (1 read) - instead of reading every venue in the collection (~150 reads)
+        // on every pageview. Falls back to the full collection read if the
+        // snapshot has not been published yet, so the page never hard-breaks.
+        let venues = await loadVenuesFromSnapshot(districtUpper);
 
-        if (querySnapshot.empty) {
-            console.log(`No venues found for district ${districtId.toUpperCase()} in Firestore.`);
-        } else {
-            querySnapshot.forEach((doc) => {
-                const data = doc.data();
-                data.id = doc.id;
-                venues.push(data);
-            });
+        if (venues === null) {
+            console.warn(`No snapshot for district ${districtUpper}; falling back to full venue read.`);
+            venues = [];
+            const venuesRef = collection(db, "venues");
+            const q = query(venuesRef, where("district", "==", districtUpper));
+            const querySnapshot = await getDocs(q);
+            if (querySnapshot.empty) {
+                console.log(`No venues found for district ${districtUpper} in Firestore.`);
+            } else {
+                querySnapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    data.id = docSnap.id;
+                    venues.push(data);
+                });
+            }
         }
 
         // Determine if venues are in bounds and mock ranks if necessary
