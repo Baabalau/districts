@@ -799,7 +799,11 @@ function renderVoteModals(district) {
                     <div class="share-modal-body">
                         <div class="share-modal-instructions">
                             <div style="background: rgba(255,255,255,0.05); padding: 12px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); text-align: left; margin-bottom: 0;">
-                                <p style="color: var(--text-secondary); font-family: var(--font-main); font-size: 1.05rem; margin: 0 0 12px 0; line-height: 1.3;">Encourage friends to vote for this business, too! <b style="color: var(--text-primary);">Save the image below & share as an Instagram story.</b> Use Instagram's text and sticker tools to add the business name and the link to vote for this business.</p>
+                                <div id="share-instructions-text" style="color: var(--text-secondary); font-family: var(--font-main); font-size: 1.05rem; line-height: 1.3;">
+                                    <p style="margin: 0 0 10px 0;">Encourage friends to vote for <b id="share-instructions-venue" style="color: var(--text-primary);">this business</b>, too!</p>
+                                    <p style="margin: 0 0 10px 0;">Save this image, then share it as an Instagram story.</p>
+                                    <p style="margin: 0 0 12px 0;">Use Instagram's text and sticker tools to add the business name and the custom link below.</p>
+                                </div>
                                 <input type="text" id="share-url-input" readonly style="position: absolute; left: -9999px;" aria-hidden="true">
                                 <div style="text-align: left;">
                                     <button onclick="window.copyShareUrl()" style="padding: 8px 14px; background: #618A62; color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9rem; font-family: var(--font-main); transition: background 0.2s; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px;">
@@ -1746,6 +1750,12 @@ class EventLayout extends HTMLElement {
                 // Capitalize only the first letter of the sentence, keep venue name as is
                 titleEl.innerHTML = `Vote for <span style="text-transform: uppercase;">${venueName}</span> confirmed!`;
                 titleEl.style.textTransform = 'none'; // Override the CSS uppercase
+            }
+
+            // Personalize the "encourage friends" instructions with the venue name too.
+            const instructionsVenueEl = this.querySelector('#share-instructions-venue');
+            if (instructionsVenueEl) {
+                instructionsVenueEl.textContent = venueName || 'this business';
             }
 
             // Generate the deep link URL for this specific venue immediately
