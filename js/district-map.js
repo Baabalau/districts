@@ -390,9 +390,18 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         }
 
-        // Determine if venues are in bounds and mock ranks if necessary
+        // Separate the polygon-boundary filter (for map visuals) from the list of
+        // venues eligible to appear in the voter explorer.
+        //
+        // inDistrictVenues  — passes the council-district polygon check; used for
+        //                     map rank badges and marker opacity.
+        // allVenuesWithCoords — all geocoded (lat/lng) venues tagged for this district,
+        //                     regardless of whether coordinates fall inside the polygon.
+        //                     Geocoding imprecision can push a venue just outside the
+        //                     boundary; that should not make it invisible to voters.
         let inDistrictVenues = [];
-        
+        let allVenuesWithCoords = [];
+
         // --- CLIENT-SIDE OVERRIDES ---
         
         venues.forEach((place) => {
@@ -405,15 +414,16 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
 
             if (!place.lat || !place.lng) return;
-            // Since we override district to C for Saturn Bar, ensure it's filtered correctly
-            // if we're not on District C page (but wait, venues are already queried by districtId).
-            // Actually, because Firestore returned it for District D, we should just let it be on the map
-            // but at the right coordinate, or exclude it if it's no longer in bounds.
+
             place.inBounds = districtFeature ? isPointInDistrict(place.lat, place.lng, districtFeature) : true;
             if (place.inBounds) inDistrictVenues.push(place);
+
+            // All geocoded venues go into this list regardless of polygon outcome.
+            allVenuesWithCoords.push(place);
         });
 
-        // Live vote rankings for map Top 10 highlighting (must match leaderboard).
+        // Live vote rankings for map Top 10 highlighting (polygon-aware, matches
+        // the visual rank badges on map markers).
         const sortedByVotes = [...inDistrictVenues].sort((a, b) => {
             const diff = (b.voteCount || 0) - (a.voteCount || 0);
             if (diff !== 0) return diff;
@@ -523,8 +533,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                 return;
             }
             
-            // Sort venues by voteCount descending
-            const sortedVenues = [...inDistrictVenues].sort((a, b) => (b.voteCount || 0) - (a.voteCount || 0));
+            // Sort ALL geocoded venues by voteCount for the explorer/leaderboard.
+            // Using allVenuesWithCoords (not inDistrictVenues) so venues whose
+            // coordinates fall slightly outside the council-district polygon due to
+            // geocoding imprecision still appear in the list and are votable.
+            const sortedVenues = [...allVenuesWithCoords].sort((a, b) => (b.voteCount || 0) - (a.voteCount || 0));
             
             // Map a raw venue type to one of the 5 map-legend categories
             // (mirrors the substring matching used in getVenueIcon).
