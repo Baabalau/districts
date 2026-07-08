@@ -2,7 +2,7 @@
 
 .interior-neighborhoods,
 .event-info .event-neighborhoods {
-    font-size: 17px;
+    font-size: 20px;
     font-weight: 400;
     color: var(--text-secondary);
     line-height: 1.45;
@@ -10,7 +10,7 @@
 
 .interior-hosts,
 .event-info .event-hosts {
-    font-size: 17px;
+    font-size: 20px;
     font-weight: 700;
     color: rgba(222, 186, 132, 1);
     line-height: 17px;

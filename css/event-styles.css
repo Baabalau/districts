@@ -20,6 +20,7 @@
     --font-main: 'EB Garamond', Georgia, serif;
     --font-header: 'EB Garamond', Georgia, serif;
     --font-subhead: 'EB Garamond', Georgia, serif;
+    --body-text-size: 1.25rem; /* 20px — shared interior/body copy */
 }
 
 /* Brand Button */
@@ -129,7 +130,7 @@
 
 .hero-left p {
     font-family: var(--font-main);
-    font-size: clamp(1rem, 1.8vw, 1.15rem);
+    font-size: clamp(var(--body-text-size), 2vw, 1.35rem);
     color: var(--text-primary);
     line-height: 1.75;
     font-weight: 500;
@@ -395,7 +396,7 @@
     }
 
     .hero-left p {
-        font-size: clamp(1rem, 3.33vw, 19px);
+        font-size: var(--body-text-size);
     }
 
     .hero-right {
@@ -433,7 +434,7 @@
     }
 
     .hero-left p {
-        font-size: 19px;
+        font-size: 1.3125rem;
     }
 
     .hero-left .brand-btn,
@@ -660,7 +661,7 @@
 }
 
 .purpose-frame p {
-    font-size: clamp(1rem, 1.8vw, 1.15rem);
+    font-size: clamp(var(--body-text-size), 2vw, 1.35rem);
     color: var(--text-primary);
     line-height: 1.75;
     font-weight: 500;
@@ -677,7 +678,7 @@
 
 @media (max-width: 900px) {
     .purpose-frame p {
-        font-size: 19px;
+        font-size: var(--body-text-size);
     }
 }
 
