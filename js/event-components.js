@@ -619,7 +619,7 @@ function renderMapLegend() {
                         
                         <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 10px; border-right: 1px solid rgba(255,255,255,0.2);">
                             <div style="text-align: center;">
-                                <div id="legend-round-subtitle" style="color: var(--text-secondary); font-size: 1.2rem; font-family: var(--font-hero); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px;">RUN-OFF BEGINS IN</div>
+                                <div id="legend-round-subtitle" style="color: var(--text-secondary); font-size: 1.2rem; font-family: var(--font-hero); letter-spacing: 1px; margin-top: 2px;">Top 10 run-off begins in</div>
                             </div>
                             <div class="countdown-clock small-clock">
                                 <div class="time-box"><span>--</span><label>Days</label></div>
@@ -1871,7 +1871,7 @@ class EventLayout extends HTMLElement {
             const legendSubtitle = document.querySelector('#legend-round-subtitle');
             if (legendSubtitle) {
                 if (stateId === 'round-1') {
-                    legendSubtitle.innerText = 'RUN-OFF BEGINS IN';
+                    legendSubtitle.innerText = 'Top 10 run-off begins in';
                 } else if (stateId === 'run-off') {
                     legendSubtitle.innerText = 'VOTING CLOSES IN';
                 } else if (stateId === 'post-election') {
