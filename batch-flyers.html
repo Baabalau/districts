@@ -345,21 +345,8 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
-
-        // Firebase config
-        const firebaseConfig = {
-            apiKey: "AIzaSyDf-vGCbNNKa6xayqCJXSJc_JDWR8atJ_4",
-            authDomain: "districts-after-dark.firebaseapp.com",
-            projectId: "districts-after-dark",
-            storageBucket: "districts-after-dark.firebasestorage.app",
-            messagingSenderId: "111193459737",
-            appId: "1:111193459737:web:8531d3c7405e374af96e88"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        import { db } from './js/firebase-config.js';
+        import { collection, getDocs, query, where, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
         // Graphic configuration (same as promote.html)
         const graphicConfig = {
@@ -431,6 +418,59 @@
             return filename;
         }
 
+        // Load venues for a district. Prefer the sheet-published snapshot
+        // (settings/venues_<D>) — same source the district map uses — so flyers
+        // always match the current master list. Fall back to the venues collection
+        // only if the snapshot has not been published yet.
+        async function loadDistrictVenues(district) {
+            const districtUpper = district.toUpperCase();
+
+            try {
+                const snap = await getDoc(doc(db, 'settings', `venues_${districtUpper}`));
+                if (snap.exists()) {
+                    let points;
+                    try {
+                        points = JSON.parse(snap.data().points || '[]');
+                    } catch (e) {
+                        console.warn('Could not parse venue snapshot:', e);
+                        points = [];
+                    }
+                    if (Array.isArray(points) && points.length > 0) {
+                        return {
+                            venues: points
+                                .filter(p => p.id && p.name)
+                                .map(p => ({
+                                    id: p.id,
+                                    name: p.name,
+                                    address: p.address || '',
+                                    district: districtUpper
+                                })),
+                            source: 'snapshot'
+                        };
+                    }
+                }
+            } catch (e) {
+                console.warn('Snapshot read failed; falling back to Firestore collection.', e);
+            }
+
+            const venuesRef = collection(db, 'venues');
+            const q = query(venuesRef, where('district', '==', districtUpper));
+            const snapshot = await getDocs(q);
+            const venues = [];
+            snapshot.forEach(docSnap => {
+                const data = docSnap.data();
+                if (data.name) {
+                    venues.push({
+                        id: docSnap.id,
+                        name: data.name,
+                        address: data.address || '',
+                        district: data.district
+                    });
+                }
+            });
+            return { venues, source: 'firestore' };
+        }
+
         // Load venues from Firebase
         loadBtn.addEventListener('click', async () => {
             const district = districtSelect.value;
@@ -443,22 +483,8 @@
             loadBtn.disabled = true;
 
             try {
-                const venuesRef = collection(db, 'venues');
-                const q = query(venuesRef, where('district', '==', district));
-                const snapshot = await getDocs(q);
-
-                venues = [];
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    if (data.name) {
-                        venues.push({
-                            id: doc.id,
-                            name: data.name,
-                            address: data.address || '',
-                            district: data.district
-                        });
-                    }
-                });
+                const result = await loadDistrictVenues(district);
+                venues = result.venues;
 
                 // Sort alphabetically
                 venues.sort((a, b) => a.name.localeCompare(b.name));
@@ -468,8 +494,11 @@
                 selectAllRow.style.display = 'flex';
                 generateBtn.disabled = venues.length === 0;
                 
-                showStatus(`Loaded ${venues.length} venues from District ${district}`);
-                setTimeout(hideStatus, 3000);
+                const sourceNote = result.source === 'snapshot'
+                    ? ' (from published snapshot)'
+                    : ' (from Firestore — run Apps Script menu 4 to publish snapshot)';
+                showStatus(`Loaded ${venues.length} venues from District ${district}${sourceNote}`);
+                setTimeout(hideStatus, 4000);
 
             } catch (error) {
                 console.error('Error loading venues:', error);
