@@ -5,3 +5,4 @@ __pycache__/
 .DS_Store
 node_modules/
 districts_after_dark.code-workspace
+scripts/og_build/libs/
