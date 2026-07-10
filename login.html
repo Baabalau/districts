@@ -297,7 +297,16 @@
                 successMsg.textContent = `A login link has been sent to ${email}. Please check your inbox and click the link to continue.`;
             } catch (error) {
                 console.error(error);
-                errorMsg.textContent = error.message.replace("Firebase: ", "");
+                // auth/operation-not-allowed => the Email Link provider is disabled
+                // in the Firebase Console. Show a human message and steer users to
+                // the Google button, which uses a separate (working) provider.
+                if (error.code === 'auth/operation-not-allowed') {
+                    errorMsg.textContent = "Email login is temporarily unavailable. Please use \"Sign in with Google\" below, or try again shortly.";
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMsg.textContent = "Please enter a valid email address.";
+                } else {
+                    errorMsg.textContent = error.message.replace("Firebase: ", "");
+                }
                 submitBtn.disabled = false;
                 submitBtn.textContent = "Send Magic Link";
             }
