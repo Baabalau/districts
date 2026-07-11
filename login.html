@@ -181,6 +181,7 @@
             margin-bottom: 15px;
             font-weight: bold;
             line-height: 1.5;
+            text-align: left;
         }
     </style>
     <link rel="stylesheet" href="css/site-footer.css">
@@ -318,13 +319,7 @@
                 
                 authFormContainer.style.display = "none";
                 authInstructions.style.display = "none";
-                successMsg.innerHTML = `A login link has been sent to <strong>${email}</strong>.<br><br>
-                    Check your inbox and spam/junk folder. The sender is
-                    <strong>noreply@districts-after-dark.firebaseapp.com</strong>.
-                    It can take a few minutes to arrive.<br><br>
-                    <span style="font-size:0.95rem;color:var(--text-secondary);">
-                    Corporate and organization email servers often block Firebase login emails.
-                    If nothing arrives, try Gmail or use Sign in with Google.</span>`;
+                successMsg.innerHTML = `Link sent to <strong>${email}</strong>. Check spam if you don't see it.`;
                 submitBtn.textContent = "Send Magic Link";
             } catch (error) {
                 console.error('Magic link send failed:', error.code, error.message, actionCodeSettings.url);
