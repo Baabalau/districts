@@ -27,8 +27,8 @@ body {
     background-color: var(--bg-primary);
     color: var(--text-primary);
     font-family: var(--font-main);
-    font-size: 1.25rem;
-    line-height: 1.6;
+    font-size: 1.375rem;
+    line-height: 32px;
     text-align: left;
 }
 
