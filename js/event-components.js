@@ -489,9 +489,9 @@ function renderHostStop(stop, index, vars) {
     // Stop links out to the host's social account or official bio page.
     let hostLinkHtml = '';
     if (hostRole === 'influencer' && vars.influencerSocialUrl) {
-        hostLinkHtml = `<a href="${vars.influencerSocialUrl}" target="_blank" rel="noopener noreferrer" class="stop-host-link">Follow ${vars.influencerName} ${socialHandleFromUrl(vars.influencerSocialUrl)}</a>`;
+        hostLinkHtml = `<a href="${vars.influencerSocialUrl}" target="_blank" rel="noopener noreferrer" class="stop-host-link">Follow ${socialHandleFromUrl(vars.influencerSocialUrl)}</a>`;
     } else if (hostRole === 'council' && vars.councilBioUrl) {
-        hostLinkHtml = `<a href="${vars.councilBioUrl}" target="_blank" rel="noopener noreferrer" class="stop-host-link">View ${vars.councilName}'s Official Bio</a>`;
+        hostLinkHtml = `<a href="${vars.councilBioUrl}" target="_blank" rel="noopener noreferrer" class="stop-host-link">View ${vars.councilName}'s bio</a>`;
     }
 
     return `
@@ -948,7 +948,7 @@ class EventLayout extends HTMLElement {
             ${renderVoteModals(districtCopy.district)}
 
             <!-- Local Legends Photo Wall Bento Grid (populated from check-in photos) -->
-            <div class="local-legends-section js-reveal reveal-opacity" style="padding: 30px 0; background: var(--bg-primary); width: 100%; overflow: hidden;">
+            <div class="local-legends-section js-reveal reveal-opacity" style="background: var(--bg-primary); width: 100%; overflow: hidden;">
                 <h2 class="title-3d section-title" id="local-legends-title">Become a Local Legend</h2>
                 <p id="local-legends-subtitle">Earn 50 points every time you check in at a hospitality business in District ${districtCopy.district} &mdash;<br>reach 500 to become a Local Legend.</p>
 
@@ -990,18 +990,26 @@ class EventLayout extends HTMLElement {
                 /* Local Legends Bento Wall Styles */
                 .bento-photo-wall {
                     display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-                    grid-auto-rows: 200px;
+                    grid-template-columns: repeat(3, 1fr);
+                    grid-auto-rows: 100px;
                     grid-auto-flow: dense;
-                    gap: 12px;
-                    padding: 0 clamp(32px, 6vw, 72px);
+                    gap: 8px;
+                    padding: 0 20px;
                     max-width: 1120px;
                     margin: 0 auto;
+                }
+
+                /* Keep every tile uniform on phones — no oversized bento spans */
+                .bento-large,
+                .bento-tall,
+                .bento-wide {
+                    grid-column: span 1;
+                    grid-row: span 1;
                 }
                 
                 .bento-item {
                     position: relative;
-                    border-radius: 12px;
+                    border-radius: 8px;
                     overflow: hidden;
                     background-size: cover;
                     background-position: center;
@@ -1034,7 +1042,7 @@ class EventLayout extends HTMLElement {
                     background: linear-gradient(to top, rgba(15,22,38,0.9) 0%, rgba(15,22,38,0.2) 50%, rgba(15,22,38,0) 100%);
                     display: flex;
                     align-items: flex-end;
-                    padding: 20px;
+                    padding: 8px 10px;
                     opacity: 0;
                     transition: opacity 0.3s ease;
                 }
@@ -1046,9 +1054,10 @@ class EventLayout extends HTMLElement {
                 .bento-overlay span {
                     color: var(--text-primary);
                     font-family: var(--font-hero);
-                    font-size: 1.5rem;
+                    font-size: 0.75rem;
+                    line-height: 1.05;
                     text-transform: uppercase;
-                    letter-spacing: 1px;
+                    letter-spacing: 0.4px;
                     transform: translateY(15px);
                     transition: transform 0.3s ease;
                 }
@@ -1094,8 +1103,51 @@ class EventLayout extends HTMLElement {
 
                 @media (min-width: 768px) {
                     .bento-photo-wall {
-                        grid-template-columns: repeat(4, 1fr);
+                        grid-template-columns: repeat(3, 1fr);
+                        grid-auto-rows: 130px;
+                        gap: 10px;
+                        padding: 0 clamp(24px, 5vw, 48px);
+                        max-width: 800px;
                     }
+
+                    .bento-item {
+                        border-radius: 10px;
+                    }
+
+                    .bento-overlay {
+                        padding: 10px 12px;
+                    }
+
+                    .bento-overlay span {
+                        font-size: 0.75rem;
+                        line-height: 1.1;
+                        letter-spacing: 0.5px;
+                    }
+                }
+
+                @media (min-width: 1024px) {
+                    .bento-photo-wall {
+                        grid-template-columns: repeat(4, 1fr);
+                        grid-auto-rows: 200px;
+                        gap: 12px;
+                        padding: 0 clamp(32px, 6vw, 72px);
+                        max-width: 1120px;
+                    }
+
+                    .bento-item {
+                        border-radius: 12px;
+                    }
+
+                    .bento-overlay {
+                        padding: 20px;
+                    }
+
+                    .bento-overlay span {
+                        font-size: 1.5rem;
+                        line-height: 1.2;
+                        letter-spacing: 1px;
+                    }
+
                     .bento-large {
                         grid-column: span 2;
                         grid-row: span 2;

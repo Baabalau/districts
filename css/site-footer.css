@@ -139,8 +139,13 @@
 
     .site-footer-contact-spacer {
         display: block;
-        flex: 0 0 68px;
-        width: 68px;
+        flex: 0 0 46px;
+        width: 46px;
+    }
+
+    .footer-seal {
+        width: 46px;
+        height: 46px;
     }
 
     .site-footer-meta-row {
