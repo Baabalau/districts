@@ -519,6 +519,21 @@
         left: 46%;
         margin-top: 0;
     }
+
+    .hero-cards-stack .card-caption {
+        padding: 8px 6px;
+    }
+
+    .hero-cards-stack .card-caption .interior-hosts {
+        font-size: 15px;
+        line-height: 1.15;
+    }
+
+    .hero-cards-stack .card-caption .interior-neighborhoods {
+        font-size: 13px;
+        line-height: 1.2;
+        margin-top: 2px;
+    }
 }
 
 /* Crawl-tinery / proceedings intro */
@@ -579,6 +594,11 @@
     }
 }
 
+/* Local Legends section */
+.local-legends-section {
+    padding: 30px 0 160px;
+}
+
 /* Local Legends section header */
 .local-legends-section #local-legends-title {
     margin-bottom: 38px;
@@ -591,6 +611,12 @@
     max-width: 640px;
     margin: 0 auto 40px;
     line-height: 1.5;
+}
+
+@media (min-width: 768px) {
+    .local-legends-section {
+        padding-bottom: 200px;
+    }
 }
 
 /* Purpose Section (from index.html) */
