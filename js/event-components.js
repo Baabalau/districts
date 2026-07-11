@@ -1390,7 +1390,7 @@ class EventLayout extends HTMLElement {
             const caption = escapeHtml(isLegendsMode ? p.displayName : p.venueName);
             return `
                 <div class="bento-item ${sizeClass}">
-                    <img class="bento-photo" src="${encodeURI(p.photoUrl)}" alt="${caption}" loading="lazy">
+                    <img class="bento-photo" src="${escapeHtml(p.photoUrl)}" alt="${caption}" loading="lazy">
                     ${badge}
                     <div class="bento-overlay"><span>${caption}</span></div>
                 </div>`;
