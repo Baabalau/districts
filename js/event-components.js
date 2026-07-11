@@ -213,19 +213,26 @@ function itineraryStyles() {
             display: block;
             margin-top: 14px;
             font-weight: 700;
-            font-size: 0.95rem;
+            font-size: var(--body-text-size);
+            line-height: var(--body-line-height);
             color: var(--text-primary);
             text-decoration: none;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            white-space: normal;
+            overflow-wrap: anywhere;
         }
         .stop-host-link:hover { text-decoration: underline; }
 
+        .proc-card-body {
+            margin: 0;
+            font-size: var(--body-text-size);
+            line-height: var(--body-line-height);
+            color: var(--text-secondary);
+        }
+
         .election-runoff-date {
             margin: 10px 0 0 0;
-            font-size: 1.3rem;
-            line-height: 1.5;
+            font-size: var(--body-text-size);
+            line-height: var(--body-line-height);
             color: var(--text-primary);
             font-weight: 600;
         }
@@ -236,8 +243,8 @@ function itineraryStyles() {
         }
         .election-runoff-disclaimer {
             margin: 8px 0 0 0;
-            font-size: 0.95rem;
-            line-height: 1.5;
+            font-size: var(--body-text-size);
+            line-height: var(--body-line-height);
             color: var(--text-secondary);
         }
         .election-runoff-disclaimer em {
@@ -257,10 +264,18 @@ function itineraryStyles() {
             color: var(--text-primary); margin: 0 0 6px 0; font-size: 1.3rem; font-family: var(--font-header); text-transform: uppercase; letter-spacing: 1px;
         }
         .proc-instructions > p.hiw-intro {
-            margin: 0 0 20px 0; color: var(--text-secondary); font-size: 1rem; line-height: 1.5; max-width: 620px;
+            margin: 0 0 20px 0;
+            color: var(--text-secondary);
+            font-size: var(--body-text-size);
+            line-height: var(--body-line-height);
+            max-width: 620px;
         }
         .proc-instructions ul {
-            margin: 0; padding-left: 20px; color: var(--text-main); font-size: 1.05rem; line-height: 1.6;
+            margin: 0;
+            padding-left: 20px;
+            color: var(--text-main);
+            font-size: var(--body-text-size);
+            line-height: var(--body-line-height);
         }
         .proc-instructions li { margin-bottom: 12px; }
         .proc-instructions li:last-child { margin-bottom: 0; }
@@ -308,8 +323,8 @@ function itineraryStyles() {
         }
         .hiw-card p {
             margin: 0;
-            font-size: 0.92rem;
-            line-height: 1.55;
+            font-size: var(--body-text-size);
+            line-height: var(--body-line-height);
             color: var(--text-secondary);
         }
         .hiw-scroll-cue {
@@ -364,8 +379,8 @@ function itineraryStyles() {
         }
         .reveal-body {
             margin: 0 0 22px 0;
-            font-size: 1.05rem;
-            line-height: 1.6;
+            font-size: var(--body-text-size);
+            line-height: var(--body-line-height);
             color: var(--text-secondary);
         }
         .reveal-actions { display: flex; gap: 12px; flex-wrap: wrap; }
@@ -489,7 +504,7 @@ function renderHostStop(stop, index, vars) {
                             <h3 style="margin: 0; font-size: 1.7rem; line-height: 36px; font-family: var(--font-header); text-transform: uppercase;">${interpolate(stop.title, vars)}</h3>
                         </div>
                     </div>
-                    <p style="margin: 0; font-size: 1.1rem; line-height: 1.6; color: var(--text-secondary);">${interpolate(stop.body, vars)}</p>
+                    <p class="proc-card-body">${interpolate(stop.body, vars)}</p>
                     ${hostLinkHtml}
                 </div>
             </div>`;
@@ -510,7 +525,7 @@ function renderElectionStop() {
                             <h3 style="margin: 0; font-size: 1.7rem; line-height: 36px; font-family: var(--font-header); text-transform: uppercase;">Tell Us Where to End the Night</h3>
                         </div>
                     </div>
-                    <p style="margin: 0; font-size: 1.15rem; line-height: 1.6; color: var(--text-secondary);">Your favorite neighborhood restaurant? A dive bar? A great spot for live music? It's up to you!</p>
+                    <p class="proc-card-body">Your favorite neighborhood restaurant? A dive bar? A great spot for live music? It's up to you!</p>
                     <p class="election-runoff-date" id="election-runoff-date">A run-off of your top ten choices starts <span class="runoff-date-value">soon</span>.</p>
                     <p class="election-runoff-disclaimer"><em>* Event hosts (Nighttime Economy, Council Office and influencer) must agree to appear at a location for it to be included in the run-off.</em></p>
 
