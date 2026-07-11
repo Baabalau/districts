@@ -339,10 +339,19 @@
                     // 2. Local Legend (Global) points logic - ONLY ON FIRST VISIT
                     if (isFirstVisit) {
                         const userRef = doc(db, "users", user.uid);
-                        await updateDoc(userRef, {
+                        // setDoc(merge) rather than updateDoc: a first-time sign-in can land
+                        // straight on this page before auth.js has created the profile doc,
+                        // and updateDoc throws not-found in that race — silently dropping the
+                        // +50 (the customer doc is already written, so the check-in "sticks"
+                        // with zero points). Merging creates the doc if missing; including uid
+                        // satisfies the users create rule.
+                        await setDoc(userRef, {
+                            uid: user.uid,
+                            email: user.email,
+                            displayName: userData.displayName || "Crawler",
                             checkIns: arrayUnion(venueId),
                             totalPoints: increment(50)
-                        });
+                        }, { merge: true });
                         pointsAward.style.display = "block";
                         pointsAward.textContent = "+50 Points!";
                     } else {

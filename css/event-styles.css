@@ -141,9 +141,8 @@
 }
 
 .hero-left p strong {
-    text-decoration: underline;
-    text-decoration-thickness: 2px;
-    text-underline-offset: 4px;
+    font-style: italic;
+    text-decoration: none;
 }
 
 .hero-left .brand-btn {
@@ -578,6 +577,20 @@
     .section-title.title-3d {
         font-size: clamp(2rem, 7.5vw, 2.8rem);
     }
+}
+
+/* Local Legends section header */
+.local-legends-section #local-legends-title {
+    margin-bottom: 38px;
+}
+
+.local-legends-section #local-legends-subtitle {
+    text-align: center;
+    font-size: 1.15rem;
+    color: var(--text-secondary);
+    max-width: 640px;
+    margin: 0 auto 40px;
+    line-height: 1.5;
 }
 
 /* Purpose Section (from index.html) */

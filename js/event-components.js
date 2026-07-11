@@ -950,7 +950,7 @@ class EventLayout extends HTMLElement {
             <!-- Local Legends Photo Wall Bento Grid (populated from check-in photos) -->
             <div class="local-legends-section js-reveal reveal-opacity" style="padding: 30px 0; background: var(--bg-primary); width: 100%; overflow: hidden;">
                 <h2 class="title-3d section-title" id="local-legends-title">Become a Local Legend</h2>
-                <p id="local-legends-subtitle" style="text-align: center; font-size: 1.15rem; color: var(--text-secondary); max-width: 640px; margin: 40px auto 40px; line-height: 1.5;">Earn 50 points every time you check in at a hospitality business in District ${districtCopy.district} &mdash; reach 500 to become a Local Legend.</p>
+                <p id="local-legends-subtitle">Earn 50 points every time you check in at a hospitality business in District ${districtCopy.district} &mdash;<br>reach 500 to become a Local Legend.</p>
 
                 <div class="bento-photo-wall" id="local-legends-wall">
                     <div class="legends-loading" style="grid-column: 1 / -1; text-align: center; color: var(--text-secondary); padding: 40px 0;">Loading check-ins&hellip;</div>
@@ -990,12 +990,12 @@ class EventLayout extends HTMLElement {
                 /* Local Legends Bento Wall Styles */
                 .bento-photo-wall {
                     display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                    grid-auto-rows: 250px;
+                    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+                    grid-auto-rows: 200px;
                     grid-auto-flow: dense;
-                    gap: 15px;
-                    padding: 0 15px;
-                    max-width: 1400px;
+                    gap: 12px;
+                    padding: 0 clamp(32px, 6vw, 72px);
+                    max-width: 1120px;
                     margin: 0 auto;
                 }
                 
@@ -1345,7 +1345,7 @@ class EventLayout extends HTMLElement {
             subtitle.textContent = `Meet the District ${district} crawlers who earned ${LEGEND_POINTS_THRESHOLD}+ points (${LEGEND_CHECKIN_COUNT} check-ins) to reach Legend status.`;
         } else {
             title.textContent = 'Become a Local Legend';
-            subtitle.textContent = `Earn 50 points every time you check in at a hospitality business in District ${district} — reach 500 to become a Local Legend.`;
+            subtitle.innerHTML = `Earn 50 points every time you check in at a hospitality business in District ${escapeHtml(district)} &mdash;<br>reach 500 to become a Local Legend.`;
         }
     }
 
@@ -1390,7 +1390,7 @@ class EventLayout extends HTMLElement {
             const caption = escapeHtml(isLegendsMode ? p.displayName : p.venueName);
             return `
                 <div class="bento-item ${sizeClass}">
-                    <img class="bento-photo" src="${encodeURI(p.photoUrl)}" alt="${caption}" loading="lazy">
+                    <img class="bento-photo" src="${escapeHtml(p.photoUrl)}" alt="${caption}" loading="lazy">
                     ${badge}
                     <div class="bento-overlay"><span>${caption}</span></div>
                 </div>`;
