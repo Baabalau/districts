@@ -245,11 +245,30 @@
                     const ref = new URL(document.referrer);
                     if (ref.origin === window.location.origin
                         && !ref.pathname.endsWith('login.html')) {
-                        return ref.pathname.split('/').pop() + ref.search + ref.hash || 'index.html';
+                        const page = ref.pathname.split('/').pop() + ref.search + ref.hash;
+                        return page || 'index.html';
                     }
                 }
             } catch (e) { /* fall through */ }
             return 'index.html';
+        }
+
+        function consumeRedirectUrl() {
+            const fromStorage = window.localStorage.getItem('redirectAfterSignIn');
+            if (fromStorage && !fromStorage.includes('login.html')) {
+                window.localStorage.removeItem('redirectAfterSignIn');
+                return fromStorage;
+            }
+            return getRedirectUrl();
+        }
+
+        function buildContinueUrl(redirectUrl) {
+            // Keep the continue URL short and stable: login.html + optional redirect.
+            // Firebase embeds this in the email link; the domain MUST appear in
+            // Authentication → Settings → Authorized domains.
+            const base = `${window.location.origin}/login.html`;
+            if (!redirectUrl || redirectUrl === 'index.html') return base;
+            return `${base}?redirect=${encodeURIComponent(redirectUrl)}`;
         }
 
         // Ensure user document exists (used after auth completes)
@@ -273,16 +292,21 @@
             e.preventDefault();
             errorMsg.textContent = "";
             successMsg.textContent = "";
-            const email = emailInput.value;
+            const email = emailInput.value.trim().toLowerCase();
+            if (!email) {
+                errorMsg.textContent = "Please enter a valid email address.";
+                return;
+            }
 
             submitBtn.disabled = true;
             submitBtn.textContent = "Sending...";
 
             const redirectUrl = getRedirectUrl();
+            window.localStorage.setItem('redirectAfterSignIn', redirectUrl);
 
             const actionCodeSettings = {
                 // URL you want to redirect back to. The domain must be in the authorized domains list in the Firebase Console.
-                url: window.location.origin + window.location.pathname + '?redirect=' + encodeURIComponent(redirectUrl),
+                url: buildContinueUrl(redirectUrl),
                 handleCodeInApp: true,
             };
 
@@ -294,9 +318,16 @@
                 
                 authFormContainer.style.display = "none";
                 authInstructions.style.display = "none";
-                successMsg.textContent = `A login link has been sent to ${email}. Please check your inbox and click the link to continue.`;
+                successMsg.innerHTML = `A login link has been sent to <strong>${email}</strong>.<br><br>
+                    Check your inbox and spam/junk folder. The sender is
+                    <strong>noreply@districts-after-dark.firebaseapp.com</strong>.
+                    It can take a few minutes to arrive.<br><br>
+                    <span style="font-size:0.95rem;color:var(--text-secondary);">
+                    Corporate and organization email servers often block Firebase login emails.
+                    If nothing arrives, try Gmail or use Sign in with Google.</span>`;
+                submitBtn.textContent = "Send Magic Link";
             } catch (error) {
-                console.error(error);
+                console.error('Magic link send failed:', error.code, error.message, actionCodeSettings.url);
                 // auth/operation-not-allowed => the Email Link provider is disabled
                 // in the Firebase Console. Show a human message and steer users to
                 // the Google button, which uses a separate (working) provider.
@@ -304,6 +335,10 @@
                     errorMsg.textContent = "Email login is temporarily unavailable. Please use \"Sign in with Google\" below, or try again shortly.";
                 } else if (error.code === 'auth/invalid-email') {
                     errorMsg.textContent = "Please enter a valid email address.";
+                } else if (error.code === 'auth/unauthorized-continue-uri' || error.code === 'auth/invalid-continue-uri') {
+                    errorMsg.textContent = "This site domain is not authorized for login links yet. Please use Sign in with Google, or try again from districtsafterdark.com.";
+                } else if (error.code === 'auth/quota-exceeded') {
+                    errorMsg.textContent = "Too many login emails were sent recently. Please wait a few minutes or use Sign in with Google.";
                 } else {
                     errorMsg.textContent = error.message.replace("Firebase: ", "");
                 }
@@ -320,7 +355,7 @@
             try {
                 const result = await signInWithPopup(auth, provider);
                 await ensureUserDocument(result.user);
-                window.location.href = getRedirectUrl();
+                window.location.href = consumeRedirectUrl();
             } catch (error) {
                 console.error("Google Auth Error:", error);
                 if (error.code === 'auth/popup-blocked') {
@@ -351,7 +386,7 @@
                         const result = await signInWithEmailLink(auth, email, window.location.href);
                         window.localStorage.removeItem('emailForSignIn');
                         await ensureUserDocument(result.user);
-                        window.location.href = getRedirectUrl();
+                        window.location.href = consumeRedirectUrl();
                     } catch (error) {
                         console.error(error);
                         errorMsg.textContent = "Error signing in with link. The link may have expired or already been used.";
@@ -382,7 +417,7 @@
         // Check if user is already logged in, redirect them (unless they are currently processing a sign in link)
         auth.onAuthStateChanged((user) => {
             if (user && !isSignInWithEmailLink(auth, window.location.href)) {
-                window.location.href = getRedirectUrl();
+                window.location.href = consumeRedirectUrl();
             }
         });
     </script>
