@@ -13,7 +13,19 @@
     font-size: 22px;
     font-weight: 700;
     color: rgba(222, 186, 132, 1);
-    line-height: 17px;
+    line-height: 24px;
+}
+
+/* Card caption overlays — homepage carousel + event hero cards */
+.card-caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(15, 22, 38, 0.92);
+    text-align: center;
+    padding: 10px 8px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
 }
 
 .card-caption .interior-neighborhoods,
@@ -23,4 +35,13 @@
 
 .card-caption .interior-neighborhoods {
     margin-top: 4px;
+}
+
+.flow-card .card-caption .interior-hosts,
+.flow-card .card-caption .interior-neighborhoods {
+    font-size: 15px;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

@@ -237,23 +237,6 @@
     display: block;
 }
 
-.hero-cards-stack .card-caption {
-    background: rgba(15, 22, 38, 0.92);
-    padding: clamp(10px, 1.5vw, 14px) 10px;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
-}
-
-.card-caption {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background: rgba(15, 22, 38, 0.92);
-    text-align: center;
-    padding: clamp(10px, 1.5vw, 14px) 10px;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
-}
-
 .couple-ampersand {
     font-family: var(--font-header);
     font-size: clamp(1.5rem, 2.5vw, 2.2rem);
@@ -518,21 +501,6 @@
         top: 42%;
         left: 46%;
         margin-top: 0;
-    }
-
-    .hero-cards-stack .card-caption {
-        padding: 8px 6px;
-    }
-
-    .hero-cards-stack .card-caption .interior-hosts {
-        font-size: 15px;
-        line-height: 1.15;
-    }
-
-    .hero-cards-stack .card-caption .interior-neighborhoods {
-        font-size: 13px;
-        line-height: 1.2;
-        margin-top: 2px;
     }
 }
 
