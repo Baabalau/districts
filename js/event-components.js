@@ -215,7 +215,7 @@ function itineraryStyles() {
             font-weight: 700;
             font-size: var(--body-text-size);
             line-height: var(--body-line-height);
-            color: var(--text-primary);
+            color: var(--brand-red);
             text-decoration: none;
             white-space: normal;
             overflow-wrap: anywhere;
@@ -568,21 +568,21 @@ function renderRevealCard({ role, roleLabel, stopNumber, alignClass, avatar, hos
 
     let hostLinkHtml = '';
     if (hostLinkUrl) {
-        hostLinkHtml = `<a href="${hostLinkUrl}" target="_blank" rel="noopener noreferrer" class="stop-host-link" style="font-size: var(--body-text-size); font-weight: 600; color: var(--accent); text-decoration: none; display: inline-block;">${hostLinkText}</a>`;
+        hostLinkHtml = `<a href="${hostLinkUrl}" target="_blank" rel="noopener noreferrer" class="stop-host-link" style="font-size: var(--body-text-size); font-weight: 600; color: var(--brand-red); text-decoration: none; display: inline-block; margin: 0;">${hostLinkText}</a>`;
     }
 
     // Business website link text
     const websiteLinkText = businessName ? `${businessName} on the web` : 'Visit Website';
     let websiteHtml = '';
     if (website) {
-        websiteHtml = `<a href="${website}" target="_blank" rel="noopener noreferrer" class="stop-host-link" data-field="website" style="font-size: var(--body-text-size); font-weight: 600; color: var(--accent); text-decoration: none; display: inline-block;">${websiteLinkText}</a>`;
+        websiteHtml = `<a href="${website}" target="_blank" rel="noopener noreferrer" class="stop-host-link" data-field="website" style="font-size: var(--body-text-size); font-weight: 600; color: var(--brand-red); text-decoration: none; display: inline-block; margin: 0;">${websiteLinkText}</a>`;
     } else {
         // Placeholder for dynamic population
-        websiteHtml = `<a href="#" target="_blank" rel="noopener noreferrer" class="stop-host-link" data-field="website" data-business-name="${businessName || ''}" style="font-size: var(--body-text-size); font-weight: 600; color: var(--accent); text-decoration: none; display: none;">Visit Website</a>`;
+        websiteHtml = `<a href="#" target="_blank" rel="noopener noreferrer" class="stop-host-link" data-field="website" data-business-name="${businessName || ''}" style="font-size: var(--body-text-size); font-weight: 600; color: var(--brand-red); text-decoration: none; display: none; margin: 0;">Visit Website</a>`;
     }
 
     const linksSection = (hostLinkHtml || websiteHtml) ? 
-        `<div style="margin-top: 5px; display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+        `<div style="margin-top: 4px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; line-height: 1.3;">
             ${hostLinkHtml}
             ${websiteHtml}
         </div>` : '';
@@ -600,12 +600,12 @@ function renderRevealCard({ role, roleLabel, stopNumber, alignClass, avatar, hos
                     
                     <div class="reveal-business-info" style="margin-top: 35px; margin-bottom: 12px; position: relative; text-align: center;">
                         <img class="reveal-card-media" data-field="image" src="${image || ''}" alt="${businessName || ''}" style="width: 100%; max-width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin: 0 auto; display: ${image ? 'block' : 'none'};">
-                        <h4 class="reveal-business-name" data-field="name" style="position: absolute; top: 0; left: 0; right: 0; margin: 0; padding: 8px 12px; font-size: 2.2rem; font-family: var(--font-header); color: var(--brand-red); text-transform: uppercase; background: var(--text-primary); border-radius: 8px 8px 0 0; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">${businessName || 'To Be Revealed'}</h4>
+                        <h4 class="reveal-business-name" data-field="name" style="position: absolute; top: 0; left: 0; right: 0; margin: 0; padding: 8px 12px; font-size: 2.2rem; font-family: var(--font-header); color: var(--accent); text-transform: uppercase; background: var(--text-primary); border-radius: 8px 8px 0 0; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">${businessName || 'To Be Revealed'}</h4>
                     </div>
                     
                     <p class="reveal-body" data-field="body" style="margin: 0; font-size: var(--body-text-size); line-height: 1.6; color: var(--text-secondary);">${body || ''}</p>
                     
-                    <div class="reveal-business-address" data-field="address" style="font-size: var(--body-text-size); color: var(--text-secondary); margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(203, 160, 82, 0.3); ${address ? '' : 'display: none;'}">${address || ''}</div>
+                    <div class="reveal-business-address" data-field="address" style="font-size: var(--body-text-size); color: var(--text-secondary); margin-top: 8px; padding-top: 6px; border-top: 1px solid rgba(203, 160, 82, 0.3); line-height: 1.3; ${address ? '' : 'display: none;'}">${address || ''}</div>
                     
                     ${linksSection}
                 </div>
