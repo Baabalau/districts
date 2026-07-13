@@ -584,17 +584,20 @@ function renderRevealCard({ role, roleLabel, stopNumber, alignClass, avatar, hos
                         <img src="${avatar}" class="stop-avatar" alt="${hostName}">
                         <div style="text-align: left; display: flex; flex-direction: column; justify-content: center; min-height: 95px;">
                             <div class="stop-label-3d">${stopNumber === '01' ? 'FIRST STOP' : 'SECOND STOP'}</div>
-                            <h3 style="margin: 0 0 15px 0; font-size: 1.7rem; line-height: 1.2; font-family: var(--font-header); text-transform: uppercase;">${title}</h3>
-                            <h4 class="reveal-business-name" data-field="name" style="margin: 5px 0 0 0; font-size: 1.8rem; font-family: var(--font-header); color: var(--brand-green); text-transform: uppercase;">${businessName || 'To Be Revealed'}</h4>
-                            <div class="reveal-business-address" data-field="address" style="font-size: 1rem; color: var(--text-secondary); margin-top: 2px; ${address ? '' : 'display: none;'}">${address || ''}</div>
+                            <h3 style="margin: 0; font-size: 1.7rem; line-height: 1.2; font-family: var(--font-header); text-transform: uppercase;">${title}</h3>
                         </div>
                     </div>
                     
-                    <div class="reveal-business-info" style="margin-top: 25px; margin-bottom: 20px;">
-                        <img class="reveal-card-media" data-field="image" src="${image || ''}" alt="${businessName || ''}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; display: block; ${image ? '' : 'display: none;'}">
+                    <h4 class="reveal-business-name" data-field="name" style="margin: 20px 0 0 0; font-size: 2.2rem; font-family: var(--font-header); color: var(--brand-red); text-transform: uppercase;">${businessName || 'To Be Revealed'}</h4>
+                    
+                    <div class="reveal-business-info" style="margin-top: 20px; margin-bottom: 20px; text-align: center;">
+                        <img class="reveal-card-media" data-field="image" src="${image || ''}" alt="${businessName || ''}" style="width: 100%; max-width: 100%; height: 200px; object-fit: cover; border-radius: 8px; display: ${image ? 'inline-block' : 'none'};">
                     </div>
                     
-                    <p class="reveal-body" data-field="body" style="margin: 0; font-size: 1.15rem; line-height: 1.6; color: var(--text-secondary);">${body || ''}</p>
+                    <p class="reveal-body" data-field="body" style="margin: 0; font-size: var(--body-text-size); line-height: 1.6; color: var(--text-secondary);">${body || ''}</p>
+                    
+                    <div class="reveal-business-address" data-field="address" style="font-size: 1rem; color: var(--text-secondary); margin-top: 15px; ${address ? '' : 'display: none;'}">${address || ''}</div>
+                    
                     ${linksSection}
                 </div>
             </div>`;
