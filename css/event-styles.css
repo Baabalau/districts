@@ -933,15 +933,15 @@
     text-transform: uppercase;
     letter-spacing: 1px;
     color: var(--text-primary);
-    font-size: 0.9rem;
+    font-size: 1.15rem;
     font-weight: 700;
     white-space: nowrap;
     flex-shrink: 0;
 }
 .venue-operators-text {
     color: var(--text-secondary);
-    font-size: 0.9rem;
-    line-height: 1.4;
+    font-size: var(--body-text-size);
+    line-height: 1.5;
     margin: 0;
     white-space: nowrap;
     flex-shrink: 1;
