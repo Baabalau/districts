@@ -558,28 +558,38 @@ function renderElectionStop() {
 // A single "revealed pick" card for the run-off Crawl-tinery. Content is
 // populated at runtime from the venue doc + schedule (see populateRunoffCrawltinery).
 function renderRevealCard({ role, roleLabel, stopNumber, alignClass, avatar, hostName, title, hostLinkUrl, businessName, address, image, website, body }) {
-    let hostLinkHtml = '';
-    if (hostLinkUrl) {
-        hostLinkHtml = `<a href="${hostLinkUrl}" target="_blank" rel="noopener noreferrer" class="stop-host-link" style="font-size: 1.1rem; font-weight: 600; color: var(--accent); text-decoration: none; display: inline-block;">View ${hostName}'s bio</a>`;
+    // Determine link text based on role
+    let hostLinkText = '';
+    if (role === 'influencer' && hostLinkUrl) {
+        hostLinkText = `Follow ${socialHandleFromUrl(hostLinkUrl)}`;
+    } else if (hostLinkUrl) {
+        hostLinkText = `View ${hostName}'s bio`;
     }
 
+    let hostLinkHtml = '';
+    if (hostLinkUrl) {
+        hostLinkHtml = `<a href="${hostLinkUrl}" target="_blank" rel="noopener noreferrer" class="stop-host-link" style="font-size: var(--body-text-size); font-weight: 600; color: var(--accent); text-decoration: none; display: inline-block;">${hostLinkText}</a>`;
+    }
+
+    // Business website link text
+    const websiteLinkText = businessName ? `${businessName} on the web` : 'Visit Website';
     let websiteHtml = '';
     if (website) {
-        websiteHtml = `<a href="${website}" target="_blank" rel="noopener noreferrer" class="stop-host-link" data-field="website" style="font-size: 1.1rem; font-weight: 600; color: var(--accent); text-decoration: none; display: inline-block;">Visit Website</a>`;
+        websiteHtml = `<a href="${website}" target="_blank" rel="noopener noreferrer" class="stop-host-link" data-field="website" style="font-size: var(--body-text-size); font-weight: 600; color: var(--accent); text-decoration: none; display: inline-block;">${websiteLinkText}</a>`;
     } else {
         // Placeholder for dynamic population
-        websiteHtml = `<a href="#" target="_blank" rel="noopener noreferrer" class="stop-host-link" data-field="website" style="font-size: 1.1rem; font-weight: 600; color: var(--accent); text-decoration: none; display: none;">Visit Website</a>`;
+        websiteHtml = `<a href="#" target="_blank" rel="noopener noreferrer" class="stop-host-link" data-field="website" data-business-name="${businessName || ''}" style="font-size: var(--body-text-size); font-weight: 600; color: var(--accent); text-decoration: none; display: none;">Visit Website</a>`;
     }
 
     const linksSection = (hostLinkHtml || websiteHtml) ? 
-        `<div style="margin-top: 20px; display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+        `<div style="margin-top: 10px; display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
             ${hostLinkHtml}
             ${websiteHtml}
         </div>` : '';
 
     return `
             <div class="proc-step ${alignClass}" data-pick-role="${role}">
-                <div class="proc-card reveal-card">
+                <div class="proc-card reveal-card" style="padding-top: 45px;">
                     <div class="stop-avatar-container" style="align-items: flex-start;">
                         <img src="${avatar}" class="stop-avatar" alt="${hostName}">
                         <div style="text-align: left; display: flex; flex-direction: column; justify-content: center; min-height: 95px;">
@@ -588,15 +598,14 @@ function renderRevealCard({ role, roleLabel, stopNumber, alignClass, avatar, hos
                         </div>
                     </div>
                     
-                    <h4 class="reveal-business-name" data-field="name" style="margin: 20px 0 0 0; font-size: 2.2rem; font-family: var(--font-header); color: var(--brand-red); text-transform: uppercase;">${businessName || 'To Be Revealed'}</h4>
-                    
-                    <div class="reveal-business-info" style="margin-top: 20px; margin-bottom: 20px; text-align: center;">
-                        <img class="reveal-card-media" data-field="image" src="${image || ''}" alt="${businessName || ''}" style="width: 100%; max-width: 100%; height: 200px; object-fit: cover; border-radius: 8px; display: ${image ? 'inline-block' : 'none'};">
+                    <div class="reveal-business-info" style="margin-top: 20px; margin-bottom: 12px; position: relative; text-align: center;">
+                        <img class="reveal-card-media" data-field="image" src="${image || ''}" alt="${businessName || ''}" style="width: 100%; max-width: 100%; height: 200px; object-fit: cover; border-radius: 8px; display: ${image ? 'block' : 'none'};">
+                        <h4 class="reveal-business-name" data-field="name" style="position: absolute; top: 0; left: 0; right: 0; margin: 0; padding: 8px 12px; font-size: 2.2rem; font-family: var(--font-header); color: var(--brand-red); text-transform: uppercase; background: var(--text-primary); border-radius: 8px 8px 0 0;">${businessName || 'To Be Revealed'}</h4>
                     </div>
                     
                     <p class="reveal-body" data-field="body" style="margin: 0; font-size: var(--body-text-size); line-height: 1.6; color: var(--text-secondary);">${body || ''}</p>
                     
-                    <div class="reveal-business-address" data-field="address" style="font-size: 1rem; color: var(--text-secondary); margin-top: 15px; ${address ? '' : 'display: none;'}">${address || ''}</div>
+                    <div class="reveal-business-address" data-field="address" style="font-size: var(--body-text-size); color: var(--text-secondary); margin-top: 8px; ${address ? '' : 'display: none;'}">${address || ''}</div>
                     
                     ${linksSection}
                 </div>
@@ -1566,6 +1575,7 @@ class EventLayout extends HTMLElement {
                 const websiteUrl = venue.website || venue.facebook;
                 if (webEl && websiteUrl) {
                     webEl.href = websiteUrl;
+                    webEl.textContent = venue.name ? `${venue.name} on the web` : 'Visit Website';
                     webEl.style.display = 'inline-block';
                 } else if (webEl) {
                     webEl.style.display = 'none';
