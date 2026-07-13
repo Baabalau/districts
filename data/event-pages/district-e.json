@@ -22,14 +22,24 @@
       {
         "number": "01",
         "hostRole": "council",
-        "title": "{councilName}' Lower 9 Opener",
-        "body": "{councilName} opens the crawl in the lower ninth ward with a stop that puts New Orleans East and the Lower 9 on the mapùmusic, food, and a room full of neighborhood pride."
+        "title": "{councilName}'s Lower 9 Opener",
+        "body": "{councilName} opens the crawl in the lower ninth ward with a stop that puts New Orleans East and the Lower 9 on the map\u2014music, food, and a room full of neighborhood pride.",
+        "runoffBody": "{councilName} opens the crawl in the lower ninth ward at Mercede's Place, a stop that puts Holy Cross on the map\u2014music, food, and a room full of Lower 9 pride.",
+        "businessName": "Mercede's Place",
+        "address": "5200 Burgundy St",
+        "website": "https://www.facebook.com/p/Mercedes-Place-100057569195380/",
+        "image": "assets/mercede_place.png"
       },
       {
         "number": "02",
         "hostRole": "influencer",
-        "title": "{influencerName}' NO East Favorite",
-        "body": "{influencerName} chooses a second stop rooted in the community: a place where locals gather, support each other, and keep the culture alive after dark."
+        "title": "{influencerName}'s NO East Favorite",
+        "body": "{influencerName} chooses a second stop rooted in the community: a place where locals gather, support each other, and keep the culture alive after dark.",
+        "runoffBody": "{influencerName} chooses The Blue Flamingo for our second stop, rooted in the community: a place where locals gather and keep the good vibes going after dark.",
+        "businessName": "The Blue Flamingo",
+        "address": "10800 Hayne Blvd",
+        "website": "https://haluwana.com/",
+        "image": "assets/blue_flamingo.png"
       },
       {
         "number": "03",

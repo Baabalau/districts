@@ -681,7 +681,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             };
 
             // Vote-ranked leaderboard (top 10), shown in the Leaderboard pane.
-            const updateLeaderboard = (selector, limit) => {
+            // During run-off, only show venues that actually have votes (no "Awaiting Votes" slots).
+            const updateLeaderboard = (selector, limit, isRunoff = false) => {
                 const leaderboard = eventLayout.querySelector(selector);
                 if (!leaderboard) return;
 
@@ -689,9 +690,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                 if (!list) return;
 
                 const venuesWithVotes = sortedVenues.filter(v => (v.voteCount || 0) > 0);
+                
+                // During run-off, show only venues with votes (up to limit)
+                // During round-1, show empty slots up to limit
+                const displayCount = isRunoff ? Math.min(venuesWithVotes.length, limit) : limit;
+                
                 let htmlString = '';
 
-                for (let i = 0; i < limit; i++) {
+                for (let i = 0; i < displayCount; i++) {
                     const v = venuesWithVotes[i];
                     const badgeClass = i === 0 ? 'gold' : (i === 1 ? 'silver' : (i === 2 ? 'bronze' : 'dark-gray'));
                     const leftIndicator = `<span class="rank-badge ${badgeClass}">${i + 1}</span>`;
@@ -703,15 +709,28 @@ document.addEventListener("DOMContentLoaded", async () => {
                             subtitleHtml: buildLeaderboardSubtitle(v),
                             actionsHtml: renderVenueActions(v)
                         });
-                    } else {
+                    } else if (!isRunoff) {
+                        // Only show "Awaiting Votes" during round-1
                         htmlString += renderVenueCard({
                             leftIndicatorHtml: leftIndicator,
                             nameHtml: `<strong class="venue-name venue-name-placeholder">Awaiting Votes...</strong>`
                         });
                     }
                 }
+                
+                // If no venues have votes during run-off, show a message
+                if (isRunoff && venuesWithVotes.length === 0) {
+                    htmlString = '<li class="venue-card" style="text-align: center; padding: 20px; color: var(--text-secondary); font-style: italic;">No businesses received votes before the run-off.</li>';
+                }
 
                 list.innerHTML = htmlString;
+            };
+            
+            // Expose a function to refresh leaderboards when state changes
+            window.refreshLeaderboards = (stateId) => {
+                const isRunoff = stateId === 'run-off';
+                updateLeaderboard('#state-round-1 .leaderboard', 10, isRunoff);
+                updateLeaderboard('#state-run-off .leaderboard', 10, isRunoff);
             };
 
             // Combined Venue Explorer: one component toggling between the vote-ranked
@@ -722,7 +741,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 if (!explorer) return;
 
                 // Leaderboard pane (vote rankings)
-                updateLeaderboard(`${stateSelector} .leaderboard`, 10);
+                // Check current election state to determine if we're in run-off mode
+                const isRunoff = window.currentElectionState === 'run-off' || window._displayedElectionState === 'run-off';
+                updateLeaderboard(`${stateSelector} .leaderboard`, 10, isRunoff);
 
                 // Browse pane: search + alphabetical sort + type filter, applied client-side
                 const searchInput = explorer.querySelector('.venue-search');

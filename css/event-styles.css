@@ -933,15 +933,15 @@
     text-transform: uppercase;
     letter-spacing: 1px;
     color: var(--text-primary);
-    font-size: 0.9rem;
+    font-size: 1.15rem;
     font-weight: 700;
     white-space: nowrap;
     flex-shrink: 0;
 }
 .venue-operators-text {
     color: var(--text-secondary);
-    font-size: 0.9rem;
-    line-height: 1.4;
+    font-size: var(--body-text-size);
+    line-height: 1.5;
     margin: 0;
     white-space: nowrap;
     flex-shrink: 1;
@@ -954,6 +954,16 @@
     flex-shrink: 0;
 }
 
+@media (max-width: 1024px) {
+    .venue-operators-label {
+        font-size: 1.05rem;
+    }
+    .venue-operators-text {
+        font-size: 1.15rem;
+        line-height: 1.5;
+    }
+}
+
 @media (max-width: 768px) {
     .venue-operators-strip {
         flex-direction: column;
@@ -963,13 +973,13 @@
         padding: 16px 12px 0;
     }
     .venue-operators-label {
-        font-size: 0.8rem;
+        font-size: 1.2rem;
         white-space: normal;
     }
     .venue-operators-text {
-        font-size: 0.85rem;
+        font-size: var(--body-text-size);
         white-space: normal;
-        line-height: 1.45;
+        line-height: 1.5;
         flex-shrink: 1;
     }
     .venue-operators-btn {
@@ -1156,8 +1166,17 @@
 .small-clock .time-box span { font-size: 1.8rem; }
 
 /* Map filters bar: full-width countdown + left-aligned legend */
+#legend-round-subtitle {
+    color: var(--text-secondary);
+    font-size: 1.2rem;
+    font-family: var(--font-hero);
+    letter-spacing: 1px;
+    margin-top: 2px;
+    text-align: left;
+}
 .map-filters-inner > div:first-child {
     padding: 5px;
+    align-items: flex-start;
 }
 .map-filters-inner .countdown-clock.small-clock {
     width: 100%;

@@ -215,7 +215,7 @@ function itineraryStyles() {
             font-weight: 700;
             font-size: var(--body-text-size);
             line-height: var(--body-line-height);
-            color: var(--text-primary);
+            color: var(--brand-red);
             text-decoration: none;
             white-space: normal;
             overflow-wrap: anywhere;
@@ -557,25 +557,56 @@ function renderElectionStop() {
 
 // A single "revealed pick" card for the run-off Crawl-tinery. Content is
 // populated at runtime from the venue doc + schedule (see populateRunoffCrawltinery).
-function renderRevealCard({ role, roleLabel, stopNumber, alignClass }) {
+function renderRevealCard({ role, roleLabel, stopNumber, alignClass, avatar, hostName, title, hostLinkUrl, businessName, address, image, website, body }) {
+    // Determine link text based on role
+    let hostLinkText = '';
+    if (role === 'influencer' && hostLinkUrl) {
+        hostLinkText = `Follow ${socialHandleFromUrl(hostLinkUrl)}`;
+    } else if (hostLinkUrl) {
+        hostLinkText = `View ${hostName}'s bio`;
+    }
+
+    let hostLinkHtml = '';
+    if (hostLinkUrl) {
+        hostLinkHtml = `<a href="${hostLinkUrl}" target="_blank" rel="noopener noreferrer" class="stop-host-link" style="font-size: var(--body-text-size); font-weight: 600; color: var(--brand-red); text-decoration: none; display: block; margin: 0;">${hostLinkText}</a>`;
+    }
+
+    // Business website link text
+    const websiteLinkText = businessName ? `${businessName} on the web` : 'Visit Website';
+    let websiteHtml = '';
+    if (website) {
+        websiteHtml = `<a href="${website}" target="_blank" rel="noopener noreferrer" class="stop-host-link" data-field="website" style="font-size: var(--body-text-size); font-weight: 600; color: var(--brand-red); text-decoration: none; display: block; margin: 0;">${websiteLinkText}</a>`;
+    } else {
+        // Placeholder for dynamic population
+        websiteHtml = `<a href="#" target="_blank" rel="noopener noreferrer" class="stop-host-link" data-field="website" data-business-name="${businessName || ''}" style="font-size: var(--body-text-size); font-weight: 600; color: var(--brand-red); text-decoration: none; display: none; margin: 0;">Visit Website</a>`;
+    }
+
+    const footerSection = (address || hostLinkHtml || websiteHtml) ?
+        `<div class="reveal-card-footer" style="margin-top: 10px; padding-top: 10px; padding-bottom: 4px; border-top: 1px solid rgba(203, 160, 82, 0.3); display: flex; flex-direction: column; gap: 6px;">
+            <div class="reveal-business-address" data-field="address" style="font-size: var(--body-text-size); color: var(--text-secondary); line-height: 1.3; margin: 0; ${address ? '' : 'display: none;'}">${address || ''}</div>
+            ${hostLinkHtml}
+            ${websiteHtml}
+        </div>` : '';
+
     return `
             <div class="proc-step ${alignClass}" data-pick-role="${role}">
-                <div class="proc-card reveal-card">
-                    <img class="reveal-card-media" data-field="image" src="" alt="" hidden>
-                    <div class="reveal-role-label">${roleLabel}'s Pick</div>
-                    <div class="reveal-stop-number">STOP ${stopNumber}</div>
-                    <h3 class="reveal-business-name" data-field="name">To Be Revealed</h3>
-                    <p class="reveal-body" data-field="body"></p>
-                    <div class="reveal-actions">
-                        <button type="button" class="reveal-btn reveal-map-link" data-field="map">
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                            Find on Map
-                        </button>
-                        <a class="reveal-btn reveal-web-link" data-field="website" href="#" target="_blank" rel="noopener noreferrer" hidden>
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-                            Visit Website
-                        </a>
+                <div class="proc-card reveal-card" style="padding-top: 45px;">
+                    <div class="stop-avatar-container" style="align-items: flex-start;">
+                        <img src="${avatar}" class="stop-avatar" alt="${hostName}">
+                        <div style="text-align: left; display: flex; flex-direction: column; justify-content: center; min-height: 95px;">
+                            <div class="stop-label-3d">${stopNumber === '01' ? 'FIRST STOP' : 'SECOND STOP'}</div>
+                            <h3 style="margin: 0; font-size: 1.7rem; line-height: 1.2; font-family: var(--font-header); text-transform: uppercase;">${title}</h3>
+                        </div>
                     </div>
+                    
+                    <div class="reveal-business-info" style="margin-top: 35px; margin-bottom: 12px; position: relative; text-align: center;">
+                        <img class="reveal-card-media" data-field="image" src="${image || ''}" alt="${businessName || ''}" style="width: 100%; max-width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin: 0 auto; display: ${image ? 'block' : 'none'};">
+                        <h4 class="reveal-business-name" data-field="name" style="position: absolute; top: 0; left: 0; right: 0; margin: 0; padding: 8px 12px; font-size: 2.2rem; font-family: var(--font-header); color: var(--accent); text-transform: uppercase; background: var(--text-primary); border-radius: 8px 8px 0 0; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">${businessName || 'To Be Revealed'}</h4>
+                    </div>
+                    
+                    <p class="reveal-body" data-field="body" style="margin: 0; font-size: var(--body-text-size); line-height: 1.6; color: var(--text-secondary);">${body || ''}</p>
+                    
+                    ${footerSection}
                 </div>
             </div>`;
 }
@@ -593,12 +624,50 @@ function renderDefaultCrawltinery(stops, vars) {
 
 // Run-off Crawl-tinery: reveals the two businesses the hosts selected, then the
 // still-live election for the third stop.
-function renderRunoffCrawltinery(vars, influencerRole, councilRole) {
+function renderRunoffCrawltinery(vars, influencerRole, councilRole, stops) {
+    const getRoleData = (role) => {
+        if (role === 'council') return { label: councilRole, avatar: vars.councilImg, name: vars.councilName, link: vars.councilBioUrl };
+        return { label: influencerRole, avatar: vars.influencerImg, name: vars.influencerName, link: vars.influencerSocialUrl };
+    };
+
+    const stop1 = stops[0];
+    const stop2 = stops[1];
+    const s1Data = getRoleData(stop1.hostRole);
+    const s2Data = getRoleData(stop2.hostRole);
+
     return `
     <div class="proceedings-container">
         ${proceedingsPathSvg()}
-        ${renderRevealCard({ role: 'influencer', roleLabel: influencerRole, stopNumber: '01', alignClass: 'left' })}
-        ${renderRevealCard({ role: 'council', roleLabel: councilRole, stopNumber: '02', alignClass: 'right' })}
+        ${renderRevealCard({ 
+            role: stop1.hostRole, 
+            roleLabel: s1Data.label, 
+            stopNumber: '01', 
+            alignClass: 'left', 
+            avatar: s1Data.avatar, 
+            hostName: s1Data.name, 
+            title: interpolate(stop1.title, vars), 
+            hostLinkUrl: s1Data.link,
+            businessName: stop1.businessName,
+            address: stop1.address,
+            image: stop1.image,
+            website: stop1.website,
+            body: interpolate(stop1.runoffBody || stop1.body, vars)
+        })}
+        ${renderRevealCard({ 
+            role: stop2.hostRole, 
+            roleLabel: s2Data.label, 
+            stopNumber: '02', 
+            alignClass: 'right', 
+            avatar: s2Data.avatar, 
+            hostName: s2Data.name, 
+            title: interpolate(stop2.title, vars), 
+            hostLinkUrl: s2Data.link,
+            businessName: stop2.businessName,
+            address: stop2.address,
+            image: stop2.image,
+            website: stop2.website,
+            body: interpolate(stop2.runoffBody || stop2.body, vars)
+        })}
         ${renderElectionStop()}
     </div>`;
 }
@@ -614,7 +683,7 @@ function renderItinerary(districtCopy, vars, shared) {
         ${renderDefaultCrawltinery(districtCopy.itinerary.stops, vars)}
     </div>
     <div id="crawltinery-runoff" style="display: none;">
-        ${renderRunoffCrawltinery(vars, influencerRole, councilRole)}
+        ${renderRunoffCrawltinery(vars, influencerRole, councilRole, districtCopy.itinerary.stops)}
     </div>`;
 }
 
@@ -632,9 +701,9 @@ function renderMapLegend() {
                 <div class="map-filters-viewport" style="background: var(--bg-secondary); margin-top: 0; margin-bottom: 0px; padding: 20px 0; border-radius: 0 0 8px 8px; width: 100%;">
                     <div class="map-filters-inner" style="width: 100%; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: nowrap; gap: 30px;">
                         
-                        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 10px; border-right: 1px solid rgba(255,255,255,0.2);">
-                            <div style="text-align: center;">
-                                <div id="legend-round-subtitle" style="color: var(--text-secondary); font-size: 1.2rem; font-family: var(--font-hero); letter-spacing: 1px; margin-top: 2px;">Top 10 run-off begins in</div>
+                        <div style="flex: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; border-right: 1px solid rgba(255,255,255,0.2);">
+                            <div style="text-align: left; width: 100%;">
+                                <div id="legend-round-subtitle">Top 10 run-off begins in</div>
                             </div>
                             <div class="countdown-clock small-clock">
                                 <div class="time-box"><span>--</span><label>Days</label></div>
@@ -666,7 +735,7 @@ function renderMapLegend() {
                             </div>
                             <div class="map-legend-item map-legend-item--top10">
                                 <div class="map-legend-dot map-legend-dot--outline"></div>
-                                <span class="map-legend-label map-legend-label--muted">Currently Top 10</span>
+                                <span id="legend-top10-label" class="map-legend-label map-legend-label--muted">Currently Top 10</span>
                             </div>
                         </div>
                     </div>
@@ -702,7 +771,7 @@ function renderVenueExplorer() {
                         </div>
                         <div class="explorer-pane leaderboard-pane">
                             <div class="leaderboard" style="margin-bottom: 0;">
-                                <h3>Current Leaders</h3>
+                                <h3 class="leaderboard-title">Current Leaders</h3>
                                 <ul class="venue-list leaderboard-list">
                                     <!-- Dynamically populated from Firestore -->
                                 </ul>
@@ -1488,28 +1557,43 @@ class EventLayout extends HTMLElement {
                 const nameEl = card.querySelector('[data-field="name"]');
                 if (nameEl && venue.name) nameEl.textContent = venue.name;
 
+                const addressEl = card.querySelector('[data-field="address"]');
+                if (addressEl && venue.address) {
+                    addressEl.textContent = venue.address;
+                    addressEl.style.display = 'block';
+                }
+
                 const imgEl = card.querySelector('[data-field="image"]');
                 if (imgEl && venue.image) {
                     imgEl.src = venue.image;
                     imgEl.alt = venue.name || '';
-                    imgEl.hidden = false;
+                    imgEl.style.display = 'block';
                 }
 
                 const webEl = card.querySelector('[data-field="website"]');
                 const websiteUrl = venue.website || venue.facebook;
                 if (webEl && websiteUrl) {
                     webEl.href = websiteUrl;
-                    webEl.hidden = false;
+                    webEl.textContent = venue.name ? `${venue.name} on the web` : 'Visit Website';
+                    webEl.style.display = 'block';
+                } else if (webEl) {
+                    webEl.style.display = 'none';
                 }
 
+                // We removed the map button from the HTML, so we don't need this logic anymore
+                // but we keep it commented out just in case
+                /*
                 const mapBtn = card.querySelector('[data-field="map"]');
                 if (mapBtn) {
+                    mapBtn.style.display = 'inline-flex';
+                    mapBtn.style.alignItems = 'center';
                     mapBtn.addEventListener('click', () => {
                         if (window.openMapPopupForVenue) window.openMapPopupForVenue(pick.id);
                         const mapSection = document.getElementById('map-section');
                         if (mapSection) mapSection.scrollIntoView({ behavior: 'smooth' });
                     });
                 }
+                */
             } catch (err) {
                 console.warn(`Unable to load run-off pick for ${pick.role}:`, err);
             }
@@ -1946,6 +2030,23 @@ class EventLayout extends HTMLElement {
                 } else {
                     legendSubtitle.innerText = 'EVENT COMPLETE';
                 }
+            }
+            
+            // Update map legend "Currently Top 10" label for run-off
+            const top10Label = document.querySelector('#legend-top10-label');
+            if (top10Label) {
+                top10Label.innerText = (stateId === 'run-off') ? 'In the Run-Off' : 'Currently Top 10';
+            }
+            
+            // Update leaderboard headers based on state
+            const leaderboardTitles = this.querySelectorAll('.leaderboard-title');
+            leaderboardTitles.forEach(h3 => {
+                h3.innerText = (stateId === 'run-off') ? 'Run-Off for Last Stop' : 'Current Leaders';
+            });
+            
+            // Refresh leaderboards to show/hide empty slots based on state
+            if (window.refreshLeaderboards) {
+                window.refreshLeaderboards(stateId);
             }
             
             states.forEach(s => {
