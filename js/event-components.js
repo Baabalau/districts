@@ -701,9 +701,9 @@ function renderMapLegend() {
                 <div class="map-filters-viewport" style="background: var(--bg-secondary); margin-top: 0; margin-bottom: 0px; padding: 20px 0; border-radius: 0 0 8px 8px; width: 100%;">
                     <div class="map-filters-inner" style="width: 100%; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: nowrap; gap: 30px;">
                         
-                        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 10px; border-right: 1px solid rgba(255,255,255,0.2);">
-                            <div style="text-align: center;">
-                                <div id="legend-round-subtitle" style="color: var(--text-secondary); font-size: 1.2rem; font-family: var(--font-hero); letter-spacing: 1px; margin-top: 2px;">Top 10 run-off begins in</div>
+                        <div style="flex: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; border-right: 1px solid rgba(255,255,255,0.2);">
+                            <div style="text-align: left; width: 100%;">
+                                <div id="legend-round-subtitle">Top 10 run-off begins in</div>
                             </div>
                             <div class="countdown-clock small-clock">
                                 <div class="time-box"><span>--</span><label>Days</label></div>
@@ -735,7 +735,7 @@ function renderMapLegend() {
                             </div>
                             <div class="map-legend-item map-legend-item--top10">
                                 <div class="map-legend-dot map-legend-dot--outline"></div>
-                                <span class="map-legend-label map-legend-label--muted">Currently Top 10</span>
+                                <span id="legend-top10-label" class="map-legend-label map-legend-label--muted">Currently Top 10</span>
                             </div>
                         </div>
                     </div>
@@ -771,7 +771,7 @@ function renderVenueExplorer() {
                         </div>
                         <div class="explorer-pane leaderboard-pane">
                             <div class="leaderboard" style="margin-bottom: 0;">
-                                <h3>Current Leaders</h3>
+                                <h3 class="leaderboard-title">Current Leaders</h3>
                                 <ul class="venue-list leaderboard-list">
                                     <!-- Dynamically populated from Firestore -->
                                 </ul>
@@ -2030,6 +2030,23 @@ class EventLayout extends HTMLElement {
                 } else {
                     legendSubtitle.innerText = 'EVENT COMPLETE';
                 }
+            }
+            
+            // Update map legend "Currently Top 10" label for run-off
+            const top10Label = document.querySelector('#legend-top10-label');
+            if (top10Label) {
+                top10Label.innerText = (stateId === 'run-off') ? 'In the Run-Off' : 'Currently Top 10';
+            }
+            
+            // Update leaderboard headers based on state
+            const leaderboardTitles = this.querySelectorAll('.leaderboard-title');
+            leaderboardTitles.forEach(h3 => {
+                h3.innerText = (stateId === 'run-off') ? 'Run-Off for Last Stop' : 'Current Leaders';
+            });
+            
+            // Refresh leaderboards to show/hide empty slots based on state
+            if (window.refreshLeaderboards) {
+                window.refreshLeaderboards(stateId);
             }
             
             states.forEach(s => {
