@@ -558,44 +558,44 @@ function renderElectionStop() {
 // A single "revealed pick" card for the run-off Crawl-tinery. Content is
 // populated at runtime from the venue doc + schedule (see populateRunoffCrawltinery).
 function renderRevealCard({ role, roleLabel, stopNumber, alignClass, avatar, hostName, title, hostLinkUrl, businessName, address, image, website, body }) {
-    const isLeft = alignClass === 'left';
-    
     let hostLinkHtml = '';
     if (hostLinkUrl) {
-        hostLinkHtml = `<div style="margin-top: 15px; margin-bottom: 0;"><a href="${hostLinkUrl}" target="_blank" rel="noopener noreferrer" class="stop-host-link">View ${hostName}'s bio</a></div>`;
+        hostLinkHtml = `<a href="${hostLinkUrl}" target="_blank" rel="noopener noreferrer" class="stop-host-link" style="font-size: 1.1rem; font-weight: 600; color: var(--accent); text-decoration: none; display: inline-block;">View ${hostName}'s bio</a>`;
     }
+
+    let websiteHtml = '';
+    if (website) {
+        websiteHtml = `<a href="${website}" target="_blank" rel="noopener noreferrer" class="stop-host-link" data-field="website" style="font-size: 1.1rem; font-weight: 600; color: var(--accent); text-decoration: none; display: inline-block;">Visit Website</a>`;
+    } else {
+        // Placeholder for dynamic population
+        websiteHtml = `<a href="#" target="_blank" rel="noopener noreferrer" class="stop-host-link" data-field="website" style="font-size: 1.1rem; font-weight: 600; color: var(--accent); text-decoration: none; display: none;">Visit Website</a>`;
+    }
+
+    const linksSection = (hostLinkHtml || websiteHtml) ? 
+        `<div style="margin-top: 20px; display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+            ${hostLinkHtml}
+            ${websiteHtml}
+        </div>` : '';
 
     return `
             <div class="proc-step ${alignClass}" data-pick-role="${role}">
                 <div class="proc-card reveal-card">
-                    <div class="stop-avatar-container">
+                    <div class="stop-avatar-container" style="align-items: flex-start;">
                         <img src="${avatar}" class="stop-avatar" alt="${hostName}">
-                        <div style="text-align: ${isLeft ? 'left' : 'right'};">
+                        <div style="text-align: left; display: flex; flex-direction: column; justify-content: center; min-height: 95px;">
                             <div class="stop-label-3d">${stopNumber === '01' ? 'FIRST STOP' : 'SECOND STOP'}</div>
-                            <h3 style="margin: 0; font-size: 1.7rem; line-height: 36px; font-family: var(--font-header); text-transform: uppercase;">${title}</h3>
+                            <h3 style="margin: 0 0 15px 0; font-size: 1.7rem; line-height: 1.2; font-family: var(--font-header); text-transform: uppercase;">${title}</h3>
+                            <h4 class="reveal-business-name" data-field="name" style="margin: 5px 0 0 0; font-size: 1.8rem; font-family: var(--font-header); color: var(--brand-green); text-transform: uppercase;">${businessName || 'To Be Revealed'}</h4>
+                            <div class="reveal-business-address" data-field="address" style="font-size: 1rem; color: var(--text-secondary); margin-top: 2px; ${address ? '' : 'display: none;'}">${address || ''}</div>
                         </div>
                     </div>
                     
-                    <div class="reveal-business-info" style="display: flex; gap: 20px; margin-top: 20px; margin-bottom: 20px; align-items: center;">
-                        <img class="reveal-card-media" data-field="image" src="${image || ''}" alt="${businessName || ''}" style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px; flex-shrink: 0; ${image ? '' : 'display: none;'}">
-                        <div>
-                            <h4 class="reveal-business-name" data-field="name" style="margin: 0 0 5px 0; font-size: 1.4rem; font-family: var(--font-header); color: var(--accent);">${businessName || 'To Be Revealed'}</h4>
-                            <div class="reveal-business-address" data-field="address" style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 10px; ${address ? '' : 'display: none;'}">${address || ''}</div>
-                            <div class="reveal-actions" style="display: flex; gap: 10px; flex-wrap: wrap;">
-                                <button type="button" class="brand-btn reveal-btn reveal-map-link" data-field="map" style="padding: 5px 10px; font-size: 0.8rem; display: none;">
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: middle;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                                    Map
-                                </button>
-                                <a class="brand-btn reveal-btn reveal-web-link" data-field="website" href="${website || '#'}" target="_blank" rel="noopener noreferrer" style="padding: 5px 10px; font-size: 0.8rem; ${website ? 'display: inline-flex; align-items: center;' : 'display: none;'}">
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: middle;"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-                                    Website
-                                </a>
-                            </div>
-                        </div>
+                    <div class="reveal-business-info" style="margin-top: 25px; margin-bottom: 20px;">
+                        <img class="reveal-card-media" data-field="image" src="${image || ''}" alt="${businessName || ''}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; display: block; ${image ? '' : 'display: none;'}">
                     </div>
                     
                     <p class="reveal-body" data-field="body" style="margin: 0; font-size: 1.15rem; line-height: 1.6; color: var(--text-secondary);">${body || ''}</p>
-                    ${hostLinkHtml}
+                    ${linksSection}
                 </div>
             </div>`;
 }
@@ -1563,10 +1563,14 @@ class EventLayout extends HTMLElement {
                 const websiteUrl = venue.website || venue.facebook;
                 if (webEl && websiteUrl) {
                     webEl.href = websiteUrl;
-                    webEl.style.display = 'inline-flex';
-                    webEl.style.alignItems = 'center';
+                    webEl.style.display = 'inline-block';
+                } else if (webEl) {
+                    webEl.style.display = 'none';
                 }
 
+                // We removed the map button from the HTML, so we don't need this logic anymore
+                // but we keep it commented out just in case
+                /*
                 const mapBtn = card.querySelector('[data-field="map"]');
                 if (mapBtn) {
                     mapBtn.style.display = 'inline-flex';
@@ -1577,6 +1581,7 @@ class EventLayout extends HTMLElement {
                         if (mapSection) mapSection.scrollIntoView({ behavior: 'smooth' });
                     });
                 }
+                */
             } catch (err) {
                 console.warn(`Unable to load run-off pick for ${pick.role}:`, err);
             }
