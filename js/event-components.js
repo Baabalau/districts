@@ -568,21 +568,22 @@ function renderRevealCard({ role, roleLabel, stopNumber, alignClass, avatar, hos
 
     let hostLinkHtml = '';
     if (hostLinkUrl) {
-        hostLinkHtml = `<a href="${hostLinkUrl}" target="_blank" rel="noopener noreferrer" class="stop-host-link" style="font-size: var(--body-text-size); font-weight: 600; color: var(--brand-red); text-decoration: none; display: inline-block; margin: 0;">${hostLinkText}</a>`;
+        hostLinkHtml = `<a href="${hostLinkUrl}" target="_blank" rel="noopener noreferrer" class="stop-host-link" style="font-size: var(--body-text-size); font-weight: 600; color: var(--brand-red); text-decoration: none; display: block; margin: 0;">${hostLinkText}</a>`;
     }
 
     // Business website link text
     const websiteLinkText = businessName ? `${businessName} on the web` : 'Visit Website';
     let websiteHtml = '';
     if (website) {
-        websiteHtml = `<a href="${website}" target="_blank" rel="noopener noreferrer" class="stop-host-link" data-field="website" style="font-size: var(--body-text-size); font-weight: 600; color: var(--brand-red); text-decoration: none; display: inline-block; margin: 0;">${websiteLinkText}</a>`;
+        websiteHtml = `<a href="${website}" target="_blank" rel="noopener noreferrer" class="stop-host-link" data-field="website" style="font-size: var(--body-text-size); font-weight: 600; color: var(--brand-red); text-decoration: none; display: block; margin: 0;">${websiteLinkText}</a>`;
     } else {
         // Placeholder for dynamic population
         websiteHtml = `<a href="#" target="_blank" rel="noopener noreferrer" class="stop-host-link" data-field="website" data-business-name="${businessName || ''}" style="font-size: var(--body-text-size); font-weight: 600; color: var(--brand-red); text-decoration: none; display: none; margin: 0;">Visit Website</a>`;
     }
 
-    const linksSection = (hostLinkHtml || websiteHtml) ? 
-        `<div style="margin-top: 4px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; line-height: 1.3;">
+    const footerSection = (address || hostLinkHtml || websiteHtml) ?
+        `<div class="reveal-card-footer" style="margin-top: 10px; padding-top: 10px; padding-bottom: 4px; border-top: 1px solid rgba(203, 160, 82, 0.3); display: flex; flex-direction: column; gap: 6px;">
+            <div class="reveal-business-address" data-field="address" style="font-size: var(--body-text-size); color: var(--text-secondary); line-height: 1.3; margin: 0; ${address ? '' : 'display: none;'}">${address || ''}</div>
             ${hostLinkHtml}
             ${websiteHtml}
         </div>` : '';
@@ -605,9 +606,7 @@ function renderRevealCard({ role, roleLabel, stopNumber, alignClass, avatar, hos
                     
                     <p class="reveal-body" data-field="body" style="margin: 0; font-size: var(--body-text-size); line-height: 1.6; color: var(--text-secondary);">${body || ''}</p>
                     
-                    <div class="reveal-business-address" data-field="address" style="font-size: var(--body-text-size); color: var(--text-secondary); margin-top: 8px; padding-top: 6px; border-top: 1px solid rgba(203, 160, 82, 0.3); line-height: 1.3; ${address ? '' : 'display: none;'}">${address || ''}</div>
-                    
-                    ${linksSection}
+                    ${footerSection}
                 </div>
             </div>`;
 }
@@ -1576,7 +1575,7 @@ class EventLayout extends HTMLElement {
                 if (webEl && websiteUrl) {
                     webEl.href = websiteUrl;
                     webEl.textContent = venue.name ? `${venue.name} on the web` : 'Visit Website';
-                    webEl.style.display = 'inline-block';
+                    webEl.style.display = 'block';
                 } else if (webEl) {
                     webEl.style.display = 'none';
                 }
