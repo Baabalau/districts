@@ -557,25 +557,45 @@ function renderElectionStop() {
 
 // A single "revealed pick" card for the run-off Crawl-tinery. Content is
 // populated at runtime from the venue doc + schedule (see populateRunoffCrawltinery).
-function renderRevealCard({ role, roleLabel, stopNumber, alignClass }) {
+function renderRevealCard({ role, roleLabel, stopNumber, alignClass, avatar, hostName, title, hostLinkUrl, businessName, address, image, website, body }) {
+    const isLeft = alignClass === 'left';
+    
+    let hostLinkHtml = '';
+    if (hostLinkUrl) {
+        hostLinkHtml = `<div style="margin-top: 15px; margin-bottom: 0;"><a href="${hostLinkUrl}" target="_blank" rel="noopener noreferrer" class="stop-host-link">View ${hostName}'s bio</a></div>`;
+    }
+
     return `
             <div class="proc-step ${alignClass}" data-pick-role="${role}">
                 <div class="proc-card reveal-card">
-                    <img class="reveal-card-media" data-field="image" src="" alt="" hidden>
-                    <div class="reveal-role-label">${roleLabel}'s Pick</div>
-                    <div class="reveal-stop-number">STOP ${stopNumber}</div>
-                    <h3 class="reveal-business-name" data-field="name">To Be Revealed</h3>
-                    <p class="reveal-body" data-field="body"></p>
-                    <div class="reveal-actions">
-                        <button type="button" class="reveal-btn reveal-map-link" data-field="map">
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                            Find on Map
-                        </button>
-                        <a class="reveal-btn reveal-web-link" data-field="website" href="#" target="_blank" rel="noopener noreferrer" hidden>
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-                            Visit Website
-                        </a>
+                    <div class="stop-avatar-container">
+                        <img src="${avatar}" class="stop-avatar" alt="${hostName}">
+                        <div style="text-align: ${isLeft ? 'left' : 'right'};">
+                            <div class="stop-label-3d">${stopNumber === '01' ? 'FIRST STOP' : 'SECOND STOP'}</div>
+                            <h3 style="margin: 0; font-size: 1.7rem; line-height: 36px; font-family: var(--font-header); text-transform: uppercase;">${title}</h3>
+                        </div>
                     </div>
+                    
+                    <div class="reveal-business-info" style="display: flex; gap: 20px; margin-top: 20px; margin-bottom: 20px; align-items: center;">
+                        <img class="reveal-card-media" data-field="image" src="${image || ''}" alt="${businessName || ''}" style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px; flex-shrink: 0; ${image ? '' : 'display: none;'}">
+                        <div>
+                            <h4 class="reveal-business-name" data-field="name" style="margin: 0 0 5px 0; font-size: 1.4rem; font-family: var(--font-header); color: var(--accent);">${businessName || 'To Be Revealed'}</h4>
+                            <div class="reveal-business-address" data-field="address" style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 10px; ${address ? '' : 'display: none;'}">${address || ''}</div>
+                            <div class="reveal-actions" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                <button type="button" class="brand-btn reveal-btn reveal-map-link" data-field="map" style="padding: 5px 10px; font-size: 0.8rem; display: none;">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: middle;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                    Map
+                                </button>
+                                <a class="brand-btn reveal-btn reveal-web-link" data-field="website" href="${website || '#'}" target="_blank" rel="noopener noreferrer" style="padding: 5px 10px; font-size: 0.8rem; ${website ? 'display: inline-flex; align-items: center;' : 'display: none;'}">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: middle;"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                                    Website
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p class="reveal-body" data-field="body" style="margin: 0; font-size: 1.15rem; line-height: 1.6; color: var(--text-secondary);">${body || ''}</p>
+                    ${hostLinkHtml}
                 </div>
             </div>`;
 }
@@ -593,12 +613,50 @@ function renderDefaultCrawltinery(stops, vars) {
 
 // Run-off Crawl-tinery: reveals the two businesses the hosts selected, then the
 // still-live election for the third stop.
-function renderRunoffCrawltinery(vars, influencerRole, councilRole) {
+function renderRunoffCrawltinery(vars, influencerRole, councilRole, stops) {
+    const getRoleData = (role) => {
+        if (role === 'council') return { label: councilRole, avatar: vars.councilImg, name: vars.councilName, link: vars.councilBioUrl };
+        return { label: influencerRole, avatar: vars.influencerImg, name: vars.influencerName, link: vars.influencerSocialUrl };
+    };
+
+    const stop1 = stops[0];
+    const stop2 = stops[1];
+    const s1Data = getRoleData(stop1.hostRole);
+    const s2Data = getRoleData(stop2.hostRole);
+
     return `
     <div class="proceedings-container">
         ${proceedingsPathSvg()}
-        ${renderRevealCard({ role: 'influencer', roleLabel: influencerRole, stopNumber: '01', alignClass: 'left' })}
-        ${renderRevealCard({ role: 'council', roleLabel: councilRole, stopNumber: '02', alignClass: 'right' })}
+        ${renderRevealCard({ 
+            role: stop1.hostRole, 
+            roleLabel: s1Data.label, 
+            stopNumber: '01', 
+            alignClass: 'left', 
+            avatar: s1Data.avatar, 
+            hostName: s1Data.name, 
+            title: interpolate(stop1.title, vars), 
+            hostLinkUrl: s1Data.link,
+            businessName: stop1.businessName,
+            address: stop1.address,
+            image: stop1.image,
+            website: stop1.website,
+            body: interpolate(stop1.runoffBody || stop1.body, vars)
+        })}
+        ${renderRevealCard({ 
+            role: stop2.hostRole, 
+            roleLabel: s2Data.label, 
+            stopNumber: '02', 
+            alignClass: 'right', 
+            avatar: s2Data.avatar, 
+            hostName: s2Data.name, 
+            title: interpolate(stop2.title, vars), 
+            hostLinkUrl: s2Data.link,
+            businessName: stop2.businessName,
+            address: stop2.address,
+            image: stop2.image,
+            website: stop2.website,
+            body: interpolate(stop2.runoffBody || stop2.body, vars)
+        })}
         ${renderElectionStop()}
     </div>`;
 }
@@ -614,7 +672,7 @@ function renderItinerary(districtCopy, vars, shared) {
         ${renderDefaultCrawltinery(districtCopy.itinerary.stops, vars)}
     </div>
     <div id="crawltinery-runoff" style="display: none;">
-        ${renderRunoffCrawltinery(vars, influencerRole, councilRole)}
+        ${renderRunoffCrawltinery(vars, influencerRole, councilRole, districtCopy.itinerary.stops)}
     </div>`;
 }
 
@@ -1488,22 +1546,31 @@ class EventLayout extends HTMLElement {
                 const nameEl = card.querySelector('[data-field="name"]');
                 if (nameEl && venue.name) nameEl.textContent = venue.name;
 
+                const addressEl = card.querySelector('[data-field="address"]');
+                if (addressEl && venue.address) {
+                    addressEl.textContent = venue.address;
+                    addressEl.style.display = 'block';
+                }
+
                 const imgEl = card.querySelector('[data-field="image"]');
                 if (imgEl && venue.image) {
                     imgEl.src = venue.image;
                     imgEl.alt = venue.name || '';
-                    imgEl.hidden = false;
+                    imgEl.style.display = 'block';
                 }
 
                 const webEl = card.querySelector('[data-field="website"]');
                 const websiteUrl = venue.website || venue.facebook;
                 if (webEl && websiteUrl) {
                     webEl.href = websiteUrl;
-                    webEl.hidden = false;
+                    webEl.style.display = 'inline-flex';
+                    webEl.style.alignItems = 'center';
                 }
 
                 const mapBtn = card.querySelector('[data-field="map"]');
                 if (mapBtn) {
+                    mapBtn.style.display = 'inline-flex';
+                    mapBtn.style.alignItems = 'center';
                     mapBtn.addEventListener('click', () => {
                         if (window.openMapPopupForVenue) window.openMapPopupForVenue(pick.id);
                         const mapSection = document.getElementById('map-section');
