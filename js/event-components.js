@@ -582,7 +582,7 @@ function renderRevealCard({ role, roleLabel, stopNumber, alignClass, avatar, hos
     }
 
     const linksSection = (hostLinkHtml || websiteHtml) ? 
-        `<div style="margin-top: 10px; display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+        `<div style="margin-top: 5px; display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
             ${hostLinkHtml}
             ${websiteHtml}
         </div>` : '';
@@ -598,14 +598,14 @@ function renderRevealCard({ role, roleLabel, stopNumber, alignClass, avatar, hos
                         </div>
                     </div>
                     
-                    <div class="reveal-business-info" style="margin-top: 20px; margin-bottom: 12px; position: relative; text-align: center;">
-                        <img class="reveal-card-media" data-field="image" src="${image || ''}" alt="${businessName || ''}" style="width: 100%; max-width: 100%; height: 200px; object-fit: cover; border-radius: 8px; display: ${image ? 'block' : 'none'};">
-                        <h4 class="reveal-business-name" data-field="name" style="position: absolute; top: 0; left: 0; right: 0; margin: 0; padding: 8px 12px; font-size: 2.2rem; font-family: var(--font-header); color: var(--brand-red); text-transform: uppercase; background: var(--text-primary); border-radius: 8px 8px 0 0;">${businessName || 'To Be Revealed'}</h4>
+                    <div class="reveal-business-info" style="margin-top: 35px; margin-bottom: 12px; position: relative; text-align: center;">
+                        <img class="reveal-card-media" data-field="image" src="${image || ''}" alt="${businessName || ''}" style="width: 100%; max-width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin: 0 auto; display: ${image ? 'block' : 'none'};">
+                        <h4 class="reveal-business-name" data-field="name" style="position: absolute; top: 0; left: 0; right: 0; margin: 0; padding: 8px 12px; font-size: 2.2rem; font-family: var(--font-header); color: var(--brand-red); text-transform: uppercase; background: var(--text-primary); border-radius: 8px 8px 0 0; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">${businessName || 'To Be Revealed'}</h4>
                     </div>
                     
                     <p class="reveal-body" data-field="body" style="margin: 0; font-size: var(--body-text-size); line-height: 1.6; color: var(--text-secondary);">${body || ''}</p>
                     
-                    <div class="reveal-business-address" data-field="address" style="font-size: var(--body-text-size); color: var(--text-secondary); margin-top: 8px; ${address ? '' : 'display: none;'}">${address || ''}</div>
+                    <div class="reveal-business-address" data-field="address" style="font-size: var(--body-text-size); color: var(--text-secondary); margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(203, 160, 82, 0.3); ${address ? '' : 'display: none;'}">${address || ''}</div>
                     
                     ${linksSection}
                 </div>
