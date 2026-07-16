@@ -674,6 +674,110 @@ function renderRunoffCrawltinery(vars, influencerRole, councilRole, stops) {
 
 // Renders both Crawl-tinery variants. The run-off variant is hidden until the
 // run-off begins; setVotingState() toggles between them based on the schedule.
+
+function renderWinnerCard(district, vars, { stepClass = '' } = {}) {
+    const stepClasses = stepClass ? ` center ${stepClass}` : ' center';
+    return `
+        <div class="proc-step${stepClasses}" style="margin-bottom: 0;">
+            <div class="proc-card reveal-card winner-card-celebration">
+                <div class="stop-avatar-container" style="align-items: flex-start;">
+                    <div class="stop-avatar" style="font-size: 2.8rem;">👑</div>
+                    <div style="text-align: left; display: flex; flex-direction: column; justify-content: center; min-height: 95px;">
+                        <div class="stop-label-3d">FINAL STOP</div>
+                        <h3 style="margin: 0; font-size: 1.7rem; line-height: 1.2; font-family: var(--font-header); text-transform: uppercase;">The People's Choice</h3>
+                    </div>
+                </div>
+
+                <div class="reveal-business-info" style="margin-top: 35px; margin-bottom: 12px; position: relative; text-align: center;">
+                    <img class="reveal-card-media" src="assets/Brittanys-539df087-ef53-4198-9d9c-e122ffb2d934.png" alt="Brittany's Restaurant and Lounge" style="width: 100%; max-width: 100%; height: 250px; object-fit: cover; border-radius: 8px; margin: 0 auto; display: block;">
+                    <h4 class="reveal-business-name" style="position: absolute; top: 0; left: 0; right: 0; margin: 0; padding: 8px 12px; font-size: 2.2rem; font-family: var(--font-header); color: var(--accent); text-transform: uppercase; background: var(--text-primary); border-radius: 8px 8px 0 0; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">Brittany's Restaurant</h4>
+                </div>
+
+                <div class="winner-card-copy">
+                    <p class="reveal-body">With <strong>46 votes from residents</strong>, Brittany's Restaurant and Lounge is the official last stop of District ${district} After Dark featuring ${vars.councilName} and ${vars.influencerName}!!</p>
+                    <p class="reveal-body winner-card-meetup">Meet us there ${vars.date} at 8:30pm!</p>
+                </div>
+            </div>
+        </div>`;
+}
+
+function renderPostElectionCrawltinery(vars, influencerRole, councilRole, stops, district) {
+    const getRoleData = (role) => {
+        if (role === 'council') return { label: councilRole, avatar: vars.councilImg, name: vars.councilName, link: vars.councilBioUrl };
+        return { label: influencerRole, avatar: vars.influencerImg, name: vars.influencerName, link: vars.influencerSocialUrl };
+    };
+
+    const stop1 = stops[0];
+    const stop2 = stops[1];
+    const s1Data = getRoleData(stop1.hostRole);
+    const s2Data = getRoleData(stop2.hostRole);
+
+    return `
+    <div class="proceedings-container">
+        ${proceedingsPathSvg()}
+        ${renderRevealCard({ 
+            role: stop1.hostRole, 
+            roleLabel: s1Data.label, 
+            stopNumber: '01', 
+            alignClass: 'left', 
+            avatar: s1Data.avatar, 
+            hostName: s1Data.name, 
+            title: interpolate(stop1.title, vars), 
+            hostLinkUrl: s1Data.link,
+            businessName: stop1.businessName,
+            address: stop1.address,
+            image: stop1.image,
+            website: stop1.website,
+            body: interpolate(stop1.runoffBody || stop1.body, vars)
+        })}
+        ${renderRevealCard({ 
+            role: stop2.hostRole, 
+            roleLabel: s2Data.label, 
+            stopNumber: '02', 
+            alignClass: 'right', 
+            avatar: s2Data.avatar, 
+            hostName: s2Data.name, 
+            title: interpolate(stop2.title, vars), 
+            hostLinkUrl: s2Data.link,
+            businessName: stop2.businessName,
+            address: stop2.address,
+            image: stop2.image,
+            website: stop2.website,
+            body: interpolate(stop2.runoffBody || stop2.body, vars)
+        })}
+        ${renderWinnerCard(district, vars, { stepClass: 'stop-3' })}
+    </div>`;
+}
+
+function renderHowItWorksCompleted() {
+    return `
+    <div class="proc-step center" style="margin-top: 40px;">
+        <div class="proc-card" style="padding-top: 35px;">
+            <div class="proc-instructions" style="border-top: none; margin-top: 0; padding-top: 0;">
+                <h4 style="font-size: 1.7rem; margin-bottom: 15px;">How It Worked</h4>
+                <p class="hiw-intro">The election is now complete! Here is how the community made their voices heard to decide the final stop.</p>
+                <div class="how-it-works-grid">
+                    <div class="hiw-card">
+                        <div class="hiw-icon">🗺️</div>
+                        <h5>Explore &amp; Vote on the Map</h5>
+                        <p>Residents browsed every bar, restaurant, live venue, and museum/gallery in the district &mdash; each one color-coded and pinned to the map above.</p>
+                    </div>
+                    <div class="hiw-card">
+                        <div class="hiw-icon">🏆</div>
+                        <h5>Browse Businesses on the Leaderboard</h5>
+                        <p>They tapped pins and used the leaderboard to vote for their favorite spots. The top 10 advanced to the run-off.</p>
+                    </div>
+                    <div class="hiw-card">
+                        <div class="hiw-icon">📲</div>
+                        <h5>Recruit More Votes</h5>
+                        <p>Crawlers copied venue links and dropped them into Instagram or TikTok stories to rally their friends and followers.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>`;
+}
+
 function renderItinerary(districtCopy, vars, shared) {
     const influencerRole = districtCopy.influencerAccountTitle || shared.roles.influencer;
     const councilRole = shared.roles.council;
@@ -684,6 +788,13 @@ function renderItinerary(districtCopy, vars, shared) {
     </div>
     <div id="crawltinery-runoff" style="display: none;">
         ${renderRunoffCrawltinery(vars, influencerRole, councilRole, districtCopy.itinerary.stops)}
+    </div>
+    <div id="crawltinery-post-election" style="display: none;">
+        ${renderPostElectionCrawltinery(vars, influencerRole, councilRole, districtCopy.itinerary.stops, districtCopy.district)}
+        ${renderHowItWorksCompleted()}
+        <div id="venue-operators-post-election" style="display: none;">
+            ${renderVenueOperatorsStrip(shared)}
+        </div>
     </div>`;
 }
 
@@ -793,7 +904,7 @@ function renderVenueExplorer(district) {
                     </div>`;
 }
 
-function renderVotingStates(district) {
+function renderVotingStates(district, vars) {
     return `
             <div class="voting-section" id="voting-module">
                 <div id="state-round-1" class="voting-state-container" style="display: block;">
@@ -820,16 +931,8 @@ function renderVotingStates(district) {
                 <div id="state-post-election" class="voting-state-container" style="display: none;">
                     <div class="voting-header">
                         <h2>The Results Are In</h2>
-                        <p>Voting has concluded for District ${district}.</p>
                     </div>
-                    <div class="winner-card">
-                        <div class="badge">WINNER</div>
-                        <img src="https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=600&h=400&fit=crop" alt="The Rusty Nail">
-                        <h3>The Rusty Nail</h3>
-                        <p>With 1,842 total votes, The Rusty Nail is the official Stop 3 for the Nightcrawl!</p>
-                        <button id="rsvp-btn" class="brand-btn" style="margin-top: 15px;">RSVP NOW</button>
-                        <p id="rsvp-msg" style="margin-top: 10px; color: var(--accent); font-weight: bold; display: none;"></p>
-                    </div>
+                    ${renderWinnerCard(district, vars)}
                 </div>
                 <div id="state-post-event" class="voting-state-container" style="display: none; padding: 40px 0; text-align: center;">
                     <div class="voting-header">
@@ -1003,8 +1106,10 @@ class EventLayout extends HTMLElement {
             <!-- Voting States Below Map -->
             <div class="voting-states-section js-reveal reveal-y delay-200" style="padding: 30px 0; margin-bottom: 30px; background: transparent;">
                 <div class="page-module">
-                ${renderVotingStates(districtCopy.district)}
-                ${renderVenueOperatorsStrip(shared)}
+                ${renderVotingStates(districtCopy.district, vars)}
+                <div id="venue-operators-voting">
+                    ${renderVenueOperatorsStrip(shared)}
+                </div>
                 </div>
             </div>
 
@@ -2016,9 +2121,27 @@ class EventLayout extends HTMLElement {
             // revealed for every later phase.
             const defaultCrawl = this.querySelector('#crawltinery-default');
             const runoffCrawl = this.querySelector('#crawltinery-runoff');
-            const picksRevealed = stateId !== 'round-1';
-            if (defaultCrawl) defaultCrawl.style.display = picksRevealed ? 'none' : 'block';
-            if (runoffCrawl) runoffCrawl.style.display = picksRevealed ? 'block' : 'none';
+            const postElectionCrawl = this.querySelector('#crawltinery-post-election');
+            
+            if (stateId === 'round-1') {
+                if (defaultCrawl) defaultCrawl.style.display = 'block';
+                if (runoffCrawl) runoffCrawl.style.display = 'none';
+                if (postElectionCrawl) postElectionCrawl.style.display = 'none';
+            } else if (stateId === 'run-off') {
+                if (defaultCrawl) defaultCrawl.style.display = 'none';
+                if (runoffCrawl) runoffCrawl.style.display = 'block';
+                if (postElectionCrawl) postElectionCrawl.style.display = 'none';
+            } else {
+                if (defaultCrawl) defaultCrawl.style.display = 'none';
+                if (runoffCrawl) runoffCrawl.style.display = 'none';
+                if (postElectionCrawl) postElectionCrawl.style.display = 'block';
+            }
+
+            const isPostElection = stateId === 'post-election' || stateId === 'post-event';
+            const votingVenueStrip = this.querySelector('#venue-operators-voting');
+            const postElectionVenueStrip = this.querySelector('#venue-operators-post-election');
+            if (votingVenueStrip) votingVenueStrip.style.display = isPostElection ? 'none' : '';
+            if (postElectionVenueStrip) postElectionVenueStrip.style.display = isPostElection ? '' : 'none';
             
             // Update map legend subtitle based on state
             const legendSubtitle = document.querySelector('#legend-round-subtitle');

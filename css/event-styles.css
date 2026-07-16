@@ -1800,6 +1800,54 @@
 .winner-card h3 { color: var(--brand-red); font-family: var(--font-header); font-size: 2rem; margin-bottom: 10px; }
 .winner-card p { color: var(--text-secondary); font-size: 1.1rem; line-height: 1.5; }
 
+/* Winner Card Celebration Animation */
+@keyframes winnerPulse {
+    0% { box-shadow: 0 0 25px rgba(203, 160, 82, 0.4); transform: scale(1); }
+    50% { box-shadow: 0 0 45px rgba(203, 160, 82, 0.85); transform: scale(1.02); }
+    100% { box-shadow: 0 0 25px rgba(203, 160, 82, 0.4); transform: scale(1); }
+}
+
+.winner-card-celebration {
+    animation: winnerPulse 3.5s infinite ease-in-out;
+    border-color: var(--text-primary) !important;
+    padding: 45px 35px 35px !important;
+    box-sizing: border-box;
+}
+
+.winner-card-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.winner-card-copy .reveal-body {
+    margin: 0;
+    font-size: var(--body-text-size);
+    line-height: 1.6;
+    color: var(--text-secondary);
+}
+
+.winner-card-meetup {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+#venue-operators-post-election {
+    margin-top: 24px;
+    margin-bottom: 30px;
+}
+
+@media (max-width: 900px) {
+    .winner-card-celebration {
+        padding: 45px 24px 28px !important;
+    }
+
+    .voting-states-section #state-post-election .proc-step.center {
+        padding-inline: 16px;
+        box-sizing: border-box;
+    }
+}
+
 /* Modals */
 .modal-overlay {
     position: fixed;
