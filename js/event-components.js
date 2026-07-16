@@ -280,7 +280,7 @@ function itineraryStyles() {
         .proc-instructions li { margin-bottom: 12px; }
         .proc-instructions li:last-child { margin-bottom: 0; }
 
-        /* Redesigned "How It Works" — focuses on the map/leaderboard below and
+        /* Redesigned "How It Works" — focuses on the map/leaderboard above and
            on recruiting votes via social shares, styled as engaging icon cards. */
         .how-it-works-grid {
             display: grid;
@@ -531,17 +531,17 @@ function renderElectionStop() {
 
                     <div class="proc-instructions">
                         <h4>How It Works</h4>
-                        <p class="hiw-intro">Every vote below is a real vote for the crawl's final stop. Here's how to make yours count.</p>
+                        <p class="hiw-intro">Every vote on the map and leaderboard above is a real vote for the crawl's final stop. Here's how to make yours count.</p>
                         <div class="how-it-works-grid">
                             <div class="hiw-card">
                                 <div class="hiw-icon">🗺️</div>
                                 <h5>Explore &amp; Vote on the Map</h5>
-                                <p>Scroll down to browse every bar, restaurant, live venue, and museum/gallery in the district &mdash; each one color-coded and pinned to the map below.</p>
+                                <p>Scroll up to browse every bar, restaurant, live venue, and museum/gallery in the district &mdash; each one color-coded and pinned to the map above.</p>
                             </div>
                             <div class="hiw-card">
                                 <div class="hiw-icon">🏆</div>
                                 <h5>Browse Businesses on the Leaderboard</h5>
-                                <p>Tap any pin, or use the leaderboard and browse list below, to vote for your favorite spots. Vote for as many businesses as you like &mdash; the top 10 advance to the run-off.</p>
+                                <p>Tap any pin, or use the leaderboard and browse list above, to vote for your favorite spots. Vote for as many businesses as you like &mdash; the top 10 advance to the run-off.</p>
                             </div>
                             <div class="hiw-card">
                                 <div class="hiw-icon">📲</div>
@@ -549,7 +549,7 @@ function renderElectionStop() {
                                 <p>Copy a venue's direct link from its map popup or leaderboard card and drop it into an Instagram or TikTok story to rally your friends and followers.</p>
                             </div>
                         </div>
-                        <div class="hiw-scroll-cue">↓ Scroll down to explore the map &amp; leaderboard ↓</div>
+                        <div class="hiw-scroll-cue">&uarr; Scroll up to explore the map &amp; leaderboard &uarr;</div>
                     </div>
                 </div>
             </div>`;
@@ -703,7 +703,7 @@ function renderMapLegend() {
                         
                         <div style="flex: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; border-right: 1px solid rgba(255,255,255,0.2);">
                             <div style="text-align: left; width: 100%;">
-                                <div id="legend-round-subtitle">Top 10 run-off begins in</div>
+                                <div id="legend-round-subtitle">Last Stop Run-Off begins in</div>
                             </div>
                             <div class="countdown-clock small-clock">
                                 <div class="time-box"><span>--</span><label>Days</label></div>
@@ -744,10 +744,15 @@ function renderMapLegend() {
             `;
 }
 
+function getLeaderboardTitle(district, isRunoff = false) {
+    if (isRunoff) return 'Run-Off for Last Stop';
+    return `District ${district} Nightcrawl's Last Stop`;
+}
+
 // Reusable Venue Explorer: one component that toggles between a vote-ranked
 // Leaderboard view and a Browse view (A-Z/Z-A sort + business-type filter).
 // Used in both the round-1 and run-off states to avoid duplicated markup.
-function renderVenueExplorer() {
+function renderVenueExplorer(district) {
     return `
                     <div class="venue-explorer">
                         <div class="explorer-tabs">
@@ -771,7 +776,7 @@ function renderVenueExplorer() {
                         </div>
                         <div class="explorer-pane leaderboard-pane">
                             <div class="leaderboard" style="margin-bottom: 0;">
-                                <h3 class="leaderboard-title">Current Leaders</h3>
+                                <h3 class="leaderboard-title">${getLeaderboardTitle(district)}</h3>
                                 <ul class="venue-list leaderboard-list">
                                     <!-- Dynamically populated from Firestore -->
                                 </ul>
@@ -801,7 +806,7 @@ function renderVotingStates(district) {
                             <div class="time-box"><span>--</span><label>Mins</label></div>
                         </div>
                     </div>
-                    ${renderVenueExplorer()}
+                    ${renderVenueExplorer(district)}
                 </div>
 
                 <div id="state-run-off" class="voting-state-container" style="display: none;">
@@ -809,7 +814,7 @@ function renderVotingStates(district) {
                         <h2>The Run-Off: Top 10</h2>
                         <p>It's down to the wire! The polls close in:</p>
                     </div>
-                    ${renderVenueExplorer()}
+                    ${renderVenueExplorer(district)}
                 </div>
 
                 <div id="state-post-election" class="voting-state-container" style="display: none;">
@@ -988,17 +993,6 @@ class EventLayout extends HTMLElement {
                 </div>
             </div>
 
-            <!-- Night's Proceedings & Election Intro -->
-            <div class="proceedings-section js-reveal reveal-y delay-200">
-                <div class="page-module">
-                    <h2 class="title-3d section-title crawl-tinery-title">${shared.itinerary.heading}</h2>
-                    <div class="proceedings-intro">
-                        <p class="proceedings-intro__lede">Follow the trail and cast your vote to decide where District ${districtCopy.district} ends the night.</p>
-                    </div>
-                    ${renderItinerary(districtCopy, vars, shared)}
-                </div>
-            </div>
-
             <!-- Map Section -->
             <div class="map-section-wrapper js-reveal reveal-opacity" id="map-section" style="margin-bottom: 0;">
                 <h2 class="title-3d map-title"><u>District ${districtCopy.district}</u><span class="map-title-neighborhoods">${districtCopy.location}</span></h2>
@@ -1011,6 +1005,14 @@ class EventLayout extends HTMLElement {
                 <div class="page-module">
                 ${renderVotingStates(districtCopy.district)}
                 ${renderVenueOperatorsStrip(shared)}
+                </div>
+            </div>
+
+            <!-- Night's Proceedings & Election Intro -->
+            <div class="proceedings-section js-reveal reveal-y delay-200">
+                <div class="page-module">
+                    <h2 class="title-3d section-title crawl-tinery-title">${shared.itinerary.heading}</h2>
+                    ${renderItinerary(districtCopy, vars, shared)}
                 </div>
             </div>
 
@@ -2022,7 +2024,7 @@ class EventLayout extends HTMLElement {
             const legendSubtitle = document.querySelector('#legend-round-subtitle');
             if (legendSubtitle) {
                 if (stateId === 'round-1') {
-                    legendSubtitle.innerText = 'Top 10 run-off begins in';
+                    legendSubtitle.innerText = 'Last Stop Run-Off begins in';
                 } else if (stateId === 'run-off') {
                     legendSubtitle.innerText = 'VOTING CLOSES IN';
                 } else if (stateId === 'post-election') {
@@ -2039,9 +2041,10 @@ class EventLayout extends HTMLElement {
             }
             
             // Update leaderboard headers based on state
+            const districtLetter = (this.getAttribute('district') || 'A').toUpperCase();
             const leaderboardTitles = this.querySelectorAll('.leaderboard-title');
             leaderboardTitles.forEach(h3 => {
-                h3.innerText = (stateId === 'run-off') ? 'Run-Off for Last Stop' : 'Current Leaders';
+                h3.innerText = getLeaderboardTitle(districtLetter, stateId === 'run-off');
             });
             
             // Refresh leaderboards to show/hide empty slots based on state
