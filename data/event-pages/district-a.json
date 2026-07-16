@@ -2,7 +2,7 @@
   "district": "A",
   "date": "Tuesday, August 18th",
   "time": "7:00 PM - 10:00 PM",
-  "location": "Carrollton, Holly Grove, Mid-City, Lakeview & Bayou Saint John",
+  "location": "Carrollton, Hollygrove, Mid-City, Lakeview & Bayou Saint John",
   "councilName": "Aimee McCarron",
   "councilImg": "assets/profile-pics/Aimee-McCarron_2.png",
   "councilBioUrl": "https://council.nola.gov/councilmembers/aimee-mccarron/",
@@ -16,7 +16,7 @@
     "url": "https://www.flickr.com/photos/infrogmation/4946844705/in/photostream/"
   },
   "heroIntro": [
-    "Councilmember {councilDisplayName} and {influencerIntro} are supporting District {district}'s hospitality businesses this summer with a special night out to three local favorites across Uptown, Carrollton, Holly Grove, Mid-City, Bayou Saint John and Lakeview!",
+    "Councilmember {councilDisplayName} and {influencerIntro} are supporting District {district}'s hospitality businesses this summer with a special night out to three local favorites across Uptown, Carrollton, Hollygrove, Mid-City, Bayou Saint John and Lakeview!",
     "<strong>Vote to decide</strong> {councilFirstName} & {influencerFirstName}'s last stop of the night & <strong>become a Local Legend</strong> by checking in at neighborhood restaurants, bars, music venues and more all summer long!"
   ],
   "councilQuote": "This isn't just about nightlife; it's about connecting with the community where they are. We're breaking down the walls of City Hall.",
