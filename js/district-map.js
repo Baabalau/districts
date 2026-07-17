@@ -605,17 +605,37 @@ document.addEventListener("DOMContentLoaded", async () => {
                 return subtitleFlipHtml;
             };
 
-            const renderVenueActions = (v, forPostElection = false) => {
+            const renderVenueActions = (v, actionMode = 'normal') => {
                 const safeName = v.name ? v.name.replace(/'/g, "\\'") : '';
                 const votingClosed = isVotingClosed();
-                
-                // Post-election: only show expanded check-in button, no vote tally or vote button
-                if (forPostElection) {
+
+                const renderExpandedCheckIn = (compact = false) => {
+                    const label = compact ? 'Check In' : 'Check In at Business';
+                    const btnClass = compact
+                        ? 'brand-btn venue-checkin-btn venue-checkin-btn-expanded venue-checkin-btn-compact'
+                        : 'brand-btn venue-checkin-btn venue-checkin-btn-expanded';
+                    return `<a href="checkin.html?venue=${v.id}" class="${btnClass}" title="Check In at Business">
+                        <span class="desktop-text"><span class="checkin-pin" aria-hidden="true">📍</span> ${label}</span>
+                        <span class="mobile-text"><span class="checkin-pin" aria-hidden="true">📍</span></span>
+                    </a>`;
+                };
+
+                // Post-election browse tab: expanded check-in only, no vote tally
+                if (actionMode === 'post-election-browse') {
                     return `<div class="venue-actions post-election-actions">
-                        <a href="checkin.html?venue=${v.id}" class="brand-btn venue-checkin-btn venue-checkin-btn-expanded" title="Check In at Business">
-                            <span class="desktop-text"><span class="checkin-pin" aria-hidden="true">📍</span> Check In at Business</span>
-                            <span class="mobile-text"><span class="checkin-pin" aria-hidden="true">📍</span></span>
-                        </a>
+                        ${renderExpandedCheckIn(false)}
+                    </div>`;
+                }
+
+                // Post-election runoff results: vote tally + gold divider + compact check-in
+                if (actionMode === 'post-election-results') {
+                    return `<div class="venue-actions post-election-results-actions">
+                        <div class="venue-actions-stack">
+                            ${renderVoteTally(v.voteCount, v.id)}
+                            <div class="venue-actions-buttons">
+                                ${renderExpandedCheckIn(true)}
+                            </div>
+                        </div>
                     </div>`;
                 }
                 
@@ -650,7 +670,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 </li>`;
             };
 
-            const renderVenueItem = (v, forPostElection = false) => {
+            const renderVenueItem = (v, actionMode = 'normal') => {
                 const category = categorizeType(v.type);
                 const leftIndicator = `<span class="type-dot" style="background-color: ${categoryColor(category)};" title="${category}"></span>`;
                 const nameHtml = `<strong class="venue-name">${v.name || 'Unknown'}</strong>`;
@@ -659,13 +679,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                     leftIndicatorHtml: leftIndicator,
                     nameHtml,
                     subtitleHtml,
-                    actionsHtml: renderVenueActions(v, forPostElection)
+                    actionsHtml: renderVenueActions(v, actionMode)
                 });
             };
 
             // Paginated venue lists (avoids one long scroll of businesses)
             const PAGE_SIZE = 10;
-            const renderPaginatedList = (stateSelector, venues, forPostElection = false) => {
+            const renderPaginatedList = (stateSelector, venues, actionMode = 'normal') => {
                 const container = eventLayout.querySelector(`${stateSelector} .venue-list-container`);
                 if (!container) return;
                 const list = container.querySelector('.venue-list');
@@ -684,7 +704,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     const currentPage = Math.min(Math.max(1, page), totalPages);
                     const start = (currentPage - 1) * PAGE_SIZE;
                     const pageItems = venues.slice(start, start + PAGE_SIZE);
-                    list.innerHTML = pageItems.map((v) => renderVenueItem(v, forPostElection)).join('');
+                    list.innerHTML = pageItems.map((v) => renderVenueItem(v, actionMode)).join('');
 
                     if (venues.length <= PAGE_SIZE) {
                         pagination.style.display = 'none';
@@ -706,7 +726,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             // Vote-ranked leaderboard (top 10), shown in the Leaderboard pane.
             // During run-off, only show venues that actually have votes (no "Awaiting Votes" slots).
-            const updateLeaderboard = (selector, limit, isRunoff = false, forPostElection = false) => {
+            const updateLeaderboard = (selector, limit, isRunoff = false, actionMode = 'normal') => {
                 const leaderboard = eventLayout.querySelector(selector);
                 if (!leaderboard) return;
 
@@ -715,9 +735,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 const venuesWithVotes = sortedVenues.filter(v => (v.voteCount || 0) > 0);
                 
-                // During run-off or post-election, show only venues with votes (up to limit)
+                // During run-off or post-election results, show only venues with votes (up to limit)
                 // During round-1, show empty slots up to limit
-                const showOnlyWithVotes = isRunoff || forPostElection;
+                const showOnlyWithVotes = isRunoff || actionMode === 'post-election-results';
                 const displayCount = showOnlyWithVotes ? Math.min(venuesWithVotes.length, limit) : limit;
                 
                 let htmlString = '';
@@ -732,7 +752,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                             leftIndicatorHtml: leftIndicator,
                             nameHtml: `<strong class="venue-name">${v.name || 'Unknown'}</strong>`,
                             subtitleHtml: buildLeaderboardSubtitle(v),
-                            actionsHtml: renderVenueActions(v, forPostElection)
+                            actionsHtml: renderVenueActions(v, actionMode)
                         });
                     } else if (!showOnlyWithVotes) {
                         // Only show "Awaiting Votes" during round-1
@@ -755,23 +775,26 @@ document.addEventListener("DOMContentLoaded", async () => {
             window.refreshLeaderboards = (stateId) => {
                 const isRunoff = stateId === 'run-off';
                 const isPostElection = stateId === 'post-election' || stateId === 'post-event';
-                updateLeaderboard('#state-round-1 .leaderboard', 10, isRunoff, false);
-                updateLeaderboard('#state-run-off .leaderboard', 10, isRunoff, false);
-                updateLeaderboard('#state-post-election .leaderboard', 10, isPostElection, isPostElection);
+                updateLeaderboard('#state-round-1 .leaderboard', 10, isRunoff, 'normal');
+                updateLeaderboard('#state-run-off .leaderboard', 10, isRunoff, 'normal');
+                updateLeaderboard('#state-post-election .leaderboard', 10, isPostElection, 'post-election-results');
             };
 
             // Combined Venue Explorer: one component toggling between the vote-ranked
             // Leaderboard and a Browse view (A-Z/Z-A sort + business-type filter + search).
             // Everything operates on the already-fetched in-memory array -> 0 extra reads.
-            const setupVenueExplorer = (stateSelector, browseVenues, forPostElection = false) => {
+            const setupVenueExplorer = (stateSelector, browseVenues, postElectionMode = false) => {
                 const explorer = eventLayout.querySelector(`${stateSelector} .venue-explorer`);
                 if (!explorer) return;
+
+                const leaderboardActionMode = postElectionMode ? 'post-election-results' : 'normal';
+                const browseActionMode = postElectionMode ? 'post-election-browse' : 'normal';
 
                 // Leaderboard pane (vote rankings)
                 // Check current election state to determine display mode
                 const state = window.currentElectionState || window._displayedElectionState || 'round-1';
                 const showFinalResults = state === 'run-off' || state === 'post-election' || state === 'post-event';
-                updateLeaderboard(`${stateSelector} .leaderboard`, 10, showFinalResults, forPostElection);
+                updateLeaderboard(`${stateSelector} .leaderboard`, 10, showFinalResults, leaderboardActionMode);
 
                 // Browse pane: search + alphabetical sort + type filter, applied client-side
                 const searchInput = explorer.querySelector('.venue-search');
@@ -803,7 +826,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         const bn = (b.name || '').toLowerCase();
                         return sortVal === 'za' ? bn.localeCompare(an) : an.localeCompare(bn);
                     });
-                    renderPaginatedList(stateSelector, list, forPostElection);
+                    renderPaginatedList(stateSelector, list, browseActionMode);
                 };
 
                 if (searchInput) searchInput.addEventListener('input', applyBrowse);
