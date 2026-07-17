@@ -1781,6 +1781,100 @@
     padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; font-family: var(--font-main);
 }
 .pagination button:disabled { opacity: 0.5; cursor: not-allowed; border-color: rgba(255,255,255,0.1); color: rgba(255,255,255,0.3); }
+
+/* Voting closed state for vote buttons */
+.voting-closed-btn,
+.voting-closed-btn:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    color: rgba(255, 255, 255, 0.4) !important;
+    cursor: not-allowed !important;
+    pointer-events: none;
+}
+
+/* Post-election venue actions - simplified layout with expanded check-in */
+.post-election-actions {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    margin-left: 12px;
+}
+
+.post-election-actions .venue-checkin-btn-expanded {
+    width: auto;
+    min-width: 200px;
+    height: auto;
+    min-height: 44px;
+    padding: 10px 20px !important;
+    white-space: nowrap;
+    background: transparent !important;
+    box-shadow: none;
+    color: #fff;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    line-height: 1.2;
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+
+.post-election-actions .venue-checkin-btn-expanded:hover {
+    background: transparent !important;
+    color: #fff;
+    border-color: var(--text-secondary);
+    transform: none;
+    box-shadow: none;
+    opacity: 1;
+}
+
+.post-election-actions .venue-checkin-btn-expanded .desktop-text {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    color: #fff;
+}
+
+.post-election-actions .venue-checkin-btn-expanded .mobile-text {
+    display: none;
+    color: #fff;
+}
+
+.post-election-actions .venue-checkin-btn-expanded .checkin-pin {
+    font-size: 1.45rem;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+    .post-election-actions {
+        margin-left: 8px;
+    }
+
+    .post-election-actions .venue-checkin-btn-expanded {
+        min-width: 44px;
+        width: 44px;
+        height: 44px;
+        padding: 0 !important;
+    }
+
+    .post-election-actions .venue-checkin-btn-expanded .desktop-text {
+        display: none;
+    }
+
+    .post-election-actions .venue-checkin-btn-expanded .mobile-text {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .post-election-actions .venue-checkin-btn-expanded .checkin-pin {
+        font-size: 1.6rem;
+    }
+}
 .pagination span { color: var(--text-primary); font-weight: 600; }
 
 /* Winner Card */
@@ -1812,6 +1906,7 @@
     border-color: var(--text-primary) !important;
     padding: 45px 35px 35px !important;
     box-sizing: border-box;
+    margin-bottom: 30px;
 }
 
 .winner-card-copy {

@@ -863,12 +863,16 @@ function getLeaderboardTitle(district, isRunoff = false) {
 // Reusable Venue Explorer: one component that toggles between a vote-ranked
 // Leaderboard view and a Browse view (A-Z/Z-A sort + business-type filter).
 // Used in both the round-1 and run-off states to avoid duplicated markup.
-function renderVenueExplorer(district) {
+// The isPostElection flag customizes labels for the winner-announced state.
+function renderVenueExplorer(district, isPostElection = false) {
+    const leaderboardLabel = isPostElection ? 'Run-Off Results' : 'Leaderboard';
+    const browseLabel = isPostElection ? `Browse All District ${district} Businesses` : 'Browse All';
+    const explorerClass = isPostElection ? 'venue-explorer post-election-explorer' : 'venue-explorer';
     return `
-                    <div class="venue-explorer">
+                    <div class="${explorerClass}">
                         <div class="explorer-tabs">
-                            <button type="button" class="explorer-tab active" data-view="leaderboard">Leaderboard</button>
-                            <button type="button" class="explorer-tab" data-view="browse">Browse All</button>
+                            <button type="button" class="explorer-tab active" data-view="leaderboard">${leaderboardLabel}</button>
+                            <button type="button" class="explorer-tab" data-view="browse">${browseLabel}</button>
                         </div>
                         <div class="explorer-controls" style="display: none;">
                             <input type="search" class="venue-search" placeholder="Search venues..." aria-label="Search venues">
@@ -933,6 +937,7 @@ function renderVotingStates(district, vars) {
                         <h2>The Results Are In</h2>
                     </div>
                     ${renderWinnerCard(district, vars)}
+                    ${renderVenueExplorer(district, true)}
                 </div>
                 <div id="state-post-event" class="voting-state-container" style="display: none; padding: 40px 0; text-align: center;">
                     <div class="voting-header">
@@ -1866,6 +1871,11 @@ class EventLayout extends HTMLElement {
         });
 
         window.openVoteModal = (venueId, venueName, voteCount) => {
+            const state = window.currentElectionState || this._displayedElectionState || 'round-1';
+            if (state === 'post-election' || state === 'post-event') {
+                return;
+            }
+
             const modal = this.querySelector('#vote-modal');
             const nameEl = this.querySelector('#modal-venue-name');
             nameEl.innerText = venueName;
