@@ -55,7 +55,7 @@ function renderHeroIntroWinnerParagraphs(districtCopy, vars, pastTense = false) 
             <p><span class="hero-meetup-highlight">${highlight}</span>${guestSuffix}</p>`;
     }
 
-    const highlight = `Join us at ${escapeHtml(w.winnerBusiness)} ${escapeHtml(w.date)} at ${escapeHtml(w.meetupTime)}`;
+    const highlight = `Join us at ${escapeHtml(w.winnerBusiness)} &mdash; ${escapeHtml(w.date)} at ${escapeHtml(w.meetupTime)}`;
     return `
         <p>Our first stop in District ${escapeHtml(w.district)} will be ${escapeHtml(w.firstStopBusiness)}, then we'll drop by ${escapeHtml(w.secondStopBusiness)}, and our last stop elected by local residents is ${escapeHtml(w.winnerBusiness)}!</p>
         <p><span class="hero-meetup-highlight">${highlight}</span>${guestSuffix}</p>`;
