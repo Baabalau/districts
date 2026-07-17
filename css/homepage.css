@@ -1625,3 +1625,10 @@
         .delay-200 { transition-delay: 0.2s; }
         .delay-400 { transition-delay: 0.4s; }
 
+
+/* District Map Highlight Animation */
+@keyframes rotate-highlight {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
