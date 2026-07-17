@@ -31,6 +31,55 @@ function renderHeroIntro(intro, vars) {
         .join('');
 }
 
+function buildWinnerHeroVars(districtCopy, vars) {
+    const stops = districtCopy.itinerary?.stops || [];
+    const winner = districtCopy.winner || {};
+    return {
+        ...vars,
+        firstStopBusiness: stops[0]?.businessName || 'TBA',
+        secondStopBusiness: stops[1]?.businessName || 'TBA',
+        winnerBusiness: winner.businessName || "Brittany's Restaurant and Lounge",
+        meetupTime: winner.meetupTime || '8:30pm',
+        specialGuest: winner.specialGuest || ''
+    };
+}
+
+function renderHeroIntroWinnerParagraphs(districtCopy, vars, pastTense = false) {
+    const w = buildWinnerHeroVars(districtCopy, vars);
+    const guestSuffix = w.specialGuest ? `, with special guest ${escapeHtml(w.specialGuest)}.` : '.';
+
+    if (pastTense) {
+        const highlight = `We joined ${escapeHtml(w.winnerBusiness)} on ${escapeHtml(w.date)} at ${escapeHtml(w.meetupTime)}`;
+        return `
+            <p>Our first stop in District ${escapeHtml(w.district)} was ${escapeHtml(w.firstStopBusiness)}, then we dropped by ${escapeHtml(w.secondStopBusiness)}, and our last stop elected by local residents was ${escapeHtml(w.winnerBusiness)}!</p>
+            <p><span class="hero-meetup-highlight">${highlight}</span>${guestSuffix}</p>`;
+    }
+
+    const highlight = `Join us at ${escapeHtml(w.winnerBusiness)} ${escapeHtml(w.date)} at ${escapeHtml(w.meetupTime)}`;
+    return `
+        <p>Our first stop in District ${escapeHtml(w.district)} will be ${escapeHtml(w.firstStopBusiness)}, then we'll drop by ${escapeHtml(w.secondStopBusiness)}, and our last stop elected by local residents is ${escapeHtml(w.winnerBusiness)}!</p>
+        <p><span class="hero-meetup-highlight">${highlight}</span>${guestSuffix}</p>`;
+}
+
+// Keeps the councilmember intro but swaps the voting call-to-action once a winner
+// is announced (or after the event, in past tense).
+function renderHeroIntroForState(intro, districtCopy, vars, stateId) {
+    const paragraphs = Array.isArray(intro) ? intro : [intro];
+    const defaultParagraphs = paragraphs.filter(Boolean);
+
+    if (stateId === 'post-election' || stateId === 'post-event') {
+        const leadParagraphs = defaultParagraphs.length > 1
+            ? defaultParagraphs.slice(0, -1)
+            : defaultParagraphs.slice(0, 1);
+        const leadHtml = leadParagraphs
+            .map((paragraph) => `<p>${interpolate(paragraph, vars)}</p>`)
+            .join('');
+        return leadHtml + renderHeroIntroWinnerParagraphs(districtCopy, vars, stateId === 'post-event');
+    }
+
+    return renderHeroIntro(intro, vars);
+}
+
 function renderHeroTitle(title, vars) {
     const text = interpolate(title, vars);
     const match = text.match(/^District\s+(\S+)\s+(.+)$/i);
@@ -40,7 +89,7 @@ function renderHeroTitle(title, vars) {
     return escapeHtml(text);
 }
 
-function buildTemplateVars(districtCopy) {
+function buildTemplateVars(districtCopy, shared = null) {
     const councilFirstName = districtCopy.councilName?.split(' ')[0] ?? '';
     const influencerFirstName = districtCopy.influencerName?.split(' ')[0] ?? '';
     const brandedAccounts = ['EatenPathNola', 'EmpowerYouNola'];
@@ -60,10 +109,17 @@ function buildTemplateVars(districtCopy) {
         influencerFirstName,
         influencerIntro,
         influencerAccountTitle: districtCopy.influencerAccountTitle ?? '',
+        councilRole: shared?.roles?.council || 'The Policy Pro',
+        influencerRole: districtCopy.influencerAccountTitle || shared?.roles?.influencer || 'The Tastemaker',
         councilImg: districtCopy.councilImg,
         influencerImg: districtCopy.influencerImg,
         influencerSocialUrl: districtCopy.influencerSocialUrl,
-        councilBioUrl: districtCopy.councilBioUrl
+        councilBioUrl: districtCopy.councilBioUrl,
+        winnerBusiness: districtCopy.winner?.businessName || "Brittany's Restaurant and Lounge",
+        winnerVoteCount: districtCopy.winner?.voteCount ?? 46,
+        meetupTime: districtCopy.winner?.meetupTime || '8:30pm',
+        specialGuest: districtCopy.winner?.specialGuest || '',
+        specialGuestImg: districtCopy.winner?.specialGuestImg || ''
     };
 }
 
@@ -677,14 +733,39 @@ function renderRunoffCrawltinery(vars, influencerRole, councilRole, stops) {
 
 function renderWinnerCard(district, vars, { stepClass = '' } = {}) {
     const stepClasses = stepClass ? ` center ${stepClass}` : ' center';
+    const meetupHighlight = `Meet us there ${vars.date} at ${vars.meetupTime || '8:30pm'}!`;
+
+    const hostEntries = [
+        { name: vars.councilName, img: vars.councilImg, role: 'Councilmember' },
+        { name: vars.influencerName, img: vars.influencerImg, role: vars.influencerRole }
+    ];
+    if (vars.specialGuest) {
+        hostEntries.push({
+            name: vars.specialGuest,
+            img: vars.specialGuestImg,
+            role: 'Special Guest'
+        });
+    }
+
+    const hostsHtml = hostEntries.map((host) => `
+        <div class="winner-card-host">
+            ${host.img
+                ? `<img src="${host.img}" class="stop-avatar" alt="${escapeHtml(host.name)}">`
+                : `<div class="stop-avatar" aria-hidden="true">★</div>`}
+            <div class="winner-card-host-copy">
+                <span class="interior-neighborhoods winner-card-host-role">${escapeHtml(host.role)}</span>
+                <span class="interior-hosts winner-card-host-name">${escapeHtml(host.name)}</span>
+            </div>
+        </div>`).join('');
+
     return `
         <div class="proc-step${stepClasses}" style="margin-bottom: 0;">
             <div class="proc-card reveal-card winner-card-celebration">
-                <div class="stop-avatar-container" style="align-items: flex-start;">
-                    <div class="stop-avatar" style="font-size: 2.8rem;">👑</div>
-                    <div style="text-align: left; display: flex; flex-direction: column; justify-content: center; min-height: 95px;">
+                <div class="stop-avatar-container winner-card-header">
+                    <div class="stop-avatar winner-card-crown">👑</div>
+                    <div class="winner-card-header-copy">
                         <div class="stop-label-3d">FINAL STOP</div>
-                        <h3 style="margin: 0; font-size: 1.7rem; line-height: 1.2; font-family: var(--font-header); text-transform: uppercase;">The People's Choice</h3>
+                        <h3 class="winner-card-header-title">The People's Choice</h3>
                     </div>
                 </div>
 
@@ -694,8 +775,8 @@ function renderWinnerCard(district, vars, { stepClass = '' } = {}) {
                 </div>
 
                 <div class="winner-card-copy">
-                    <p class="reveal-body">With <strong>46 votes from residents</strong>, Brittany's Restaurant and Lounge is the official last stop of District ${district} After Dark featuring ${vars.councilName} and ${vars.influencerName}!!</p>
-                    <p class="reveal-body winner-card-meetup">Meet us there ${vars.date} at 8:30pm!</p>
+                    <p class="reveal-body winner-card-summary">With <strong>${vars.winnerVoteCount} votes</strong>, <strong>${vars.winnerBusiness}</strong> has been elected to host the last stop of <em>District <strong><em>${district}</em></strong> After Dark!</em> <span class="hero-meetup-highlight">${meetupHighlight}</span></p>
+                    <div class="winner-card-hosts">${hostsHtml}</div>
                 </div>
             </div>
         </div>`;
@@ -1054,7 +1135,7 @@ class EventLayout extends HTMLElement {
 
             const shared = await sharedResponse.json();
             const districtCopy = await districtResponse.json();
-            const vars = buildTemplateVars(districtCopy);
+            const vars = buildTemplateVars(districtCopy, shared);
 
             // Render immediately with a safe default state. The election schedule is
             // fetched asynchronously AFTER render (see applyElectionSchedule) so a slow,
@@ -1071,7 +1152,9 @@ class EventLayout extends HTMLElement {
                 <div class="hero-left">
                     <h1 class="title-3d">${renderHeroTitle(shared.hero.title, vars)}</h1>
                     <h2>${districtCopy.date}</h2>
-                    ${renderHeroIntro(districtCopy.heroIntro || shared.heroIntro, vars)}
+                    <div id="hero-intro">
+                    ${renderHeroIntroForState(districtCopy.heroIntro || shared.heroIntro, districtCopy, vars, window.currentElectionState || 'round-1')}
+                    </div>
                     <button type="button" id="vote-scroll-btn" class="brand-btn" onclick="document.getElementById('map-section').scrollIntoView({behavior: 'smooth'})">${interpolate(shared.hero.rsvpButton, vars)}</button>
                 </div>
                 <div class="hero-right">
@@ -1346,6 +1429,9 @@ class EventLayout extends HTMLElement {
         `;
             this.initScrollAnimations();
             this.initVotingPortal();
+            this._districtCopy = districtCopy;
+            this._heroIntroSource = districtCopy.heroIntro || shared.heroIntro;
+            this._heroVars = vars;
             const footer = document.querySelector('site-footer');
             if (footer?.setPhotoCredit && districtCopy.photoCredit) {
                 footer.setPhotoCredit(districtCopy.photoCredit);
@@ -1362,6 +1448,17 @@ class EventLayout extends HTMLElement {
             console.error('CRITICAL ERROR loading event page:', error);
             this.innerHTML = `<p style="padding: 2rem; margin-top: 100px; text-align: center; color: red; font-size: 2rem; z-index: 9999; position: relative;">Unable to load event content: ${error.message}</p>`;
         }
+    }
+
+    updateHeroIntro(stateId) {
+        const container = this.querySelector('#hero-intro');
+        if (!container || !this._heroIntroSource || !this._districtCopy || !this._heroVars) return;
+        container.innerHTML = renderHeroIntroForState(
+            this._heroIntroSource,
+            this._districtCopy,
+            this._heroVars,
+            stateId
+        );
     }
 
     async applyElectionSchedule(districtId) {
@@ -2125,6 +2222,8 @@ class EventLayout extends HTMLElement {
         window.setVotingState = (stateId) => {
             const states = ['round-1', 'run-off', 'post-election', 'post-event'];
             this._displayedElectionState = stateId;
+
+            this.updateHeroIntro(stateId);
 
             // Toggle the Crawl-tinery variant: the default teaser shows only in
             // round-1 (and pre-launch); once the run-off begins the host picks stay
