@@ -148,10 +148,10 @@
 .hero-meetup-highlight {
     background: var(--accent);
     color: #fff;
-    padding: 3px 10px;
+    padding: 3px 8px 3px 10px;
     border-radius: 4px;
-    box-decoration-break: clone;
-    -webkit-box-decoration-break: clone;
+    box-decoration-break: slice;
+    -webkit-box-decoration-break: slice;
 }
 
 .hero-left .brand-btn {
