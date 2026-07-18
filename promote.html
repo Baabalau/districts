@@ -1043,6 +1043,19 @@
             // Map to store venue names and their Firebase IDs
             const venueMap = new Map();
 
+            // Mirror of slugify() in scripts/google-apps-script-firestore-sync.gs so a
+            // generated venue id matches the id the sync assigns (name + district suffix).
+            function slugifyVenueId(name, district) {
+                const slug = String(name || '')
+                    .toLowerCase()
+                    .replace(/['\u2019]/g, '')      // drop straight + curly apostrophes
+                    .replace(/&/g, 'and')           // & -> and
+                    .replace(/[^a-z0-9]+/g, '-')    // non-alphanumeric -> hyphen
+                    .replace(/^-+|-+$/g, '');       // trim leading/trailing hyphens
+                const dist = String(district || '').trim().toLowerCase();
+                return dist ? `${slug}-${dist}` : slug;
+            }
+
             // Load existing venues for autocomplete
             const datalist = document.getElementById('existing-businesses');
             import('./js/firebase-config.js').then(async (module) => {
@@ -1324,8 +1337,8 @@
                 // Clean the business name for graphics (remove the address in parentheses if it exists)
                 const bizName = rawBizName.replace(/\s*\(.*\)$/, '').trim();
                 
-                // Construct pseudo-unique venue id and district page URL
-                const venueId = matchedVenueId || bizName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                // Resolve the district first so a generated venue id can carry the
+                // district suffix (the id format the Firestore sync produces).
                 let districtLetter = 'A';
                 let districtEventDate = '[Tuesday, July 28th]';
                 if (bizDistrict.startsWith('District')) {
@@ -1340,6 +1353,13 @@
                         case 'E': districtEventDate = 'Tuesday, July 21st'; break;
                     }
                 }
+
+                // Construct the venue id used for the share/QR stub. For an existing
+                // venue use its real Firestore id; otherwise mirror the Apps Script
+                // slugify(name, district) exactly (see google-apps-script-firestore-sync.gs)
+                // so a brand-new business's link matches the stub generated after the
+                // next Sheets->Firestore sync and stub rebuild.
+                const venueId = matchedVenueId || slugifyVenueId(bizName, districtLetter);
                 // Build the link relative to the current directory so it also works
                 // when the site is served from a subfolder (e.g. GitHub Pages project sites).
                 const basePath = window.location.pathname.replace(/[^/]*$/, '');
