@@ -590,8 +590,7 @@
                 try {
                     // Build vote URL
                     const venueId = venue.id || venue.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-                    const districtPage = `district-${districtLetter.toLowerCase()}.html`;
-                    const votingUrl = `${window.location.origin}${basePath}${districtPage}?vote=${venueId}`;
+                    const votingUrl = `${window.location.origin}${basePath}v/${venueId}.html`;
                     const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(votingUrl)}&color=${graphicConfig.qrColors.foreground}&bgcolor=${graphicConfig.qrColors.background}`;
 
                     // Set up flyer

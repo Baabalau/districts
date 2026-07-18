@@ -2163,8 +2163,10 @@ class EventLayout extends HTMLElement {
                 instructionsVenueEl.textContent = venueName || 'this business';
             }
 
-            // Generate the deep link URL for this specific venue immediately
-            const shareUrl = window.location.origin + window.location.pathname + '?vote=' + encodeURIComponent(venueId) + '&name=' + encodeURIComponent(venueName);
+            // Generate the shareable per-business link (a /v/ stub that carries
+            // Open Graph tags for social unfurling, then redirects to this venue's
+            // vote popup on the district page).
+            const shareUrl = window.location.origin + '/v/' + encodeURIComponent(venueId) + '.html';
             const urlInput = this.querySelector('#share-url-input');
             if (urlInput) {
                 urlInput.value = shareUrl;
