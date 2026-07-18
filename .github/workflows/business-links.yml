@@ -4,8 +4,9 @@ name: Refresh business share links
 # Firestore venue snapshots, then commits any changes so Vercel auto-deploys.
 on:
   schedule:
-    # Daily at 08:00 UTC. Adjust or add more times as needed.
-    - cron: "0 8 * * *"
+    # Hourly (top of the hour, UTC) so newly added businesses get a shareable
+    # stub within ~1 hour hands-off. The manual trigger below refreshes on demand.
+    - cron: "0 * * * *"
   workflow_dispatch: {}
 
 permissions:
