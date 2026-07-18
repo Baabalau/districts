@@ -2008,6 +2008,20 @@
     line-height: var(--body-line-height);
 }
 
+.winner-card-summary-lead,
+.winner-card-summary-address,
+.winner-card-summary-meetup {
+    display: block;
+}
+
+.winner-card-summary-address {
+    margin-top: 0.35em;
+}
+
+.winner-card-summary-meetup {
+    margin-top: 0.35em;
+}
+
 .winner-card-summary .hero-meetup-highlight {
     color: #fff;
 }
@@ -2015,7 +2029,7 @@
 .winner-card-hosts {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: flex-start;
     gap: 24px 36px;
     margin-top: 8px;

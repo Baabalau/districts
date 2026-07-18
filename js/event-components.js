@@ -116,6 +116,7 @@ function buildTemplateVars(districtCopy, shared = null) {
         influencerSocialUrl: districtCopy.influencerSocialUrl,
         councilBioUrl: districtCopy.councilBioUrl,
         winnerBusiness: districtCopy.winner?.businessName || "Brittany's Restaurant and Lounge",
+        winnerAddress: districtCopy.winner?.address || '',
         winnerVoteCount: districtCopy.winner?.voteCount ?? 46,
         meetupTime: districtCopy.winner?.meetupTime || '8:30pm',
         specialGuest: districtCopy.winner?.specialGuest || '',
@@ -775,7 +776,11 @@ function renderWinnerCard(district, vars, { stepClass = '' } = {}) {
                 </div>
 
                 <div class="winner-card-copy">
-                    <p class="reveal-body winner-card-summary">With <strong>${vars.winnerVoteCount} votes</strong>, <strong>${vars.winnerBusiness}</strong> has been elected to host the last stop of <em>District <strong><em>${district}</em></strong> After Dark!</em> <span class="hero-meetup-highlight">${meetupHighlight}</span></p>
+                    <p class="reveal-body winner-card-summary">
+                        <span class="winner-card-summary-lead">With <strong>${vars.winnerVoteCount} votes</strong>, <strong>${vars.winnerBusiness}</strong> has been elected to host the last stop of <em>District <strong><em>${district}</em></strong> After Dark!</em></span>
+                        ${vars.winnerAddress ? `<span class="winner-card-summary-address">${escapeHtml(vars.winnerAddress)}</span>` : ''}
+                        <span class="winner-card-summary-meetup"><span class="hero-meetup-highlight">${meetupHighlight}</span></span>
+                    </p>
                     <div class="winner-card-hosts">${hostsHtml}</div>
                 </div>
             </div>
