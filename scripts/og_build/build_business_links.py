@@ -79,7 +79,7 @@ def render_stub(vid, name, district):
     )
     redirect_attr = html.escape(redirect, quote=True)
     redirect_js = json.dumps(redirect)  # safely quoted JS string literal
-    og_title = f"Vote for {attr_name} to be the last stop - District {district} Nightcrawl"
+    og_title = f"Vote for {attr_name} to be our last stop - District {district} Nightcrawl"
     description = (
         f"Help {attr_name} win the District {district} Nightcrawl. "
         "Cast your vote and become a Local Legend."
