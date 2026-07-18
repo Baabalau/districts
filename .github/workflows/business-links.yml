@@ -1,0 +1,43 @@
+name: Refresh business share links
+
+# Regenerates the per-business Open Graph stub pages under /v/ from the public
+# Firestore venue snapshots, then commits any changes so Vercel auto-deploys.
+on:
+  schedule:
+    # Daily at 08:00 UTC. Adjust or add more times as needed.
+    - cron: "0 8 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: business-links
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Regenerate business link stubs
+        run: python3 scripts/og_build/build_business_links.py --prune
+
+      - name: Commit and push if changed
+        run: |
+          if [ -n "$(git status --porcelain v/)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add v/
+            git commit -m "chore: refresh business share-link stubs"
+            git push
+          else
+            echo "No stub changes."
+          fi

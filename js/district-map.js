@@ -450,7 +450,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             
             // Generate deep link for this venue
             const venueNameStr = place.name || 'Unnamed Venue';
-            const venueShareUrl = window.location.origin + window.location.pathname + '?vote=' + encodeURIComponent(place.id) + '&name=' + encodeURIComponent(venueNameStr);
+            const venueShareUrl = window.location.origin + '/v/' + encodeURIComponent(place.id) + '.html';
             const safeVenueShareUrl = venueShareUrl.replace(/'/g, "\\'");
             const displayAddress = formatVenueAddress(place);
 
