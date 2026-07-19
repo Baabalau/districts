@@ -411,7 +411,14 @@ function itineraryStyles() {
         }
 
         /* Run-off "revealed pick" cards */
-        .reveal-card { padding-top: 0; overflow: hidden; }
+        .reveal-card {
+            padding-top: 45px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .reveal-card .stop-avatar-container { margin-bottom: 0; }
         .reveal-card-media {
             display: block;
             width: calc(100% + 70px);
@@ -435,7 +442,7 @@ function itineraryStyles() {
             font-weight: bold; letter-spacing: 1px;
         }
         .reveal-business-name {
-            margin: 0 0 16px 0;
+            margin: 0;
             font-size: 1.9rem;
             font-family: var(--font-header);
             text-transform: uppercase;
@@ -444,8 +451,8 @@ function itineraryStyles() {
         }
         .reveal-business-info {
             position: relative;
-            margin-top: 35px;
-            margin-bottom: 12px;
+            margin: 6px 0 0;
+            width: 100%;
         }
         .reveal-business-info .reveal-card-media {
             width: 100%;
@@ -454,6 +461,7 @@ function itineraryStyles() {
             object-fit: cover;
             border-radius: 8px;
             display: block;
+            margin: 0 auto;
         }
         .reveal-business-info .reveal-business-name {
             position: absolute;
@@ -479,10 +487,39 @@ function itineraryStyles() {
             height: 250px;
         }
         .reveal-body {
-            margin: 0 0 22px 0;
+            margin: 0;
             font-size: var(--body-text-size);
             line-height: var(--body-line-height);
             color: var(--text-secondary);
+        }
+        .reveal-card-footer {
+            margin: 0;
+            padding: 14px 0 0;
+            border-top: 1px solid rgba(203, 160, 82, 0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .reveal-business-address {
+            font-size: var(--body-text-size);
+            color: var(--text-secondary);
+            line-height: 1.3;
+            margin: 0;
+        }
+        .winner-card-celebration {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .winner-card-celebration .winner-card-header {
+            margin-bottom: 0;
+        }
+        .winner-card-celebration .winner-card-copy {
+            gap: 14px;
+        }
+        .winner-card-celebration .winner-card-summary-address,
+        .winner-card-celebration .winner-card-summary-meetup {
+            margin-top: 0;
         }
         .reveal-actions { display: flex; gap: 12px; flex-wrap: wrap; }
         .reveal-actions .reveal-btn {
@@ -691,15 +728,15 @@ function renderRevealCard({ role, roleLabel, stopNumber, alignClass, avatar, hos
 
     const streetAddress = address ? formatStreetAddress(address) : '';
     const footerSection = (streetAddress || hostLinkHtml || websiteHtml) ?
-        `<div class="reveal-card-footer" style="margin-top: 10px; padding-top: 10px; padding-bottom: 4px; border-top: 1px solid rgba(203, 160, 82, 0.3); display: flex; flex-direction: column; gap: 6px;">
-            <div class="reveal-business-address" data-field="address" style="font-size: var(--body-text-size); color: var(--text-secondary); line-height: 1.3; margin: 0; ${streetAddress ? '' : 'display: none;'}">${escapeHtml(streetAddress)}</div>
+        `<div class="reveal-card-footer">
+            <div class="reveal-business-address" data-field="address" style="${streetAddress ? '' : 'display: none;'}">${escapeHtml(streetAddress)}</div>
             ${hostLinkHtml}
             ${websiteHtml}
         </div>` : '';
 
     return `
             <div class="proc-step ${alignClass}" data-pick-role="${role}">
-                <div class="proc-card reveal-card" style="padding-top: 45px;">
+                <div class="proc-card reveal-card">
                     <div class="stop-avatar-container" style="align-items: flex-start;">
                         <img src="${avatar}" class="stop-avatar" alt="${hostName}">
                         <div style="text-align: left; display: flex; flex-direction: column; justify-content: center; min-height: 95px;">
@@ -713,7 +750,7 @@ function renderRevealCard({ role, roleLabel, stopNumber, alignClass, avatar, hos
                         <h4 class="reveal-business-name" data-field="name">${escapeHtml(businessName || 'To Be Revealed')}</h4>
                     </div>
                     
-                    <p class="reveal-body" data-field="body" style="margin: 0; font-size: var(--body-text-size); line-height: 1.6; color: var(--text-secondary);">${body || ''}</p>
+                    <p class="reveal-body" data-field="body">${body || ''}</p>
                     
                     ${footerSection}
                 </div>
