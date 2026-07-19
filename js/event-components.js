@@ -63,11 +63,11 @@ function renderHeroIntroWinnerParagraphs(districtCopy, vars, pastTense = false) 
 
 // Keeps the councilmember intro but swaps the voting call-to-action once a winner
 // is announced (or after the event, in past tense).
-function renderHeroIntroForState(intro, districtCopy, vars, stateId) {
-    const paragraphs = Array.isArray(intro) ? intro : [intro];
+function renderHeroIntroForState(intro, districtCopy, vars, stateId, isCustom = false) {
+    const paragraphs = Array.isArray(intro) ? intro : intro.split('\n').filter(Boolean);
     const defaultParagraphs = paragraphs.filter(Boolean);
 
-    if (stateId === 'post-election' || stateId === 'post-event') {
+    if (!isCustom && (stateId === 'post-election' || stateId === 'post-event')) {
         const leadParagraphs = defaultParagraphs.length > 1
             ? defaultParagraphs.slice(0, -1)
             : defaultParagraphs.slice(0, 1);
@@ -77,7 +77,7 @@ function renderHeroIntroForState(intro, districtCopy, vars, stateId) {
         return leadHtml + renderHeroIntroWinnerParagraphs(districtCopy, vars, stateId === 'post-event');
     }
 
-    return renderHeroIntro(intro, vars);
+    return renderHeroIntro(paragraphs, vars);
 }
 
 function renderHeroTitle(title, vars) {
@@ -1552,11 +1552,32 @@ class EventLayout extends HTMLElement {
     updateHeroIntro(stateId) {
         const container = this.querySelector('#hero-intro');
         if (!container || !this._heroIntroSource || !this._districtCopy || !this._heroVars) return;
+        
+        let introSource = this._heroIntroSource;
+        let isCustom = false;
+        
+        if (this._electionSchedule) {
+            if (stateId === 'round-1' && this._electionSchedule.heroRound1) {
+                introSource = this._electionSchedule.heroRound1;
+                isCustom = true;
+            } else if (stateId === 'run-off' && this._electionSchedule.heroRunOff) {
+                introSource = this._electionSchedule.heroRunOff;
+                isCustom = true;
+            } else if (stateId === 'post-election' && this._electionSchedule.heroWinner) {
+                introSource = this._electionSchedule.heroWinner;
+                isCustom = true;
+            } else if (stateId === 'post-event' && this._electionSchedule.heroPostEvent) {
+                introSource = this._electionSchedule.heroPostEvent;
+                isCustom = true;
+            }
+        }
+
         container.innerHTML = renderHeroIntroForState(
-            this._heroIntroSource,
+            introSource,
             this._districtCopy,
             this._heroVars,
-            stateId
+            stateId,
+            isCustom
         );
     }
 
@@ -1587,7 +1608,7 @@ class EventLayout extends HTMLElement {
             // Populate the run-off Crawl-tinery cards from the schedule's picks so
             // they are ready before we toggle them into view.
             this.populateRunoffCrawltinery(sched);
-            this.populateWinnerCard(sched.winnerId);
+            this.populateWinnerCard(sched);
             this.updateRunoffDateDisplay(sched.runOffStart);
 
             // Local Legends board mode is controlled from the same dashboard doc.
@@ -1852,8 +1873,8 @@ class EventLayout extends HTMLElement {
     async populateRunoffCrawltinery(sched) {
         if (!sched) return;
         const picks = [
-            { role: 'influencer', id: sched.influencerPickId, body: sched.influencerPickBody },
-            { role: 'council', id: sched.councilPickId, body: sched.councilPickBody }
+            { role: 'influencer', id: sched.influencerPickId, body: sched.influencerPickBody, imageOverride: sched.influencerPickImage },
+            { role: 'council', id: sched.councilPickId, body: sched.councilPickBody, imageOverride: sched.councilPickImage }
         ];
 
         for (const pick of picks) {
@@ -1886,7 +1907,7 @@ class EventLayout extends HTMLElement {
                 addressEl.style.display = 'block';
             }
 
-            const displayImage = fallback?.image || venue?.image;
+            const displayImage = pick.imageOverride || fallback?.image || venue?.image;
             const imgEl = card.querySelector('[data-field="image"]');
             if (imgEl && displayImage) {
                 imgEl.src = displayImage;
@@ -1947,16 +1968,30 @@ class EventLayout extends HTMLElement {
     }
 
     // Populates the winner card with venue data from Firestore when winnerId is set.
-    async populateWinnerCard(winnerId) {
-        if (!winnerId) return;
+    async populateWinnerCard(sched) {
+        if (!sched || !sched.winnerId) return;
 
         try {
-            const venueSnap = await getDoc(doc(db, "venues", winnerId));
+            const venueSnap = await getDoc(doc(db, "venues", sched.winnerId));
             if (!venueSnap.exists()) {
-                console.warn(`Winner venue not found: ${winnerId}`);
+                console.warn(`Winner venue not found: ${sched.winnerId}`);
                 return;
             }
-            this.applyWinnerVenueToPage(venueSnap.data());
+            const venueData = venueSnap.data();
+            
+            // Apply schedule overrides if they exist
+            if (sched.winnerImage) venueData.image = sched.winnerImage;
+            
+            this.applyWinnerVenueToPage(venueData);
+            
+            // Apply winner body override if it exists
+            if (sched.winnerBody) {
+                const winnerCards = this.querySelectorAll('.winner-card-celebration');
+                winnerCards.forEach(card => {
+                    const bodyEl = card.querySelector('.winner-card-summary-lead');
+                    if (bodyEl) bodyEl.textContent = sched.winnerBody;
+                });
+            }
         } catch (err) {
             console.warn('Unable to load winner venue:', err);
         }
