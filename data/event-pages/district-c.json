@@ -26,18 +26,20 @@
     "stops": [
       {
         "number": "01",
+        "hostRole": "influencer",
         "title": "{influencerName}'s Westbank Opener",
         "body": "{influencerName} starts us on the far side of the river with a stop that blends music, mood, and a crowd that knows how to show up for local business."
       },
       {
         "number": "02",
+        "hostRole": "council",
         "title": "{councilName}'s Difficult Decision",
         "body": "Councilmember {councilName} has a lot of hospitality's finest to choose from for his stop. Les bon temps rouler across District {district}."
       },
       {
         "number": "03",
         "title": "The District C Vote",
-        "body": "Help choose where we land last. Your vote decides which {location} venue joins the crawl on March 19 as the community's third stop."
+        "body": "Help choose where we land last. Your vote decides which {location} venue joins the crawl on July 28 as the community's third stop."
       }
     ]
   }

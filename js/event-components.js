@@ -534,11 +534,18 @@ function proceedingsPathSvg() {
 // "STOP 01/02/03" caption with the homepage's 3D title treatment).
 const STOP_ORDINAL_LABELS = ['First Stop', 'Second Stop', 'Last Stop'];
 
+// Maps each itinerary stop to the host whose run-off pick should fill that card.
+// District E intentionally puts council first; other districts default stop 1 to
+// influencer and stop 2 to council when hostRole is omitted from JSON.
+function getStopHostRole(stop, index) {
+    return stop.hostRole ?? (index === 0 ? 'influencer' : 'council');
+}
+
 // A single teaser stop card (used for the influencer & council stops in the
 // default, pre-run-off Crawl-tinery).
 function renderHostStop(stop, index, vars) {
     const alignClass = index === 0 ? 'left' : 'right';
-    const hostRole = stop.hostRole ?? (index === 0 ? 'influencer' : 'council');
+    const hostRole = getStopHostRole(stop, index);
     const avatarHtml = hostRole === 'influencer'
         ? `<img src="${vars.influencerImg}" class="stop-avatar" alt="${vars.influencerName}">`
         : `<img src="${vars.councilImg}" class="stop-avatar" alt="${vars.councilName}">`;
@@ -689,14 +696,16 @@ function renderRunoffCrawltinery(vars, influencerRole, councilRole, stops) {
 
     const stop1 = stops[0];
     const stop2 = stops[1];
-    const s1Data = getRoleData(stop1.hostRole);
-    const s2Data = getRoleData(stop2.hostRole);
+    const stop1Role = getStopHostRole(stop1, 0);
+    const stop2Role = getStopHostRole(stop2, 1);
+    const s1Data = getRoleData(stop1Role);
+    const s2Data = getRoleData(stop2Role);
 
     return `
     <div class="proceedings-container">
         ${proceedingsPathSvg()}
         ${renderRevealCard({ 
-            role: stop1.hostRole, 
+            role: stop1Role, 
             roleLabel: s1Data.label, 
             stopNumber: '01', 
             alignClass: 'left', 
@@ -711,7 +720,7 @@ function renderRunoffCrawltinery(vars, influencerRole, councilRole, stops) {
             body: interpolate(stop1.runoffBody || stop1.body, vars)
         })}
         ${renderRevealCard({ 
-            role: stop2.hostRole, 
+            role: stop2Role, 
             roleLabel: s2Data.label, 
             stopNumber: '02', 
             alignClass: 'right', 
@@ -771,8 +780,8 @@ function renderWinnerCard(district, vars, { stepClass = '' } = {}) {
                 </div>
 
                 <div class="reveal-business-info" style="margin-top: 35px; margin-bottom: 12px; position: relative; text-align: center;">
-                    <img class="reveal-card-media" src="assets/Brittanys-539df087-ef53-4198-9d9c-e122ffb2d934.png" alt="Brittany's Restaurant and Lounge" style="width: 100%; max-width: 100%; height: 250px; object-fit: cover; border-radius: 8px; margin: 0 auto; display: block;">
-                    <h4 class="reveal-business-name" style="position: absolute; top: 0; left: 0; right: 0; margin: 0; padding: 8px 12px; font-size: 2.2rem; font-family: var(--font-header); color: var(--accent); text-transform: uppercase; background: var(--text-primary); border-radius: 8px 8px 0 0; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">Brittany's Restaurant</h4>
+                    <img class="reveal-card-media" data-field="winner-image" src="" alt="${escapeHtml(vars.winnerBusiness)}" style="width: 100%; max-width: 100%; height: 250px; object-fit: cover; border-radius: 8px; margin: 0 auto; display: none;">
+                    <h4 class="reveal-business-name" data-field="winner-name" style="position: absolute; top: 0; left: 0; right: 0; margin: 0; padding: 8px 12px; font-size: 2.2rem; font-family: var(--font-header); color: var(--accent); text-transform: uppercase; background: var(--text-primary); border-radius: 8px 8px 0 0; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">${escapeHtml(vars.winnerBusiness)}</h4>
                 </div>
 
                 <div class="winner-card-copy">
@@ -795,14 +804,16 @@ function renderPostElectionCrawltinery(vars, influencerRole, councilRole, stops,
 
     const stop1 = stops[0];
     const stop2 = stops[1];
-    const s1Data = getRoleData(stop1.hostRole);
-    const s2Data = getRoleData(stop2.hostRole);
+    const stop1Role = getStopHostRole(stop1, 0);
+    const stop2Role = getStopHostRole(stop2, 1);
+    const s1Data = getRoleData(stop1Role);
+    const s2Data = getRoleData(stop2Role);
 
     return `
     <div class="proceedings-container">
         ${proceedingsPathSvg()}
         ${renderRevealCard({ 
-            role: stop1.hostRole, 
+            role: stop1Role, 
             roleLabel: s1Data.label, 
             stopNumber: '01', 
             alignClass: 'left', 
@@ -817,7 +828,7 @@ function renderPostElectionCrawltinery(vars, influencerRole, councilRole, stops,
             body: interpolate(stop1.runoffBody || stop1.body, vars)
         })}
         ${renderRevealCard({ 
-            role: stop2.hostRole, 
+            role: stop2Role, 
             roleLabel: s2Data.label, 
             stopNumber: '02', 
             alignClass: 'right', 
@@ -1493,6 +1504,7 @@ class EventLayout extends HTMLElement {
             // Populate the run-off Crawl-tinery cards from the schedule's picks so
             // they are ready before we toggle them into view.
             this.populateRunoffCrawltinery(sched);
+            this.populateWinnerCard(sched.winnerId);
             this.updateRunoffDateDisplay(sched.runOffStart);
 
             // Local Legends board mode is controlled from the same dashboard doc.
@@ -1761,11 +1773,19 @@ class EventLayout extends HTMLElement {
             const bodyEl = card.querySelector('[data-field="body"]');
             if (bodyEl && pick.body) bodyEl.textContent = pick.body;
 
-            if (!pick.id) continue;
+            if (!pick.id) {
+                console.log(`[Runoff] No venue ID set for ${pick.role}'s pick`);
+                continue;
+            }
 
             try {
+                console.log(`[Runoff] Looking up venue ID: ${pick.id} for ${pick.role}`);
                 const venueSnap = await getDoc(doc(db, "venues", pick.id));
-                if (!venueSnap.exists()) continue;
+                if (!venueSnap.exists()) {
+                    console.warn(`[Runoff] Venue not found in Firestore: ${pick.id}`);
+                    continue;
+                }
+                console.log(`[Runoff] Found venue: ${venueSnap.data().name}`);
                 const venue = venueSnap.data();
 
                 const nameEl = card.querySelector('[data-field="name"]');
@@ -1811,6 +1831,36 @@ class EventLayout extends HTMLElement {
             } catch (err) {
                 console.warn(`Unable to load run-off pick for ${pick.role}:`, err);
             }
+        }
+    }
+
+    // Populates the winner card with venue data from Firestore when winnerId is set.
+    async populateWinnerCard(winnerId) {
+        if (!winnerId) return;
+
+        try {
+            const venueSnap = await getDoc(doc(db, "venues", winnerId));
+            if (!venueSnap.exists()) {
+                console.warn(`Winner venue not found: ${winnerId}`);
+                return;
+            }
+            const venue = venueSnap.data();
+
+            // Find all winner cards (there may be multiple in different Crawl-tinery variants)
+            const winnerCards = this.querySelectorAll('.winner-card-celebration');
+            winnerCards.forEach(card => {
+                const nameEl = card.querySelector('[data-field="winner-name"]');
+                if (nameEl && venue.name) nameEl.textContent = venue.name;
+
+                const imgEl = card.querySelector('[data-field="winner-image"]');
+                if (imgEl && venue.image) {
+                    imgEl.src = venue.image;
+                    imgEl.alt = venue.name || '';
+                    imgEl.style.display = 'block';
+                }
+            });
+        } catch (err) {
+            console.warn('Unable to load winner venue:', err);
         }
     }
 
