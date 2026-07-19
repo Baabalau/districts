@@ -461,12 +461,13 @@ function itineraryStyles() {
             object-fit: cover;
             border-radius: 8px;
             display: block;
-            margin: 0 auto;
+            margin: 15px auto 0;
         }
         .reveal-business-info .reveal-business-name {
             position: absolute;
-            top: 15px;
+            top: 0;
             left: 15px;
+            z-index: 1;
             margin: 0;
             padding: 6px 10px;
             font-size: 2.2rem;
