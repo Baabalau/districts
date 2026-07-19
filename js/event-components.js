@@ -38,9 +38,9 @@ function buildWinnerHeroVars(districtCopy, vars) {
         ...vars,
         firstStopBusiness: stops[0]?.businessName || 'TBA',
         secondStopBusiness: stops[1]?.businessName || 'TBA',
-        winnerBusiness: winner.businessName || "Brittany's Restaurant and Lounge",
-        meetupTime: winner.meetupTime || '8:30pm',
-        specialGuest: winner.specialGuest || ''
+        winnerBusiness: winner.businessName || vars.winnerBusiness || 'TBA',
+        meetupTime: winner.meetupTime || vars.meetupTime || '8:30pm',
+        specialGuest: winner.specialGuest || vars.specialGuest || ''
     };
 }
 
@@ -115,9 +115,9 @@ function buildTemplateVars(districtCopy, shared = null) {
         influencerImg: districtCopy.influencerImg,
         influencerSocialUrl: districtCopy.influencerSocialUrl,
         councilBioUrl: districtCopy.councilBioUrl,
-        winnerBusiness: districtCopy.winner?.businessName || "Brittany's Restaurant and Lounge",
+        winnerBusiness: districtCopy.winner?.businessName || 'TBA',
         winnerAddress: districtCopy.winner?.address || '',
-        winnerVoteCount: districtCopy.winner?.voteCount ?? 46,
+        winnerVoteCount: districtCopy.winner?.voteCount ?? null,
         meetupTime: districtCopy.winner?.meetupTime || '8:30pm',
         specialGuest: districtCopy.winner?.specialGuest || '',
         specialGuestImg: districtCopy.winner?.specialGuestImg || ''
@@ -786,8 +786,8 @@ function renderWinnerCard(district, vars, { stepClass = '' } = {}) {
 
                 <div class="winner-card-copy">
                     <p class="reveal-body winner-card-summary">
-                        <span class="winner-card-summary-lead">With <strong>${vars.winnerVoteCount} votes</strong>, <strong>${vars.winnerBusiness}</strong> has been elected to host the last stop of <em>District <strong><em>${district}</em></strong> After Dark!</em></span>
-                        ${vars.winnerAddress ? `<span class="winner-card-summary-address">${escapeHtml(vars.winnerAddress)}</span>` : ''}
+                        <span class="winner-card-summary-lead">With <strong data-field="winner-vote-count">${vars.winnerVoteCount ?? '—'}</strong> votes, <strong data-field="winner-summary-name">${escapeHtml(vars.winnerBusiness)}</strong> has been elected to host the last stop of <em>District <strong><em>${district}</em></strong> After Dark!</em></span>
+                        ${vars.winnerAddress ? `<span class="winner-card-summary-address" data-field="winner-address">${escapeHtml(vars.winnerAddress)}</span>` : `<span class="winner-card-summary-address" data-field="winner-address" style="display: none;"></span>`}
                         <span class="winner-card-summary-meetup"><span class="hero-meetup-highlight">${meetupHighlight}</span></span>
                     </p>
                     <div class="winner-card-hosts">${hostsHtml}</div>
@@ -1756,9 +1756,16 @@ class EventLayout extends HTMLElement {
         });
     }
 
+    getItineraryStopForRole(role) {
+        const stops = this._districtCopy?.itinerary?.stops || [];
+        return stops.find((stop, index) => getStopHostRole(stop, index) === role);
+    }
+
     // Fills the run-off Crawl-tinery "revealed pick" cards. The business identity
     // (name, photo, website, map location) is pulled from each venue doc so the
     // admin only has to paste a venue ID + write the blurb in the dashboard.
+    // Itinerary stop fields in the district JSON (image, website, address) are used
+    // as fallbacks when the venue doc is missing those details.
     async populateRunoffCrawltinery(sched) {
         if (!sched) return;
         const picks = [
@@ -1770,67 +1777,89 @@ class EventLayout extends HTMLElement {
             const card = this.querySelector(`[data-pick-role="${pick.role}"]`);
             if (!card) continue;
 
+            const fallback = this.getItineraryStopForRole(pick.role);
+
             const bodyEl = card.querySelector('[data-field="body"]');
             if (bodyEl && pick.body) bodyEl.textContent = pick.body;
 
-            if (!pick.id) {
-                console.log(`[Runoff] No venue ID set for ${pick.role}'s pick`);
-                continue;
+            let venue = null;
+            if (pick.id) {
+                try {
+                    const venueSnap = await getDoc(doc(db, "venues", pick.id));
+                    if (venueSnap.exists()) venue = venueSnap.data();
+                } catch (err) {
+                    console.warn(`Unable to load run-off pick for ${pick.role}:`, err);
+                }
             }
 
-            try {
-                console.log(`[Runoff] Looking up venue ID: ${pick.id} for ${pick.role}`);
-                const venueSnap = await getDoc(doc(db, "venues", pick.id));
-                if (!venueSnap.exists()) {
-                    console.warn(`[Runoff] Venue not found in Firestore: ${pick.id}`);
-                    continue;
-                }
-                console.log(`[Runoff] Found venue: ${venueSnap.data().name}`);
-                const venue = venueSnap.data();
+            const displayName = venue?.name || fallback?.businessName;
+            const nameEl = card.querySelector('[data-field="name"]');
+            if (nameEl && displayName) nameEl.textContent = displayName;
 
-                const nameEl = card.querySelector('[data-field="name"]');
-                if (nameEl && venue.name) nameEl.textContent = venue.name;
-
-                const addressEl = card.querySelector('[data-field="address"]');
-                if (addressEl && venue.address) {
-                    addressEl.textContent = venue.address;
-                    addressEl.style.display = 'block';
-                }
-
-                const imgEl = card.querySelector('[data-field="image"]');
-                if (imgEl && venue.image) {
-                    imgEl.src = venue.image;
-                    imgEl.alt = venue.name || '';
-                    imgEl.style.display = 'block';
-                }
-
-                const webEl = card.querySelector('[data-field="website"]');
-                const websiteUrl = venue.website || venue.facebook;
-                if (webEl && websiteUrl) {
-                    webEl.href = websiteUrl;
-                    webEl.textContent = venue.name ? `${venue.name} on the web` : 'Visit Website';
-                    webEl.style.display = 'block';
-                } else if (webEl) {
-                    webEl.style.display = 'none';
-                }
-
-                // We removed the map button from the HTML, so we don't need this logic anymore
-                // but we keep it commented out just in case
-                /*
-                const mapBtn = card.querySelector('[data-field="map"]');
-                if (mapBtn) {
-                    mapBtn.style.display = 'inline-flex';
-                    mapBtn.style.alignItems = 'center';
-                    mapBtn.addEventListener('click', () => {
-                        if (window.openMapPopupForVenue) window.openMapPopupForVenue(pick.id);
-                        const mapSection = document.getElementById('map-section');
-                        if (mapSection) mapSection.scrollIntoView({ behavior: 'smooth' });
-                    });
-                }
-                */
-            } catch (err) {
-                console.warn(`Unable to load run-off pick for ${pick.role}:`, err);
+            const displayAddress = fallback?.address || venue?.address;
+            const addressEl = card.querySelector('[data-field="address"]');
+            if (addressEl && displayAddress) {
+                addressEl.textContent = displayAddress;
+                addressEl.style.display = 'block';
             }
+
+            const displayImage = fallback?.image || venue?.image;
+            const imgEl = card.querySelector('[data-field="image"]');
+            if (imgEl && displayImage) {
+                imgEl.src = displayImage;
+                imgEl.alt = displayName || '';
+                imgEl.style.display = 'block';
+            }
+
+            const webEl = card.querySelector('[data-field="website"]');
+            const websiteUrl = fallback?.website || venue?.website || venue?.facebook;
+            if (webEl && websiteUrl) {
+                webEl.href = websiteUrl;
+                webEl.textContent = displayName ? `${displayName} on the web` : 'Visit Website';
+                webEl.style.display = 'block';
+            } else if (webEl) {
+                webEl.style.display = 'none';
+            }
+        }
+    }
+
+    applyWinnerVenueToPage(venue) {
+        if (!venue) return;
+
+        if (this._heroVars) {
+            this._heroVars.winnerBusiness = venue.name || this._heroVars.winnerBusiness;
+            this._heroVars.winnerAddress = venue.address || this._heroVars.winnerAddress;
+            if (venue.voteCount != null) this._heroVars.winnerVoteCount = venue.voteCount;
+        }
+
+        const winnerCards = this.querySelectorAll('.winner-card-celebration');
+        winnerCards.forEach(card => {
+            const nameEl = card.querySelector('[data-field="winner-name"]');
+            if (nameEl && venue.name) nameEl.textContent = venue.name;
+
+            const summaryNameEl = card.querySelector('[data-field="winner-summary-name"]');
+            if (summaryNameEl && venue.name) summaryNameEl.textContent = venue.name;
+
+            const voteEl = card.querySelector('[data-field="winner-vote-count"]');
+            if (voteEl && venue.voteCount != null) voteEl.textContent = venue.voteCount;
+
+            const addressEl = card.querySelector('[data-field="winner-address"]');
+            if (addressEl && venue.address) {
+                addressEl.textContent = venue.address;
+                addressEl.style.display = '';
+            }
+
+            const imgEl = card.querySelector('[data-field="winner-image"]');
+            if (imgEl && venue.image) {
+                imgEl.src = venue.image;
+                imgEl.alt = venue.name || '';
+                imgEl.style.display = 'block';
+            }
+        });
+
+        const displayed = this._displayedElectionState || window.currentElectionState;
+        if (displayed === 'post-election' || displayed === 'post-event') {
+            this.updateHeroIntro(displayed);
         }
     }
 
@@ -1844,21 +1873,7 @@ class EventLayout extends HTMLElement {
                 console.warn(`Winner venue not found: ${winnerId}`);
                 return;
             }
-            const venue = venueSnap.data();
-
-            // Find all winner cards (there may be multiple in different Crawl-tinery variants)
-            const winnerCards = this.querySelectorAll('.winner-card-celebration');
-            winnerCards.forEach(card => {
-                const nameEl = card.querySelector('[data-field="winner-name"]');
-                if (nameEl && venue.name) nameEl.textContent = venue.name;
-
-                const imgEl = card.querySelector('[data-field="winner-image"]');
-                if (imgEl && venue.image) {
-                    imgEl.src = venue.image;
-                    imgEl.alt = venue.name || '';
-                    imgEl.style.display = 'block';
-                }
-            });
+            this.applyWinnerVenueToPage(venueSnap.data());
         } catch (err) {
             console.warn('Unable to load winner venue:', err);
         }
