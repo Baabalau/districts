@@ -124,6 +124,14 @@ function buildTemplateVars(districtCopy, shared = null) {
     };
 }
 
+function formatStreetAddress(address) {
+    if (!address || typeof address !== 'string') return '';
+    const trimmed = address.trim();
+    if (!trimmed) return '';
+    const commaIdx = trimmed.indexOf(',');
+    return commaIdx === -1 ? trimmed : trimmed.slice(0, commaIdx).trim();
+}
+
 // Pulls a readable @handle out of a social profile URL (falls back to a
 // generic label if the URL shape is unexpected).
 function socialHandleFromUrl(url) {
@@ -434,6 +442,42 @@ function itineraryStyles() {
             color: var(--text-primary);
             line-height: 1.05;
         }
+        .reveal-business-info {
+            position: relative;
+            margin-top: 35px;
+            margin-bottom: 12px;
+        }
+        .reveal-business-info .reveal-card-media {
+            width: 100%;
+            max-width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            display: block;
+        }
+        .reveal-business-info .reveal-business-name {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            margin: 0;
+            padding: 6px 10px;
+            font-size: 2.2rem;
+            font-family: var(--font-header);
+            color: var(--accent);
+            text-transform: uppercase;
+            text-align: left;
+            background: var(--text-primary);
+            border-radius: 4px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            width: fit-content;
+            max-width: calc(100% - 30px);
+            line-height: 1.1;
+            box-decoration-break: clone;
+            -webkit-box-decoration-break: clone;
+        }
+        .winner-card-celebration .reveal-business-info .reveal-card-media {
+            height: 250px;
+        }
         .reveal-body {
             margin: 0 0 22px 0;
             font-size: var(--body-text-size);
@@ -645,9 +689,10 @@ function renderRevealCard({ role, roleLabel, stopNumber, alignClass, avatar, hos
         websiteHtml = `<a href="#" target="_blank" rel="noopener noreferrer" class="stop-host-link" data-field="website" data-business-name="${businessName || ''}" style="font-size: var(--body-text-size); font-weight: 600; color: var(--brand-red); text-decoration: none; display: none; margin: 0;">Visit Website</a>`;
     }
 
-    const footerSection = (address || hostLinkHtml || websiteHtml) ?
+    const streetAddress = address ? formatStreetAddress(address) : '';
+    const footerSection = (streetAddress || hostLinkHtml || websiteHtml) ?
         `<div class="reveal-card-footer" style="margin-top: 10px; padding-top: 10px; padding-bottom: 4px; border-top: 1px solid rgba(203, 160, 82, 0.3); display: flex; flex-direction: column; gap: 6px;">
-            <div class="reveal-business-address" data-field="address" style="font-size: var(--body-text-size); color: var(--text-secondary); line-height: 1.3; margin: 0; ${address ? '' : 'display: none;'}">${address || ''}</div>
+            <div class="reveal-business-address" data-field="address" style="font-size: var(--body-text-size); color: var(--text-secondary); line-height: 1.3; margin: 0; ${streetAddress ? '' : 'display: none;'}">${escapeHtml(streetAddress)}</div>
             ${hostLinkHtml}
             ${websiteHtml}
         </div>` : '';
@@ -663,9 +708,9 @@ function renderRevealCard({ role, roleLabel, stopNumber, alignClass, avatar, hos
                         </div>
                     </div>
                     
-                    <div class="reveal-business-info" style="margin-top: 35px; margin-bottom: 12px; position: relative; text-align: center;">
-                        <img class="reveal-card-media" data-field="image" src="${image || ''}" alt="${businessName || ''}" style="width: 100%; max-width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin: 0 auto; display: ${image ? 'block' : 'none'};">
-                        <h4 class="reveal-business-name" data-field="name" style="position: absolute; top: 0; left: 0; right: 0; margin: 0; padding: 8px 12px; font-size: 2.2rem; font-family: var(--font-header); color: var(--accent); text-transform: uppercase; background: var(--text-primary); border-radius: 8px 8px 0 0; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">${businessName || 'To Be Revealed'}</h4>
+                    <div class="reveal-business-info">
+                        <img class="reveal-card-media" data-field="image" src="${image || ''}" alt="${businessName || ''}" style="display: ${image ? 'block' : 'none'};">
+                        <h4 class="reveal-business-name" data-field="name">${escapeHtml(businessName || 'To Be Revealed')}</h4>
                     </div>
                     
                     <p class="reveal-body" data-field="body" style="margin: 0; font-size: var(--body-text-size); line-height: 1.6; color: var(--text-secondary);">${body || ''}</p>
@@ -779,15 +824,15 @@ function renderWinnerCard(district, vars, { stepClass = '' } = {}) {
                     </div>
                 </div>
 
-                <div class="reveal-business-info" style="margin-top: 35px; margin-bottom: 12px; position: relative; text-align: center;">
-                    <img class="reveal-card-media" data-field="winner-image" src="" alt="${escapeHtml(vars.winnerBusiness)}" style="width: 100%; max-width: 100%; height: 250px; object-fit: cover; border-radius: 8px; margin: 0 auto; display: none;">
-                    <h4 class="reveal-business-name" data-field="winner-name" style="position: absolute; top: 0; left: 0; right: 0; margin: 0; padding: 8px 12px; font-size: 2.2rem; font-family: var(--font-header); color: var(--accent); text-transform: uppercase; background: var(--text-primary); border-radius: 8px 8px 0 0; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">${escapeHtml(vars.winnerBusiness)}</h4>
+                <div class="reveal-business-info">
+                    <img class="reveal-card-media" data-field="winner-image" src="" alt="${escapeHtml(vars.winnerBusiness)}" style="display: none;">
+                    <h4 class="reveal-business-name" data-field="winner-name">${escapeHtml(vars.winnerBusiness)}</h4>
                 </div>
 
                 <div class="winner-card-copy">
                     <p class="reveal-body winner-card-summary">
                         <span class="winner-card-summary-lead">With <strong data-field="winner-vote-count">${vars.winnerVoteCount ?? '—'}</strong> votes, <strong data-field="winner-summary-name">${escapeHtml(vars.winnerBusiness)}</strong> has been elected to host the last stop of <em>District <strong><em>${district}</em></strong> After Dark!</em></span>
-                        ${vars.winnerAddress ? `<span class="winner-card-summary-address" data-field="winner-address">${escapeHtml(vars.winnerAddress)}</span>` : `<span class="winner-card-summary-address" data-field="winner-address" style="display: none;"></span>`}
+                        ${vars.winnerAddress ? `<span class="winner-card-summary-address" data-field="winner-address">${escapeHtml(formatStreetAddress(vars.winnerAddress))}</span>` : `<span class="winner-card-summary-address" data-field="winner-address" style="display: none;"></span>`}
                         <span class="winner-card-summary-meetup"><span class="hero-meetup-highlight">${meetupHighlight}</span></span>
                     </p>
                     <div class="winner-card-hosts">${hostsHtml}</div>
@@ -1796,7 +1841,7 @@ class EventLayout extends HTMLElement {
             const nameEl = card.querySelector('[data-field="name"]');
             if (nameEl && displayName) nameEl.textContent = displayName;
 
-            const displayAddress = fallback?.address || venue?.address;
+            const displayAddress = formatStreetAddress(fallback?.address || venue?.address);
             const addressEl = card.querySelector('[data-field="address"]');
             if (addressEl && displayAddress) {
                 addressEl.textContent = displayAddress;
@@ -1828,7 +1873,7 @@ class EventLayout extends HTMLElement {
 
         if (this._heroVars) {
             this._heroVars.winnerBusiness = venue.name || this._heroVars.winnerBusiness;
-            this._heroVars.winnerAddress = venue.address || this._heroVars.winnerAddress;
+            this._heroVars.winnerAddress = venue.address ? formatStreetAddress(venue.address) : this._heroVars.winnerAddress;
             if (venue.voteCount != null) this._heroVars.winnerVoteCount = venue.voteCount;
         }
 
@@ -1845,7 +1890,7 @@ class EventLayout extends HTMLElement {
 
             const addressEl = card.querySelector('[data-field="winner-address"]');
             if (addressEl && venue.address) {
-                addressEl.textContent = venue.address;
+                addressEl.textContent = formatStreetAddress(venue.address);
                 addressEl.style.display = '';
             }
 
