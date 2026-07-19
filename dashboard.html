@@ -782,8 +782,21 @@
                     document.getElementById('sched-council-pick-id').value = data.councilPickId || '';
                     document.getElementById('sched-council-pick-body').value = data.councilPickBody || '';
                     document.getElementById('sched-legends-mode').value = data.localLegendsMode || 'default';
-                    document.getElementById('schedule-form').style.display = 'block';
+                } else {
+                    // District has no existing schedule data - clear form for new entry
+                    document.getElementById('sched-round-1').value = '';
+                    document.getElementById('sched-run-off').value = '';
+                    document.getElementById('sched-winner').value = '';
+                    document.getElementById('sched-post').value = '';
+                    document.getElementById('sched-winner-id').value = '';
+                    document.getElementById('sched-influencer-pick-id').value = '';
+                    document.getElementById('sched-influencer-pick-body').value = '';
+                    document.getElementById('sched-council-pick-id').value = '';
+                    document.getElementById('sched-council-pick-body').value = '';
+                    document.getElementById('sched-legends-mode').value = 'default';
                 }
+                // Always show the form so admin can create/edit schedule
+                document.getElementById('schedule-form').style.display = 'block';
             } catch (e) {
                 console.error("Error loading schedule:", e);
             }
@@ -815,7 +828,8 @@
             };
             
             try {
-                await updateDoc(doc(db, "settings", "schedule"), updates);
+                // Use setDoc with merge to handle both create and update cases
+                await setDoc(doc(db, "settings", "schedule"), updates, { merge: true });
                 const msg = document.getElementById('schedule-save-msg');
                 msg.style.display = 'inline';
                 setTimeout(() => msg.style.display = 'none', 2000);

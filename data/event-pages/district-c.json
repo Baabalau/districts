@@ -26,18 +26,29 @@
     "stops": [
       {
         "number": "01",
+        "hostRole": "influencer",
         "title": "{influencerName}'s Westbank Opener",
-        "body": "{influencerName} starts us on the far side of the river with a stop that blends music, mood, and a crowd that knows how to show up for local business."
+        "body": "{influencerName} starts us on the far side of the river with a stop that blends music, mood, and a crowd that knows how to show up for local business.",
+        "runoffBody": "{influencerName} starts us on the far side of the river at Sportsman Bar & Lounge — music, mood, and a crowd that knows how to show up for local business.",
+        "businessName": "Sportsman Bar & Lounge",
+        "address": "3120 Diana St, New Orleans, LA 70114",
+        "image": "assets/sportsman-bar-and-lounge-c.png"
       },
       {
         "number": "02",
+        "hostRole": "council",
         "title": "{councilName}'s Difficult Decision",
-        "body": "Councilmember {councilName} has a lot of hospitality's finest to choose from for his stop. Les bon temps rouler across District {district}."
+        "body": "Councilmember {councilName} has a lot of hospitality's finest to choose from for his stop. Les bon temps rouler across District {district}.",
+        "runoffBody": "Councilmember {councilName} lands at Pepp's Pub — a neighborhood bar that's dog friendly, people tolerant, and full of District {district} character.",
+        "businessName": "Pepp's Pub",
+        "address": "706 Franklin Ave, New Orleans, LA 70117",
+        "website": "https://www.peppspub.com/",
+        "image": "assets/pepps-pub-c.png"
       },
       {
         "number": "03",
         "title": "The District C Vote",
-        "body": "Help choose where we land last. Your vote decides which {location} venue joins the crawl on March 19 as the community's third stop."
+        "body": "Help choose where we land last. Your vote decides which {location} venue joins the crawl on July 28 as the community's third stop."
       }
     ]
   }

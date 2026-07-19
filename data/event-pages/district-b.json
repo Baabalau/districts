@@ -25,11 +25,13 @@
     "stops": [
       {
         "number": "01",
+        "hostRole": "influencer",
         "title": "{influencerName}'s Sundown Wind-Down",
         "body": "The crawl begins at a spot {influencerName} calls essentialùlive energy, strong pours, and the kind of room that sets the tone for the whole night."
       },
       {
         "number": "02",
+        "hostRole": "council",
         "title": "{councilName}'s Mystery Pick",
         "body": "Councilmember {councilName} takes the group to a trusted institution where regulars, workers, and visitors mixùperfect for talking policy without leaving the party behind."
       },

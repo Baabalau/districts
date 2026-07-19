@@ -25,11 +25,13 @@
     "stops": [
       {
         "number": "01",
+        "hostRole": "influencer",
         "title": "{influencerName}'s Happy Hour Hangout",
         "body": "Start the night undwinding with good people.{influencerName} opens the crawl at a spot built for conversation and an authenticlook at what makes District A tick."
       },
       {
         "number": "02",
+        "hostRole": "council",
         "title": "{councilName}'s Neighborhood Anchor",
         "body": "Stop two lands at a local favorite hand-picked by Councilmember {councilName}: a place where neighbors actually gather, the menu knows your name, and civic talk feels welcome."
       },
