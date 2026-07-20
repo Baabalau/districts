@@ -2494,6 +2494,12 @@ class EventLayout extends HTMLElement {
             const voteTarget = urlParams.get('vote');
 
             if (voteTarget) {
+                // Clean the ?vote= and &name= params from the URL so that if the user
+                // later copies/shares "the district page" they get a clean URL without
+                // the business-specific query string baked in.
+                const cleanUrl = window.location.pathname;
+                history.replaceState(null, '', cleanUrl);
+
                 // We want to open the map popup for this venue, not just the vote modal directly.
                 // The map + Firestore markers load asynchronously, so wait for THIS venue's
                 // marker specifically (not just the helper) before scrolling and opening it.
