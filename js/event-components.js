@@ -117,6 +117,7 @@ function buildTemplateVars(districtCopy, shared = null) {
         councilBioUrl: districtCopy.councilBioUrl,
         winnerBusiness: districtCopy.winner?.businessName || 'TBA',
         winnerAddress: districtCopy.winner?.address || '',
+        winnerImage: districtCopy.winner?.image || '',
         winnerVoteCount: districtCopy.winner?.voteCount ?? null,
         meetupTime: districtCopy.winner?.meetupTime || '8:30pm',
         specialGuest: districtCopy.winner?.specialGuest || '',
@@ -863,7 +864,7 @@ function renderWinnerCard(district, vars, { stepClass = '' } = {}) {
                 </div>
 
                 <div class="reveal-business-info">
-                    <img class="reveal-card-media" data-field="winner-image" src="" alt="${escapeHtml(vars.winnerBusiness)}" style="display: none;">
+                    <img class="reveal-card-media" data-field="winner-image" src="${vars.winnerImage || ''}" alt="${escapeHtml(vars.winnerBusiness)}" style="display: ${vars.winnerImage ? 'block' : 'none'};">
                     <h4 class="reveal-business-name" data-field="winner-name">${escapeHtml(vars.winnerBusiness)}</h4>
                 </div>
 
