@@ -850,10 +850,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 });
             };
 
-            // Round 1: all qualifying venues. Run-off: top 10 (excluding opt-outs).
+            // Round 1: all qualifying venues. Run-off: all venues for browsing (leaderboard handled separately).
             setupVenueExplorer('#state-round-1', sortedVenues, false);
-            const qualifiedForRunoff = sortedVenues.filter(v => !v.optOutRunoff).slice(0, 10);
-            setupVenueExplorer('#state-run-off', qualifiedForRunoff, false);
+            setupVenueExplorer('#state-run-off', sortedVenues, false);
             // Post-election: show all venues for browsing, leaderboard shows final runoff results
             setupVenueExplorer('#state-post-election', sortedVenues, true);
         };
