@@ -38,9 +38,9 @@ function buildWinnerHeroVars(districtCopy, vars) {
         ...vars,
         firstStopBusiness: stops[0]?.businessName || 'TBA',
         secondStopBusiness: stops[1]?.businessName || 'TBA',
-        winnerBusiness: winner.businessName || "Brittany's Restaurant and Lounge",
-        meetupTime: winner.meetupTime || '8:30pm',
-        specialGuest: winner.specialGuest || ''
+        winnerBusiness: winner.businessName || vars.winnerBusiness || 'TBA',
+        meetupTime: winner.meetupTime || vars.meetupTime || '8:30pm',
+        specialGuest: winner.specialGuest || vars.specialGuest || ''
     };
 }
 
@@ -63,11 +63,11 @@ function renderHeroIntroWinnerParagraphs(districtCopy, vars, pastTense = false) 
 
 // Keeps the councilmember intro but swaps the voting call-to-action once a winner
 // is announced (or after the event, in past tense).
-function renderHeroIntroForState(intro, districtCopy, vars, stateId) {
-    const paragraphs = Array.isArray(intro) ? intro : [intro];
+function renderHeroIntroForState(intro, districtCopy, vars, stateId, isCustom = false) {
+    const paragraphs = Array.isArray(intro) ? intro : intro.split('\n').filter(Boolean);
     const defaultParagraphs = paragraphs.filter(Boolean);
 
-    if (stateId === 'post-election' || stateId === 'post-event') {
+    if (!isCustom && (stateId === 'post-election' || stateId === 'post-event')) {
         const leadParagraphs = defaultParagraphs.length > 1
             ? defaultParagraphs.slice(0, -1)
             : defaultParagraphs.slice(0, 1);
@@ -77,7 +77,7 @@ function renderHeroIntroForState(intro, districtCopy, vars, stateId) {
         return leadHtml + renderHeroIntroWinnerParagraphs(districtCopy, vars, stateId === 'post-event');
     }
 
-    return renderHeroIntro(intro, vars);
+    return renderHeroIntro(paragraphs, vars);
 }
 
 function renderHeroTitle(title, vars) {
@@ -115,13 +115,22 @@ function buildTemplateVars(districtCopy, shared = null) {
         influencerImg: districtCopy.influencerImg,
         influencerSocialUrl: districtCopy.influencerSocialUrl,
         councilBioUrl: districtCopy.councilBioUrl,
-        winnerBusiness: districtCopy.winner?.businessName || "Brittany's Restaurant and Lounge",
+        winnerBusiness: districtCopy.winner?.businessName || 'TBA',
         winnerAddress: districtCopy.winner?.address || '',
-        winnerVoteCount: districtCopy.winner?.voteCount ?? 46,
+        winnerImage: districtCopy.winner?.image || '',
+        winnerVoteCount: districtCopy.winner?.voteCount ?? null,
         meetupTime: districtCopy.winner?.meetupTime || '8:30pm',
         specialGuest: districtCopy.winner?.specialGuest || '',
         specialGuestImg: districtCopy.winner?.specialGuestImg || ''
     };
+}
+
+function formatStreetAddress(address) {
+    if (!address || typeof address !== 'string') return '';
+    const trimmed = address.trim();
+    if (!trimmed) return '';
+    const commaIdx = trimmed.indexOf(',');
+    return commaIdx === -1 ? trimmed : trimmed.slice(0, commaIdx).trim();
 }
 
 // Pulls a readable @handle out of a social profile URL (falls back to a
@@ -403,7 +412,14 @@ function itineraryStyles() {
         }
 
         /* Run-off "revealed pick" cards */
-        .reveal-card { padding-top: 0; overflow: hidden; }
+        .reveal-card {
+            padding-top: 45px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .reveal-card .stop-avatar-container { margin-bottom: 0; }
         .reveal-card-media {
             display: block;
             width: calc(100% + 70px);
@@ -427,18 +443,85 @@ function itineraryStyles() {
             font-weight: bold; letter-spacing: 1px;
         }
         .reveal-business-name {
-            margin: 0 0 16px 0;
+            margin: 0;
             font-size: 1.9rem;
             font-family: var(--font-header);
             text-transform: uppercase;
             color: var(--text-primary);
             line-height: 1.05;
         }
+        .reveal-business-info {
+            position: relative;
+            margin: 6px 0 0;
+            width: 100%;
+        }
+        .reveal-business-info .reveal-card-media {
+            width: 100%;
+            max-width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            display: block;
+            margin: 15px auto 0;
+        }
+        .reveal-business-info .reveal-business-name {
+            position: absolute;
+            top: 0;
+            left: 15px;
+            z-index: 1;
+            margin: 0;
+            padding: 6px 10px;
+            font-size: 2.2rem;
+            font-family: var(--font-header);
+            color: var(--accent);
+            text-transform: uppercase;
+            text-align: left;
+            background: var(--text-primary);
+            border-radius: 4px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            width: fit-content;
+            max-width: calc(100% - 30px);
+            line-height: 1.1;
+            box-decoration-break: clone;
+            -webkit-box-decoration-break: clone;
+        }
+        .winner-card-celebration .reveal-business-info .reveal-card-media {
+            height: 250px;
+        }
         .reveal-body {
-            margin: 0 0 22px 0;
+            margin: 0;
             font-size: var(--body-text-size);
             line-height: var(--body-line-height);
             color: var(--text-secondary);
+        }
+        .reveal-card-footer {
+            margin: 0;
+            padding: 14px 0 0;
+            border-top: 1px solid rgba(203, 160, 82, 0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .reveal-business-address {
+            font-size: var(--body-text-size);
+            color: var(--text-secondary);
+            line-height: 1.3;
+            margin: 0;
+        }
+        .winner-card-celebration {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .winner-card-celebration .winner-card-header {
+            margin-bottom: 0;
+        }
+        .winner-card-celebration .winner-card-copy {
+            gap: 14px;
+        }
+        .winner-card-celebration .winner-card-summary-address,
+        .winner-card-celebration .winner-card-summary-meetup {
+            margin-top: 0;
         }
         .reveal-actions { display: flex; gap: 12px; flex-wrap: wrap; }
         .reveal-actions .reveal-btn {
@@ -534,11 +617,18 @@ function proceedingsPathSvg() {
 // "STOP 01/02/03" caption with the homepage's 3D title treatment).
 const STOP_ORDINAL_LABELS = ['First Stop', 'Second Stop', 'Last Stop'];
 
+// Maps each itinerary stop to the host whose run-off pick should fill that card.
+// District E intentionally puts council first; other districts default stop 1 to
+// influencer and stop 2 to council when hostRole is omitted from JSON.
+function getStopHostRole(stop, index) {
+    return stop.hostRole ?? (index === 0 ? 'influencer' : 'council');
+}
+
 // A single teaser stop card (used for the influencer & council stops in the
 // default, pre-run-off Crawl-tinery).
 function renderHostStop(stop, index, vars) {
     const alignClass = index === 0 ? 'left' : 'right';
-    const hostRole = stop.hostRole ?? (index === 0 ? 'influencer' : 'council');
+    const hostRole = getStopHostRole(stop, index);
     const avatarHtml = hostRole === 'influencer'
         ? `<img src="${vars.influencerImg}" class="stop-avatar" alt="${vars.influencerName}">`
         : `<img src="${vars.councilImg}" class="stop-avatar" alt="${vars.councilName}">`;
@@ -638,16 +728,17 @@ function renderRevealCard({ role, roleLabel, stopNumber, alignClass, avatar, hos
         websiteHtml = `<a href="#" target="_blank" rel="noopener noreferrer" class="stop-host-link" data-field="website" data-business-name="${businessName || ''}" style="font-size: var(--body-text-size); font-weight: 600; color: var(--brand-red); text-decoration: none; display: none; margin: 0;">Visit Website</a>`;
     }
 
-    const footerSection = (address || hostLinkHtml || websiteHtml) ?
-        `<div class="reveal-card-footer" style="margin-top: 10px; padding-top: 10px; padding-bottom: 4px; border-top: 1px solid rgba(203, 160, 82, 0.3); display: flex; flex-direction: column; gap: 6px;">
-            <div class="reveal-business-address" data-field="address" style="font-size: var(--body-text-size); color: var(--text-secondary); line-height: 1.3; margin: 0; ${address ? '' : 'display: none;'}">${address || ''}</div>
+    const streetAddress = address ? formatStreetAddress(address) : '';
+    const footerSection = (streetAddress || hostLinkHtml || websiteHtml) ?
+        `<div class="reveal-card-footer">
+            <div class="reveal-business-address" data-field="address" style="${streetAddress ? '' : 'display: none;'}">${escapeHtml(streetAddress)}</div>
             ${hostLinkHtml}
             ${websiteHtml}
         </div>` : '';
 
     return `
             <div class="proc-step ${alignClass}" data-pick-role="${role}">
-                <div class="proc-card reveal-card" style="padding-top: 45px;">
+                <div class="proc-card reveal-card">
                     <div class="stop-avatar-container" style="align-items: flex-start;">
                         <img src="${avatar}" class="stop-avatar" alt="${hostName}">
                         <div style="text-align: left; display: flex; flex-direction: column; justify-content: center; min-height: 95px;">
@@ -656,12 +747,12 @@ function renderRevealCard({ role, roleLabel, stopNumber, alignClass, avatar, hos
                         </div>
                     </div>
                     
-                    <div class="reveal-business-info" style="margin-top: 35px; margin-bottom: 12px; position: relative; text-align: center;">
-                        <img class="reveal-card-media" data-field="image" src="${image || ''}" alt="${businessName || ''}" style="width: 100%; max-width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin: 0 auto; display: ${image ? 'block' : 'none'};">
-                        <h4 class="reveal-business-name" data-field="name" style="position: absolute; top: 0; left: 0; right: 0; margin: 0; padding: 8px 12px; font-size: 2.2rem; font-family: var(--font-header); color: var(--accent); text-transform: uppercase; background: var(--text-primary); border-radius: 8px 8px 0 0; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">${businessName || 'To Be Revealed'}</h4>
+                    <div class="reveal-business-info">
+                        <img class="reveal-card-media" data-field="image" src="${image || ''}" alt="${businessName || ''}" style="display: ${image ? 'block' : 'none'};">
+                        <h4 class="reveal-business-name" data-field="name">${escapeHtml(businessName || 'To Be Revealed')}</h4>
                     </div>
                     
-                    <p class="reveal-body" data-field="body" style="margin: 0; font-size: var(--body-text-size); line-height: 1.6; color: var(--text-secondary);">${body || ''}</p>
+                    <p class="reveal-body" data-field="body">${body || ''}</p>
                     
                     ${footerSection}
                 </div>
@@ -689,14 +780,16 @@ function renderRunoffCrawltinery(vars, influencerRole, councilRole, stops) {
 
     const stop1 = stops[0];
     const stop2 = stops[1];
-    const s1Data = getRoleData(stop1.hostRole);
-    const s2Data = getRoleData(stop2.hostRole);
+    const stop1Role = getStopHostRole(stop1, 0);
+    const stop2Role = getStopHostRole(stop2, 1);
+    const s1Data = getRoleData(stop1Role);
+    const s2Data = getRoleData(stop2Role);
 
     return `
     <div class="proceedings-container">
         ${proceedingsPathSvg()}
         ${renderRevealCard({ 
-            role: stop1.hostRole, 
+            role: stop1Role, 
             roleLabel: s1Data.label, 
             stopNumber: '01', 
             alignClass: 'left', 
@@ -711,7 +804,7 @@ function renderRunoffCrawltinery(vars, influencerRole, councilRole, stops) {
             body: interpolate(stop1.runoffBody || stop1.body, vars)
         })}
         ${renderRevealCard({ 
-            role: stop2.hostRole, 
+            role: stop2Role, 
             roleLabel: s2Data.label, 
             stopNumber: '02', 
             alignClass: 'right', 
@@ -770,15 +863,15 @@ function renderWinnerCard(district, vars, { stepClass = '' } = {}) {
                     </div>
                 </div>
 
-                <div class="reveal-business-info" style="margin-top: 35px; margin-bottom: 12px; position: relative; text-align: center;">
-                    <img class="reveal-card-media" src="assets/Brittanys-539df087-ef53-4198-9d9c-e122ffb2d934.png" alt="Brittany's Restaurant and Lounge" style="width: 100%; max-width: 100%; height: 250px; object-fit: cover; border-radius: 8px; margin: 0 auto; display: block;">
-                    <h4 class="reveal-business-name" style="position: absolute; top: 0; left: 0; right: 0; margin: 0; padding: 8px 12px; font-size: 2.2rem; font-family: var(--font-header); color: var(--accent); text-transform: uppercase; background: var(--text-primary); border-radius: 8px 8px 0 0; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">Brittany's Restaurant</h4>
+                <div class="reveal-business-info">
+                    <img class="reveal-card-media" data-field="winner-image" src="${vars.winnerImage || ''}" alt="${escapeHtml(vars.winnerBusiness)}" style="display: ${vars.winnerImage ? 'block' : 'none'};">
+                    <h4 class="reveal-business-name" data-field="winner-name">${escapeHtml(vars.winnerBusiness)}</h4>
                 </div>
 
                 <div class="winner-card-copy">
                     <p class="reveal-body winner-card-summary">
-                        <span class="winner-card-summary-lead">With <strong>${vars.winnerVoteCount} votes</strong>, <strong>${vars.winnerBusiness}</strong> has been elected to host the last stop of <em>District <strong><em>${district}</em></strong> After Dark!</em></span>
-                        ${vars.winnerAddress ? `<span class="winner-card-summary-address">${escapeHtml(vars.winnerAddress)}</span>` : ''}
+                        <span class="winner-card-summary-lead">With <strong data-field="winner-vote-count">${vars.winnerVoteCount ?? '—'}</strong> votes, <strong data-field="winner-summary-name">${escapeHtml(vars.winnerBusiness)}</strong> has been elected to host the last stop of <em>District <strong><em>${district}</em></strong> After Dark!</em></span>
+                        ${vars.winnerAddress ? `<span class="winner-card-summary-address" data-field="winner-address">${escapeHtml(formatStreetAddress(vars.winnerAddress))}</span>` : `<span class="winner-card-summary-address" data-field="winner-address" style="display: none;"></span>`}
                         <span class="winner-card-summary-meetup"><span class="hero-meetup-highlight">${meetupHighlight}</span></span>
                     </p>
                     <div class="winner-card-hosts">${hostsHtml}</div>
@@ -795,14 +888,16 @@ function renderPostElectionCrawltinery(vars, influencerRole, councilRole, stops,
 
     const stop1 = stops[0];
     const stop2 = stops[1];
-    const s1Data = getRoleData(stop1.hostRole);
-    const s2Data = getRoleData(stop2.hostRole);
+    const stop1Role = getStopHostRole(stop1, 0);
+    const stop2Role = getStopHostRole(stop2, 1);
+    const s1Data = getRoleData(stop1Role);
+    const s2Data = getRoleData(stop2Role);
 
     return `
     <div class="proceedings-container">
         ${proceedingsPathSvg()}
         ${renderRevealCard({ 
-            role: stop1.hostRole, 
+            role: stop1Role, 
             roleLabel: s1Data.label, 
             stopNumber: '01', 
             alignClass: 'left', 
@@ -817,7 +912,7 @@ function renderPostElectionCrawltinery(vars, influencerRole, councilRole, stops,
             body: interpolate(stop1.runoffBody || stop1.body, vars)
         })}
         ${renderRevealCard({ 
-            role: stop2.hostRole, 
+            role: stop2Role, 
             roleLabel: s2Data.label, 
             stopNumber: '02', 
             alignClass: 'right', 
@@ -1458,11 +1553,32 @@ class EventLayout extends HTMLElement {
     updateHeroIntro(stateId) {
         const container = this.querySelector('#hero-intro');
         if (!container || !this._heroIntroSource || !this._districtCopy || !this._heroVars) return;
+        
+        let introSource = this._heroIntroSource;
+        let isCustom = false;
+        
+        if (this._electionSchedule) {
+            if (stateId === 'round-1' && this._electionSchedule.heroRound1) {
+                introSource = this._electionSchedule.heroRound1;
+                isCustom = true;
+            } else if (stateId === 'run-off' && this._electionSchedule.heroRunOff) {
+                introSource = this._electionSchedule.heroRunOff;
+                isCustom = true;
+            } else if (stateId === 'post-election' && this._electionSchedule.heroWinner) {
+                introSource = this._electionSchedule.heroWinner;
+                isCustom = true;
+            } else if (stateId === 'post-event' && this._electionSchedule.heroPostEvent) {
+                introSource = this._electionSchedule.heroPostEvent;
+                isCustom = true;
+            }
+        }
+
         container.innerHTML = renderHeroIntroForState(
-            this._heroIntroSource,
+            introSource,
             this._districtCopy,
             this._heroVars,
-            stateId
+            stateId,
+            isCustom
         );
     }
 
@@ -1493,6 +1609,7 @@ class EventLayout extends HTMLElement {
             // Populate the run-off Crawl-tinery cards from the schedule's picks so
             // they are ready before we toggle them into view.
             this.populateRunoffCrawltinery(sched);
+            this.populateWinnerCard(sched);
             this.updateRunoffDateDisplay(sched.runOffStart);
 
             // Local Legends board mode is controlled from the same dashboard doc.
@@ -1744,73 +1861,140 @@ class EventLayout extends HTMLElement {
         });
     }
 
+    getItineraryStopForRole(role) {
+        const stops = this._districtCopy?.itinerary?.stops || [];
+        return stops.find((stop, index) => getStopHostRole(stop, index) === role);
+    }
+
     // Fills the run-off Crawl-tinery "revealed pick" cards. The business identity
     // (name, photo, website, map location) is pulled from each venue doc so the
     // admin only has to paste a venue ID + write the blurb in the dashboard.
+    // Itinerary stop fields in the district JSON (image, website, address) are used
+    // as fallbacks when the venue doc is missing those details.
     async populateRunoffCrawltinery(sched) {
         if (!sched) return;
         const picks = [
-            { role: 'influencer', id: sched.influencerPickId, body: sched.influencerPickBody },
-            { role: 'council', id: sched.councilPickId, body: sched.councilPickBody }
+            { role: 'influencer', id: sched.influencerPickId, body: sched.influencerPickBody, imageOverride: sched.influencerPickImage },
+            { role: 'council', id: sched.councilPickId, body: sched.councilPickBody, imageOverride: sched.councilPickImage }
         ];
 
         for (const pick of picks) {
             const card = this.querySelector(`[data-pick-role="${pick.role}"]`);
             if (!card) continue;
 
+            const fallback = this.getItineraryStopForRole(pick.role);
+
             const bodyEl = card.querySelector('[data-field="body"]');
             if (bodyEl && pick.body) bodyEl.textContent = pick.body;
 
-            if (!pick.id) continue;
-
-            try {
-                const venueSnap = await getDoc(doc(db, "venues", pick.id));
-                if (!venueSnap.exists()) continue;
-                const venue = venueSnap.data();
-
-                const nameEl = card.querySelector('[data-field="name"]');
-                if (nameEl && venue.name) nameEl.textContent = venue.name;
-
-                const addressEl = card.querySelector('[data-field="address"]');
-                if (addressEl && venue.address) {
-                    addressEl.textContent = venue.address;
-                    addressEl.style.display = 'block';
+            let venue = null;
+            if (pick.id) {
+                try {
+                    const venueSnap = await getDoc(doc(db, "venues", pick.id));
+                    if (venueSnap.exists()) venue = venueSnap.data();
+                } catch (err) {
+                    console.warn(`Unable to load run-off pick for ${pick.role}:`, err);
                 }
-
-                const imgEl = card.querySelector('[data-field="image"]');
-                if (imgEl && venue.image) {
-                    imgEl.src = venue.image;
-                    imgEl.alt = venue.name || '';
-                    imgEl.style.display = 'block';
-                }
-
-                const webEl = card.querySelector('[data-field="website"]');
-                const websiteUrl = venue.website || venue.facebook;
-                if (webEl && websiteUrl) {
-                    webEl.href = websiteUrl;
-                    webEl.textContent = venue.name ? `${venue.name} on the web` : 'Visit Website';
-                    webEl.style.display = 'block';
-                } else if (webEl) {
-                    webEl.style.display = 'none';
-                }
-
-                // We removed the map button from the HTML, so we don't need this logic anymore
-                // but we keep it commented out just in case
-                /*
-                const mapBtn = card.querySelector('[data-field="map"]');
-                if (mapBtn) {
-                    mapBtn.style.display = 'inline-flex';
-                    mapBtn.style.alignItems = 'center';
-                    mapBtn.addEventListener('click', () => {
-                        if (window.openMapPopupForVenue) window.openMapPopupForVenue(pick.id);
-                        const mapSection = document.getElementById('map-section');
-                        if (mapSection) mapSection.scrollIntoView({ behavior: 'smooth' });
-                    });
-                }
-                */
-            } catch (err) {
-                console.warn(`Unable to load run-off pick for ${pick.role}:`, err);
             }
+
+            const displayName = venue?.name || fallback?.businessName;
+            const nameEl = card.querySelector('[data-field="name"]');
+            if (nameEl && displayName) nameEl.textContent = displayName;
+
+            const displayAddress = formatStreetAddress(fallback?.address || venue?.address);
+            const addressEl = card.querySelector('[data-field="address"]');
+            if (addressEl && displayAddress) {
+                addressEl.textContent = displayAddress;
+                addressEl.style.display = 'block';
+            }
+
+            const displayImage = pick.imageOverride || fallback?.image || venue?.image;
+            const imgEl = card.querySelector('[data-field="image"]');
+            if (imgEl && displayImage) {
+                imgEl.src = displayImage;
+                imgEl.alt = displayName || '';
+                imgEl.style.display = 'block';
+            }
+
+            const webEl = card.querySelector('[data-field="website"]');
+            const websiteUrl = fallback?.website || venue?.website || venue?.facebook;
+            if (webEl && websiteUrl) {
+                webEl.href = websiteUrl;
+                webEl.textContent = displayName ? `${displayName} on the web` : 'Visit Website';
+                webEl.style.display = 'block';
+            } else if (webEl) {
+                webEl.style.display = 'none';
+            }
+        }
+    }
+
+    applyWinnerVenueToPage(venue) {
+        if (!venue) return;
+
+        if (this._heroVars) {
+            this._heroVars.winnerBusiness = venue.name || this._heroVars.winnerBusiness;
+            this._heroVars.winnerAddress = venue.address ? formatStreetAddress(venue.address) : this._heroVars.winnerAddress;
+            if (venue.voteCount != null) this._heroVars.winnerVoteCount = venue.voteCount;
+        }
+
+        const winnerCards = this.querySelectorAll('.winner-card-celebration');
+        winnerCards.forEach(card => {
+            const nameEl = card.querySelector('[data-field="winner-name"]');
+            if (nameEl && venue.name) nameEl.textContent = venue.name;
+
+            const summaryNameEl = card.querySelector('[data-field="winner-summary-name"]');
+            if (summaryNameEl && venue.name) summaryNameEl.textContent = venue.name;
+
+            const voteEl = card.querySelector('[data-field="winner-vote-count"]');
+            if (voteEl && venue.voteCount != null) voteEl.textContent = venue.voteCount;
+
+            const addressEl = card.querySelector('[data-field="winner-address"]');
+            if (addressEl && venue.address) {
+                addressEl.textContent = formatStreetAddress(venue.address);
+                addressEl.style.display = '';
+            }
+
+            const imgEl = card.querySelector('[data-field="winner-image"]');
+            if (imgEl && venue.image) {
+                imgEl.src = venue.image;
+                imgEl.alt = venue.name || '';
+                imgEl.style.display = 'block';
+            }
+        });
+
+        const displayed = this._displayedElectionState || window.currentElectionState;
+        if (displayed === 'post-election' || displayed === 'post-event') {
+            this.updateHeroIntro(displayed);
+        }
+    }
+
+    // Populates the winner card with venue data from Firestore when winnerId is set.
+    async populateWinnerCard(sched) {
+        if (!sched || !sched.winnerId) return;
+
+        try {
+            const venueSnap = await getDoc(doc(db, "venues", sched.winnerId));
+            if (!venueSnap.exists()) {
+                console.warn(`Winner venue not found: ${sched.winnerId}`);
+                return;
+            }
+            const venueData = venueSnap.data();
+            
+            // Apply schedule overrides if they exist
+            if (sched.winnerImage) venueData.image = sched.winnerImage;
+            
+            this.applyWinnerVenueToPage(venueData);
+            
+            // Apply winner body override if it exists
+            if (sched.winnerBody) {
+                const winnerCards = this.querySelectorAll('.winner-card-celebration');
+                winnerCards.forEach(card => {
+                    const bodyEl = card.querySelector('.winner-card-summary-lead');
+                    if (bodyEl) bodyEl.textContent = sched.winnerBody;
+                });
+            }
+        } catch (err) {
+            console.warn('Unable to load winner venue:', err);
         }
     }
 
@@ -2311,6 +2495,12 @@ class EventLayout extends HTMLElement {
             const voteTarget = urlParams.get('vote');
 
             if (voteTarget) {
+                // Clean the ?vote= and &name= params from the URL so that if the user
+                // later copies/shares "the district page" they get a clean URL without
+                // the business-specific query string baked in.
+                const cleanUrl = window.location.pathname;
+                history.replaceState(null, '', cleanUrl);
+
                 // We want to open the map popup for this venue, not just the vote modal directly.
                 // The map + Firestore markers load asynchronously, so wait for THIS venue's
                 // marker specifically (not just the helper) before scrolling and opening it.

@@ -349,10 +349,42 @@
                 <label style="display:block; margin-bottom:5px;">Event Concludes (Post-Event State):</label>
                 <input type="datetime-local" id="sched-post" step="3600" style="width: 100%;">
             </div>
+
             <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+            <h3 style="font-family: var(--font-header); text-transform: uppercase; font-size: 1.1rem; letter-spacing: 1px; margin: 0 0 6px;">Hero Body Text Overrides</h3>
+            <p style="color: var(--text-secondary); font-size: 0.85rem; margin: 0 0 15px;">Optional. Override the default hero intro text for each state. Leave blank to use defaults.</p>
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px;">Round 1 Hero Text:</label>
+                <textarea id="sched-hero-round-1" rows="2" style="width: 100%;"></textarea>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px;">Run-Off Hero Text:</label>
+                <textarea id="sched-hero-run-off" rows="2" style="width: 100%;"></textarea>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px;">Winner Hero Text:</label>
+                <textarea id="sched-hero-winner" rows="2" style="width: 100%;"></textarea>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px;">Post-Event Hero Text:</label>
+                <textarea id="sched-hero-post-event" rows="2" style="width: 100%;"></textarea>
+            </div>
+
+            <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+            <h3 style="font-family: var(--font-header); text-transform: uppercase; font-size: 1.1rem; letter-spacing: 1px; margin: 0 0 6px;">Winner Details</h3>
             <div style="margin-bottom: 15px;">
                 <label style="display:block; margin-bottom:5px; color: var(--text-primary);">Official Winner (Venue ID):</label>
                 <input type="text" id="sched-winner-id" placeholder="Paste venue document ID here" style="width: 100%;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px;">Winner Body Text Override:</label>
+                <textarea id="sched-winner-body" rows="2" placeholder="Optional override for the winner card text..." style="width: 100%;"></textarea>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px;">Winner Image Upload:</label>
+                <input type="file" id="sched-winner-image-upload" accept="image/*" style="width: 100%; margin-bottom: 5px;">
+                <input type="text" id="sched-winner-image-url" placeholder="Or paste image URL here" style="width: 100%;">
+                <div id="sched-winner-image-preview" style="margin-top: 10px; max-width: 200px;"></div>
             </div>
 
             <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin: 20px 0;">
@@ -368,12 +400,25 @@
                 <textarea id="sched-influencer-pick-body" rows="3" placeholder="Why the influencer chose this stop..." style="width: 100%;"></textarea>
             </div>
             <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px;">Influencer's Pick &mdash; Image Upload:</label>
+                <input type="file" id="sched-influencer-pick-image-upload" accept="image/*" style="width: 100%; margin-bottom: 5px;">
+                <input type="text" id="sched-influencer-pick-image-url" placeholder="Or paste image URL here" style="width: 100%;">
+                <div id="sched-influencer-pick-image-preview" style="margin-top: 10px; max-width: 200px;"></div>
+            </div>
+
+            <div style="margin-bottom: 15px;">
                 <label style="display:block; margin-bottom:5px;">Council's Pick &mdash; Venue ID:</label>
                 <input type="text" id="sched-council-pick-id" placeholder="Paste venue document ID here" style="width: 100%;">
             </div>
             <div style="margin-bottom: 15px;">
                 <label style="display:block; margin-bottom:5px;">Council's Pick &mdash; Body Text:</label>
                 <textarea id="sched-council-pick-body" rows="3" placeholder="Why the councilmember chose this stop..." style="width: 100%;"></textarea>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px;">Council's Pick &mdash; Image Upload:</label>
+                <input type="file" id="sched-council-pick-image-upload" accept="image/*" style="width: 100%; margin-bottom: 5px;">
+                <input type="text" id="sched-council-pick-image-url" placeholder="Or paste image URL here" style="width: 100%;">
+                <div id="sched-council-pick-image-preview" style="margin-top: 10px; max-width: 200px;"></div>
             </div>
 
             <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin: 20px 0;">
@@ -395,9 +440,10 @@
     </div>
 
     <script type="module">
-        import { auth, db } from "./js/firebase-config.js";
+        import { auth, db, storage } from "./js/firebase-config.js";
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
         import { collection, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, increment, arrayUnion, query, where, orderBy, collectionGroup } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+        import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-storage.js";
         import { isAdminUser } from "./js/admin-auth.js";
 
         const loadingEl = document.getElementById("loading");
@@ -757,6 +803,33 @@
         // --- SCHEDULE LOGIC ---
         const schedSelect = document.getElementById('schedule-district-select');
         
+        async function handleImageUpload(fileInputId, urlInputId, previewDivId) {
+            const fileInput = document.getElementById(fileInputId);
+            const urlInput = document.getElementById(urlInputId);
+            const previewDiv = document.getElementById(previewDivId);
+            
+            fileInput.addEventListener('change', async () => {
+                const file = fileInput.files[0];
+                if (!file) return;
+                
+                previewDiv.innerHTML = '<span style="color: var(--text-secondary);">Uploading...</span>';
+                try {
+                    const storageRef = ref(storage, `assets/${Date.now()}_${file.name}`);
+                    await uploadBytes(storageRef, file);
+                    const url = await getDownloadURL(storageRef);
+                    urlInput.value = url;
+                    previewDiv.innerHTML = `<img src="${url}" style="max-width: 100%; border-radius: 4px; border: 1px solid rgba(203, 160, 82, 0.3);">`;
+                } catch (e) {
+                    console.error("Upload failed", e);
+                    previewDiv.innerHTML = `<span style="color: #ff6b6b;">Upload failed: ${e.message}</span>`;
+                }
+            });
+        }
+
+        handleImageUpload('sched-winner-image-upload', 'sched-winner-image-url', 'sched-winner-image-preview');
+        handleImageUpload('sched-influencer-pick-image-upload', 'sched-influencer-pick-image-url', 'sched-influencer-pick-image-preview');
+        handleImageUpload('sched-council-pick-image-upload', 'sched-council-pick-image-url', 'sched-council-pick-image-preview');
+
         function formatForDateTimeLocal(dateStr) {
             if (!dateStr) return '';
             const d = new Date(dateStr);
@@ -776,14 +849,59 @@
                     document.getElementById('sched-run-off').value = formatForDateTimeLocal(parseD(data.runOffStart));
                     document.getElementById('sched-winner').value = formatForDateTimeLocal(parseD(data.winnerAnnounce));
                     document.getElementById('sched-post').value = formatForDateTimeLocal(parseD(data.postEvent));
+                    
+                    document.getElementById('sched-hero-round-1').value = data.heroRound1 || '';
+                    document.getElementById('sched-hero-run-off').value = data.heroRunOff || '';
+                    document.getElementById('sched-hero-winner').value = data.heroWinner || '';
+                    document.getElementById('sched-hero-post-event').value = data.heroPostEvent || '';
+                    
                     document.getElementById('sched-winner-id').value = data.winnerId || '';
+                    document.getElementById('sched-winner-body').value = data.winnerBody || '';
+                    document.getElementById('sched-winner-image-url').value = data.winnerImage || '';
+                    document.getElementById('sched-winner-image-preview').innerHTML = data.winnerImage ? `<img src="${data.winnerImage}" style="max-width: 100%; border-radius: 4px; border: 1px solid rgba(203, 160, 82, 0.3);">` : '';
+                    
                     document.getElementById('sched-influencer-pick-id').value = data.influencerPickId || '';
                     document.getElementById('sched-influencer-pick-body').value = data.influencerPickBody || '';
+                    document.getElementById('sched-influencer-pick-image-url').value = data.influencerPickImage || '';
+                    document.getElementById('sched-influencer-pick-image-preview').innerHTML = data.influencerPickImage ? `<img src="${data.influencerPickImage}" style="max-width: 100%; border-radius: 4px; border: 1px solid rgba(203, 160, 82, 0.3);">` : '';
+                    
                     document.getElementById('sched-council-pick-id').value = data.councilPickId || '';
                     document.getElementById('sched-council-pick-body').value = data.councilPickBody || '';
+                    document.getElementById('sched-council-pick-image-url').value = data.councilPickImage || '';
+                    document.getElementById('sched-council-pick-image-preview').innerHTML = data.councilPickImage ? `<img src="${data.councilPickImage}" style="max-width: 100%; border-radius: 4px; border: 1px solid rgba(203, 160, 82, 0.3);">` : '';
+                    
                     document.getElementById('sched-legends-mode').value = data.localLegendsMode || 'default';
-                    document.getElementById('schedule-form').style.display = 'block';
+                } else {
+                    // District has no existing schedule data - clear form for new entry
+                    document.getElementById('sched-round-1').value = '';
+                    document.getElementById('sched-run-off').value = '';
+                    document.getElementById('sched-winner').value = '';
+                    document.getElementById('sched-post').value = '';
+                    
+                    document.getElementById('sched-hero-round-1').value = '';
+                    document.getElementById('sched-hero-run-off').value = '';
+                    document.getElementById('sched-hero-winner').value = '';
+                    document.getElementById('sched-hero-post-event').value = '';
+                    
+                    document.getElementById('sched-winner-id').value = '';
+                    document.getElementById('sched-winner-body').value = '';
+                    document.getElementById('sched-winner-image-url').value = '';
+                    document.getElementById('sched-winner-image-preview').innerHTML = '';
+                    
+                    document.getElementById('sched-influencer-pick-id').value = '';
+                    document.getElementById('sched-influencer-pick-body').value = '';
+                    document.getElementById('sched-influencer-pick-image-url').value = '';
+                    document.getElementById('sched-influencer-pick-image-preview').innerHTML = '';
+                    
+                    document.getElementById('sched-council-pick-id').value = '';
+                    document.getElementById('sched-council-pick-body').value = '';
+                    document.getElementById('sched-council-pick-image-url').value = '';
+                    document.getElementById('sched-council-pick-image-preview').innerHTML = '';
+                    
+                    document.getElementById('sched-legends-mode').value = 'default';
                 }
+                // Always show the form so admin can create/edit schedule
+                document.getElementById('schedule-form').style.display = 'block';
             } catch (e) {
                 console.error("Error loading schedule:", e);
             }
@@ -806,16 +924,30 @@
                 runOffStart: onTheHour(document.getElementById('sched-run-off').value),
                 winnerAnnounce: onTheHour(document.getElementById('sched-winner').value),
                 postEvent: onTheHour(document.getElementById('sched-post').value),
-                winnerId: document.getElementById('sched-winner-id').value || null,
+                
+                heroRound1: document.getElementById('sched-hero-round-1').value.trim() || null,
+                heroRunOff: document.getElementById('sched-hero-run-off').value.trim() || null,
+                heroWinner: document.getElementById('sched-hero-winner').value.trim() || null,
+                heroPostEvent: document.getElementById('sched-hero-post-event').value.trim() || null,
+                
+                winnerId: document.getElementById('sched-winner-id').value.trim() || null,
+                winnerBody: document.getElementById('sched-winner-body').value.trim() || null,
+                winnerImage: document.getElementById('sched-winner-image-url').value.trim() || null,
+                
                 influencerPickId: document.getElementById('sched-influencer-pick-id').value.trim() || null,
                 influencerPickBody: document.getElementById('sched-influencer-pick-body').value.trim() || null,
+                influencerPickImage: document.getElementById('sched-influencer-pick-image-url').value.trim() || null,
+                
                 councilPickId: document.getElementById('sched-council-pick-id').value.trim() || null,
                 councilPickBody: document.getElementById('sched-council-pick-body').value.trim() || null,
+                councilPickImage: document.getElementById('sched-council-pick-image-url').value.trim() || null,
+                
                 localLegendsMode: document.getElementById('sched-legends-mode').value || 'default'
             };
             
             try {
-                await updateDoc(doc(db, "settings", "schedule"), updates);
+                // Use setDoc with merge to handle both create and update cases
+                await setDoc(doc(db, "settings", "schedule"), updates, { merge: true });
                 const msg = document.getElementById('schedule-save-msg');
                 msg.style.display = 'inline';
                 setTimeout(() => msg.style.display = 'none', 2000);

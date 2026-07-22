@@ -1958,7 +1958,7 @@
 .winner-card-celebration .winner-card-header {
     align-items: center;
     gap: 18px;
-    margin-bottom: 20px;
+    margin-bottom: 0;
 }
 
 .winner-card-celebration .winner-card-header-copy {
@@ -1994,7 +1994,7 @@
 .winner-card-copy {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
 }
 
 .winner-card-copy .reveal-body {
@@ -2015,11 +2015,11 @@
 }
 
 .winner-card-summary-address {
-    margin-top: 0.35em;
+    margin-top: 0;
 }
 
 .winner-card-summary-meetup {
-    margin-top: 0.35em;
+    margin-top: 0;
 }
 
 .winner-card-summary .hero-meetup-highlight {
@@ -2032,8 +2032,8 @@
     justify-content: flex-start;
     align-items: flex-start;
     gap: 24px 36px;
-    margin-top: 8px;
-    padding-top: 22px;
+    margin-top: 0;
+    padding-top: 14px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
