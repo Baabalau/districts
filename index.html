@@ -148,17 +148,27 @@
                                 <span class="pv-icon" aria-hidden="true">📲</span>
                                 <div>
                                     <h5>Share who you voted for</h5>
-                                    <p>Grab a custom "I Voted" graphic to post to your story and rally friends and followers behind your favorite spot.</p>
+                                    <p>Grab a custom "I Voted" graphic to post to your story, or just text a friend your pick &mdash; the link brings them directly to the business you shared.</p>
                                 </div>
                             </li>
                         </ul>
                         <a href="#events" class="participate-form-link">Find your crawl</a>
                     </div>
                     <div class="pv-media">
-                        <div class="pv-phone">
-                            <img src="assets/District%20Parings/VoteShare_C.png" alt="Custom 'I Voted' share graphic for a district crawl" loading="lazy">
+                        <div class="pv-stack" id="pv-stack-residents" aria-label="Interactive previews of the shareable vote graphics">
+                            <div class="pv-stack-card pv-stack-card--vote-graphic" tabindex="0" role="button" aria-label="Preview 'I Voted' story graphic">
+                                <div class="pv-phone">
+                                    <img src="assets/District%20Parings/VoteShare_C.png" alt="Custom 'I Voted' share graphic for a district crawl" loading="lazy">
+                                </div>
+                                <span class="pv-card-caption">Instagram Story</span>
+                            </div>
+                            <div class="pv-stack-card pv-stack-card--imessage" tabindex="0" role="button" aria-label="Preview text message share preview">
+                                <div class="pv-phone">
+                                    <img src="assets/imessage-share-preview.png" alt="Text message conversation showing a Districts After Dark vote link unfurl into a rich preview card" loading="lazy">
+                                </div>
+                                <span class="pv-card-caption">Text Message</span>
+                            </div>
                         </div>
-                        <span class="pv-media-caption">Post your pick as an Instagram story</span>
                     </div>
                 </div>
             </div>
@@ -191,12 +201,12 @@
                         <a href="promote.html" class="participate-form-link">Promote your business</a>
                     </div>
                     <div class="pv-media">
-                        <div class="pv-biz-stack" id="pv-biz-stack" aria-label="Interactive previews of business promotional materials">
-                            <div class="pv-biz-card pv-biz-card--flyer" tabindex="0" role="button" aria-label="Preview printable check-in flyer">
+                        <div class="pv-stack" id="pv-stack-venues" aria-label="Interactive previews of business promotional materials">
+                            <div class="pv-stack-card pv-stack-card--flyer" tabindex="0" role="button" aria-label="Preview printable check-in flyer">
                                 <img class="pv-flyer" src="assets/Districts_Standup_preview.png" alt="Printable check-in flyer preview" loading="lazy">
                                 <span class="pv-card-caption">Printable Flyer</span>
                             </div>
-                            <div class="pv-biz-card pv-biz-card--popup" tabindex="0" aria-label="Preview map listing popup">
+                            <div class="pv-stack-card pv-stack-card--popup" tabindex="0" aria-label="Preview map listing popup">
                                 <div class="pv-popup">
                                     <div class="pv-popup-head">
                                         <h4>Your Business</h4>
@@ -775,39 +785,43 @@
 
             const participateTabs = document.querySelectorAll('.participate-toggle [role="tab"]');
             const participatePanels = document.querySelectorAll('#about .participate-panel');
-            const bizStack = document.getElementById('pv-biz-stack');
+            const residentsPanel = document.getElementById('panel-participate-residents');
             const venuesPanel = document.getElementById('panel-participate-venues');
+            const residentStack = document.getElementById('pv-stack-residents');
+            const venueStack = document.getElementById('pv-stack-venues');
 
-            function activateBizStack() {
-                if (!bizStack) return;
-                bizStack.classList.remove('is-active');
-                void bizStack.offsetWidth;
-                bizStack.classList.add('is-active');
+            // Shared overlapping-card "stack" behavior, reused by both the resident
+            // (vote graphic / text message) and business (flyer / map popup) previews.
+            function activateStack(stackEl) {
+                if (!stackEl) return;
+                stackEl.classList.remove('is-active');
+                void stackEl.offsetWidth;
+                stackEl.classList.add('is-active');
             }
 
-            function activateBizStackWhenVisible() {
-                if (!bizStack || venuesPanel.hidden) return;
-                const rect = bizStack.getBoundingClientRect();
+            function activateStackWhenVisible(stackEl, panelEl) {
+                if (!stackEl || (panelEl && panelEl.hidden)) return;
+                const rect = stackEl.getBoundingClientRect();
                 const inView = rect.top < window.innerHeight * 0.85 && rect.bottom > window.innerHeight * 0.15;
                 if (inView) {
-                    activateBizStack();
+                    activateStack(stackEl);
                     return;
                 }
                 const once = new IntersectionObserver((entries) => {
                     if (entries[0].isIntersecting) {
-                        activateBizStack();
+                        activateStack(stackEl);
                         once.disconnect();
                     }
                 }, { threshold: 0.25 });
-                once.observe(bizStack);
+                once.observe(stackEl);
             }
 
-            function initBizStackCards() {
-                if (!bizStack) return;
+            function initStackCards(stackEl) {
+                if (!stackEl) return;
 
-                bizStack.querySelectorAll('.pv-biz-card').forEach((card) => {
+                stackEl.querySelectorAll('.pv-stack-card').forEach((card) => {
                     const bringFront = () => {
-                        bizStack.querySelectorAll('.pv-biz-card').forEach((c) => c.classList.remove('is-front'));
+                        stackEl.querySelectorAll('.pv-stack-card').forEach((c) => c.classList.remove('is-front'));
                         card.classList.add('is-front');
                     };
 
@@ -824,9 +838,11 @@
                     });
                 });
 
-                const linkBtn = bizStack.querySelector('.pv-popup-link');
-                const copiedMsg = bizStack.querySelector('.pv-popup-copied');
-                const voteBtn = bizStack.querySelector('.pv-popup-vote');
+                // Only present on the business stack's map-popup card, but scoped to
+                // stackEl so this stays a no-op (not an error) on the resident stack.
+                const linkBtn = stackEl.querySelector('.pv-popup-link');
+                const copiedMsg = stackEl.querySelector('.pv-popup-copied');
+                const voteBtn = stackEl.querySelector('.pv-popup-vote');
 
                 if (linkBtn && copiedMsg) {
                     linkBtn.addEventListener('click', (e) => {
@@ -857,12 +873,18 @@
                         p.hidden = p.id !== panelId;
                     });
                     if (panelId === 'panel-participate-venues') {
-                        activateBizStackWhenVisible();
+                        activateStackWhenVisible(venueStack, venuesPanel);
+                    } else if (panelId === 'panel-participate-residents') {
+                        activateStackWhenVisible(residentStack, residentsPanel);
                     }
                 });
             });
 
-            initBizStackCards();
+            initStackCards(residentStack);
+            initStackCards(venueStack);
+            // Residents is the default visible tab on load, so its stack needs an
+            // initial activation the same way switching tabs triggers one.
+            activateStackWhenVisible(residentStack, residentsPanel);
         });
     </script>
 </body>
