@@ -1046,8 +1046,9 @@
             flex-direction: column;
             align-items: center;
             gap: 14px;
-            padding-top: 0;
-            padding-bottom: 0;
+            padding: 0 16px;
+            box-sizing: border-box;
+            width: 100%;
         }
 
         .pv-media-caption {
@@ -1059,10 +1060,9 @@
             text-align: center;
         }
 
-        /* Residents: shareable "I Voted" graphic in a phone frame */
+        /* Shareable graphics in a phone frame (used inside both stack cards below) */
         .pv-phone {
-            width: 216px;
-            max-width: 54vw;
+            width: 100%;
             border-radius: 30px;
             padding: 10px;
             background: linear-gradient(160deg, #2a3350, #0b1120);
@@ -1076,15 +1076,17 @@
             border-radius: 20px;
         }
 
-        /* Businesses: overlapping flyer + map popup previews (promote.html pattern) */
-        .pv-biz-stack {
+        /* Shared overlapping-card "stack" pattern: two staggered, rotated previews
+           that swap to the front on hover/tap. Used for both the resident
+           (vote graphic / text message) and business (flyer / map popup) previews. */
+        .pv-stack {
             position: relative;
             width: 352px;
             height: 418px;
-            max-width: 81.4vw;
+            max-width: 100%;
         }
 
-        .pv-biz-card {
+        .pv-stack-card {
             position: absolute;
             display: flex;
             flex-direction: column;
@@ -1094,13 +1096,13 @@
             outline: none;
         }
 
-        .pv-biz-card:focus-visible {
+        .pv-stack-card:focus-visible {
             outline: 2px solid var(--accent);
             outline-offset: 4px;
             border-radius: 14px;
         }
 
-        .pv-biz-card--flyer {
+        .pv-stack-card--flyer {
             top: 10px;
             left: 0;
             width: 74%;
@@ -1109,7 +1111,7 @@
             z-index: 2;
         }
 
-        .pv-biz-card--popup {
+        .pv-stack-card--popup {
             top: 48px;
             left: 46px;
             width: 62%;
@@ -1118,17 +1120,37 @@
             z-index: 1;
         }
 
-        .pv-biz-stack:not(.is-active) .pv-biz-card {
+        .pv-stack-card--vote-graphic {
+            top: 6px;
+            left: 4%;
+            width: 60%;
+            --pv-rot: -7deg;
+            transform: rotate(-7deg);
+            z-index: 2;
+        }
+
+        .pv-stack-card--imessage {
+            top: 60px;
+            left: 42%;
+            width: 60%;
+            --pv-rot: 6deg;
+            transform: rotate(6deg);
+            z-index: 1;
+        }
+
+        .pv-stack:not(.is-active) .pv-stack-card {
             opacity: 0;
             pointer-events: none;
         }
 
-        .pv-biz-stack.is-active .pv-biz-card--flyer {
+        .pv-stack.is-active .pv-stack-card--flyer,
+        .pv-stack.is-active .pv-stack-card--vote-graphic {
             animation: pvCardEnter 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.05s both;
             pointer-events: auto;
         }
 
-        .pv-biz-stack.is-active .pv-biz-card--popup {
+        .pv-stack.is-active .pv-stack-card--popup,
+        .pv-stack.is-active .pv-stack-card--imessage {
             animation: pvCardEnter 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.22s both;
             pointer-events: auto;
         }
@@ -1144,15 +1166,27 @@
             }
         }
 
-        .pv-biz-card--flyer:hover,
-        .pv-biz-card--flyer.is-front {
+        .pv-stack-card--flyer:hover,
+        .pv-stack-card--flyer.is-front {
             transform: rotate(-12deg) translateY(-20px) scale(1.05);
             z-index: 3;
         }
 
-        .pv-biz-card--popup:hover,
-        .pv-biz-card--popup.is-front {
+        .pv-stack-card--popup:hover,
+        .pv-stack-card--popup.is-front {
             transform: rotate(8deg) translateY(-20px) scale(1.05);
+            z-index: 3;
+        }
+
+        .pv-stack-card--vote-graphic:hover,
+        .pv-stack-card--vote-graphic.is-front {
+            transform: rotate(-11deg) translateY(-20px) scale(1.05);
+            z-index: 3;
+        }
+
+        .pv-stack-card--imessage:hover,
+        .pv-stack-card--imessage.is-front {
+            transform: rotate(9deg) translateY(-20px) scale(1.05);
             z-index: 3;
         }
 
@@ -1165,8 +1199,8 @@
             transition: box-shadow 0.4s ease;
         }
 
-        .pv-biz-card:hover .pv-flyer,
-        .pv-biz-card.is-front .pv-flyer {
+        .pv-stack-card:hover .pv-flyer,
+        .pv-stack-card.is-front .pv-flyer {
             box-shadow: 0 26px 52px rgba(0, 0, 0, 0.65);
         }
 
@@ -1188,8 +1222,8 @@
             transition: opacity 0.25s ease, transform 0.25s ease;
         }
 
-        .pv-biz-card:hover .pv-card-caption,
-        .pv-biz-card.is-front .pv-card-caption {
+        .pv-stack-card:hover .pv-card-caption,
+        .pv-stack-card.is-front .pv-card-caption {
             opacity: 1;
             transform: none;
         }
@@ -1205,8 +1239,8 @@
             transition: box-shadow 0.4s ease;
         }
 
-        .pv-biz-card:hover .pv-popup,
-        .pv-biz-card.is-front .pv-popup {
+        .pv-stack-card:hover .pv-popup,
+        .pv-stack-card.is-front .pv-popup {
             box-shadow: 0 24px 44px rgba(0, 0, 0, 0.7);
         }
 
@@ -1351,7 +1385,7 @@
                 align-self: center;
             }
 
-            .pv-biz-stack {
+            .pv-stack {
                 margin: 0 auto;
                 height: 374px;
             }
@@ -1363,12 +1397,7 @@
                 min-width: 280px;
             }
 
-            .pv-phone {
-                width: clamp(270px, 30.6vw, 378px);
-                max-width: none;
-            }
-
-            .pv-biz-stack {
+            .pv-stack {
                 width: clamp(374px, 41.8vw, 506px);
                 height: clamp(440px, 48.4vw, 594px);
                 max-width: none;
@@ -1376,13 +1405,12 @@
         }
 
         @media (prefers-reduced-motion: reduce) {
-            .pv-biz-stack.is-active .pv-biz-card--flyer,
-            .pv-biz-stack.is-active .pv-biz-card--popup {
+            .pv-stack.is-active .pv-stack-card {
                 animation: none;
                 opacity: 1;
             }
 
-            .pv-biz-card {
+            .pv-stack-card {
                 transition: none;
             }
         }
