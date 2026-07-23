@@ -814,7 +814,7 @@
                 
                 previewDiv.innerHTML = '<span style="color: var(--text-secondary);">Uploading...</span>';
                 try {
-                    const storageRef = ref(storage, `assets/${Date.now()}_${file.name}`);
+                    const storageRef = ref(storage, `schedule_assets/${Date.now()}_${file.name}`);
                     await uploadBytes(storageRef, file);
                     const url = await getDownloadURL(storageRef);
                     urlInput.value = url;

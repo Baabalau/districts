@@ -2531,8 +2531,12 @@ class EventLayout extends HTMLElement {
             }
             const venueData = venueSnap.data();
             
-            // Apply schedule overrides if they exist
-            if (sched.winnerImage) venueData.image = sched.winnerImage;
+            // Apply schedule override, then fall back to the district JSON image.
+            if (sched.winnerImage) {
+                venueData.image = sched.winnerImage;
+            } else if (this._heroVars?.winnerImage) {
+                venueData.image = this._heroVars.winnerImage;
+            }
             
             this.applyWinnerVenueToPage(venueData);
             

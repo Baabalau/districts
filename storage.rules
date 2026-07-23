@@ -27,6 +27,12 @@ service firebase.storage {
       allow write: if isImage() && underMax(10);
     }
 
+    // Dashboard schedule images (winner + run-off reveals): admin uploads while signed in.
+    match /schedule_assets/{fileName} {
+      allow read: if true;
+      allow write: if isSignedIn() && isImage() && underMax(10);
+    }
+
     // Default deny: anything not matched above is denied.
     match /{allPaths=**} {
       allow read, write: if false;
