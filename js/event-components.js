@@ -1216,6 +1216,29 @@ function renderVoteModals(district) {
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <div id="legends-lightbox" class="lightbox-overlay" style="display: none;">
+                <div class="lightbox-flash"></div>
+                <button type="button" class="lightbox-close" onclick="window.closeLegendsLightbox()" aria-label="Close">×</button>
+                <div class="lightbox-stage">
+                    <div class="lightbox-content">
+                        <figure class="lightbox-frame">
+                            <img class="lightbox-img" src="" alt="">
+                            <div class="lightbox-legend-badge" hidden>
+                                <div class="legend-badge-inner">
+                                    <div class="legend-badge-face legend-badge-front">★ Legend</div>
+                                    <div class="legend-badge-face legend-badge-back"></div>
+                                </div>
+                            </div>
+                            <figcaption class="lightbox-caption"></figcaption>
+                        </figure>
+                        <div class="lightbox-controls">
+                            <button type="button" class="lightbox-nav lightbox-prev" onclick="window.navLegendsLightbox(-1)" aria-label="Previous photo">&#8249;</button>
+                            <button type="button" class="lightbox-nav lightbox-next" onclick="window.navLegendsLightbox(1)" aria-label="Next photo">&#8250;</button>
+                        </div>
+                    </div>
+                </div>
             </div>`;
 }
 
@@ -1351,42 +1374,111 @@ class EventLayout extends HTMLElement {
                         10px 12px 15px rgba(0,0,0,0.45);
                 }
                 
-                /* Local Legends Bento Wall Styles */
+                /* Local Legends Bento Wall Styles — a horizontally-scrolling,
+                   2-row bento strip so the varied tile sizes ("bento" rhythm)
+                   survive on every breakpoint instead of collapsing into a
+                   plain uniform grid on phones/tablets. */
                 .bento-photo-wall {
                     display: grid;
-                    grid-template-columns: repeat(3, 1fr);
-                    grid-auto-rows: 100px;
-                    grid-auto-flow: dense;
-                    gap: 8px;
-                    padding: 0 20px;
-                    max-width: 1120px;
-                    margin: 0 auto;
+                    grid-auto-flow: column dense;
+                    /* Row height shrinks on short viewports so the wall (2 rows +
+                       gap + padding) never exceeds 90% of the viewport height. */
+                    grid-template-rows: repeat(2, min(194px, calc((90vh - 52px) / 2)));
+                    grid-auto-columns: 194px;
+                    gap: 6px;
+                    padding: 16px 24px 30px;
+                    max-height: 90vh;
+                    overflow-x: auto;
+                    overflow-y: hidden;
+                    scroll-snap-type: x proximity;
+                    -webkit-overflow-scrolling: touch;
+                    cursor: grab;
+                    scrollbar-width: thin;
+                    scrollbar-color: rgba(203, 160, 82, 0.5) transparent;
+                }
+                .bento-photo-wall.is-dragging {
+                    cursor: grabbing;
+                    scroll-snap-type: none;
+                    user-select: none;
+                }
+                .bento-photo-wall::-webkit-scrollbar { height: 6px; }
+                .bento-photo-wall::-webkit-scrollbar-track { background: transparent; }
+                .bento-photo-wall::-webkit-scrollbar-thumb {
+                    background: rgba(203, 160, 82, 0.5);
+                    border-radius: 4px;
                 }
 
-                /* Keep every tile uniform on phones — no oversized bento spans */
-                .bento-large,
-                .bento-tall,
-                .bento-wide {
-                    grid-column: span 1;
-                    grid-row: span 1;
-                }
-                
+                .bento-large { grid-column: span 2; grid-row: span 2; }
+                .bento-wide  { grid-column: span 2; grid-row: span 1; }
+                .bento-tall  { grid-column: span 1; grid-row: span 2; }
+
+                /* Each tile gets a slight resting rotation + nudge (set inline
+                   per photo via --tile-rot/--tile-shift-x/-y/--tile-z) so the
+                   wall reads like a loosely-scattered pile of photos rather
+                   than a rigid grid. Tiles straighten and lift to the front
+                   on hover so every photo stays easy to read. */
                 .bento-item {
                     position: relative;
+                    scroll-snap-align: start;
                     border-radius: 8px;
                     overflow: hidden;
-                    background-size: cover;
-                    background-position: center;
-                    background-color: #1a1a1a;
+                    background: rgba(255,255,255,0.04);
+                    padding: 2px;
+                    box-sizing: border-box;
+                    transform: translate(var(--tile-shift-x, 0px), var(--tile-shift-y, 0px)) rotate(var(--tile-rot, 0deg));
+                    z-index: var(--tile-z, 1);
                     transition: transform 0.4s ease, box-shadow 0.4s ease;
                     cursor: pointer;
-                    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                    box-shadow: 0 6px 18px rgba(0,0,0,0.4);
                 }
                 
                 .bento-item:hover {
-                    transform: scale(1.02);
-                    box-shadow: 0 8px 25px rgba(0,0,0,0.5);
-                    z-index: 2;
+                    transform: translate(0, 0) rotate(0deg) scale(1.08);
+                    box-shadow: 0 16px 34px rgba(0,0,0,0.6);
+                    z-index: 30;
+                }
+
+                .bento-item:focus-visible {
+                    outline: 2px solid var(--text-primary);
+                    outline-offset: 2px;
+                }
+
+                /* Subtle gold tracer that chases around each tile's edge, giving
+                   the wall a quiet sense of activity. A big rotating conic
+                   gradient sits behind the tile; .bento-item-content covers
+                   everything but a thin 2px ring, so only the traveling arc
+                   of light is visible along the border. */
+                @keyframes bentoTracerSpin {
+                    to { transform: translate(-50%, -50%) rotate(360deg); }
+                }
+                .bento-item::before {
+                    content: "";
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    width: 220%;
+                    height: 220%;
+                    transform: translate(-50%, -50%) rotate(0deg);
+                    background: conic-gradient(from 0deg,
+                        transparent 0deg, transparent 296deg,
+                        rgba(203, 160, 82, 0.85) 322deg,
+                        rgba(255, 241, 209, 1) 335deg,
+                        rgba(203, 160, 82, 0.85) 348deg,
+                        transparent 360deg);
+                    animation: bentoTracerSpin 8s linear infinite;
+                    animation-delay: var(--tracer-delay, 0s);
+                    z-index: 0;
+                    pointer-events: none;
+                }
+
+                .bento-item-content {
+                    position: relative;
+                    z-index: 1;
+                    width: 100%;
+                    height: 100%;
+                    border-radius: 6px;
+                    overflow: hidden;
+                    background: #0F1626;
                 }
 
                 .bento-photo {
@@ -1430,25 +1522,59 @@ class EventLayout extends HTMLElement {
                     transform: translateY(0);
                 }
 
-                /* Legend badge (shown in "legends only" mode) */
-                .bento-legend-badge {
+                /* Legend badge flip card — only rendered when a photo's uploader
+                   has actually reached Legend status. Loops a gentle 3D flip so
+                   it periodically reveals the legend's name, then returns. */
+                @keyframes legendBadgeFlip {
+                    0%, 42% { transform: rotateY(0deg); }
+                    50%, 92% { transform: rotateY(180deg); }
+                    100% { transform: rotateY(360deg); }
+                }
+                .legend-badge-inner {
+                    position: relative;
+                    transform-style: preserve-3d;
+                    animation: legendBadgeFlip 7s ease-in-out infinite;
+                    animation-delay: var(--flip-delay, 0s);
+                }
+                .legend-badge-face {
                     position: absolute;
-                    top: 12px;
-                    left: 12px;
-                    z-index: 2;
-                    display: inline-flex;
+                    inset: 0;
+                    display: flex;
                     align-items: center;
-                    gap: 5px;
+                    justify-content: center;
+                    gap: 4px;
+                    backface-visibility: hidden;
                     background: linear-gradient(135deg, var(--accent), var(--brand-red));
                     color: #fff;
                     font-family: var(--font-hero);
                     text-transform: uppercase;
-                    letter-spacing: 1px;
-                    font-size: 0.72rem;
+                    letter-spacing: 0.5px;
                     font-weight: 700;
-                    padding: 5px 10px;
                     border-radius: 20px;
                     box-shadow: 0 3px 10px rgba(0,0,0,0.5);
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+                .legend-badge-back {
+                    transform: rotateY(180deg);
+                }
+
+                .bento-legend-badge {
+                    position: absolute;
+                    top: 10px;
+                    left: 10px;
+                    z-index: 2;
+                    perspective: 400px;
+                    pointer-events: none;
+                }
+                .bento-legend-badge .legend-badge-inner {
+                    width: 92px;
+                    height: 24px;
+                }
+                .bento-legend-badge .legend-badge-face {
+                    font-size: 0.6rem;
+                    padding: 0 8px;
                 }
 
                 /* Empty state when a district has no qualifying check-in photos yet */
@@ -1465,17 +1591,200 @@ class EventLayout extends HTMLElement {
                 }
                 .legends-empty strong { color: var(--text-primary); display: block; font-family: var(--font-hero); text-transform: uppercase; font-size: 1.3rem; margin-bottom: 8px; letter-spacing: 1px; }
 
+                /* Local Legends Lightbox — click a photo to pop it open with a
+                   quick camera-flash + bouncy scale-in microanimation. */
+                @keyframes lightboxFlash {
+                    0% { opacity: 0.85; }
+                    100% { opacity: 0; }
+                }
+                @keyframes lightboxPopIn {
+                    0% { opacity: 0; transform: scale(0.55) rotate(-4deg); }
+                    60% { opacity: 1; transform: scale(1.04) rotate(1deg); }
+                    100% { opacity: 1; transform: scale(1) rotate(0deg); }
+                }
+                @keyframes lightboxBackdropIn {
+                    0% { opacity: 0; }
+                    100% { opacity: 1; }
+                }
+                @keyframes lightboxBadgePop {
+                    0%, 40% { transform: scale(0) rotate(-15deg); }
+                    65% { transform: scale(1.2) rotate(6deg); }
+                    100% { transform: scale(1) rotate(0deg); }
+                }
+
+                .lightbox-overlay {
+                    position: fixed;
+                    inset: 0;
+                    z-index: 4000;
+                    background: rgba(8, 11, 20, 0.92);
+                    backdrop-filter: blur(6px);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    animation: lightboxBackdropIn 0.25s ease both;
+                }
+
+                .lightbox-flash {
+                    position: absolute;
+                    inset: 0;
+                    background: #fff;
+                    pointer-events: none;
+                    z-index: 1;
+                    opacity: 0;
+                }
+                .lightbox-flash.is-flashing {
+                    animation: lightboxFlash 0.45s ease-out both;
+                }
+
+                .lightbox-stage {
+                    position: relative;
+                    z-index: 2;
+                    width: 100%;
+                    height: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 70px 20px;
+                    box-sizing: border-box;
+                }
+
+                /* Hugs the frame's own rendered width (inline-flex, shrink-to-fit)
+                   so the control row below can right-align to sit exactly under
+                   the frame's right edge, no matter each photo's aspect ratio. */
+                .lightbox-content {
+                    display: inline-flex;
+                    flex-direction: column;
+                    align-items: flex-end;
+                    gap: 12px;
+                    max-width: 100%;
+                    touch-action: pan-y;
+                }
+
+                .lightbox-frame {
+                    position: relative;
+                    margin: 0;
+                    max-width: min(90vw, 640px);
+                    max-height: 76vh;
+                    background: var(--bg-secondary);
+                    border: 1px solid rgba(203, 160, 82, 0.35);
+                    border-radius: 14px;
+                    box-shadow: 0 25px 60px rgba(0,0,0,0.65);
+                    overflow: hidden;
+                    animation: lightboxPopIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+                }
+
+                .lightbox-img {
+                    display: block;
+                    max-width: min(90vw, 640px);
+                    max-height: 64vh;
+                    width: auto;
+                    height: auto;
+                    object-fit: contain;
+                    background: #000;
+                    transition: opacity 0.2s ease, transform 0.2s ease;
+                }
+
+                .lightbox-caption {
+                    margin: 0;
+                    padding: 12px 18px;
+                    font-family: var(--font-hero);
+                    text-transform: uppercase;
+                    letter-spacing: 0.6px;
+                    font-size: 0.95rem;
+                    color: var(--text-primary);
+                    background: linear-gradient(180deg, rgba(15,22,38,0) 0%, rgba(15,22,38,0.9) 100%);
+                }
+
+                .lightbox-legend-badge {
+                    position: absolute;
+                    top: 14px;
+                    left: 14px;
+                    z-index: 2;
+                    perspective: 600px;
+                    animation: lightboxBadgePop 0.5s 0.15s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+                }
+                .lightbox-legend-badge .legend-badge-inner {
+                    width: 148px;
+                    height: 32px;
+                }
+                .lightbox-legend-badge .legend-badge-face {
+                    font-size: 0.78rem;
+                    padding: 0 12px;
+                }
+
+                /* Prev/next now live in a row beneath the frame, right-aligned
+                   under the frame's right edge instead of floating over the
+                   photo (per-request layout on desktop). */
+                .lightbox-controls {
+                    display: flex;
+                    gap: 10px;
+                }
+
+                .lightbox-close,
+                .lightbox-nav {
+                    z-index: 3;
+                    background: rgba(15, 22, 38, 0.75);
+                    color: var(--text-primary);
+                    border: 1px solid rgba(203, 160, 82, 0.4);
+                    cursor: pointer;
+                    transition: transform 0.2s ease, background 0.2s ease;
+                }
+
+                .lightbox-close {
+                    position: absolute;
+                    top: 18px;
+                    right: 18px;
+                    width: 42px;
+                    height: 42px;
+                    border-radius: 50%;
+                    font-size: 1.6rem;
+                    line-height: 1;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .lightbox-nav {
+                    width: 42px;
+                    height: 42px;
+                    border-radius: 50%;
+                    font-size: 1.7rem;
+                    line-height: 1;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .lightbox-close:hover,
+                .lightbox-nav:hover {
+                    background: var(--accent);
+                    color: #fff;
+                    transform: scale(1.08);
+                }
+
+                @media (max-width: 640px) {
+                    .lightbox-nav { width: 38px; height: 38px; font-size: 1.5rem; }
+                    .lightbox-close { width: 38px; height: 38px; font-size: 1.4rem; top: 12px; right: 12px; }
+                }
+
                 @media (min-width: 768px) {
                     .bento-photo-wall {
-                        grid-template-columns: repeat(3, 1fr);
-                        grid-auto-rows: 130px;
-                        gap: 10px;
-                        padding: 0 clamp(24px, 5vw, 48px);
-                        max-width: 800px;
+                        grid-template-rows: repeat(2, min(270px, calc((90vh - 58px) / 2)));
+                        grid-auto-columns: 270px;
+                        gap: 8px;
+                        padding: 18px clamp(24px, 5vw, 48px) 32px;
                     }
 
                     .bento-item {
                         border-radius: 10px;
+                    }
+
+                    .bento-legend-badge .legend-badge-inner {
+                        width: 108px;
+                        height: 27px;
+                    }
+                    .bento-legend-badge .legend-badge-face {
+                        font-size: 0.68rem;
                     }
 
                     .bento-overlay {
@@ -1491,15 +1800,22 @@ class EventLayout extends HTMLElement {
 
                 @media (min-width: 1024px) {
                     .bento-photo-wall {
-                        grid-template-columns: repeat(4, 1fr);
-                        grid-auto-rows: 200px;
-                        gap: 12px;
-                        padding: 0 clamp(32px, 6vw, 72px);
-                        max-width: 1120px;
+                        grid-template-rows: repeat(2, min(378px, calc((90vh - 66px) / 2)));
+                        grid-auto-columns: 378px;
+                        gap: 10px;
+                        padding: 20px clamp(32px, 6vw, 72px) 36px;
                     }
 
                     .bento-item {
                         border-radius: 12px;
+                    }
+
+                    .bento-legend-badge .legend-badge-inner {
+                        width: 124px;
+                        height: 30px;
+                    }
+                    .bento-legend-badge .legend-badge-face {
+                        font-size: 0.74rem;
                     }
 
                     .bento-overlay {
@@ -1511,24 +1827,12 @@ class EventLayout extends HTMLElement {
                         line-height: 1.2;
                         letter-spacing: 1px;
                     }
-
-                    .bento-large {
-                        grid-column: span 2;
-                        grid-row: span 2;
-                    }
-                    .bento-wide {
-                        grid-column: span 2;
-                        grid-row: span 1;
-                    }
-                    .bento-tall {
-                        grid-column: span 1;
-                        grid-row: span 2;
-                    }
                 }
             </style>
         `;
             this.initScrollAnimations();
             this.initVotingPortal();
+            this.initLegendsLightbox();
             this._districtCopy = districtCopy;
             this._heroIntroSource = districtCopy.heroIntro || shared.heroIntro;
             this._heroVars = vars;
@@ -1770,6 +2074,8 @@ class EventLayout extends HTMLElement {
             // Newest check-ins first.
             photos.sort((a, b) => b.lastVisit - a.lastVisit);
 
+            console.info(`[Local Legends] District ${districtUpper}: ${districtVenueIds.size} venue(s), ${photos.length} check-in photo(s) found.`, photos.length ? { sampleUrl: photos[0].photoUrl } : '');
+
             this._legendsData = { photos, legendUids };
             this.renderLocalLegends(window.localLegendsMode || 'default');
         } catch (err) {
@@ -1801,6 +2107,23 @@ class EventLayout extends HTMLElement {
         }
     }
 
+    // Randomizes the wall's display order — a fresh shuffle every page load
+    // (this class instance), memoized per mode/item-set so repeat renders of
+    // the same photos (e.g. an admin toggling modes) don't keep re-shuffling.
+    getShuffledLegendsOrder(mode, items) {
+        if (!this._legendsShuffleCache) this._legendsShuffleCache = new Map();
+        const cacheKey = `${mode}:${items.map((p) => p.uid).join(',')}`;
+        if (this._legendsShuffleCache.has(cacheKey)) return this._legendsShuffleCache.get(cacheKey);
+
+        const shuffled = items.slice();
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        this._legendsShuffleCache.set(cacheKey, shuffled);
+        return shuffled;
+    }
+
     // Empty-state markup shown when a district has no usable check-in photos yet
     // (none submitted, or none that successfully load).
     legendsEmptyHtml(isLegendsMode) {
@@ -1825,8 +2148,11 @@ class EventLayout extends HTMLElement {
         let items = data.photos;
         if (isLegendsMode) items = items.filter((p) => data.legendUids.has(p.uid));
 
-        // Cap the wall so it stays a tidy bento (most recent win).
-        items = items.slice(0, 9);
+        // Cap the wall so it stays performant, then randomize the *display*
+        // order — fresh shuffle every page load, but kept stable across
+        // re-renders (mode toggles) within that load.
+        items = items.slice(0, 24);
+        items = this.getShuffledLegendsOrder(mode, items);
 
         if (items.length === 0) {
             wall.innerHTML = this.legendsEmptyHtml(isLegendsMode);
@@ -1836,29 +2162,254 @@ class EventLayout extends HTMLElement {
         // Repeating size pattern gives the grid its bento rhythm.
         const sizePattern = ['bento-large', '', 'bento-tall', 'bento-wide', '', '', 'bento-tall', '', 'bento-wide'];
 
-        wall.innerHTML = items.map((p, i) => {
+        // Small per-tile rotation/nudge/stacking so the wall reads like a
+        // loosely-scattered pile of photos rather than a rigid grid (each
+        // tile straightens back out and lifts to the front on hover). These
+        // cycle at different lengths than sizePattern (and each other) on
+        // purpose, so even a large wall doesn't visibly repeat the same
+        // size+angle+nudge combo every N tiles.
+        const tileRotations = [-1.4, 1.2, -0.7, 1.4, -1, 0.7, 1];
+        const tileShiftsX = [-11, 13, -14, 10, -12, 14, -9, 12];
+        const tileShiftsY = [8, -10, 12, -8, 9];
+        const tileZ = [2, 3, 1];
+
+        // Only render tiles that have a usable URL. (Empty/placeholder URLs would
+        // otherwise render as permanently-dark boxes that never error.)
+        const validItems = items.filter(p => p.photoUrl && typeof p.photoUrl === 'string' && /^https?:\/\//.test(p.photoUrl));
+
+        if (validItems.length === 0) {
+            console.warn(`[Local Legends] No valid photo URLs to render (had ${items.length} candidate photo(s)).`);
+            wall.innerHTML = this.legendsEmptyHtml(isLegendsMode);
+            return;
+        }
+
+        // Escape the URL for safe innerHTML insertion. The HTML parser decodes
+        // entities (e.g. &amp; -> &) back to a valid URL, so Firebase Storage
+        // download links with ?alt=media&token=... survive intact. Do NOT use
+        // encodeURI here: Firebase paths are already percent-encoded (%2F), and
+        // re-encoding turns %2F into %252F, which 404s.
+        wall.innerHTML = validItems.map((p, i) => {
             const sizeClass = sizePattern[i % sizePattern.length];
-            const badge = isLegendsMode ? `<div class="bento-legend-badge">★ Legend</div>` : '';
+            // The Legend pill only applies when this specific upload's owner has
+            // actually reached Legend status — not just because the board is
+            // currently switched to "legends" mode (that mode simply filters the
+            // wall down to legend-only photos, it doesn't make every photo a
+            // legend photo).
+            const isLegend = data.legendUids.has(p.uid);
+            const legendName = escapeHtml(p.displayName || 'A Local Legend');
+            const badge = isLegend ? `
+                    <div class="bento-legend-badge" style="--flip-delay: ${(i % 5) * 1.1}s">
+                        <div class="legend-badge-inner">
+                            <div class="legend-badge-face legend-badge-front">★ Legend</div>
+                            <div class="legend-badge-face legend-badge-back">${legendName}</div>
+                        </div>
+                    </div>` : '';
             const caption = escapeHtml(isLegendsMode ? p.displayName : p.venueName);
+            const rot = tileRotations[i % tileRotations.length];
+            const shiftX = tileShiftsX[i % tileShiftsX.length];
+            const shiftY = tileShiftsY[i % tileShiftsY.length];
+            const z = tileZ[i % tileZ.length];
+            const tileStyle = `--tracer-delay: ${(i % 6) * -1.3}s; --tile-rot: ${rot}deg; --tile-shift-x: ${shiftX}px; --tile-shift-y: ${shiftY}px; --tile-z: ${z};`;
             return `
-                <div class="bento-item ${sizeClass}">
-                    <img class="bento-photo" src="${escapeHtml(p.photoUrl)}" alt="${caption}" loading="lazy">
-                    ${badge}
-                    <div class="bento-overlay"><span>${caption}</span></div>
+                <div class="bento-item ${sizeClass}" role="button" tabindex="0" aria-label="View photo: ${caption}" style="${tileStyle}" ${isLegend ? `data-legend-name="${legendName}"` : ''}>
+                    <div class="bento-item-content">
+                        <img class="bento-photo" src="${escapeHtml(p.photoUrl)}" alt="${caption}" loading="lazy">
+                        ${badge}
+                        <div class="bento-overlay"><span>${caption}</span></div>
+                    </div>
                 </div>`;
         }).join('');
 
         // Drop any tile whose photo can't load so a broken/expired URL never
         // renders as an empty dark box; if they all fail, show the empty state.
-        wall.querySelectorAll('.bento-photo').forEach((img) => {
+        // Log the offending URL so genuinely-broken links can be diagnosed
+        // instead of silently disappearing.
+        let failures = 0;
+        const imgs = wall.querySelectorAll('.bento-photo');
+        imgs.forEach((img) => {
             img.addEventListener('error', () => {
+                failures += 1;
+                console.warn(`[Local Legends] Photo failed to load (${failures}/${imgs.length}):`, img.src);
                 const tile = img.closest('.bento-item');
                 if (tile) tile.remove();
                 if (!wall.querySelector('.bento-item')) {
+                    console.warn('[Local Legends] All photos failed to load — showing empty state.');
                     wall.innerHTML = this.legendsEmptyHtml(isLegendsMode);
                 }
             });
         });
+
+        // Click (or Enter/Space) any tile to pop its photo open in the lightbox.
+        // Delegated + guarded so re-renders (mode switches) never double-bind.
+        if (!wall.dataset.lightboxBound) {
+            wall.dataset.lightboxBound = '1';
+            let didDrag = false;
+
+            wall.addEventListener('click', (e) => {
+                if (didDrag) { didDrag = false; return; } // a drag-to-scroll, not a tap
+                const tile = e.target.closest('.bento-item');
+                if (tile && window.openLegendsLightbox) window.openLegendsLightbox(tile);
+            });
+            wall.addEventListener('keydown', (e) => {
+                if (e.key !== 'Enter' && e.key !== ' ') return;
+                const tile = e.target.closest('.bento-item');
+                if (tile && window.openLegendsLightbox) {
+                    e.preventDefault();
+                    window.openLegendsLightbox(tile);
+                }
+            });
+
+            // The wall is a horizontally-scrolling strip on every breakpoint so
+            // the bento can extend past either edge of the viewport. Touch
+            // devices scroll it natively; these add mouse-friendly ways to
+            // navigate it on desktop (click-drag, and vertical wheel/trackpad).
+            let isPointerDown = false, dragStartX = 0, dragScrollStart = 0;
+            wall.addEventListener('mousedown', (e) => {
+                isPointerDown = true;
+                didDrag = false;
+                dragStartX = e.pageX;
+                dragScrollStart = wall.scrollLeft;
+            });
+            window.addEventListener('mousemove', (e) => {
+                if (!isPointerDown) return;
+                const dx = e.pageX - dragStartX;
+                if (Math.abs(dx) > 4) {
+                    didDrag = true;
+                    wall.classList.add('is-dragging');
+                }
+                wall.scrollLeft = dragScrollStart - dx;
+            });
+            window.addEventListener('mouseup', () => {
+                isPointerDown = false;
+                wall.classList.remove('is-dragging');
+            });
+            wall.addEventListener('wheel', (e) => {
+                if (wall.scrollWidth <= wall.clientWidth) return;
+                if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+                e.preventDefault();
+                wall.scrollLeft += e.deltaY;
+            }, { passive: false });
+        }
+    }
+
+    // Wires up the full-screen photo lightbox: click any wall tile to pop it
+    // open with a quick camera-flash + bouncy scale-in, then arrow-key/swipe
+    // between photos without leaving the lightbox.
+    initLegendsLightbox() {
+        const lightbox = this.querySelector('#legends-lightbox');
+        if (!lightbox) return;
+
+        const frame = lightbox.querySelector('.lightbox-frame');
+        const img = lightbox.querySelector('.lightbox-img');
+        const caption = lightbox.querySelector('.lightbox-caption');
+        const badge = lightbox.querySelector('.lightbox-legend-badge');
+        const flash = lightbox.querySelector('.lightbox-flash');
+
+        let currentIndex = -1;
+        const getTiles = () => Array.from(this.querySelectorAll('#local-legends-wall .bento-item'));
+
+        const badgeBack = badge.querySelector('.legend-badge-back');
+
+        const openAt = (index, tiles) => {
+            tiles = tiles || getTiles();
+            if (!tiles.length) return;
+            currentIndex = ((index % tiles.length) + tiles.length) % tiles.length;
+            const tile = tiles[currentIndex];
+            const tileImg = tile.querySelector('.bento-photo');
+            const tileCaption = tile.querySelector('.bento-overlay span');
+            if (!tileImg) return;
+
+            // Clear any leftover drag/swipe transform + opacity before swapping in
+            // the new photo, so every open/nav starts from a clean state.
+            img.style.transition = 'none';
+            img.style.opacity = '';
+            img.style.transform = '';
+
+            img.src = tileImg.currentSrc || tileImg.src;
+            img.alt = tileImg.alt || '';
+            caption.textContent = tileCaption ? tileCaption.textContent : '';
+
+            const legendName = tile.dataset.legendName || '';
+            badge.hidden = !legendName;
+            if (legendName && badgeBack) badgeBack.textContent = legendName;
+
+            // Re-trigger the pop-in + flash microanimation on every open/nav.
+            frame.style.animation = 'none';
+            flash.classList.remove('is-flashing');
+            void flash.offsetWidth; // force reflow so the animation can restart
+            frame.style.animation = '';
+            flash.classList.add('is-flashing');
+            requestAnimationFrame(() => { img.style.transition = ''; });
+
+            lightbox.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.openLegendsLightbox = (tileEl) => {
+            const tiles = getTiles();
+            const index = tiles.indexOf(tileEl);
+            openAt(index === -1 ? 0 : index, tiles);
+        };
+
+        window.closeLegendsLightbox = () => {
+            lightbox.style.display = 'none';
+            document.body.style.overflow = '';
+            currentIndex = -1;
+        };
+
+        window.navLegendsLightbox = (delta) => {
+            if (currentIndex === -1) return;
+            openAt(currentIndex + delta);
+        };
+
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox || e.target.classList.contains('lightbox-stage')) {
+                window.closeLegendsLightbox();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (lightbox.style.display !== 'flex') return;
+            if (e.key === 'Escape') window.closeLegendsLightbox();
+            else if (e.key === 'ArrowLeft') window.navLegendsLightbox(-1);
+            else if (e.key === 'ArrowRight') window.navLegendsLightbox(1);
+        });
+
+        // Swipe support for touch/tablet: the photo fades and slides with the
+        // finger as you drag, then either completes the swap (fading the next
+        // photo back in via the pop-in animation) or snaps back to full opacity
+        // if the drag didn't clear the threshold.
+        const SWIPE_THRESHOLD = 50;
+        const SWIPE_FADE_RANGE = 170;
+        let touchStartX = null;
+        let touchDX = 0;
+
+        lightbox.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].clientX;
+            touchDX = 0;
+            img.style.transition = 'none';
+        }, { passive: true });
+
+        lightbox.addEventListener('touchmove', (e) => {
+            if (touchStartX == null) return;
+            touchDX = e.changedTouches[0].clientX - touchStartX;
+            const progress = Math.min(Math.abs(touchDX) / SWIPE_FADE_RANGE, 1);
+            img.style.opacity = String(1 - progress * 0.85);
+            img.style.transform = `translateX(${touchDX * 0.4}px)`;
+        }, { passive: true });
+
+        lightbox.addEventListener('touchend', () => {
+            if (touchStartX == null) return;
+            img.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+            if (Math.abs(touchDX) > SWIPE_THRESHOLD) {
+                window.navLegendsLightbox(touchDX > 0 ? -1 : 1);
+            } else {
+                img.style.opacity = '';
+                img.style.transform = '';
+            }
+            touchStartX = null;
+            touchDX = 0;
+        }, { passive: true });
     }
 
     getItineraryStopForRole(role) {
