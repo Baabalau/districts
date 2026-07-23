@@ -67,14 +67,28 @@ function renderHeroIntroForState(intro, districtCopy, vars, stateId, isCustom = 
     const paragraphs = Array.isArray(intro) ? intro : intro.split('\n').filter(Boolean);
     const defaultParagraphs = paragraphs.filter(Boolean);
 
-    if (!isCustom && (stateId === 'post-election' || stateId === 'post-event')) {
-        const leadParagraphs = defaultParagraphs.length > 1
-            ? defaultParagraphs.slice(0, -1)
-            : defaultParagraphs.slice(0, 1);
-        const leadHtml = leadParagraphs
+    if (stateId === 'post-election' || stateId === 'post-event') {
+        if (!isCustom) {
+            const leadParagraphs = defaultParagraphs.length > 1
+                ? defaultParagraphs.slice(0, -1)
+                : defaultParagraphs.slice(0, 1);
+            const leadHtml = leadParagraphs
+                .map((paragraph) => `<p>${interpolate(paragraph, vars)}</p>`)
+                .join('');
+            return leadHtml + renderHeroIntroWinnerParagraphs(districtCopy, vars, stateId === 'post-event');
+        }
+
+        if (defaultParagraphs.length === 0) {
+            return renderHeroIntroWinnerParagraphs(districtCopy, vars, stateId === 'post-event');
+        }
+
+        const bodyParagraphs = defaultParagraphs.slice(0, -1);
+        const lastParagraph = defaultParagraphs[defaultParagraphs.length - 1];
+        const bodyHtml = bodyParagraphs
             .map((paragraph) => `<p>${interpolate(paragraph, vars)}</p>`)
             .join('');
-        return leadHtml + renderHeroIntroWinnerParagraphs(districtCopy, vars, stateId === 'post-event');
+        const lastHtml = `<p><span class="hero-meetup-highlight">${interpolate(lastParagraph, vars)}</span></p>`;
+        return bodyHtml + lastHtml;
     }
 
     return renderHeroIntro(paragraphs, vars);
