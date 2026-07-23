@@ -21,7 +21,7 @@
     <meta name="twitter:description" content="A summer-long nightlife crawl across New Orleans' council districts. Vote for the final stop and become a Local Legend.">
     <meta name="twitter:image" content="https://districtsafterdark.com/assets/og-image.png">
 
-    <link rel="stylesheet" href="css/homepage.css?v=4">
+    <link rel="stylesheet" href="css/homepage.css?v=5">
     <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Oswald:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/interior-text.css?v=2">
     <link rel="stylesheet" href="css/site-footer.css">
@@ -310,10 +310,45 @@
         }
 
         // --- LOAD EVENT CARDS FROM JSON ---
-        async function loadEventCards() {
-            const cards = document.querySelectorAll('.event-card[data-district]');
+        function parseScheduleTimestamp(val) {
+            if (!val) return null;
+            const d = val.toDate ? val.toDate() : new Date(val);
+            return isNaN(d) ? null : d;
+        }
 
-            await Promise.all([...cards].map(async (card) => {
+        // Parses display copy like "Tuesday, July 21st" into a Date (current year).
+        function parseDisplayEventDate(dateStr) {
+            if (!dateStr) return null;
+            const cleaned = dateStr.replace(/(\d+)(st|nd|rd|th)/i, '$1');
+            const d = new Date(`${cleaned}, ${new Date().getFullYear()}`);
+            return isNaN(d) ? null : d;
+        }
+
+        function isEventPast(districtId, data, schedule = {}) {
+            const districtSched = schedule[districtId.toUpperCase()];
+            const postEvent = parseScheduleTimestamp(districtSched?.postEvent);
+            if (postEvent && new Date() >= postEvent) return true;
+
+            const eventDay = parseDisplayEventDate(data?.date);
+            if (!eventDay) return false;
+            const endOfDay = new Date(eventDay);
+            endOfDay.setHours(23, 59, 59, 999);
+            return new Date() > endOfDay;
+        }
+
+        async function loadEventCards() {
+            const grid = document.getElementById('event-grid');
+            const cards = [...document.querySelectorAll('.event-card[data-district]')];
+
+            let schedule = {};
+            try {
+                const snap = await getDoc(doc(db, 'settings', 'schedule'));
+                if (snap.exists()) schedule = snap.data();
+            } catch (error) {
+                console.warn('Could not load schedule for homepage event cards:', error);
+            }
+
+            await Promise.all(cards.map(async (card) => {
                 const id = card.dataset.district;
                 try {
                     const data = await fetchDistrictData(id);
@@ -340,13 +375,24 @@
                         dateEl.textContent = data.date;
                     }
 
+                    card._isPast = isEventPast(id, data, schedule);
+                    card.classList.toggle('is-past', card._isPast);
+
                     card.onclick = () => {
                         window.location.href = `district-${id}.html`;
                     };
                 } catch (error) {
                     console.error(`Error loading event card for district ${id}:`, error);
+                    card._isPast = false;
                 }
             }));
+
+            // Past crawls go to the back of the line; upcoming keep their order.
+            if (grid) {
+                const upcoming = cards.filter((card) => !card._isPast);
+                const past = cards.filter((card) => card._isPast);
+                [...upcoming, ...past].forEach((card) => grid.appendChild(card));
+            }
         }
 
         function renderFlowCouple(data) {

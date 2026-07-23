@@ -1550,6 +1550,12 @@
             letter-spacing: 0.03em;
         }
 
+        /* Past crawls move to the back of the grid; their date switches to
+           theme red (--accent) instead of the default olive green. */
+        .event-card.is-past .event-info .event-datetime strong {
+            color: var(--accent);
+        }
+
         .event-info .brand-btn {
             display: none;
         }
