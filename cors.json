@@ -4,9 +4,12 @@
       "https://districts-after-dark.web.app",
       "https://districts-after-dark.firebaseapp.com",
       "https://districtsafterdark.com",
-      "https://www.districtsafterdark.com"
+      "https://www.districtsafterdark.com",
+      "http://localhost:5000",
+      "http://127.0.0.1:5000"
     ],
     "method": ["GET", "HEAD", "PUT", "POST"],
+    "responseHeader": ["Content-Type", "Content-Length", "Access-Control-Allow-Origin"],
     "maxAgeSeconds": 3600
   }
 ]

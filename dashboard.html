@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | Districts After Dark</title>
     <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Oswald:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
     <style>
         :root {
             --bg-primary: #0F1626; 
@@ -433,12 +434,27 @@
             </div>
         </div>
     </div>
+<!-- Image Crop Modal -->
+    <div id="crop-modal" style="display:none; position:fixed; inset:0; z-index:10000; background:rgba(0,0,0,0.85); display:none; flex-direction:column; align-items:center; justify-content:center; padding:20px;">
+        <div style="background:var(--bg-secondary); border-radius:10px; border:1px solid rgba(203,160,82,0.3); padding:20px; max-width:700px; width:100%; max-height:90vh; display:flex; flex-direction:column; gap:14px;">
+            <h3 style="font-family:var(--font-header); text-transform:uppercase; margin:0; font-size:1.1rem; letter-spacing:1px;">Crop Image</h3>
+            <div id="crop-container" style="max-height:55vh; overflow:hidden; border-radius:6px; background:#000;">
+                <img id="crop-source" style="display:block; max-width:100%;">
+            </div>
+            <div style="display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap;">
+                <button type="button" id="crop-cancel-btn" class="btn" style="background:transparent; border:1px solid var(--text-secondary); color:var(--text-secondary);">Cancel</button>
+                <button type="button" id="crop-confirm-btn" class="btn" style="background:var(--brand-red, #B32424); color:#fff;">Crop & Upload</button>
+            </div>
+        </div>
+    </div>
+
 <!-- Image Modal -->
     <div id="image-modal">
         <img id="modal-img" src="" alt="Full check-in photo">
         <button id="close-modal" class="btn">Close</button>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
     <script type="module">
         import { auth, db, storage } from "./js/firebase-config.js";
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
@@ -803,7 +819,88 @@
         // --- SCHEDULE LOGIC ---
         const schedSelect = document.getElementById('schedule-district-select');
         
-        async function handleImageUpload(fileInputId, urlInputId, previewDivId) {
+        // --- IMAGE CROP + UPLOAD ---
+        const cropModal = document.getElementById('crop-modal');
+        const cropSource = document.getElementById('crop-source');
+        const cropConfirmBtn = document.getElementById('crop-confirm-btn');
+        const cropCancelBtn = document.getElementById('crop-cancel-btn');
+        let activeCropper = null;
+        let cropResolve = null;
+
+        function openCropModal(imageSrc) {
+            return new Promise((resolve) => {
+                cropResolve = resolve;
+                
+                const isRemote = imageSrc.startsWith('http');
+                cropSource.crossOrigin = isRemote ? 'anonymous' : null;
+                cropSource.src = '';
+                cropSource.src = imageSrc;
+                cropModal.style.display = 'flex';
+                
+                if (activeCropper) activeCropper.destroy();
+
+                function initCropper() {
+                    activeCropper = new Cropper(cropSource, {
+                        viewMode: 1,
+                        dragMode: 'move',
+                        autoCropArea: 1,
+                        responsive: true,
+                        restore: false,
+                        background: false,
+                        checkCrossOrigin: isRemote
+                    });
+                }
+
+                if (cropSource.complete && cropSource.naturalWidth > 0) {
+                    initCropper();
+                } else {
+                    cropSource.onload = () => { cropSource.onload = null; initCropper(); };
+                    cropSource.onerror = () => { cropSource.onerror = null; closeCropModal(null); alert('Could not load image for cropping.'); };
+                }
+            });
+        }
+
+        function closeCropModal(result) {
+            cropModal.style.display = 'none';
+            if (activeCropper) { activeCropper.destroy(); activeCropper = null; }
+            if (cropResolve) { cropResolve(result); cropResolve = null; }
+        }
+
+        cropConfirmBtn.addEventListener('click', () => {
+            if (!activeCropper) return closeCropModal(null);
+            const canvas = activeCropper.getCroppedCanvas({ maxWidth: 1200, maxHeight: 1200 });
+            canvas.toBlob((blob) => closeCropModal(blob), 'image/png');
+        });
+
+        cropCancelBtn.addEventListener('click', () => closeCropModal(null));
+        cropModal.addEventListener('click', (e) => { if (e.target === cropModal) closeCropModal(null); });
+
+        function renderImagePreview(previewDiv, urlInput, imageUrl) {
+            previewDiv.innerHTML = `
+                <img src="${imageUrl}" style="max-width: 100%; border-radius: 4px; border: 1px solid rgba(203, 160, 82, 0.3);">
+                <button type="button" class="btn crop-existing-btn" style="margin-top: 8px; font-size: 0.8rem; padding: 5px 12px; background: transparent; border: 1px solid var(--text-secondary); color: var(--text-secondary);">✂️ Re-crop</button>
+            `;
+            previewDiv.querySelector('.crop-existing-btn').addEventListener('click', async () => {
+                const currentUrl = urlInput.value.trim();
+                if (!currentUrl) return;
+                const croppedBlob = await openCropModal(currentUrl);
+                if (!croppedBlob) return;
+                
+                previewDiv.innerHTML = '<span style="color: var(--text-secondary);">Uploading cropped image...</span>';
+                try {
+                    const storageRef = ref(storage, `schedule_assets/${Date.now()}_recrop.png`);
+                    await uploadBytes(storageRef, croppedBlob);
+                    const url = await getDownloadURL(storageRef);
+                    urlInput.value = url;
+                    renderImagePreview(previewDiv, urlInput, url);
+                } catch (e) {
+                    console.error("Re-crop upload failed", e);
+                    previewDiv.innerHTML = `<span style="color: #ff6b6b;">Upload failed: ${e.message}</span>`;
+                }
+            });
+        }
+
+        function setupImageUpload(fileInputId, urlInputId, previewDivId) {
             const fileInput = document.getElementById(fileInputId);
             const urlInput = document.getElementById(urlInputId);
             const previewDiv = document.getElementById(previewDivId);
@@ -812,23 +909,30 @@
                 const file = fileInput.files[0];
                 if (!file) return;
                 
+                const objectUrl = URL.createObjectURL(file);
+                const croppedBlob = await openCropModal(objectUrl);
+                URL.revokeObjectURL(objectUrl);
+                
+                if (!croppedBlob) return;
+                
                 previewDiv.innerHTML = '<span style="color: var(--text-secondary);">Uploading...</span>';
                 try {
-                    const storageRef = ref(storage, `schedule_assets/${Date.now()}_${file.name}`);
-                    await uploadBytes(storageRef, file);
+                    const storageRef = ref(storage, `schedule_assets/${Date.now()}_${file.name.replace(/\.[^.]+$/, '')}.png`);
+                    await uploadBytes(storageRef, croppedBlob);
                     const url = await getDownloadURL(storageRef);
                     urlInput.value = url;
-                    previewDiv.innerHTML = `<img src="${url}" style="max-width: 100%; border-radius: 4px; border: 1px solid rgba(203, 160, 82, 0.3);">`;
+                    renderImagePreview(previewDiv, urlInput, url);
                 } catch (e) {
                     console.error("Upload failed", e);
                     previewDiv.innerHTML = `<span style="color: #ff6b6b;">Upload failed: ${e.message}</span>`;
                 }
+                fileInput.value = '';
             });
         }
 
-        handleImageUpload('sched-winner-image-upload', 'sched-winner-image-url', 'sched-winner-image-preview');
-        handleImageUpload('sched-influencer-pick-image-upload', 'sched-influencer-pick-image-url', 'sched-influencer-pick-image-preview');
-        handleImageUpload('sched-council-pick-image-upload', 'sched-council-pick-image-url', 'sched-council-pick-image-preview');
+        setupImageUpload('sched-winner-image-upload', 'sched-winner-image-url', 'sched-winner-image-preview');
+        setupImageUpload('sched-influencer-pick-image-upload', 'sched-influencer-pick-image-url', 'sched-influencer-pick-image-preview');
+        setupImageUpload('sched-council-pick-image-upload', 'sched-council-pick-image-url', 'sched-council-pick-image-preview');
 
         function formatForDateTimeLocal(dateStr) {
             if (!dateStr) return '';
@@ -858,17 +962,29 @@
                     document.getElementById('sched-winner-id').value = data.winnerId || '';
                     document.getElementById('sched-winner-body').value = data.winnerBody || '';
                     document.getElementById('sched-winner-image-url').value = data.winnerImage || '';
-                    document.getElementById('sched-winner-image-preview').innerHTML = data.winnerImage ? `<img src="${data.winnerImage}" style="max-width: 100%; border-radius: 4px; border: 1px solid rgba(203, 160, 82, 0.3);">` : '';
+                    if (data.winnerImage) {
+                        renderImagePreview(document.getElementById('sched-winner-image-preview'), document.getElementById('sched-winner-image-url'), data.winnerImage);
+                    } else {
+                        document.getElementById('sched-winner-image-preview').innerHTML = '';
+                    }
                     
                     document.getElementById('sched-influencer-pick-id').value = data.influencerPickId || '';
                     document.getElementById('sched-influencer-pick-body').value = data.influencerPickBody || '';
                     document.getElementById('sched-influencer-pick-image-url').value = data.influencerPickImage || '';
-                    document.getElementById('sched-influencer-pick-image-preview').innerHTML = data.influencerPickImage ? `<img src="${data.influencerPickImage}" style="max-width: 100%; border-radius: 4px; border: 1px solid rgba(203, 160, 82, 0.3);">` : '';
+                    if (data.influencerPickImage) {
+                        renderImagePreview(document.getElementById('sched-influencer-pick-image-preview'), document.getElementById('sched-influencer-pick-image-url'), data.influencerPickImage);
+                    } else {
+                        document.getElementById('sched-influencer-pick-image-preview').innerHTML = '';
+                    }
                     
                     document.getElementById('sched-council-pick-id').value = data.councilPickId || '';
                     document.getElementById('sched-council-pick-body').value = data.councilPickBody || '';
                     document.getElementById('sched-council-pick-image-url').value = data.councilPickImage || '';
-                    document.getElementById('sched-council-pick-image-preview').innerHTML = data.councilPickImage ? `<img src="${data.councilPickImage}" style="max-width: 100%; border-radius: 4px; border: 1px solid rgba(203, 160, 82, 0.3);">` : '';
+                    if (data.councilPickImage) {
+                        renderImagePreview(document.getElementById('sched-council-pick-image-preview'), document.getElementById('sched-council-pick-image-url'), data.councilPickImage);
+                    } else {
+                        document.getElementById('sched-council-pick-image-preview').innerHTML = '';
+                    }
                     
                     document.getElementById('sched-legends-mode').value = data.localLegendsMode || 'default';
                 } else {
