@@ -1770,6 +1770,8 @@ class EventLayout extends HTMLElement {
             // Newest check-ins first.
             photos.sort((a, b) => b.lastVisit - a.lastVisit);
 
+            console.info(`[Local Legends] District ${districtUpper}: ${districtVenueIds.size} venue(s), ${photos.length} check-in photo(s) found.`, photos.length ? { sampleUrl: photos[0].photoUrl } : '');
+
             this._legendsData = { photos, legendUids };
             this.renderLocalLegends(window.localLegendsMode || 'default');
         } catch (err) {
@@ -1836,7 +1838,22 @@ class EventLayout extends HTMLElement {
         // Repeating size pattern gives the grid its bento rhythm.
         const sizePattern = ['bento-large', '', 'bento-tall', 'bento-wide', '', '', 'bento-tall', '', 'bento-wide'];
 
-        wall.innerHTML = items.map((p, i) => {
+        // Only render tiles that have a usable URL. (Empty/placeholder URLs would
+        // otherwise render as permanently-dark boxes that never error.)
+        const validItems = items.filter(p => p.photoUrl && typeof p.photoUrl === 'string' && /^https?:\/\//.test(p.photoUrl));
+
+        if (validItems.length === 0) {
+            console.warn(`[Local Legends] No valid photo URLs to render (had ${items.length} candidate photo(s)).`);
+            wall.innerHTML = this.legendsEmptyHtml(isLegendsMode);
+            return;
+        }
+
+        // Escape the URL for safe innerHTML insertion. The HTML parser decodes
+        // entities (e.g. &amp; -> &) back to a valid URL, so Firebase Storage
+        // download links with ?alt=media&token=... survive intact. Do NOT use
+        // encodeURI here: Firebase paths are already percent-encoded (%2F), and
+        // re-encoding turns %2F into %252F, which 404s.
+        wall.innerHTML = validItems.map((p, i) => {
             const sizeClass = sizePattern[i % sizePattern.length];
             const badge = isLegendsMode ? `<div class="bento-legend-badge">★ Legend</div>` : '';
             const caption = escapeHtml(isLegendsMode ? p.displayName : p.venueName);
@@ -1850,11 +1867,18 @@ class EventLayout extends HTMLElement {
 
         // Drop any tile whose photo can't load so a broken/expired URL never
         // renders as an empty dark box; if they all fail, show the empty state.
-        wall.querySelectorAll('.bento-photo').forEach((img) => {
+        // Log the offending URL so genuinely-broken links can be diagnosed
+        // instead of silently disappearing.
+        let failures = 0;
+        const imgs = wall.querySelectorAll('.bento-photo');
+        imgs.forEach((img) => {
             img.addEventListener('error', () => {
+                failures += 1;
+                console.warn(`[Local Legends] Photo failed to load (${failures}/${imgs.length}):`, img.src);
                 const tile = img.closest('.bento-item');
                 if (tile) tile.remove();
                 if (!wall.querySelector('.bento-item')) {
+                    console.warn('[Local Legends] All photos failed to load — showing empty state.');
                     wall.innerHTML = this.legendsEmptyHtml(isLegendsMode);
                 }
             });
