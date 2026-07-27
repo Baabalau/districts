@@ -147,6 +147,42 @@ function formatStreetAddress(address) {
     return commaIdx === -1 ? trimmed : trimmed.slice(0, commaIdx).trim();
 }
 
+function isGenericStockImage(url) {
+    return typeof url === 'string' && /unsplash\.com|placeholder|picsum/i.test(url);
+}
+
+function applyImageWithFallback(imgEl, primarySrc, fallbackSrc) {
+    if (!imgEl) return;
+
+    const fallback = fallbackSrc || imgEl.dataset.fallbackSrc || '';
+    if (fallback) imgEl.dataset.fallbackSrc = fallback;
+
+    const setSrc = (src) => {
+        if (!src) {
+            imgEl.style.display = 'none';
+            return;
+        }
+
+        imgEl.onerror = () => {
+            if (fallback && imgEl.dataset.fallbackUsed !== 'true') {
+                imgEl.dataset.fallbackUsed = 'true';
+                setSrc(fallback);
+                return;
+            }
+            imgEl.style.display = 'none';
+        };
+
+        imgEl.onload = () => {
+            imgEl.dataset.fallbackUsed = 'false';
+        };
+
+        imgEl.src = src;
+        imgEl.style.display = 'block';
+    };
+
+    setSrc(primarySrc || fallback);
+}
+
 // Pulls a readable @handle out of a social profile URL (falls back to a
 // generic label if the URL shape is unexpected).
 function socialHandleFromUrl(url) {
@@ -762,7 +798,7 @@ function renderRevealCard({ role, roleLabel, stopNumber, alignClass, avatar, hos
                     </div>
                     
                     <div class="reveal-business-info">
-                        <img class="reveal-card-media" data-field="image" src="${image || ''}" alt="${businessName || ''}" style="display: ${image ? 'block' : 'none'};">
+                        <img class="reveal-card-media" data-field="image" src="${image || ''}" data-fallback-src="${image || ''}" alt="${businessName || ''}" style="display: ${image ? 'block' : 'none'};">
                         <h4 class="reveal-business-name" data-field="name">${escapeHtml(businessName || 'To Be Revealed')}</h4>
                     </div>
                     
@@ -878,7 +914,7 @@ function renderWinnerCard(district, vars, { stepClass = '' } = {}) {
                 </div>
 
                 <div class="reveal-business-info">
-                    <img class="reveal-card-media" data-field="winner-image" src="${vars.winnerImage || ''}" alt="${escapeHtml(vars.winnerBusiness)}" style="display: ${vars.winnerImage ? 'block' : 'none'};">
+                    <img class="reveal-card-media" data-field="winner-image" src="${vars.winnerImage || ''}" data-fallback-src="${vars.winnerImage || ''}" alt="${escapeHtml(vars.winnerBusiness)}" style="display: ${vars.winnerImage ? 'block' : 'none'};">
                     <h4 class="reveal-business-name" data-field="winner-name">${escapeHtml(vars.winnerBusiness)}</h4>
                 </div>
 
@@ -2473,12 +2509,14 @@ class EventLayout extends HTMLElement {
                 addressEl.style.display = 'block';
             }
 
-            const displayImage = pick.imageOverride || fallback?.image || venue?.image;
+            const jsonImage = fallback?.image || '';
+            const scheduleImage = pick.imageOverride || '';
+            const venueImage = venue?.image || '';
+            const primaryImage = scheduleImage || jsonImage || (isGenericStockImage(venueImage) ? '' : venueImage);
             const imgEl = card.querySelector('[data-field="image"]');
-            if (imgEl && displayImage) {
-                imgEl.src = displayImage;
-                imgEl.alt = displayName || '';
-                imgEl.style.display = 'block';
+            if (imgEl) {
+                applyImageWithFallback(imgEl, primaryImage, jsonImage);
+                if (displayName) imgEl.alt = displayName;
             }
 
             const webEl = card.querySelector('[data-field="website"]');
@@ -2520,11 +2558,9 @@ class EventLayout extends HTMLElement {
             }
 
             const imgEl = card.querySelector('[data-field="winner-image"]');
-            if (imgEl && venue.image) {
-                imgEl.src = venue.image;
-                imgEl.alt = venue.name || '';
-                imgEl.style.display = 'block';
-            }
+            const fallbackImage = this._heroVars?.winnerImage || imgEl?.dataset.fallbackSrc || '';
+            applyImageWithFallback(imgEl, venue.image, fallbackImage);
+            if (imgEl && venue.name) imgEl.alt = venue.name;
         });
 
         const displayed = this._displayedElectionState || window.currentElectionState;
@@ -2544,14 +2580,18 @@ class EventLayout extends HTMLElement {
                 return;
             }
             const venueData = venueSnap.data();
-            
-            // Apply schedule override, then fall back to the district JSON image.
-            if (sched.winnerImage) {
-                venueData.image = sched.winnerImage;
-            } else if (this._heroVars?.winnerImage) {
-                venueData.image = this._heroVars.winnerImage;
+            const districtImage = this._heroVars?.winnerImage || '';
+            const scheduleImage = (sched.winnerImage || '').trim();
+            const venueImage = (venueData.image || '').trim();
+
+            if (scheduleImage) {
+                venueData.image = scheduleImage;
+            } else if (districtImage) {
+                venueData.image = districtImage;
+            } else if (isGenericStockImage(venueImage)) {
+                venueData.image = districtImage;
             }
-            
+
             this.applyWinnerVenueToPage(venueData);
             
             // Apply winner body override if it exists

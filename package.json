@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "export-reveal-layers": "node image_generator/generate_reveal_assets.js"
+  },
   "dependencies": {
     "firebase": "^12.15.0",
     "http-server": "^14.1.1",
