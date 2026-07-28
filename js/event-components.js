@@ -1175,6 +1175,7 @@ function renderVotingStates(district, vars) {
                         <h2 style="font-family: var(--font-header); font-size: 2.5rem; text-transform: uppercase; color: var(--text-primary); margin-bottom: 20px;">What a Night</h2>
                         <p style="font-size: 1.1rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto;">Thank you to everyone who came out to District ${district} and supported our local nighttime economy. We'll see you at the next one!</p>
                     </div>
+                    ${renderVenueExplorer(district, true)}
                 </div>
             </div>`;
 }

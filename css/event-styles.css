@@ -1955,6 +1955,20 @@
     text-align: left;
 }
 
+.voting-states-section #state-post-event {
+    padding-inline: clamp(16px, 4vw, 24px);
+    box-sizing: border-box;
+}
+
+.voting-states-section #state-post-event .voting-header {
+    text-align: center;
+}
+
+.voting-states-section #state-post-event .venue-explorer {
+    margin-top: 30px;
+    text-align: left;
+}
+
 .winner-card-celebration {
     animation: winnerPulse 3.5s infinite ease-in-out;
     border-color: var(--text-primary) !important;
