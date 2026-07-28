@@ -1065,6 +1065,7 @@
     padding: 10px 10px 15px;
     margin-bottom: 30px;
     box-shadow: 0 12px 32px rgba(45, 27, 21, 0.1);
+    overflow: visible;
 }
 .leaderboard h3 {
     color: var(--text-primary);
@@ -1079,7 +1080,7 @@
 .leaderboard-list .venue-card {
     position: relative;
     margin-bottom: 5px;
-    overflow: hidden;
+    overflow: visible;
     align-items: center;
 }
 .leaderboard-list .venue-card:last-child {
@@ -1338,6 +1339,7 @@
     padding: 12px 15px;
     margin-bottom: 8px;
     transition: transform 0.2s, border-color 0.2s;
+    overflow: visible;
 }
 .venue-list .venue-card:hover,
 .venue-list li:hover {
@@ -1530,10 +1532,45 @@
     flex-shrink: 0;
 }
 
-/* Wrappers are layout-neutral on tablet/desktop; stack on small phones only */
-.venue-actions-stack,
-.venue-actions-buttons {
-    display: contents;
+@media (min-width: 571px) {
+    /* Flatten wrappers so tablet/desktop keeps a single horizontal action row */
+    .venue-actions-stack,
+    .venue-actions-buttons {
+        display: contents;
+    }
+
+    .venue-list .venue-actions .prominent-vote-tally {
+        order: 1;
+    }
+
+    .venue-list .venue-actions .venue-vote-btn {
+        order: 2;
+    }
+
+    .venue-list .venue-actions .venue-checkin-btn,
+    .venue-list .venue-actions .venue-checkin-btn-expanded {
+        order: 3;
+    }
+
+    .venue-list .venue-actions .venue-share-link-wrap {
+        order: 4;
+    }
+
+    .venue-list .venue-actions.post-election-results-actions .venue-checkin-btn-expanded {
+        order: 2;
+    }
+
+    .venue-list .venue-actions.post-election-results-actions .venue-share-link-wrap {
+        order: 3;
+    }
+
+    .venue-list .venue-actions.post-election-actions .venue-share-link-wrap {
+        order: 2;
+    }
+
+    .venue-list .venue-actions.post-election-actions .venue-checkin-btn-expanded {
+        order: 1;
+    }
 }
 
 .venue-vote-btn {
@@ -1589,7 +1626,77 @@
     border-color: var(--text-secondary);
 }
 
-/* Small phones: stack vote tally above action buttons; gold line spans full stack */
+/* Circular copy-link button (matches map popup) */
+.venue-share-link-wrap {
+    position: relative;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.venue-share-link-toast {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 8px);
+    right: 0;
+    background: #618A62;
+    color: white;
+    font-family: var(--font-main);
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    white-space: nowrap;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.venue-share-link-toast.is-visible {
+    display: block;
+}
+
+.venue-share-link-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    min-height: 34px;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.venue-share-link-btn .link-icon {
+    width: 13px;
+    height: 13px;
+    object-fit: contain;
+    filter: brightness(0) saturate(100%) invert(72%) sepia(21%) saturate(942%) hue-rotate(354deg) brightness(91%) contrast(88%);
+    opacity: 0.8;
+    transition: all 0.2s ease;
+}
+
+.venue-share-link-btn:hover {
+    border-color: rgba(255, 255, 255, 0.35);
+}
+
+.venue-share-link-btn.is-copied {
+    background: #618A62;
+    border-color: #618A62;
+}
+
+.venue-share-link-btn.is-copied .link-icon {
+    filter: brightness(0) saturate(100%) invert(100%);
+    opacity: 1;
+}
+
+/* Small phones: vote tally + link on one row; vote + check-in aligned below */
 @media (max-width: 570px) {
     .venue-list .venue-actions {
         display: flex;
@@ -1609,18 +1716,53 @@
     }
 
     .venue-list .venue-actions-stack {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        justify-content: center;
-        gap: 6px;
+        display: grid;
+        grid-template-columns: auto 42px;
+        grid-template-rows: auto auto;
+        column-gap: 10px;
+        row-gap: 8px;
+        align-items: center;
+        min-width: 0;
     }
 
-    .venue-list .venue-actions-buttons {
+    .venue-list .venue-actions-stack .prominent-vote-tally {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    .venue-list .venue-actions-stack .venue-share-link-wrap {
+        grid-column: 2;
+        grid-row: 1;
+        justify-self: center;
+        width: 42px;
+    }
+
+    .venue-list .venue-actions-stack .venue-actions-buttons {
+        display: contents;
+    }
+
+    .venue-list .venue-actions-stack .venue-vote-btn {
+        grid-column: 1;
+        grid-row: 2;
+        justify-self: start;
+    }
+
+    .venue-list .venue-actions-stack .venue-checkin-btn,
+    .venue-list .venue-actions-stack .venue-checkin-btn-expanded {
+        grid-column: 2;
+        grid-row: 2;
+        justify-self: center;
+    }
+
+    .venue-list .venue-actions.post-election-results-actions .venue-actions-stack {
+        grid-template-columns: auto 42px;
+    }
+
+    .venue-list .venue-actions.post-election-actions .venue-actions-buttons {
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         align-items: center;
-        gap: 10px;
+        gap: 8px;
     }
 
     .venue-list .venue-actions .prominent-vote-tally::before {
