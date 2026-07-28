@@ -9,6 +9,32 @@ function isVotingClosed() {
     return state === 'post-election' || state === 'post-event';
 }
 
+function getVenueShareUrl(venueId) {
+    return `${window.location.origin}/v/${encodeURIComponent(venueId)}.html`;
+}
+
+window.copyVenueShareLink = (btn, url) => {
+    navigator.clipboard.writeText(url).then(() => {
+        btn.classList.add('is-copied');
+        const toast = btn.parentElement?.querySelector('.venue-share-link-toast');
+        if (toast) toast.classList.add('is-visible');
+        setTimeout(() => {
+            btn.classList.remove('is-copied');
+            if (toast) toast.classList.remove('is-visible');
+        }, 2000);
+    }).catch((err) => console.error('Failed to copy venue link:', err));
+};
+
+function renderVenueShareLinkButton(venueId) {
+    const safeUrl = getVenueShareUrl(venueId).replace(/'/g, "\\'");
+    return `<span class="venue-share-link-wrap">
+        <button type="button" class="venue-share-link-btn" onclick="window.copyVenueShareLink(this, '${safeUrl}')" title="Copy direct link to this venue" aria-label="Copy direct link to this venue">
+            <img class="link-icon" src="assets/link.png" alt="">
+        </button>
+        <span class="venue-share-link-toast" aria-live="polite">Copied!</span>
+    </span>`;
+}
+
 /** Best display address when Firestore `address` was overwritten by a bare street number. */
 export function formatVenueAddress(venue) {
     if (!venue) return '';
@@ -623,7 +649,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                 // Post-election browse tab: expanded check-in only, no vote tally
                 if (actionMode === 'post-election-browse') {
                     return `<div class="venue-actions post-election-actions">
-                        ${renderExpandedCheckIn(false)}
+                        <div class="venue-actions-buttons">
+                            ${renderVenueShareLinkButton(v.id)}
+                            ${renderExpandedCheckIn(false)}
+                        </div>
                     </div>`;
                 }
 
@@ -632,6 +661,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     return `<div class="venue-actions post-election-results-actions">
                         <div class="venue-actions-stack">
                             ${renderVoteTally(v.voteCount, v.id)}
+                            ${renderVenueShareLinkButton(v.id)}
                             <div class="venue-actions-buttons">
                                 ${renderExpandedCheckIn(true)}
                             </div>
@@ -642,6 +672,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 return `<div class="venue-actions">
                         <div class="venue-actions-stack">
                             ${renderVoteTally(v.voteCount, v.id)}
+                            ${renderVenueShareLinkButton(v.id)}
                             <div class="venue-actions-buttons">
                                 ${votingClosed 
                                     ? `<button class="brand-btn venue-vote-btn voting-closed-btn" disabled title="Voting Closed">
