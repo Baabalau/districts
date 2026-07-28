@@ -778,6 +778,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 updateLeaderboard('#state-round-1 .leaderboard', 10, isRunoff, 'normal');
                 updateLeaderboard('#state-run-off .leaderboard', 10, isRunoff, 'normal');
                 updateLeaderboard('#state-post-election .leaderboard', 10, isPostElection, 'post-election-results');
+                updateLeaderboard('#state-post-event .leaderboard', 10, isPostElection, 'post-election-results');
             };
 
             // Combined Venue Explorer: one component toggling between the vote-ranked
@@ -853,8 +854,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             // Round 1: all qualifying venues. Run-off: all venues for browsing (leaderboard handled separately).
             setupVenueExplorer('#state-round-1', sortedVenues, false);
             setupVenueExplorer('#state-run-off', sortedVenues, false);
-            // Post-election: show all venues for browsing, leaderboard shows final runoff results
+            // Post-election / post-event: browse all venues; leaderboard shows final run-off results
             setupVenueExplorer('#state-post-election', sortedVenues, true);
+            setupVenueExplorer('#state-post-event', sortedVenues, true);
         };
         
         populateLists();
