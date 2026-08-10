@@ -364,6 +364,22 @@ function buildRunoffExports(prefix, stop, vars, host) {
     ];
 }
 
+function buildWinnerBusinessNameHtml(winner, lines) {
+    const nameLines = lines?.filter(Boolean);
+    if (nameLines?.length) {
+        return `<h4 class="reveal-business-name">${nameLines.map((line) => escapeHtml(line)).join('<br>')}</h4>`;
+    }
+    return `<h4 class="reveal-business-name">${escapeHtml(winner.businessName || 'TBA')}</h4>`;
+}
+
+function buildWinnerMeetupHighlightHtml(meetupHighlight, lines) {
+    const highlightLines = lines?.filter(Boolean);
+    if (highlightLines?.length) {
+        return `<span class="hero-meetup-highlight">${highlightLines.map((line) => escapeHtml(line)).join('<br>')}</span>`;
+    }
+    return `<span class="hero-meetup-highlight">${escapeHtml(meetupHighlight)}</span>`;
+}
+
 function buildWinnerExports(districtCopy, vars) {
     const winner = districtCopy.winner || {};
     const meetupHighlight = `Meet us there ${districtCopy.date} at ${winner.meetupTime || '8:30pm'}!`;
@@ -372,7 +388,7 @@ function buildWinnerExports(districtCopy, vars) {
         `With ${voteCount} votes, ${winner.businessName || 'TBA'} has been elected to host the last stop of District ${districtCopy.district} After Dark!`
     );
 
-    return [
+    const exports = [
         {
             file: 'winner-frame.png',
             width: 920,
@@ -409,7 +425,7 @@ function buildWinnerExports(districtCopy, vars) {
             file: 'winner-business-name.png',
             width: 620,
             height: 100,
-            html: `<h4 class="reveal-business-name">${escapeHtml(winner.businessName || 'TBA')}</h4>`
+            html: buildWinnerBusinessNameHtml(winner)
         },
         {
             file: 'winner-summary-body.png',
@@ -421,7 +437,7 @@ function buildWinnerExports(districtCopy, vars) {
             file: 'winner-meetup-highlight.png',
             width: 620,
             height: 80,
-            html: `<span class="hero-meetup-highlight">${escapeHtml(meetupHighlight)}</span>`
+            html: buildWinnerMeetupHighlightHtml(meetupHighlight)
         },
         {
             file: 'winner-host-council.png',
@@ -448,6 +464,26 @@ function buildWinnerExports(districtCopy, vars) {
             </div>`
         }
     ];
+
+    if (winner.businessNameLines?.length >= 2) {
+        exports.splice(exports.findIndex((layer) => layer.file === 'winner-business-name.png') + 1, 0, {
+            file: 'winner-business-name-2line.png',
+            width: 620,
+            height: 130,
+            html: buildWinnerBusinessNameHtml(winner, winner.businessNameLines)
+        });
+    }
+
+    if (winner.meetupHighlightLines?.length >= 2) {
+        exports.splice(exports.findIndex((layer) => layer.file === 'winner-meetup-highlight.png') + 1, 0, {
+            file: 'winner-meetup-highlight-2line.png',
+            width: 620,
+            height: 110,
+            html: buildWinnerMeetupHighlightHtml(meetupHighlight, winner.meetupHighlightLines)
+        });
+    }
+
+    return exports;
 }
 
 function socialHandleFromUrl(url) {
