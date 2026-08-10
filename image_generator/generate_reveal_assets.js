@@ -17,6 +17,12 @@ function assetUrl(relativePath) {
     return `file://${path.join(ROOT, relativePath)}`;
 }
 
+function imageSrc(imagePath) {
+    if (!imagePath) return '';
+    if (/^https?:\/\//i.test(imagePath)) return imagePath;
+    return assetUrl(imagePath);
+}
+
 function interpolate(text, vars) {
     if (!text) return '';
     return text.replace(/\{(\w+)\}/g, (_, key) => vars[key] ?? `{${key}}`);
@@ -330,7 +336,7 @@ function buildRunoffExports(prefix, stop, vars, host) {
             width: 460,
             height: 240,
             html: stop.image
-                ? `<img src="${assetUrl(stop.image)}" class="reveal-card-media" alt="${escapeHtml(stop.businessName)}">`
+                ? `<img src="${imageSrc(stop.image)}" class="reveal-card-media" alt="${escapeHtml(stop.businessName)}">`
                 : `<div class="reveal-card-media" style="background:rgba(255,255,255,0.08);"></div>`
         },
         {
@@ -396,7 +402,7 @@ function buildWinnerExports(districtCopy, vars) {
             width: 820,
             height: 290,
             html: winner.image
-                ? `<img src="${assetUrl(winner.image)}" class="reveal-card-media winner-photo" alt="${escapeHtml(winner.businessName)}">`
+                ? `<img src="${imageSrc(winner.image)}" class="reveal-card-media winner-photo" alt="${escapeHtml(winner.businessName)}">`
                 : `<div class="reveal-card-media winner-photo" style="background:rgba(255,255,255,0.08);"></div>`
         },
         {

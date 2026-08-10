@@ -21,24 +21,40 @@
   ],
   "councilQuote": "This isn't just about nightlife; it's about connecting with the community where they are. We're breaking down the walls of City Hall.",
   "influencerQuote": "District {district} has some of the most vibrant, unsung spots in the city. I can't wait to show everyone what makes this neighborhood tick.",
+  "winner": {
+    "businessName": "Hot & Soul",
+    "address": "2540 Banks Street, New Orleans, LA 70119",
+    "voteCount": 69,
+    "meetupTime": "8:30pm",
+    "image": "assets/hot-and-soul-b.png",
+    "summaryBody": "Hot & Soul is serving a wide, even eclectic, array of culinary treats in Mid-City. Kudos to these neighborhood champs!"
+  },
   "itinerary": {
     "stops": [
       {
         "number": "01",
         "hostRole": "influencer",
         "title": "{influencerName}'s Sundown Wind-Down",
-        "body": "The crawl begins at a spot {influencerName} calls essentialùlive energy, strong pours, and the kind of room that sets the tone for the whole night."
+        "body": "The crawl begins at a spot {influencerName} calls essentialÔøΩlive energy, strong pours, and the kind of room that sets the tone for the whole night.",
+        "runoffBody": "Where Chef Juan works his magic, blending the bold flavors of Peru with the soulful depth of Louisiana Creole cooking. Come for the ceviche, the Pisco, the color - all rooted in heritage, family, friends and community.",
+        "businessName": "Tito's Ceviche & Pisco",
+        "address": "1433 St Charles Ave, New Orleans, LA 70130",
+        "image": "assets/titos-ceviche-and-pisco-b.png"
       },
       {
         "number": "02",
         "hostRole": "council",
         "title": "{councilName}'s Mystery Pick",
-        "body": "Councilmember {councilName} takes the group to a trusted institution where regulars, workers, and visitors mixùperfect for talking policy without leaving the party behind."
+        "body": "Councilmember {councilName} takes the group to a trusted institution where regulars, workers, and visitors mixÔøΩperfect for talking policy without leaving the party behind.",
+        "runoffBody": "Across the spectrum of vibes on offer at District B's restaurants, bars and venues, Councilmember Harris is spotlighting a neighborhood bar focused on community in the heart of Uptown - QiQi. A place for queer pride, open ears, open hearts and good times!",
+        "businessName": "QiQi",
+        "address": "2021 Foucher St, New Orleans, LA 70115",
+        "image": "assets/qiqi-b.png"
       },
       {
         "number": "03",
         "title": "The District B Vote",
-        "body": "The final stop is yours. Vote now to send the crawl to the {location} venue you want on the map when we roll through on March 12."
+        "body": "The final stop is yours. Vote now to send the crawl to the {location} venue you want on the map when we roll through on August 5."
       }
     ]
   }
