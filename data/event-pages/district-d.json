@@ -17,6 +17,16 @@
   },
   "councilQuote": "This isn't just about nightlife; it's about connecting with the community where they are. We're breaking down the walls of City Hall.",
   "influencerQuote": "District {district} has some of the most vibrant, unsung spots in the city. I can't wait to show everyone what makes this neighborhood tick.",
+  "winner": {
+    "businessName": "Kajunlicious Food Therapy",
+    "businessNameLines": ["Kajunlicious", "Food Therapy"],
+    "address": "4706 Paris Ave, New Orleans, LA 70122",
+    "voteCount": 41,
+    "meetupTime": "8pm",
+    "meetupHighlightLines": ["Meet us there Thursday, August 13th", "at 8pm!"],
+    "image": "assets/kajunlicious-food-therapy-d.png",
+    "summaryBody": "We're excited to visit \"where love & flavor meet\" at Kajunlicious Food Therapy in Gentilly! With 41 votes from the community Kajunlicious will be the last stop of our nightcrawl in District D!"
+  },
   "itinerary": {
     "stops": [
       {

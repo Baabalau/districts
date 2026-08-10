@@ -322,6 +322,22 @@
             ];
         }
 
+        function buildWinnerBusinessNameHtml(winner, lines) {
+            const nameLines = lines?.filter(Boolean);
+            if (nameLines?.length) {
+                return `<h4 class="reveal-business-name">${nameLines.map((line) => escapeHtml(line)).join('<br>')}</h4>`;
+            }
+            return `<h4 class="reveal-business-name">${escapeHtml(winner.businessName || 'TBA')}</h4>`;
+        }
+
+        function buildWinnerMeetupHighlightHtml(meetupHighlight, lines) {
+            const highlightLines = lines?.filter(Boolean);
+            if (highlightLines?.length) {
+                return `<span class="hero-meetup-highlight">${highlightLines.map((line) => escapeHtml(line)).join('<br>')}</span>`;
+            }
+            return `<span class="hero-meetup-highlight">${escapeHtml(meetupHighlight)}</span>`;
+        }
+
         function buildWinnerLayers(districtCopy, vars) {
             const winner = districtCopy.winner || {};
             const meetupHighlight = `Meet us there ${districtCopy.date} at ${winner.meetupTime || '8:30pm'}!`;
@@ -330,18 +346,38 @@
                 `With ${voteCount} votes, ${winner.businessName || 'TBA'} has been elected to host the last stop of District ${districtCopy.district} After Dark!`
             );
 
-            return [
+            const layers = [
                 { file: 'winner-frame.png', label: 'Winner glowing frame', html: `<div class="proc-card winner-frame"></div>` },
                 { file: 'winner-crown-avatar.png', label: 'Winner crown avatar', html: `<div class="stop-avatar winner-card-crown">👑</div>` },
                 { file: 'winner-stop-label-3d.png', label: 'Winner 3D stop label', html: `<div class="stop-label-3d">FINAL STOP</div>` },
                 { file: 'winner-header-title.png', label: 'Winner header title', html: `<h3 class="stop-title">The People's Choice</h3>` },
                 { file: 'winner-business-photo.png', label: 'Winner business photo', html: winner.image ? `<img src="${winner.image}" class="reveal-card-media winner-photo" alt="">` : `<div class="reveal-card-media winner-photo" style="background:rgba(255,255,255,0.08);"></div>` },
-                { file: 'winner-business-name.png', label: 'Winner business name badge', html: `<h4 class="reveal-business-name">${escapeHtml(winner.businessName || 'TBA')}</h4>` },
+                { file: 'winner-business-name.png', label: 'Winner business name badge', html: buildWinnerBusinessNameHtml(winner) },
                 { file: 'winner-summary-body.png', label: 'Winner summary body', html: `<p class="winner-summary">${escapeHtml(summaryLead)}</p>` },
-                { file: 'winner-meetup-highlight.png', label: 'Winner meetup highlight', html: `<span class="hero-meetup-highlight">${escapeHtml(meetupHighlight)}</span>` },
+                { file: 'winner-meetup-highlight.png', label: 'Winner meetup highlight', html: buildWinnerMeetupHighlightHtml(meetupHighlight) },
                 { file: 'winner-host-council.png', label: 'Winner host — council', html: `<div class="winner-card-host"><img src="${districtCopy.councilImg}" class="stop-avatar" alt=""><div><span class="winner-card-host-role">Councilmember</span><span class="winner-card-host-name">${escapeHtml(districtCopy.councilName)}</span></div></div>` },
                 { file: 'winner-host-influencer.png', label: 'Winner host — influencer', html: `<div class="winner-card-host"><img src="${districtCopy.influencerImg}" class="stop-avatar" alt=""><div><span class="winner-card-host-role">${escapeHtml(vars.influencerRole)}</span><span class="winner-card-host-name">${escapeHtml(districtCopy.influencerName)}</span></div></div>` }
             ];
+
+            if (winner.businessNameLines?.length >= 2) {
+                const nameIndex = layers.findIndex((layer) => layer.file === 'winner-business-name.png');
+                layers.splice(nameIndex + 1, 0, {
+                    file: 'winner-business-name-2line.png',
+                    label: 'Winner business name badge (2 lines)',
+                    html: buildWinnerBusinessNameHtml(winner, winner.businessNameLines)
+                });
+            }
+
+            if (winner.meetupHighlightLines?.length >= 2) {
+                const meetupIndex = layers.findIndex((layer) => layer.file === 'winner-meetup-highlight.png');
+                layers.splice(meetupIndex + 1, 0, {
+                    file: 'winner-meetup-highlight-2line.png',
+                    label: 'Winner meetup highlight (2 lines)',
+                    html: buildWinnerMeetupHighlightHtml(meetupHighlight, winner.meetupHighlightLines)
+                });
+            }
+
+            return layers;
         }
 
         function buildLayers(districtCopy) {
