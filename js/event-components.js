@@ -1963,8 +1963,10 @@ class EventLayout extends HTMLElement {
 
             // Populate the run-off Crawl-tinery cards from the schedule's picks so
             // they are ready before we toggle them into view.
-            this.populateRunoffCrawltinery(sched);
-            this.populateWinnerCard(sched);
+            await Promise.all([
+                this.populateRunoffCrawltinery(sched),
+                this.populateWinnerCard(sched)
+            ]);
             this.updateRunoffDateDisplay(sched.runOffStart);
 
             // Local Legends board mode is controlled from the same dashboard doc.
@@ -2480,14 +2482,13 @@ class EventLayout extends HTMLElement {
             { role: 'council', id: sched.councilPickId, body: sched.councilPickBody, imageOverride: sched.councilPickImage }
         ];
 
+        const resolvedNames = { influencer: null, council: null };
+
         for (const pick of picks) {
-            const card = this.querySelector(`[data-pick-role="${pick.role}"]`);
-            if (!card) continue;
+            const cards = this.querySelectorAll(`[data-pick-role="${pick.role}"]`);
+            if (!cards.length) continue;
 
             const fallback = this.getItineraryStopForRole(pick.role);
-
-            const bodyEl = card.querySelector('[data-field="body"]');
-            if (bodyEl && pick.body) bodyEl.textContent = pick.body;
 
             let venue = null;
             if (pick.id) {
@@ -2500,34 +2501,55 @@ class EventLayout extends HTMLElement {
             }
 
             const displayName = venue?.name || fallback?.businessName;
-            const nameEl = card.querySelector('[data-field="name"]');
-            if (nameEl && displayName) nameEl.textContent = displayName;
+            resolvedNames[pick.role] = displayName || resolvedNames[pick.role];
 
             const displayAddress = formatStreetAddress(fallback?.address || venue?.address);
-            const addressEl = card.querySelector('[data-field="address"]');
-            if (addressEl && displayAddress) {
-                addressEl.textContent = displayAddress;
-                addressEl.style.display = 'block';
-            }
-
             const jsonImage = fallback?.image || '';
             const scheduleImage = pick.imageOverride || '';
             const venueImage = venue?.image || '';
             const primaryImage = scheduleImage || jsonImage || (isGenericStockImage(venueImage) ? '' : venueImage);
-            const imgEl = card.querySelector('[data-field="image"]');
-            if (imgEl) {
-                applyImageWithFallback(imgEl, primaryImage, jsonImage);
-                if (displayName) imgEl.alt = displayName;
-            }
-
-            const webEl = card.querySelector('[data-field="website"]');
             const websiteUrl = fallback?.website || venue?.website || venue?.facebook;
-            if (webEl && websiteUrl) {
-                webEl.href = websiteUrl;
-                webEl.textContent = displayName ? `${displayName} on the web` : 'Visit Website';
-                webEl.style.display = 'block';
-            } else if (webEl) {
-                webEl.style.display = 'none';
+
+            cards.forEach((card) => {
+                const bodyEl = card.querySelector('[data-field="body"]');
+                if (bodyEl && pick.body) bodyEl.textContent = pick.body;
+
+                const nameEl = card.querySelector('[data-field="name"]');
+                if (nameEl && displayName) nameEl.textContent = displayName;
+
+                const addressEl = card.querySelector('[data-field="address"]');
+                if (addressEl && displayAddress) {
+                    addressEl.textContent = displayAddress;
+                    addressEl.style.display = 'block';
+                }
+
+                const imgEl = card.querySelector('[data-field="image"]');
+                if (imgEl) {
+                    applyImageWithFallback(imgEl, primaryImage, jsonImage);
+                    if (displayName) imgEl.alt = displayName;
+                }
+
+                const webEl = card.querySelector('[data-field="website"]');
+                if (webEl && websiteUrl) {
+                    webEl.href = websiteUrl;
+                    webEl.textContent = displayName ? `${displayName} on the web` : 'Visit Website';
+                    webEl.style.display = 'block';
+                } else if (webEl) {
+                    webEl.style.display = 'none';
+                }
+            });
+        }
+
+        if (this._heroVars) {
+            const stops = this._districtCopy?.itinerary?.stops || [];
+            const stop0Role = stops[0] ? getStopHostRole(stops[0], 0) : null;
+            const stop1Role = stops[1] ? getStopHostRole(stops[1], 1) : null;
+            if (stop0Role && resolvedNames[stop0Role]) this._heroVars.firstStopBusiness = resolvedNames[stop0Role];
+            if (stop1Role && resolvedNames[stop1Role]) this._heroVars.secondStopBusiness = resolvedNames[stop1Role];
+
+            const displayed = this._displayedElectionState || window.currentElectionState;
+            if (displayed === 'post-election' || displayed === 'post-event') {
+                this.updateHeroIntro(displayed);
             }
         }
     }

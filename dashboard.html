@@ -458,7 +458,7 @@
     <script type="module">
         import { auth, db, storage } from "./js/firebase-config.js";
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
-        import { collection, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, increment, arrayUnion, query, where, orderBy, collectionGroup } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+        import { collection, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, increment, arrayUnion, arrayRemove, query, where, orderBy, collectionGroup } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
         import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-storage.js";
         import { isAdminUser } from "./js/admin-auth.js";
 
@@ -478,6 +478,112 @@
                 let allData = [];
         let currentSort = { column: 'time', direction: 'desc' };
         let globalVenues = null; // Cache to save database reads
+
+        function escapeHtml(str) {
+            return String(str ?? '').replace(/[&<>"']/g, (c) => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[c]));
+        }
+
+        async function invalidateCheckin(venueId, userId, triggerBtn) {
+            if (!venueId || !userId) {
+                alert("Missing venue or user ID for this check-in.");
+                return;
+            }
+            if (!confirm("Are you sure you want to invalidate this check-in? This will remove the check-in record and photo from the photo wall.")) return;
+
+            if (triggerBtn) {
+                triggerBtn.disabled = true;
+                triggerBtn.textContent = "Invalidating…";
+            }
+
+            try {
+                const customerRef = doc(db, "venues", venueId, "customers", userId);
+                const customerSnap = await getDoc(customerRef);
+                const customerData = customerSnap.exists() ? customerSnap.data() : null;
+
+                if (!customerData) {
+                    alert("Check-in record not found — it may have already been removed.");
+                    await fetchData(true);
+                    return;
+                }
+
+                await deleteDoc(customerRef);
+
+                const venueRef = doc(db, "venues", venueId);
+                const venueSnap = await getDoc(venueRef);
+                const venueVisitCount = venueSnap.exists() ? (venueSnap.data().visitCount || 0) : 0;
+                if (venueVisitCount > 0) {
+                    await updateDoc(venueRef, { visitCount: increment(-1) });
+                }
+
+                const userRef = doc(db, "users", userId);
+                const userSnap = await getDoc(userRef);
+                const userUpdates = {
+                    notifications: arrayUnion("Your check-in at a venue was invalidated. Please ensure your photo clearly shows the required elements.")
+                };
+                if (userSnap.exists()) {
+                    const checkIns = userSnap.data().checkIns || [];
+                    if (checkIns.includes(venueId)) {
+                        userUpdates.checkIns = arrayRemove(venueId);
+                        const currentPoints = userSnap.data().totalPoints || 0;
+                        if (currentPoints >= 50) {
+                            userUpdates.totalPoints = increment(-50);
+                        }
+                    }
+                }
+                await setDoc(userRef, userUpdates, { merge: true });
+
+                alert("Check-in invalidated.");
+                await fetchData(true);
+            } catch (e) {
+                console.error("Error invalidating check-in:", e);
+                alert("Error invalidating check-in: " + e.message);
+            } finally {
+                if (triggerBtn) {
+                    triggerBtn.disabled = false;
+                    triggerBtn.textContent = "Invalidate Check-in";
+                }
+            }
+        }
+
+        async function banUser(userId, triggerBtn) {
+            if (!userId) return;
+            if (!confirm("Are you sure you want to ban this user? They will no longer be able to check-in or vote.")) return;
+
+            if (triggerBtn) {
+                triggerBtn.disabled = true;
+                triggerBtn.textContent = "Banning…";
+            }
+
+            try {
+                await setDoc(doc(db, "users", userId), {
+                    isBanned: true,
+                    notifications: arrayUnion("Your account has been suspended due to suspicious activity. You can no longer participate in voting or check-ins.")
+                }, { merge: true });
+                alert("User banned.");
+            } catch (e) {
+                console.error("Error banning user:", e);
+                alert("Error banning user: " + e.message);
+            } finally {
+                if (triggerBtn) {
+                    triggerBtn.disabled = false;
+                    triggerBtn.textContent = "Ban User";
+                }
+            }
+        }
+
+        tbody.addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-action]');
+            if (!btn || btn.disabled) return;
+
+            const { action, venueId, userId } = btn.dataset;
+            if (action === 'invalidate-checkin') {
+                invalidateCheckin(venueId, userId, btn);
+            } else if (action === 'ban-user') {
+                banUser(userId, btn);
+            }
+        });
 
         // Authentication check & Authorization
         onAuthStateChanged(auth, async (user) => {
@@ -600,8 +706,9 @@
 
             tbody.innerHTML = filteredData.map(row => {
                 let photoHTML = '';
+                const safePhotoUrl = row.photoUrl ? escapeHtml(row.photoUrl) : '';
                 if (row.photoUrl && row.photoUrl !== "pending_upload" && row.photoUrl !== "Pending Upload") {
-                    photoHTML = `<img src="${row.photoUrl}" class="thumbnail" data-full="${row.photoUrl}" alt="Check-in">`;
+                    photoHTML = `<img src="${safePhotoUrl}" class="thumbnail" data-full="${safePhotoUrl}" alt="Check-in">`;
                 } else if (row.photoStatus === "pending" || row.photoUrl === "pending_upload") {
                     photoHTML = `<div class="thumbnail-placeholder">Pending</div>`;
                 } else {
@@ -610,17 +717,17 @@
 
                 return `
                     <tr>
-                        <td style="font-size: 0.9rem; color: var(--text-secondary);">${row.timeFormatted}</td>
-                        <td style="font-weight: bold;">${row.business}</td>
+                        <td style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(row.timeFormatted)}</td>
+                        <td style="font-weight: bold;">${escapeHtml(row.business)}</td>
                         <td>
-                            ${row.user}
-                            <div style="font-size: 0.8rem; color: var(--text-secondary);">${row.email}</div>
+                            ${escapeHtml(row.user)}
+                            <div style="font-size: 0.8rem; color: var(--text-secondary);">${escapeHtml(row.email)}</div>
                         </td>
                         <td style="text-align: center;">${row.visits}</td>
                         <td>${photoHTML}</td>
                         <td style="font-size: 0.8rem;">
-                            <button onclick="window.invalidateCheckin('${row.venueId}', '${row.userId}')" style="margin-bottom: 5px; background: #6b3333; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; width: 100%;">Invalidate Check-in</button><br>
-                            <button onclick="window.banUser('${row.userId}')" style="background: #333; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; width: 100%;">Ban User</button>
+                            <button type="button" data-action="invalidate-checkin" data-venue-id="${escapeHtml(row.venueId)}" data-user-id="${escapeHtml(row.userId)}" style="margin-bottom: 5px; background: #6b3333; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; width: 100%;">Invalidate Check-in</button><br>
+                            <button type="button" data-action="ban-user" data-user-id="${escapeHtml(row.userId)}" style="background: #333; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; width: 100%;">Ban User</button>
                         </td>
                     </tr>
                 `;
@@ -1074,49 +1181,7 @@
         });
 
 
-        // --- ADMIN ACTIONS ---
-        window.invalidateCheckin = async (venueId, userId) => {
-            if (!confirm("Are you sure you want to invalidate this check-in? This will decrement the venue's visit count and remove the check-in photo.")) return;
-            
-            try {
-                // Delete check-in doc
-                await deleteDoc(doc(db, "venues", venueId, "customers", userId));
-                
-                // Decrement venue total
-                const venueRef = doc(db, "venues", venueId);
-                const venueSnap = await getDoc(venueRef);
-                if (venueSnap.exists() && venueSnap.data().visitCount > 0) {
-                    await updateDoc(venueRef, { visitCount: increment(-1) });
-                }
-                
-                // Add notification to user
-                await updateDoc(doc(db, "users", userId), {
-                    notifications: arrayUnion(`Your check-in at a venue was invalidated. Please ensure your photo clearly shows the required elements.`)
-                });
-                
-                alert("Check-in invalidated.");
-                fetchData(true); // Refresh
-            } catch (e) {
-                console.error("Error invalidating check-in:", e);
-                alert("Error invalidating check-in: " + e.message);
-            }
-        };
-
-        window.banUser = async (userId) => {
-            if (!confirm("Are you sure you want to ban this user? They will no longer be able to check-in or vote.")) return;
-            
-            try {
-                await setDoc(doc(db, "users", userId), { 
-                    isBanned: true,
-                    notifications: arrayUnion("Your account has been suspended due to suspicious activity. You can no longer participate in voting or check-ins.")
-                }, { merge: true });
-                alert("User banned.");
-            } catch (e) {
-                console.error("Error banning user:", e);
-                alert("Error banning user: " + e.message);
-            }
-        };
-
+        // --- ADMIN ACTIONS (votes) ---
         window.expandVotes = async (venueId) => {
             const row = document.getElementById(`votes-expand-${venueId}`);
             const contentDiv = document.getElementById(`votes-content-${venueId}`);
