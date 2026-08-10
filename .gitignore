@@ -6,3 +6,12 @@ __pycache__/
 node_modules/
 districts_after_dark.code-workspace
 scripts/og_build/libs/
+
+# Local Puppeteer Chrome install (used for PNG export only)
+.puppeteer-cache/
+
+# Generated congrats-post layer PNGs (export locally, do not commit)
+assets/congrats-post/
+
+# Puppeteer temp export HTML
+image_generator/_temp_reveal_export_*.html
